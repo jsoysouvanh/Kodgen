@@ -1,0 +1,31 @@
+#Temp folders
+Build/
+Binaries/
+Logs/
+enc_temp_folder/
+
+#logs
+*.bsc
+*.htm
+
+#Python
+*.pyc
+
+# Binaries
+*.exe
+*.iobj
+*.ipdb
+*.pdb
+*.ilk
+*.dmp
+
+# Visual Studio Files
+*.suo
+*.csproj.user
+*.vbproj.user
+*.user
+*.vcxproj.filters
+*.vcxproj.user
+ipch
+*sdf
+\.vs/
