@@ -2,14 +2,26 @@ language: cpp
 compiler:
 - clang
 - gcc
+
+
 os: linux
 dist: bionic
+
+
 script:
-- mkdir build
-- cd build
+- cd Refureku
+- mkdir -p Build
+- cd Build
+- cmake ..
+- cmake --build .
+- ./exe
+
+
 branches:
   except:
   - Experimental
+
+
 notifications:
   email: false
   slack:
