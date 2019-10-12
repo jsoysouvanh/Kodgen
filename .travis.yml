@@ -1,20 +1,18 @@
 language: cpp
 compiler:
-  - clang
-  - gcc
-
+- clang
+- gcc
 os: linux
 dist: bionic
-
 script:
-  - mkdir build
-  - cd build
-
-# Don't trigger build when pushing on Experimental
+- mkdir build
+- cd build
 branches:
   except:
-    - Experimental
-
-# No email notifications
+  - Experimental
 notifications:
   email: false
+  slack:
+    secure: HaT4cteCiIJYL/YoYN7zFB7me/JRaIvkF7KdsGIus7fSzi9faNke08+lJX849p3xkLC7MMQ1I1/ZnLfbtS97IO3rO9Bi0UiaFrkr4vKIWRsaY/NkGJT7lQaCY15Nlgv1yjudy1vRrSTMMzsxEgpEAp5gD3hfbzbsYqDlnGtWTWaVC9M2XPRaEo3j7tvYEUQ/nqUafL8J/YSdm3pBm514Vv2UoGRaWy+8yAy+Lez2Gy9XrITruuJx4ZEtS32XuC/jZRXAqZw/N7+wrV0kgJcPyvk9jRl6vMztCJtwVuGZgEezhvVFPSj7zk4bhN09n/q7QPIlSoTV12nWARfyCDi38uG8YCPrbhYIuVYit20gGWJykMlE4bPI3NsWBpfphAbWAUWkMZlzgnJcMJPZfZ6R6/nhn4XjypFXsis9ar939sj7+ZvA09lPZ0bTGhkj2Q7c2Wz67MHHlkkJKpgl7gIvxuKs9DP62ThxMjvi/2vH1F4lqRZzIwqqP6f1yrqtPuPX8RRPpWf+pdw92w4MAiEQ5ecPKlCXqQe1+n3DBhrprbhSAeOdaTBgNY+7N4kV0JxChv8tcZ/EyWFye6lKa2KqcgJxUwrn4bx4nny6wfvgtysImpgObgOIDM+HTgUZobvcL8F5GXjh6tApZOILPL0Oe+wClnceXqwBbvBwWgyEpug=
+    on_success: always
+    on_failure: always
