@@ -1,0 +1,20 @@
+language: cpp
+compiler:
+  - clang
+  - gcc
+
+os: linux
+dist: bionic
+
+script:
+  - mkdir build
+  - cd build
+
+# Don't trigger build when pushing on Experimental
+branches:
+  except:
+    - Experimental
+
+# No email notifications
+notifications:
+  email: false
