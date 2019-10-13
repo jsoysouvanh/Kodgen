@@ -14,7 +14,7 @@ script:
 - cd Build
 - cmake ..
 - cmake --build .
-- ./exe
+- ./Binaries/exe
 
 
 branches:
