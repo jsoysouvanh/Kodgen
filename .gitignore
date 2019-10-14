@@ -8,9 +8,6 @@ enc_temp_folder/
 *.bsc
 *.htm
 
-#Python
-*.pyc
-
 # Binaries
 *.exe
 *.iobj
