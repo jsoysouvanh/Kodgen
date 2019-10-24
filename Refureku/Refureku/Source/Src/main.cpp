@@ -36,12 +36,14 @@ int main()
 	std::filesystem::path includeDirPath	= std::filesystem::current_path() / "Source" / "Include";
 	std::filesystem::path pathToFile		= includeDirPath / "TestClass.h";
 
-	char const** commandLine = new char const*[2];
+	char const** commandLine = new char const*[4];
 	commandLine[0] = "-x";
 	commandLine[1] = "c++";
+	commandLine[2] = "-D";
+	commandLine[3] = "PARSER";
 
 	CXIndex				index	= clang_createIndex(0, 0);
-	CXTranslationUnit	unit	= clang_parseTranslationUnit(index, pathToFile.string().c_str(), commandLine, 2, nullptr, 0, CXTranslationUnit_None);
+	CXTranslationUnit	unit	= clang_parseTranslationUnit(index, pathToFile.string().c_str(), commandLine, 4, nullptr, 0, CXTranslationUnit_None);
 
 	if (unit != nullptr)
 	{
