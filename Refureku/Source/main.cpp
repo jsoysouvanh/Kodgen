@@ -33,7 +33,7 @@ CXChildVisitResult visitor( CXCursor cursor, CXCursor /* parent */, CXClientData
 
 int main()
 {
-	fs::path includeDirPath	= fs::current_path().parent_path().parent_path().parent_path().parent_path() / "Include";
+	fs::path includeDirPath	= fs::current_path().parent_path().parent_path().parent_path() / "Include";
 	fs::path pathToFile		= includeDirPath / "TestClass.h";
 
 	std::cout << includeDirPath.string() << std::endl;
@@ -59,7 +59,7 @@ int main()
 	else
 	{
 		std::cerr << "Unable to parse translation unit" << std::endl;
-		exit(-1);
+		//exit(-1);
 	}
 
 	/*CXIndex index        = clang_createIndex(0, 0);

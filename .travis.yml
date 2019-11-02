@@ -49,13 +49,12 @@ script:
 - mkdir -p Debug && cd $_
 - cmake --config Debug ../..
 - cmake --build . -- VERBOSE=1
-- make --no-print-directory
-- ./Binaries/Debug/exe
+- ./Binaries/refureku
 - cd ..
 - mkdir -p Release && cd $_
 - cmake --config Release ../..
 - cmake --build . -- VERBOSE=1
-- ./Binaries/Release/exe
+- ./Binaries/refureku
 
 
 branches:
