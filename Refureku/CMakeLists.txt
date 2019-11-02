@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.8)
 
+message("Cmake:		${CMAKE_VERSION}")
+message("Compiler:	${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
+
 project(Refureku)
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY Binaries)
@@ -20,6 +23,3 @@ set_target_properties(refureku
 					 )
 
 target_link_libraries(refureku general libclang)
-
-message("--------------------------------")
-message("Compiler: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
