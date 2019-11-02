@@ -51,8 +51,7 @@ if (IS_SUPPORTED_COMPILER)
 	add_executable(refureku Source/main.cpp)
 
 	# Link to required libraries
-	target_link_libraries(refureku PRIVATE libclang)
-	target_link_libraries(refureku PRIVATE -lc++abi)
+	target_link_libraries(refureku PRIVATE $<IF:$<PLATFORM_ID:Linux>,libclang.a,libclang.lib>)
 
 	# Setup language requirements
 	set_target_properties(refureku
