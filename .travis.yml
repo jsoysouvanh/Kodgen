@@ -7,13 +7,19 @@ matrix:
   include:
     - compiler: clang
       before_install:
-        - wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-        - sudo apt-add-repository -y "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main"
-        - sudo apt-get -q update
-        - sudo apt-get -y install clang-9 lld-9
-        - eval "${MATRIX_EVAL}"
-      env:
-         - MATRIX_EVAL="CC=clang-9 && CXX=clang++-9"
+#        - wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+#        - sudo apt-add-repository -y "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main"
+#        - sudo apt-get -q update
+#        - sudo apt-get -y install clang-9 lld-9 libc++-dev libc++abi-dev
+         - sudo apt-get -y install build-essential xz-utils curl
+         - curl -SL http://releases.llvm.org/9.0.0/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz | tar -xJC .
+         - mv clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04 clang_9.0.0
+         - sudo mv clang_9.0.0 /usr/local
+         - export PATH=/usr/local/clang_9.0.0/bin:$PATH
+         - export LD_LIBRARY_PATH=/usr/local/clang_9.0.0/lib:$LD_LIBRARY_PATH
+#         - eval "${MATRIX_EVAL}"
+#      env:
+#         - MATRIX_EVAL="CC=clang-9 && CXX=clang++-9"
     - compiler: gcc
       before_install:
         - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
@@ -39,11 +45,17 @@ install:
 
 script:
 - cd Refureku
-- mkdir -p Build
-- cd Build
-- cmake ..
-- cmake --build .
-- ./Binaries/exe
+- mkdir -p Build && cd $_
+- mkdir -p Debug && cd $_
+- cmake --config Debug ../..
+- cmake --build . -- VERBOSE=1
+- make --no-print-directory
+- ./Binaries/Debug/exe
+- cd ..
+- mkdir -p Release && cd $_
+- cmake --config Release ../..
+- cmake --build . -- VERBOSE=1
+- ./Binaries/Release/exe
 
 
 branches:

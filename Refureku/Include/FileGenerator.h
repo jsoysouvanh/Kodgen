@@ -8,24 +8,14 @@ namespace refureku
 	class FileGenerator
 	{
 		private:
-			#pragma region Variables
-
 			std::set<std::filesystem::path>	_includedFiles;
 			std::set<std::filesystem::path>	_includedDirectories;
-
-			#pragma endregion
 
 		protected:
 
 		public:
-			#pragma region Constructors/Destructor
-
 			FileGenerator() noexcept;
 			~FileGenerator() noexcept;
-
-			#pragma endregion
-
-			#pragma region Methods
 
 			/**
 			*	Add a file to the list of files to parse.
@@ -38,7 +28,5 @@ namespace refureku
 			*	All files contained in any included directory will be parsed.
 			*/
 			void AddDirectory(std::filesystem::path const& dirPath) noexcept;
-
-			#pragma endregion
 	};
 }
