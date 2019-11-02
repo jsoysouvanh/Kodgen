@@ -3,7 +3,7 @@
 
 #include <clang-c/Index.h>
 
-#include "TestClass.h"
+#include "FileGenerator.h"
 
 std::string getString(CXString const& str)
 {
@@ -33,17 +33,15 @@ CXChildVisitResult visitor( CXCursor cursor, CXCursor /* parent */, CXClientData
 
 int main()
 {
-	std::filesystem::path includeDirPath	= std::filesystem::current_path() / "Source" / "Include";
+	std::filesystem::path includeDirPath	= std::filesystem::current_path().parent_path().parent_path().parent_path() / "Include";
 	std::filesystem::path pathToFile		= includeDirPath / "TestClass.h";
 
-	char const** commandLine = new char const*[4];
-	commandLine[0] = "-x";
-	commandLine[1] = "c++";
-	commandLine[2] = "-D";
-	commandLine[3] = "PARSER";
+	std::cout << includeDirPath.string() << std::endl;
+
+	char* commandLine[] = { "-x", "c++", "-D", "PARSER" };
 
 	CXIndex				index	= clang_createIndex(0, 0);
-	CXTranslationUnit	unit	= clang_parseTranslationUnit(index, pathToFile.string().c_str(), commandLine, 4, nullptr, 0, CXTranslationUnit_None);
+	CXTranslationUnit	unit	= clang_parseTranslationUnit(index, pathToFile.string().c_str(), commandLine, sizeof(commandLine) / sizeof(char*), nullptr, 0, CXTranslationUnit_None);
 
 	if (unit != nullptr)
 	{
@@ -76,8 +74,10 @@ int main()
 
 	clang_visitChildren( rootCursor, visitor, &treeLevel );
 
-	clang_disposeTranslationUnit( tu );
-	clang_disposeIndex( index );*/
+	*/
+
+	clang_disposeTranslationUnit(unit);
+	clang_disposeIndex(index);
 
 	return EXIT_SUCCESS;
 }

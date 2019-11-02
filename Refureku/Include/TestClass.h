@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef PARSER
-#define TURBO_PROP(...)	__attribute__((annotate("TURBO_PROP: "#__VA_ARGS__)))
+#define TURBO_PROP(...)	__attribute__((annotate(#__VA_ARGS__)))
 #else
 #define TURBO_PROP(...)	
 #endif
@@ -15,6 +15,7 @@ class TestClass final
 		int				var1 = 42;
 		float			var2;
 		MyAwesomeType*	var3 = nullptr;
+		class Hey*		var4 = nullptr;
 
 		#pragma endregion
 
