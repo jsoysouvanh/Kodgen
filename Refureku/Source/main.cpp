@@ -1,9 +1,9 @@
 #include <iostream>
-#include <filesystem>
 
 #include <clang-c/Index.h>
 
-//#include "FileGenerator.h"
+#include "SafeFilesystem.h"
+#include "FileGenerator.h"
 
 std::string getString(CXString const& str)
 {
@@ -33,8 +33,8 @@ CXChildVisitResult visitor( CXCursor cursor, CXCursor /* parent */, CXClientData
 
 int main()
 {
-	std::filesystem::path includeDirPath	= std::filesystem::current_path().parent_path().parent_path().parent_path() / "Include";
-	std::filesystem::path pathToFile		= includeDirPath / "TestClass.h";
+	fs::path includeDirPath	= fs::current_path().parent_path().parent_path().parent_path() / "Include";
+	fs::path pathToFile		= includeDirPath / "TestClass.h";
 
 	std::cout << includeDirPath.string() << std::endl;
 
