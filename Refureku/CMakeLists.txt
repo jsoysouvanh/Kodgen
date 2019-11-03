@@ -52,19 +52,13 @@ if (IS_SUPPORTED_COMPILER)
 	add_executable(refureku Source/main.cpp)
 
 	# Link to required libraries
-	#target_link_libraries(refureku PRIVATE $<IF:$<PLATFORM_ID:Linux>,,libclang.lib>)
-
 	set(THREADS_PREFER_PTHREAD_FLAG ON)
 	find_package(Threads REQUIRED)
 
 	if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-#		target_link_libraries(refureku PRIVATE $<$<CXX_COMPILER_ID:Clang>:c++abi>)
 		target_link_libraries(refureku PRIVATE
 								$<$<CXX_COMPILER_ID:Clang>:c++>
 								$<$<CXX_COMPILER_ID:Clang>:c++abi>
-#								$<$<CXX_COMPILER_ID:Clang>:c>
-#								$<$<CXX_COMPILER_ID:Clang>:gcc_s>
-#								$<$<CXX_COMPILER_ID:Clang>:gcc>
 								libclang.a
 								libclangAST.a
 								libclangBasic.a
