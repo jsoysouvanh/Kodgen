@@ -9,8 +9,7 @@ set(IS_CLANG_OR_GCC NO)
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	
 	add_compile_options(-stdlib=libc++)
-	#link_libraries(-stdlib=libc++)
-	
+
 	set(IS_SUPPORTED_COMPILER YES)
 
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -55,8 +54,7 @@ if (IS_SUPPORTED_COMPILER)
 	set(THREADS_PREFER_PTHREAD_FLAG ON)
 	find_package(Threads REQUIRED)
 
-	if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-		target_link_libraries(refureku PRIVATE
+	target_link_libraries(refureku PRIVATE
 								$<$<CXX_COMPILER_ID:Clang>:c++>
 								$<$<CXX_COMPILER_ID:Clang>:c++abi>
 								clang
@@ -225,13 +223,7 @@ if (IS_SUPPORTED_COMPILER)
 								Threads::Threads
 								m
 								LLVMDemangle
-		)
-	elseif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-		target_link_libraries(refureku PRIVATE 
-								libclang.lib
-		)
-	endif()
-
+	)
 
 	# Setup language requirements
 	set_target_properties(refureku
