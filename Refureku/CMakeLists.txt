@@ -9,7 +9,7 @@ set(IS_CLANG_OR_GCC NO)
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	
 	add_compile_options(-stdlib=libc++)
-	link_libraries(-stdlib=libc++)
+	#link_libraries(-stdlib=libc++)
 	
 	set(IS_SUPPORTED_COMPILER YES)
 
@@ -58,12 +58,13 @@ if (IS_SUPPORTED_COMPILER)
 	find_package(Threads REQUIRED)
 
 	if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+#		target_link_libraries(refureku PRIVATE $<$<CXX_COMPILER_ID:Clang>:c++abi>)
 		target_link_libraries(refureku PRIVATE
 								$<$<CXX_COMPILER_ID:Clang>:c++>
 								$<$<CXX_COMPILER_ID:Clang>:c++abi>
-								$<$<CXX_COMPILER_ID:Clang>:c>
-								$<$<CXX_COMPILER_ID:Clang>:gcc_s>
-								$<$<CXX_COMPILER_ID:Clang>:gcc>
+#								$<$<CXX_COMPILER_ID:Clang>:c>
+#								$<$<CXX_COMPILER_ID:Clang>:gcc_s>
+#								$<$<CXX_COMPILER_ID:Clang>:gcc>
 								libclang.a
 								libclangAST.a
 								libclangBasic.a
