@@ -205,9 +205,7 @@ target_link_libraries(refureku PRIVATE
 							LLVMDebugInfoCodeView
 							LLVMDebugInfoMSF
 							z
-#							$<$<PLATFORM_ID:Linux>:rt>
 							$<$<PLATFORM_ID:Linux>:dl>
 							Threads::Threads
-#							$<$<PLATFORM_ID:Linux>:m>
 							LLVMDemangle
 )
