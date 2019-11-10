@@ -61,16 +61,16 @@ matrix:
 #      env:
 #        - CMAKE_GENERATOR="Visual Studio 15 2017 Win64"
 
-    - os: windows
-      before_install:
+#    - os: windows
+#      before_install:
         # Install gcc 9.0
-        - choco feature enable -n=allowGlobalConfirmation
-        - choco upgrade visualstudio2017buildtools
+#        - choco feature enable -n=allowGlobalConfirmation
+#        - choco upgrade visualstudio2017buildtools
 
         # Install Cmake 3.8.1
-        - choco upgrade cmake --version=3.8.1
-      env:
-        - CMAKE_GENERATOR="Visual Studio 15 2017 Win64"
+#        - choco upgrade cmake --version=3.8.1
+#      env:
+#        - CMAKE_GENERATOR="Visual Studio 15 2017 Win64"
 
 script:
   - cd Refureku
@@ -80,7 +80,7 @@ script:
   # Debug test
   - mkdir -p Debug
   - cd Debug
-  - cmake -G ${CMAKE_GENERATOR} --config Debug ../..
+  - cmake --config Debug ../..
   - cmake --build . -- VERBOSE=1
   - ./Binaries/refureku
  
@@ -89,7 +89,7 @@ script:
   # Release test
   - mkdir -p Release
   - cd Release
-  - cmake -G ${CMAKE_GENERATOR} --config Release ../..
+  - cmake --config Release ../..
   - cmake --build . -- VERBOSE=1
   - ./Binaries/refureku
 
