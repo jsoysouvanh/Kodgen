@@ -1,11 +1,11 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.10)
 
 project(Refureku)
 
 # Handle specific flags for each supported compiler
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	
-	# Nothing at the moment
+	add_compile_options(-stdlib=libc++)
 
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	
@@ -25,6 +25,8 @@ endif()
 message("Cmake:		${CMAKE_VERSION}")
 message("Compiler:	${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
 
+
+
 # Setup include directories
 include_directories(Include)
 include_directories(Libraries/Include)
@@ -33,8 +35,8 @@ include_directories(Libraries/Include)
 link_directories(Libraries/x64/Static)
 
 # Setup output directory
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY Bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY Lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY Lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY Bin)
 
 # Setup warning level
 if (MSVC)
@@ -45,6 +47,14 @@ endif()
 
 # Setup executable / lib
 add_executable(refureku Source/main.cpp)
+
+# Setup language requirements
+set_target_properties(refureku
+					PROPERTIES
+					CXX_STANDARD 17
+					CXX_STANDARD_REQUIRED ON
+					CXX_EXTENSIONS OFF
+					)
 
 # Link to required libraries
 set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -164,30 +174,13 @@ target_link_libraries(refureku PRIVATE
 							clangAST
 							clangLex
 							clangBasic
-							LLVMAArch64Desc
-							LLVMAArch64Info
-							LLVMAArch64Utils
 							LLVMMIRParser
-							LLVMAMDGPUDesc
-							LLVMAMDGPUInfo
-							LLVMAMDGPUUtils
-							LLVMARMDesc
-							LLVMARMInfo
-							LLVMARMUtils
-							LLVMHexagonDesc
-							LLVMHexagonInfo
-							LLVMLanaiDesc
-							LLVMLanaiInfo
 							LLVMipo
 							LLVMVectorize
 							LLVMIRReader
 							LLVMAsmParser
 							LLVMInstrumentation
 							LLVMLinker
-							LLVMSystemZDesc
-							LLVMSystemZInfo
-							LLVMWebAssemblyDesc
-							LLVMWebAssemblyInfo
 							LLVMGlobalISel
 							LLVMAsmPrinter
 							LLVMDebugInfoDWARF
@@ -203,7 +196,6 @@ target_link_libraries(refureku PRIVATE
 							LLVMProfileData
 							LLVMObject
 							LLVMBitReader
-							LLVMCore
 							LLVMRemarks
 							LLVMBitstreamReader
 							LLVMMCParser
@@ -212,19 +204,10 @@ target_link_libraries(refureku PRIVATE
 							LLVMBinaryFormat
 							LLVMDebugInfoCodeView
 							LLVMDebugInfoMSF
-							LLVMSupport
 							z
-							rt
-							dl
+#							$<$<PLATFORM_ID:Linux>:rt>
+							$<$<PLATFORM_ID:Linux>:dl>
 							Threads::Threads
-							m
+#							$<$<PLATFORM_ID:Linux>:m>
 							LLVMDemangle
 )
-
-# Setup language requirements
-set_target_properties(refureku
-					PROPERTIES
-					CXX_STANDARD 17
-					CXX_STANDARD_REQUIRED ON
-					CXX_EXTENSIONS OFF
-					)
