@@ -1,15 +1,18 @@
 #pragma once
 
 #include <set>
-#include <filesystem>
+#include <string>
+
+#include "SafeFilesystem.h"
 
 namespace refureku
 {
 	class FileGenerator
 	{
 		private:
-			std::set<std::filesystem::path>	_includedFiles;
-			std::set<std::filesystem::path>	_includedDirectories;
+			std::set<fs::path>		_includedFiles;
+			std::set<fs::path>		_includedDirectories;
+			//std::set<std::string>	_;
 
 		protected:
 
@@ -18,15 +21,20 @@ namespace refureku
 			~FileGenerator() noexcept;
 
 			/**
-			*	Add a file to the list of files to parse.
+			*	@brief Add a file to the list of files to parse.
+			*
+			*	@return true on success (the path exists and is a file), else false
 			*/
-			void AddFile(std::filesystem::path const& filePath) noexcept;
+
+			bool AddFile(fs::path filePath) noexcept;
 
 			/**
-			*	Add a directory to the list of directories to parse.
-			*	All directories contained in the given directory will be recursively inspected.
-			*	All files contained in any included directory will be parsed.
+			*	@brief Add a directory to the list of directories to parse.
+			*	@brief All directories contained in the given directory will be recursively inspected.
+			*	@brief All files contained in any included directory will be parsed.
+			*
+			*	@return true on success (the path exists and is a directory), else false
 			*/
-			void AddDirectory(std::filesystem::path const& dirPath) noexcept;
+			bool AddDirectory(fs::path dirPath) noexcept;
 	};
 }
