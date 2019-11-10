@@ -1,6 +1,8 @@
 #Temp folders
 Build/
+Bin/
 Binaries/
+Lib/
 Logs/
 enc_temp_folder/
 
