@@ -46,7 +46,11 @@ else()	# Clang or GCC
 endif()
 
 # Setup executable / lib
-add_executable(refureku Source/main.cpp)
+add_executable(refureku
+				Source/main.cpp
+				Source/FileGenerator.cpp
+				Source/Parser.cpp
+				Source/ParsingInfo.cpp)
 
 # Setup language requirements
 set_target_properties(refureku

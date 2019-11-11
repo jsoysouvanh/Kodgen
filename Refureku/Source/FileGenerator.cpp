@@ -12,12 +12,22 @@ FileGenerator::~FileGenerator() noexcept
 
 }
 
-void FileGenerator::AddFile(std::filesystem::path const& filePath) noexcept
+bool FileGenerator::AddFile(fs::path filePath) noexcept
 {
-	//_includedFiles.insert()
+	if (fs::exists(filePath) && !fs::is_directory(filePath))
+	{
+		return _includedFiles.insert(std::move(filePath)).second;
+	}
+
+	return false;
 }
 
-void FileGenerator::AddDirectory(std::filesystem::path const& dirPath) noexcept
+bool FileGenerator::AddDirectory(fs::path dirPath) noexcept
 {
+	if (fs::exists(dirPath) && fs::is_directory(dirPath))
+	{
+		return _includedDirectories.insert(std::move(dirPath)).second;
+	}
 
+	return false;
 }
