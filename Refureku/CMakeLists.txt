@@ -49,7 +49,8 @@ endif()
 add_executable(refureku
 				Source/main.cpp
 				Source/FileGenerator.cpp
-				Source/Parser.cpp)
+				Source/Parser.cpp
+				Source/ParsingInfo.cpp)
 
 # Setup language requirements
 set_target_properties(refureku
