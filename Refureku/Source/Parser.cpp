@@ -2,11 +2,9 @@
 
 #include <iostream>
 
-#include "ParsingInfo.h"
+#include "InfoStructures/ParsingInfo.h"
 
 using namespace refureku;
-
-char const* Parser::_parseArguments[] = { "-x", "c++", "-D", "PARSER" };
 
 Parser::Parser() noexcept:
 	_clangIndex{clang_createIndex(0, 0)}
@@ -23,7 +21,7 @@ std::string Parser::getString(CXString&& clangString)
 	std::string result = clang_getCString(clangString);
 	clang_disposeString(clangString);
 
-	return std::move(result);
+	return result;
 }
 
 CXChildVisitResult Parser::staticParseCursor(CXCursor c, CXCursor parent, CXClientData clientData)
@@ -85,15 +83,15 @@ void Parser::updateParsingState(CXCursor parent, ParsingInfo* parsingInfo)
 
 CXChildVisitResult Parser::parseCursor(CXCursor currentCursor, CXCursor parentCursor, ParsingInfo* parsingInfo)
 {
-	if (parsingInfo->classStructLevel)
+	if (parsingInfo->classStructLevel)		//Currently parsing a class of struct
 	{
 		return parseClassContent(currentCursor, parsingInfo);
 	}
-	else if (parsingInfo->isParsingEnum)
-	{
+	else if (parsingInfo->isParsingEnum)	//Currently parsing an enum
+	{	
 		return parseEnumContent(currentCursor, parsingInfo);
 	}
-	else
+	else									//Looking for something to parse
 	{
 		return parseDefault(currentCursor, parsingInfo);
 	}

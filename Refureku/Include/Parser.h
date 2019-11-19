@@ -11,7 +11,7 @@ namespace refureku
 	class Parser
 	{
 		private:
-			static char const* _parseArguments[];
+			static constexpr char const* _parseArguments[] = { "-x", "c++", "-D", "PARSER" };
 
 			static CXChildVisitResult	staticParseCursor(CXCursor c, CXCursor parent, CXClientData clientData);
 			static void					updateParsingState(CXCursor parent, ParsingInfo* parsingInfo);

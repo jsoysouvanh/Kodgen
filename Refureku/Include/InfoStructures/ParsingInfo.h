@@ -6,7 +6,7 @@
 #include "FundamentalTypes.h"
 #include "AccessSpecifier.h"
 
-#include "ClassInfo.h"
+#include "InfoStructures/ClassInfo.h"
 
 namespace refureku
 {

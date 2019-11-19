@@ -1,4 +1,4 @@
-#include "ParsingInfo.h"
+#include "InfoStructures/ParsingInfo.h"
 
 #include <iostream>	//TO DELETE
 
@@ -53,7 +53,7 @@ void ParsingInfo::endStructOrClassParsing()
 	classStructLevel--;
 	currentClassCursor = clang_getNullCursor();
 	shouldCheckValidity = false;
-	std::cout << "END STRUCT" << std::endl;
+	std::cout << "END CLASS/STRUCT" << std::endl;
 }
 
 void ParsingInfo::endFieldParsing()
@@ -82,8 +82,22 @@ void ParsingInfo::endEnumParsing()
 
 void ParsingInfo::updateAccessSpecifier(CXCursor const& enumCursor)
 {
-	switch (clang_getCXXAccessSpecifier(enumCursor))
+	accessSpecifier = static_cast<AccessSpecifier>(1 << clang_getCXXAccessSpecifier(enumCursor));
+
+	//TODO delete this
+	switch (accessSpecifier)
 	{
-		//case CX_CXXAccessSpecifier::
+		case AccessSpecifier::Private:
+			std::cout << " -- Private:" << std::endl;
+			break;
+		case AccessSpecifier::Protected:
+			std::cout << " -- Protected:" << std::endl;
+			break;
+		case AccessSpecifier::Public:
+			std::cout << " -- Public:" << std::endl;
+			break;
+		default:
+			std::cout << " -- Invalid:" << std::endl;
+			break;
 	}
 }

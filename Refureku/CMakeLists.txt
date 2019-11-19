@@ -50,7 +50,11 @@ add_executable(refureku
 				Source/main.cpp
 				Source/FileGenerator.cpp
 				Source/Parser.cpp
-				Source/ParsingInfo.cpp)
+				Source/Properties/SimplePropertyRule.cpp
+				Source/Properties/ComplexPropertyRule.cpp
+				Source/Properties/PropertyRules.cpp
+				Source/InfoStructures/ClassInfo.cpp
+				Source/InfoStructures/ParsingInfo.cpp)
 
 # Setup language requirements
 set_target_properties(refureku
