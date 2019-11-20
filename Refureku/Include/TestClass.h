@@ -4,9 +4,7 @@
 
 namespace TestNamespace
 {
-	//TURBO_PROP(template <typename MyAwesomeType> is following)
-	//template <typename MyAwesomeType>
-	class RfrkClass(Heyoooooooooooooooooo) TestClass final
+	class RfrkClass(Prop1, Prop2[SubProp21/ SubProp22], Prop3) TestClass final
 	{
 		private:
 		#pragma region Variables

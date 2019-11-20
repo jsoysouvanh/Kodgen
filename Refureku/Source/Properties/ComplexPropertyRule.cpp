@@ -4,14 +4,14 @@ using namespace refureku;
 
 ComplexPropertyRule::ComplexPropertyRule(std::string&& name, std::string&& argumentPattern)	noexcept:
 	SimplePropertyRule(std::forward<std::string>(name)),
-	argumentPattern{std::forward<std::string>(argumentPattern)}
+	subPropertyPattern{std::forward<std::string>(argumentPattern)}
 {}
 
-bool ComplexPropertyRule::isValidArgument(std::string const& argument) const noexcept
+bool ComplexPropertyRule::isValidSubProperty(std::string const& argument) const noexcept
 {
 	std::match_results<std::string::const_iterator>	matchResults;
 
-	if (std::regex_search(argument, matchResults, argumentPattern, std::regex_constants::match_default))
+	if (std::regex_search(argument, matchResults, subPropertyPattern, std::regex_constants::match_default))
 	{
 		return matchResults.prefix().str().empty() && matchResults.suffix().str().empty();
 	}

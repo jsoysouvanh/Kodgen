@@ -183,6 +183,11 @@ bool Parser::isClassValid(CXCursor currentCursor, ParsingInfo* parsingInfo) noex
 
 	parsingInfo->shouldCheckValidity = false;
 
+	if (cursorKind == CXCursorKind::CXCursor_AnnotateAttr)
+	{
+		std::optional<PropertyGroup> classProperties = parsingInfo->propertyParser->getClassProperties(Parser::getString(clang_getCursorSpelling(currentCursor)));
+	}
+
 	return (cursorKind == CXCursorKind::CXCursor_AnnotateAttr && true/* TODO If notation is valid for a class, add the class*/);
 }
 
@@ -281,7 +286,7 @@ bool Parser::isEnumValid(CXCursor currentCursor, ParsingInfo* parsingInfo) noexc
 	return (cursorKind == CXCursorKind::CXCursor_AnnotateAttr && true/* TODO If notation is valid for an enum, add the enum*/);
 }
 
-bool Parser::parse(fs::path const& parseFile) const noexcept
+bool Parser::parse(fs::path const& parseFile) noexcept
 {
 	bool isSuccess = false;
 
@@ -293,6 +298,9 @@ bool Parser::parse(fs::path const& parseFile) const noexcept
 		if (translationUnit != nullptr)
 		{
 			ParsingInfo parsingInfo;
+			
+			propertyParser.setup();
+			parsingInfo.propertyParser = &propertyParser;
 
 			//Get the root cursor for this translation unit
 			CXCursor cursor = clang_getTranslationUnitCursor(translationUnit);

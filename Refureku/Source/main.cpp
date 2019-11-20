@@ -35,22 +35,32 @@ void propertyTests()
 	assert(propertyRules.getComplexProperty("RefurekuProp3") == nullptr);
 }
 
-int main()
+void parsingTests()
 {
 	fs::path includeDirPath	= fs::current_path().parent_path().parent_path().parent_path() / "Include";
 	fs::path pathToFile		= includeDirPath / "TestClass.h";
-	
-	//	std::cout << includeDirPath.string() << std::endl;
 
-	refureku::FileGenerator fg;
 	refureku::Parser parser;
+	parser.propertyParser.ignoredCharacters.insert(' ');	//Ignored white space
+	parser.propertyParser.subPropertySeparator = '/';
 
-	//parser.parse(pathToFile);
+	parser.parse(pathToFile);
+}
 
-	//fg.AddFile(fs::current_path());
-	//fg.AddDirectory(fs::current_path());
+void randomTests()
+{
+	std::string str = "abcdef";
 
-	propertyTests();
+	std::cout << str.substr(0, 5) << std::endl;
+}
+
+int main()
+{
+	//propertyTests();
+
+	parsingTests();
+
+	//randomTests();
 
 	return EXIT_SUCCESS;
 }

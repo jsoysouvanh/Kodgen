@@ -5,8 +5,8 @@
 
 #include "FundamentalTypes.h"
 #include "AccessSpecifier.h"
-
 #include "InfoStructures/ClassInfo.h"
+#include "Properties/PropertyParser.h"
 
 namespace refureku
 {
@@ -68,6 +68,11 @@ namespace refureku
 			/*
 			*	//TODO enumInfos;
 			**/
+
+			/**
+			*	
+			*/
+			PropertyParser*	propertyParser = nullptr;
 
 			ParsingInfo()	= default;
 			~ParsingInfo()	= default;

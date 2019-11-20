@@ -41,6 +41,6 @@ namespace refureku
 			Parser(Parser&&)		= default;
 			~Parser()				noexcept;
 
-			virtual bool parse(fs::path const& parseFile) const noexcept;
+			virtual bool parse(fs::path const& parseFile) noexcept;
 	};
 }
