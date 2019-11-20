@@ -4,17 +4,17 @@
 #include <vector>
 #include <clang-c/Index.h>
 
-#include "InfoStructures/EntityInfo.h"
 #include "AccessSpecifier.h"
+#include "InfoStructures/EntityInfo.h"
 
 namespace refureku
 {
 	class ClassInfo : public EntityInfo
 	{
-		private:
-			
-
 		public:
+			bool isFinal;
+			//...
+
 			ClassInfo() = default;
 			~ClassInfo() = default;
 

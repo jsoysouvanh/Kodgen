@@ -12,7 +12,7 @@ namespace refureku
 	class Parser
 	{
 		private:
-			static constexpr char const*	_parseArguments[] = { "-x", "c++", "-D", "PARSER" };
+			static constexpr char const*	_parseArguments[] = { "-x", "c++", "-D", "REFUREKU_PARSING" };
 			CXIndex							_clangIndex;
 
 			static	std::string			getString(CXString&& clangString) noexcept;

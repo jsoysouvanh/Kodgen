@@ -53,6 +53,7 @@ add_executable(refureku
 				Source/Properties/SimplePropertyRule.cpp
 				Source/Properties/ComplexPropertyRule.cpp
 				Source/Properties/PropertyRules.cpp
+				Source/Properties/PropertyParser.cpp
 				Source/InfoStructures/ClassInfo.cpp
 				Source/InfoStructures/ParsingInfo.cpp)
 
