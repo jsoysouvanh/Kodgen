@@ -16,7 +16,7 @@ Parser::~Parser() noexcept
 	clang_disposeIndex(_clangIndex);
 }
 
-std::string Parser::getString(CXString&& clangString)
+std::string Parser::getString(CXString&& clangString) noexcept
 {
 	std::string result = clang_getCString(clangString);
 	clang_disposeString(clangString);
@@ -24,7 +24,7 @@ std::string Parser::getString(CXString&& clangString)
 	return result;
 }
 
-CXChildVisitResult Parser::staticParseCursor(CXCursor c, CXCursor parent, CXClientData clientData)
+CXChildVisitResult Parser::staticParseCursor(CXCursor c, CXCursor parent, CXClientData clientData) noexcept
 {
 	ParsingInfo* parsingInfo = reinterpret_cast<ParsingInfo*>(clientData);
 
@@ -42,7 +42,7 @@ CXChildVisitResult Parser::staticParseCursor(CXCursor c, CXCursor parent, CXClie
 	//return CXChildVisitResult::CXChildVisit_Recurse;
 }
 
-void Parser::updateParsingState(CXCursor parent, ParsingInfo* parsingInfo)
+void Parser::updateParsingState(CXCursor parent, ParsingInfo* parsingInfo) noexcept
 {
 	bool checkClassLeave = false;
 
@@ -81,7 +81,7 @@ void Parser::updateParsingState(CXCursor parent, ParsingInfo* parsingInfo)
 	}
 }
 
-CXChildVisitResult Parser::parseCursor(CXCursor currentCursor, CXCursor parentCursor, ParsingInfo* parsingInfo)
+CXChildVisitResult Parser::parseCursor(CXCursor currentCursor, CXCursor parentCursor, ParsingInfo* parsingInfo) noexcept
 {
 	if (parsingInfo->classStructLevel)		//Currently parsing a class of struct
 	{
@@ -97,7 +97,7 @@ CXChildVisitResult Parser::parseCursor(CXCursor currentCursor, CXCursor parentCu
 	}
 }
 
-CXChildVisitResult Parser::parseDefault(CXCursor currentCursor, ParsingInfo* parsingInfo)
+CXChildVisitResult Parser::parseDefault(CXCursor currentCursor, ParsingInfo* parsingInfo) noexcept
 {
 	CXCursorKind		cursorKind	= clang_getCursorKind(currentCursor);
 	std::string			cursorName	= Parser::getString(clang_getCursorSpelling(currentCursor));
@@ -128,7 +128,7 @@ CXChildVisitResult Parser::parseDefault(CXCursor currentCursor, ParsingInfo* par
 	return CXChildVisitResult::CXChildVisit_Recurse;
 }
 
-CXChildVisitResult Parser::parseClassContent(CXCursor currentCursor, ParsingInfo* parsingInfo)
+CXChildVisitResult Parser::parseClassContent(CXCursor currentCursor, ParsingInfo* parsingInfo) noexcept
 {
 	if (parsingInfo->isParsingField)
 	{
@@ -176,7 +176,7 @@ CXChildVisitResult Parser::parseClassContent(CXCursor currentCursor, ParsingInfo
 	return CXChildVisitResult::CXChildVisit_Recurse;
 }
 
-bool Parser::isClassValid(CXCursor currentCursor, ParsingInfo* parsingInfo)
+bool Parser::isClassValid(CXCursor currentCursor, ParsingInfo* parsingInfo) noexcept
 {
 	CXCursorKind	cursorKind	= clang_getCursorKind(currentCursor);
 	std::string		cursorName	= Parser::getString(clang_getCursorSpelling(currentCursor));
@@ -186,7 +186,7 @@ bool Parser::isClassValid(CXCursor currentCursor, ParsingInfo* parsingInfo)
 	return (cursorKind == CXCursorKind::CXCursor_AnnotateAttr && true/* TODO If notation is valid for a class, add the class*/);
 }
 
-CXChildVisitResult Parser::parseField(CXCursor currentCursor, ParsingInfo* parsingInfo)
+CXChildVisitResult Parser::parseField(CXCursor currentCursor, ParsingInfo* parsingInfo) noexcept
 {
 	//Check for any annotation attribute if the flag is raised
 	if (parsingInfo->shouldCheckValidity)
@@ -209,7 +209,7 @@ CXChildVisitResult Parser::parseField(CXCursor currentCursor, ParsingInfo* parsi
 	return CXChildVisitResult::CXChildVisit_Recurse;
 }
 
-bool Parser::isFieldValid(CXCursor currentCursor, ParsingInfo* parsingInfo)
+bool Parser::isFieldValid(CXCursor currentCursor, ParsingInfo* parsingInfo) noexcept
 {
 	CXCursorKind	cursorKind	= clang_getCursorKind(currentCursor);
 	//std::string		cursorName	= Parser::getString(clang_getCursorSpelling(currentCursor));
@@ -219,7 +219,7 @@ bool Parser::isFieldValid(CXCursor currentCursor, ParsingInfo* parsingInfo)
 	return (cursorKind == CXCursorKind::CXCursor_AnnotateAttr && true/* TODO If notation is valid for a field, add the field*/);
 }
 
-CXChildVisitResult Parser::parseMethod(CXCursor currentCursor, ParsingInfo* parsingInfo)
+CXChildVisitResult Parser::parseMethod(CXCursor currentCursor, ParsingInfo* parsingInfo) noexcept
 {
 	//Check for any annotation attribute if the flag is raised
 	if (parsingInfo->shouldCheckValidity)
@@ -242,7 +242,7 @@ CXChildVisitResult Parser::parseMethod(CXCursor currentCursor, ParsingInfo* pars
 	return CXChildVisitResult::CXChildVisit_Recurse;
 }
 
-bool Parser::isMethodValid(CXCursor currentCursor, ParsingInfo* parsingInfo)
+bool Parser::isMethodValid(CXCursor currentCursor, ParsingInfo* parsingInfo) noexcept
 {
 	CXCursorKind	cursorKind	= clang_getCursorKind(currentCursor);
 	//std::string		cursorName	= Parser::getString(clang_getCursorSpelling(currentCursor));
@@ -252,7 +252,7 @@ bool Parser::isMethodValid(CXCursor currentCursor, ParsingInfo* parsingInfo)
 	return (cursorKind == CXCursorKind::CXCursor_AnnotateAttr && true/* TODO If notation is valid for a method, add the method*/);
 }
 
-CXChildVisitResult Parser::parseEnumContent(CXCursor currentCursor, ParsingInfo* parsingInfo)
+CXChildVisitResult Parser::parseEnumContent(CXCursor currentCursor, ParsingInfo* parsingInfo) noexcept
 {
 	CXCursorKind	cursorKind	= clang_getCursorKind(currentCursor);
 	std::string		cursorName	= Parser::getString(clang_getCursorSpelling(currentCursor));
@@ -271,7 +271,7 @@ CXChildVisitResult Parser::parseEnumContent(CXCursor currentCursor, ParsingInfo*
 	}
 }
 
-bool Parser::isEnumValid(CXCursor currentCursor, ParsingInfo* parsingInfo)
+bool Parser::isEnumValid(CXCursor currentCursor, ParsingInfo* parsingInfo) noexcept
 {
 	CXCursorKind	cursorKind	= clang_getCursorKind(currentCursor);
 	//std::string		cursorName	= Parser::getString(clang_getCursorSpelling(currentCursor));

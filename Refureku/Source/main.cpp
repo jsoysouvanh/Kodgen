@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cassert>
 
 #include "SafeFilesystem.h"
 
@@ -10,21 +11,28 @@
 
 #include "TestClass.h"
 
-void regexTests()
+void propertyTests()
 {
 	refureku::PropertyRules propertyRules;
 
-	std::cout << std::boolalpha << propertyRules.addSimpleProperty(refureku::SimplePropertyRule("RefurekuProp")) << " : Should be true" << std::endl;
-	std::cout << std::boolalpha << propertyRules.addSimpleProperty(refureku::SimplePropertyRule("RefurekuProp")) << " : Should be false" << std::endl;
-	std::cout << std::boolalpha << propertyRules.removeSimpleProperty(refureku::SimplePropertyRule("RefurekuProp")) << " : Should be true" << std::endl;
-	std::cout << std::boolalpha << propertyRules.addSimpleProperty(refureku::SimplePropertyRule("RefurekuProp")) << " : Should be true" << std::endl;
-	std::cout << std::boolalpha << propertyRules.addSimpleProperty(refureku::SimplePropertyRule("RefurekuProp2")) << " : Should be true" << std::endl;
+	assert(propertyRules.addSimpleProperty(refureku::SimplePropertyRule("RefurekuProp")));
+	assert(!propertyRules.addSimpleProperty(refureku::SimplePropertyRule("RefurekuProp")));
+	assert(propertyRules.removeSimpleProperty(refureku::SimplePropertyRule("RefurekuProp")));
+	assert(propertyRules.addSimpleProperty(refureku::SimplePropertyRule("RefurekuProp")));
+	assert(propertyRules.addSimpleProperty(refureku::SimplePropertyRule("RefurekuProp2")));
 
-	std::cout << std::boolalpha << propertyRules.addComplexProperty(refureku::ComplexPropertyRule("RefurekuProp", "BlueprintRead(Only|Write)")) << " : Should be true" << std::endl;
-	std::cout << std::boolalpha << propertyRules.addComplexProperty(refureku::ComplexPropertyRule("RefurekuProp", "BlueprintRead(Only|Write)")) << " : Should be false" << std::endl;
-	std::cout << std::boolalpha << propertyRules.removeComplexProperty(refureku::ComplexPropertyRule("RefurekuProp", "BlueprintRead(Only|Write)")) << " : Should be true" << std::endl;
-	std::cout << std::boolalpha << propertyRules.addComplexProperty(refureku::ComplexPropertyRule("RefurekuProp", "BlueprintRead(Only|Write)")) << " : Should be true" << std::endl;
-	std::cout << std::boolalpha << propertyRules.addComplexProperty(refureku::ComplexPropertyRule("RefurekuProp2", "BlueprintRead(Only|Write)")) << " : Should be true" << std::endl;
+	assert(propertyRules.addComplexProperty(refureku::ComplexPropertyRule("RefurekuProp", "BlueprintRead(Only|Write)")));
+	assert(!propertyRules.addComplexProperty(refureku::ComplexPropertyRule("RefurekuProp", "BlueprintRead(Only|Write)")));
+	assert(propertyRules.removeComplexProperty(refureku::ComplexPropertyRule("RefurekuProp", "BlueprintRead(Only|Write)")));
+	assert(propertyRules.addComplexProperty(refureku::ComplexPropertyRule("RefurekuProp", "BlueprintRead(Only|Write)")));
+	assert(propertyRules.addComplexProperty(refureku::ComplexPropertyRule("RefurekuProp2", "BlueprintRead(Only|Write)")));
+
+	assert(propertyRules.getSimpleProperty("RefurekuProp") != nullptr);
+	assert(propertyRules.getComplexProperty("RefurekuProp") != nullptr);
+	assert(propertyRules.getSimpleProperty("RefurekuProp2") != nullptr);
+	assert(propertyRules.getComplexProperty("RefurekuProp2") != nullptr);
+	assert(propertyRules.getSimpleProperty("RefurekuProp3") == nullptr);
+	assert(propertyRules.getComplexProperty("RefurekuProp3") == nullptr);
 }
 
 int main()
@@ -37,15 +45,12 @@ int main()
 	refureku::FileGenerator fg;
 	refureku::Parser parser;
 
-	//TODO PropertyParser, PropertyRules, SimpleProperty, ArgumentsProperty
-	//ArgumentsProperty -> list of authorized arguments, can the user add its own arguments, might add later constraints on user arguments (check validity with regex)
-
 	//parser.parse(pathToFile);
 
 	//fg.AddFile(fs::current_path());
 	//fg.AddDirectory(fs::current_path());
 
-	regexTests();
+	propertyTests();
 
 	return EXIT_SUCCESS;
 }

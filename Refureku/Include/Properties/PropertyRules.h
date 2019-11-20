@@ -23,5 +23,12 @@ namespace refureku
 			bool removeSimpleProperty(SimplePropertyRule&& simplePropertyRule)		noexcept;
 			bool addComplexProperty(ComplexPropertyRule&& complexPropertyRule)		noexcept;
 			bool removeComplexProperty(ComplexPropertyRule&& complexPropertyRule)	noexcept;
+
+			void clearSimpleProperties()											noexcept;
+			void clearComplexProperties()											noexcept;
+			void clear()															noexcept;
+
+			SimplePropertyRule const*	getSimpleProperty(std::string const& propertyName)	const noexcept;
+			ComplexPropertyRule const*	getComplexProperty(std::string const& propertyName)	const noexcept;
 	};
 }

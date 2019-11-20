@@ -7,7 +7,7 @@ namespace refureku
 	class SimplePropertyRule
 	{
 		public:
-			std::string _name = "";
+			std::string name = "";
 
 			SimplePropertyRule()							= default;
 			SimplePropertyRule(std::string&& name)			noexcept;

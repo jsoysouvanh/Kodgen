@@ -9,7 +9,7 @@ namespace refureku
 	class ComplexPropertyRule final : public SimplePropertyRule
 	{
 		public:
-			std::regex	_argumentPattern;	//regex
+			std::regex	argumentPattern;
 			
 			ComplexPropertyRule()													= default;
 			ComplexPropertyRule(std::string&& name, std::string&& argumentPattern)	noexcept;
@@ -18,7 +18,5 @@ namespace refureku
 			~ComplexPropertyRule()													= default;
 
 			bool isValidArgument(std::string const& argument)	const noexcept;
-
-			//bool operator<(ComplexPropertyRule const& other)	const;
 	};
 }

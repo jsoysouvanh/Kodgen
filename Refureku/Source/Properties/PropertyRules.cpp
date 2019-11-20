@@ -1,5 +1,7 @@
 #include "Properties/PropertyRules.h"
 
+#include <algorithm>
+
 using namespace refureku;
 
 bool PropertyRules::addSimpleProperty(SimplePropertyRule&& simplePropertyRule) noexcept
@@ -38,4 +40,34 @@ bool PropertyRules::removeComplexProperty(ComplexPropertyRule&& complexPropertyR
 	}
 
 	return false;
+}
+
+void PropertyRules::clearSimpleProperties() noexcept
+{
+	_simplePropertyRules.clear();
+}
+
+void PropertyRules::clearComplexProperties() noexcept
+{
+	_complexPropertyRules.clear();
+}
+
+void PropertyRules::clear() noexcept
+{
+	clearSimpleProperties();
+	clearComplexProperties();
+}
+
+SimplePropertyRule const* PropertyRules::getSimpleProperty(std::string const& propertyName) const noexcept
+{
+	decltype(_simplePropertyRules)::const_iterator it = std::find_if(_simplePropertyRules.cbegin(), _simplePropertyRules.cend(), [propertyName](SimplePropertyRule const& prop) { return prop.name == propertyName; });
+
+	return (it != _simplePropertyRules.cend()) ? &*it : nullptr;
+}
+
+ComplexPropertyRule const* PropertyRules::getComplexProperty(std::string const& propertyName) const noexcept
+{
+	decltype(_complexPropertyRules)::const_iterator it = std::find_if(_complexPropertyRules.cbegin(), _complexPropertyRules.cend(), [propertyName](ComplexPropertyRule const& prop) { return prop.name == propertyName; });
+
+	return (it != _complexPropertyRules.cend()) ? &*it : nullptr;
 }

@@ -3,6 +3,7 @@
 #include <clang-c/Index.h>
 
 #include "SafeFilesystem.h"
+#include "Properties/PropertyParser.h"
 
 namespace refureku
 {
@@ -11,32 +12,34 @@ namespace refureku
 	class Parser
 	{
 		private:
-			static constexpr char const* _parseArguments[] = { "-x", "c++", "-D", "PARSER" };
+			static constexpr char const*	_parseArguments[] = { "-x", "c++", "-D", "PARSER" };
+			CXIndex							_clangIndex;
 
-			static CXChildVisitResult	staticParseCursor(CXCursor c, CXCursor parent, CXClientData clientData);
-			static void					updateParsingState(CXCursor parent, ParsingInfo* parsingInfo);
-			static CXChildVisitResult	parseCursor(CXCursor currentCursor, CXCursor parentCursor, ParsingInfo* parsingInfo);
+			static	std::string			getString(CXString&& clangString) noexcept;
 
-			static CXChildVisitResult	parseDefault(CXCursor currentCursor, ParsingInfo* parsingInfo);
+			static CXChildVisitResult	staticParseCursor(CXCursor c, CXCursor parent, CXClientData clientData)					noexcept;
+			static void					updateParsingState(CXCursor parent, ParsingInfo* parsingInfo)							noexcept;
+			static CXChildVisitResult	parseCursor(CXCursor currentCursor, CXCursor parentCursor, ParsingInfo* parsingInfo)	noexcept;
 
-			static CXChildVisitResult	parseClassContent(CXCursor currentCursor, ParsingInfo* parsingInfo);
-			static bool					isClassValid(CXCursor currentCursor, ParsingInfo* parsingInfo);
-			static CXChildVisitResult	parseField(CXCursor currentCursor, ParsingInfo* parsingInfo);
-			static bool					isFieldValid(CXCursor currentCursor, ParsingInfo* parsingInfo);
-			static CXChildVisitResult	parseMethod(CXCursor currentCursor, ParsingInfo* parsingInfo);
-			static bool					isMethodValid(CXCursor currentCursor, ParsingInfo* parsingInfo);
+			static CXChildVisitResult	parseDefault(CXCursor currentCursor, ParsingInfo* parsingInfo)							noexcept;
 
-			static CXChildVisitResult	parseEnumContent(CXCursor currentCursor, ParsingInfo* parsingInfo);
-			static bool					isEnumValid(CXCursor currentCursor, ParsingInfo* parsingInfo);
+			static CXChildVisitResult	parseClassContent(CXCursor currentCursor, ParsingInfo* parsingInfo)						noexcept;
+			static bool					isClassValid(CXCursor currentCursor, ParsingInfo* parsingInfo)							noexcept;
+			static CXChildVisitResult	parseField(CXCursor currentCursor, ParsingInfo* parsingInfo)							noexcept;
+			static bool					isFieldValid(CXCursor currentCursor, ParsingInfo* parsingInfo)							noexcept;
+			static CXChildVisitResult	parseMethod(CXCursor currentCursor, ParsingInfo* parsingInfo)							noexcept;
+			static bool					isMethodValid(CXCursor currentCursor, ParsingInfo* parsingInfo)							noexcept;
 
-		protected:
-			CXIndex _clangIndex;
-
-			static	std::string			getString(CXString&& clangString);
+			static CXChildVisitResult	parseEnumContent(CXCursor currentCursor, ParsingInfo* parsingInfo)						noexcept;
+			static bool					isEnumValid(CXCursor currentCursor, ParsingInfo* parsingInfo)							noexcept;
 
 		public:
-			Parser() noexcept;
-			~Parser() noexcept;
+			PropertyParser propertyParser;
+
+			Parser()				noexcept;
+			Parser(Parser const&)	= default;
+			Parser(Parser&&)		= default;
+			~Parser()				noexcept;
 
 			virtual bool parse(fs::path const& parseFile) const noexcept;
 	};
