@@ -1,9 +1,11 @@
 #pragma once
 
 #include <clang-c/Index.h>
+#include <optional>
 
 #include "SafeFilesystem.h"
 #include "ParsingSettings.h"
+#include "ParsingResult.h"
 #include "Properties/PropertyParser.h"
 
 namespace refureku
@@ -15,8 +17,7 @@ namespace refureku
 		private:
 			static constexpr char const*	_parseArguments[] = { "-x", "c++", "-D", "REFUREKU_PARSING" };
 			CXIndex							_clangIndex;
-
-			static	std::string			getString(CXString&& clangString) noexcept;
+			std::optional<ParsingResult>	_parsingResult	= std::nullopt;
 
 			static CXChildVisitResult	staticParseCursor(CXCursor c, CXCursor parent, CXClientData clientData)					noexcept;
 			static void					updateParsingState(CXCursor parent, ParsingInfo* parsingInfo)							noexcept;
@@ -42,6 +43,11 @@ namespace refureku
 			Parser(Parser&&)		= default;
 			~Parser()				noexcept;
 
-			virtual bool parse(fs::path const& parseFile) noexcept;
+			virtual bool			parse(fs::path const& parseFile)		noexcept;
+
+			/**
+			*	Get the parsing result of the previous parsing operation if available, else nullptr
+			*/
+			ParsingResult const*	retrieveParsingResult()			const	noexcept;
 	};
 }

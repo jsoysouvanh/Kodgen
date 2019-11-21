@@ -4,7 +4,7 @@
 
 namespace TestNamespace
 {
-	class RfrkClass(Prop1, Prop2[SubProp21/ SubProp22, Prop3) TestClass final
+	class RfrkClass(Prop1, Prop2[SubProp21/ SubProp22], Prop3) TestClass final
 	{
 		private:
 		#pragma region Variables

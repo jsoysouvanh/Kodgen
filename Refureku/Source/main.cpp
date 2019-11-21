@@ -41,10 +41,33 @@ void parsingTests()
 	fs::path pathToFile		= includeDirPath / "TestClass.h";
 
 	refureku::Parser parser;
+
+	//Setup parser settings
 	parser.parsingSettings.propertyParsingSettings.ignoredCharacters.insert(' ');	//Ignored white space
 	parser.parsingSettings.propertyParsingSettings.subPropertySeparator = '/';
 
-	parser.parse(pathToFile);
+	assert(parser.retrieveParsingResult() == nullptr);
+
+	bool success = parser.parse(pathToFile);
+
+	//Check result
+	refureku::ParsingResult const* result = parser.retrieveParsingResult();
+	assert(result != nullptr);
+
+	if (success)
+	{
+		std::cout << "Parse success" << std::endl;
+	}
+	else
+	{
+		std::cout << "Parse ended with errors" << std::endl;
+
+		//Print errors
+		for (refureku::ParsingError const& error : result->parsingErrors)
+		{
+			std::cout << "Error: " << "file: " << error.getFilename() << ", line: " << error.getLine() << ", column: " << error.getColumn() << std::endl;
+		}
+	}
 }
 
 void randomTests()

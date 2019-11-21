@@ -47,15 +47,18 @@ endif()
 
 # Setup executable / lib
 add_executable(refureku
-				Source/main.cpp
-				Source/FileGenerator.cpp
-				Source/Parser.cpp
+				Source/Helpers.cpp
 				Source/Properties/SimplePropertyRule.cpp
 				Source/Properties/ComplexPropertyRule.cpp
 				Source/Properties/PropertyRules.cpp
 				Source/Properties/PropertyParser.cpp
 				Source/InfoStructures/ClassInfo.cpp
-				Source/InfoStructures/ParsingInfo.cpp)
+				Source/InfoStructures/ParsingInfo.cpp
+				Source/FileGenerator.cpp
+				Source/ParsingError.cpp
+				Source/Parser.cpp
+				Source/main.cpp
+				)
 
 # Setup language requirements
 set_target_properties(refureku

@@ -6,6 +6,7 @@
 #include "FundamentalTypes.h"
 #include "AccessSpecifier.h"
 #include "ParsingSettings.h"
+#include "ParsingResult.h"
 #include "Properties/PropertyParser.h"
 #include "InfoStructures/ClassInfo.h"
 
@@ -25,49 +26,65 @@ namespace refureku
 			*/
 			PropertyParser			_propertyParser;
 
-		public:
 			/*	Level of class/struct parsing
-			 *	0 if not parsing a class/struct,
-			 *	1 if parsing a class/struct,
-			 *	2 is parsing a nested class/struct
-			 *	etc...
+			*	0 if not parsing a class/struct,
+			*	1 if parsing a class/struct,
+			*	2 is parsing a nested class/struct
+			*	etc...
 			**/
-			uint8			classStructLevel				= 0;
+			uint8					_classStructLevel				= 0;
 
 			/*
 			*	Clang cursor to the currently parsing class
 			**/
-			CXCursor		currentClassCursor				= clang_getNullCursor();
+			CXCursor				_currentClassCursor				= clang_getNullCursor();
 
 			/*
-			 *	Is currently parsing an enum
+			*	Is currently parsing an enum
 			**/
-			bool			isParsingEnum					= false;
+			bool					_isParsingEnum					= false;
 
 			/*
 			*	Is currently parsing a field
 			**/
-			bool			isParsingField					= false;
+			bool					_isParsingField					= false;
 
 			/*
 			*	Is currently parsing a method
 			**/
-			bool			isParsingMethod					= false;
+			bool					_isParsingMethod				= false;
 
 			/*
 			*	Clang cursor to the currently parsing entity (either an enum, a field or a method)
 			**/
-			CXCursor		currentEnumFieldMethodCursor	= clang_getNullCursor();
+			union
+			{
+				CXCursor	_currentEnumCursor = clang_getNullCursor();
+				CXCursor	_currentFieldCursor;
+				CXCursor	_currentMethodCursor;
+			};
 
+			/*
+			*	Current class modifier
+			**/
+			AccessSpecifier	_accessSpecifier	= AccessSpecifier::Private;
+
+			/**
+			*	Final collected data
+			*/
+			ParsingResult	_parsingResult;
+
+			/**
+			*	Returns true if the provided cursor describes a valid class, else false
+			*/
+			bool isClassValid(CXCursor currentCursor) noexcept;
+
+		public:		
 			/*
 			*	Should check for any annotation
+			*	TODO: move as private member with getter
 			**/
 			bool			shouldCheckValidity				= false;
-
-			/*
-			 *	Current class modifier
-			**/
-			AccessSpecifier	accessSpecifier					= AccessSpecifier::Private;
 
 			/*
 			*	All collected class data
@@ -85,22 +102,34 @@ namespace refureku
 			ParsingInfo()	= default;
 			~ParsingInfo()	= default;
 
-			void startStructParsing(CXCursor const& structCursor)			noexcept;
-			void startClassParsing(CXCursor const& classCursor)				noexcept;
-			void startFieldParsing(CXCursor const& fieldCursor)				noexcept;
-			void startMethodParsing(CXCursor const& methodCursor)			noexcept;
-			void startEnumParsing(CXCursor const& enumCursor)				noexcept;
+			void					startStructParsing(CXCursor const& structCursor)			noexcept;
+			void					startClassParsing(CXCursor const& classCursor)				noexcept;
+			void					startFieldParsing(CXCursor const& fieldCursor)				noexcept;
+			void					startMethodParsing(CXCursor const& methodCursor)			noexcept;
+			void					startEnumParsing(CXCursor const& enumCursor)				noexcept;
 
-			void endStructOrClassParsing()									noexcept;
-			void endFieldParsing()											noexcept;
-			void endMethodParsing()											noexcept;
-			void endEnumParsing()											noexcept;
+			void					endStructOrClassParsing()									noexcept;
+			void					endFieldParsing()											noexcept;
+			void					endMethodParsing()											noexcept;
+			void					endEnumParsing()											noexcept;
 
-			void updateAccessSpecifier(CXCursor const& enumCursor)			noexcept;
-			bool updateClassInfo()											noexcept;
+			void					updateAccessSpecifier(CXCursor const& enumCursor)			noexcept;
+			CXChildVisitResult		tryToAddClass(CXCursor const& classAnnotationCursor)		noexcept;
 
-			void setParsingSettings(ParsingSettings const* parsingSettings)	noexcept;
-			ParsingSettings const*	getParsingSettings()			const	noexcept;
-			PropertyParser&			getPropertyParser()						noexcept;
+			ParsingResult			extractParsingResult()										noexcept;
+
+			uint8					getClassStructLevel()								const	noexcept;
+			CXCursor const&			getCurrentClassCursor()								const	noexcept;
+			CXCursor const&			getCurrentEnumCursor()								const	noexcept;
+			CXCursor const&			getCurrentFieldCursor()								const	noexcept;
+			CXCursor const&			getCurrentMethodCursor()							const	noexcept;
+			bool					isParsingEnum()										const	noexcept;
+			bool					isParsingField()									const	noexcept;
+			bool					isParsingMethod()									const	noexcept;
+			AccessSpecifier			getAccessSpecifier()								const	noexcept;
+
+			ParsingSettings const*	getParsingSettings()								const	noexcept;
+			void					setParsingSettings(ParsingSettings const* parsingSettings)	noexcept;
+			//PropertyParser&			getPropertyParser()											noexcept;
 	};
 }
