@@ -1,22 +1,22 @@
 #pragma once
 
-#include <unordered_set>
 #include <optional>
 
-#include "Properties/PropertyRules.h"
 #include "Properties/PropertyGroup.h"
 #include "Properties/PropertyParsingError.h"
+#include "Properties/PropertyParsingSettings.h"
 
 namespace refureku
 {
 	class PropertyParser
 	{
 		private:
-			PropertyParsingError					_parsingError = PropertyParsingError::Count;
+			PropertyParsingSettings const*			_propertyParsingSettings	= nullptr;
+			bool									_hasCommonSeparator			= true;
+
+			PropertyParsingError					_parsingError				= PropertyParsingError::Count;
 
 			std::vector<std::vector<std::string>>	_splitProps;
-
-			bool									_hasCommonSeparator = true;
 
 			/**
 			*	Returns true on a successful split, else false
@@ -38,22 +38,10 @@ namespace refureku
 			void cleanString(std::string& toCleanString) const noexcept;
 
 		public:
-			char						propertySeparator		= ',';
-			char						subPropertySeparator	= ',';
-			char						subPropertyEnclosers[2]	= { '[', ']' };
-			std::unordered_set<char>	ignoredCharacters;
-
-			PropertyRules				classPropertyRules;
-			PropertyRules				structPropertyRules;
-			PropertyRules				fieldPropertyRules;
-			PropertyRules				methodPropertyRules;
-			PropertyRules				enumPropertyRules;
-			PropertyRules				enumValuePropertyRules;
-
 			/**
 			*	Called by the parser to internally setup some acceleration data
 			*/
-			void setup() noexcept;
+			void setup(PropertyParsingSettings const* propertyParsingSettings) noexcept;
 
 			/**
 			*	All get[...]Properties(std::string&& annotateMessage) below methods return an initialized optional

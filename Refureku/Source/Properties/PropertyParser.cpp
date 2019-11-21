@@ -79,7 +79,7 @@ bool PropertyParser::splitProperties(std::string&& propertiesString) noexcept
 		std::string::iterator it;
 
 		//Split main properties first
-		while ((it = std::find_if(propertiesString.begin(), propertiesString.end(), [this](char c){ return c == propertySeparator; })) != propertiesString.end())
+		while ((it = std::find_if(propertiesString.begin(), propertiesString.end(), [this](char c){ return c == _propertyParsingSettings->propertySeparator; })) != propertiesString.end())
 		{
 			_splitProps.push_back({ std::string(propertiesString.begin(), it) });
 			propertiesString.erase(propertiesString.cbegin(), it + 1);
@@ -100,11 +100,11 @@ bool PropertyParser::splitSubProperties(std::vector<std::vector<std::string>>& s
 	{
 		std::string& fullProp = vec.front();
 
-		size_t charIndex = fullProp.find_first_of(subPropertyEnclosers[0], 0u);
+		size_t charIndex = fullProp.find_first_of(_propertyParsingSettings->subPropertyEnclosers[0], 0u);
 		if (charIndex != fullProp.npos)	//found subprops beginning marker
 		{
 			//Make sure the last char is a subprops ending marker
-			if (fullProp.back() != subPropertyEnclosers[1])
+			if (fullProp.back() != _propertyParsingSettings->subPropertyEnclosers[1])
 			{
 				_parsingError = PropertyParsingError::SubPropertyEndEncloserMissing;
 				return false;
@@ -117,7 +117,7 @@ bool PropertyParser::splitSubProperties(std::vector<std::vector<std::string>>& s
 			std::string::iterator it;
 
 			//Split main properties first
-			while ((it = std::find_if(subProps.begin(), subProps.end(), [this](char c){ return c == subPropertySeparator; })) != subProps.end())
+			while ((it = std::find_if(subProps.begin(), subProps.end(), [this](char c){ return c == _propertyParsingSettings->subPropertySeparator; })) != subProps.end())
 			{
 				vec.push_back({ std::string(subProps.begin(), it) });
 				subProps.erase(subProps.cbegin(), it + 1);
@@ -133,15 +133,16 @@ bool PropertyParser::splitSubProperties(std::vector<std::vector<std::string>>& s
 
 void PropertyParser::cleanString(std::string& toCleanString) const noexcept
 {
-	for (char toRemoveChar : ignoredCharacters)
+	for (char toRemoveChar : _propertyParsingSettings->ignoredCharacters)
 	{
 		toCleanString.erase(std::remove(toCleanString.begin(), toCleanString.end(), toRemoveChar), toCleanString.end());
 	}
 }
 
-void PropertyParser::setup() noexcept
+void PropertyParser::setup(PropertyParsingSettings const* propertyParsingSettings) noexcept
 {
-	_hasCommonSeparator = propertySeparator == subPropertySeparator;
+	_propertyParsingSettings = propertyParsingSettings;
+	_hasCommonSeparator = _propertyParsingSettings->propertySeparator == _propertyParsingSettings->subPropertySeparator;
 }
 
 PropertyParsingError PropertyParser::getParsingError() const noexcept

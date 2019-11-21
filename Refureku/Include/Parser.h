@@ -3,6 +3,7 @@
 #include <clang-c/Index.h>
 
 #include "SafeFilesystem.h"
+#include "ParsingSettings.h"
 #include "Properties/PropertyParser.h"
 
 namespace refureku
@@ -34,7 +35,7 @@ namespace refureku
 			static bool					isEnumValid(CXCursor currentCursor, ParsingInfo* parsingInfo)							noexcept;
 
 		public:
-			PropertyParser propertyParser;
+			ParsingSettings	parsingSettings;
 
 			Parser()				noexcept;
 			Parser(Parser const&)	= default;

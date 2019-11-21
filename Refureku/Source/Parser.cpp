@@ -148,7 +148,7 @@ CXChildVisitResult Parser::parseClassContent(CXCursor currentCursor, ParsingInfo
 		}
 		else
 		{
-			if (parsingInfo->propertyParser->getParsingError() == PropertyParsingError::Count)
+			if (parsingInfo->getPropertyParser().getParsingError() == PropertyParsingError::Count)
 			{
 				parsingInfo->endStructOrClassParsing();
 				return CXChildVisitResult::CXChildVisit_Continue;
@@ -157,6 +157,36 @@ CXChildVisitResult Parser::parseClassContent(CXCursor currentCursor, ParsingInfo
 			{
 				std::cout << "Fatal error occured" << std::endl;
 				//TODO setupError
+				CXSourceLocation location = clang_getCursorLocation(currentCursor);
+
+
+
+				/*
+				CINDEX_LINKAGE void clang_getExpansionLocation(CXSourceLocation location,
+												CXFile *file,
+												unsigned *line,
+												unsigned *column,
+												unsigned *offset);
+									
+				CINDEX_LINKAGE void clang_getPresumedLocation(CXSourceLocation location,
+												CXString *filename,
+												unsigned *line,
+												unsigned *column);
+
+				 CINDEX_LINKAGE void clang_getSpellingLocation(CXSourceLocation location,
+												CXFile *file,
+												unsigned *line,
+												unsigned *column,
+												unsigned *offset);
+				
+				CINDEX_LINKAGE CXSourceLocation clang_getRangeStart(CXSourceRange range);
+
+				CINDEX_LINKAGE CXSourceLocation clang_getRangeEnd(CXSourceRange range);
+
+				CINDEX_LINKAGE CXToken *clang_getToken(CXTranslationUnit TU,
+				CXSourceLocation Location);
+				CINDEX_LINKAGE CXString clang_getTokenSpelling(CXTranslationUnit, CXToken);
+				*/
 				
 				return CXChildVisitResult::CXChildVisit_Break;
 			}
@@ -197,7 +227,7 @@ bool Parser::isClassValid(CXCursor currentCursor, ParsingInfo* parsingInfo) noex
 
 	if (cursorKind == CXCursorKind::CXCursor_AnnotateAttr)
 	{
-		return parsingInfo->propertyParser->getClassProperties(Parser::getString(clang_getCursorSpelling(currentCursor))).has_value();
+		return parsingInfo->getPropertyParser().getClassProperties(Parser::getString(clang_getCursorSpelling(currentCursor))).has_value();
 	}
 
 	return (cursorKind == CXCursorKind::CXCursor_AnnotateAttr && true/* TODO If notation is valid for a class, add the class*/);
@@ -311,12 +341,20 @@ bool Parser::parse(fs::path const& parseFile) noexcept
 		{
 			ParsingInfo parsingInfo;
 			
-			propertyParser.setup();
-			parsingInfo.propertyParser = &propertyParser;
+			parsingInfo.setParsingSettings(&parsingSettings);
 
 			//Get the root cursor for this translation unit
 			CXCursor cursor = clang_getTranslationUnitCursor(translationUnit);
-			clang_visitChildren(cursor, &Parser::staticParseCursor, &parsingInfo);
+			
+			if (clang_visitChildren(cursor, &Parser::staticParseCursor, &parsingInfo))
+			{
+				//ERROR
+				std::cout << "Parse ended with errors" << std::endl;
+			}
+			else
+			{
+				//SUCCESS
+			}
 
 			isSuccess = true;
 		}

@@ -41,8 +41,8 @@ void parsingTests()
 	fs::path pathToFile		= includeDirPath / "TestClass.h";
 
 	refureku::Parser parser;
-	parser.propertyParser.ignoredCharacters.insert(' ');	//Ignored white space
-	parser.propertyParser.subPropertySeparator = '/';
+	parser.parsingSettings.propertyParsingSettings.ignoredCharacters.insert(' ');	//Ignored white space
+	parser.parsingSettings.propertyParsingSettings.subPropertySeparator = '/';
 
 	parser.parse(pathToFile);
 }

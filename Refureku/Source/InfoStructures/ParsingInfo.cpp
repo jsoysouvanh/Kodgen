@@ -101,3 +101,19 @@ void ParsingInfo::updateAccessSpecifier(CXCursor const& enumCursor) noexcept
 			break;
 	}
 }
+
+void ParsingInfo::setParsingSettings(ParsingSettings const* parsingSettings) noexcept
+{
+	_parsingSettings = parsingSettings;
+	_propertyParser.setup(&parsingSettings->propertyParsingSettings);
+}
+
+ParsingSettings const* ParsingInfo::getParsingSettings() const noexcept
+{
+	return _parsingSettings;
+}
+
+PropertyParser& ParsingInfo::getPropertyParser() noexcept
+{
+	return _propertyParser;
+}
