@@ -13,14 +13,18 @@ std::optional<PropertyGroup> PropertyParser::getClassProperties(std::string&& an
 	{
 		if (splitProperties(annotateMessage.substr(classAnnotation.size())))
 		{
-			//TODO
-		}
-		else
-		{
-			//TODO
+			PropertyGroup pp;
+
+			return pp;
 		}
 	}
+	else
+	{
+		//Tried to add properties to a class with the wrong macro
+		_parsingError = PropertyParsingError::WrongPropertyMacroUsed;
+	}
 
+	assert(_parsingError != PropertyParsingError::Count);	//If fails, _parsing error must be updated
 	return std::nullopt;
 }
 
@@ -102,7 +106,7 @@ bool PropertyParser::splitSubProperties(std::vector<std::vector<std::string>>& s
 			//Make sure the last char is a subprops ending marker
 			if (fullProp.back() != subPropertyEnclosers[1])
 			{
-				_errorMessage = "Couldn't find subproperty ending marker in " + fullProp;
+				_parsingError = PropertyParsingError::SubPropertyEndEncloserMissing;
 				return false;
 			}
 
@@ -140,7 +144,7 @@ void PropertyParser::setup() noexcept
 	_hasCommonSeparator = propertySeparator == subPropertySeparator;
 }
 
-std::string const& PropertyParser::getErrorMessage() const noexcept
+PropertyParsingError PropertyParser::getParsingError() const noexcept
 {
-	return _errorMessage;
+	return _parsingError;
 }

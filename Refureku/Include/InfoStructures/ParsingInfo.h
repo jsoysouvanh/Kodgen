@@ -77,17 +77,18 @@ namespace refureku
 			ParsingInfo()	= default;
 			~ParsingInfo()	= default;
 
-			void startStructParsing(CXCursor const& structCursor);
-			void startClassParsing(CXCursor const& classCursor);
-			void startFieldParsing(CXCursor const& fieldCursor);
-			void startMethodParsing(CXCursor const& methodCursor);
-			void startEnumParsing(CXCursor const& enumCursor);
+			void startStructParsing(CXCursor const& structCursor) noexcept;
+			void startClassParsing(CXCursor const& classCursor) noexcept;
+			void startFieldParsing(CXCursor const& fieldCursor) noexcept;
+			void startMethodParsing(CXCursor const& methodCursor) noexcept;
+			void startEnumParsing(CXCursor const& enumCursor) noexcept;
 
-			void endStructOrClassParsing();
-			void endFieldParsing();
-			void endMethodParsing();
-			void endEnumParsing();
+			void endStructOrClassParsing() noexcept;
+			void endFieldParsing() noexcept;
+			void endMethodParsing() noexcept;
+			void endEnumParsing() noexcept;
 
-			void updateAccessSpecifier(CXCursor const& enumCursor);
+			void updateAccessSpecifier(CXCursor const& enumCursor) noexcept;
+			bool updateClassInfo() noexcept;
 	};
 }

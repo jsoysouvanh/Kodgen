@@ -5,13 +5,15 @@
 
 #include "Properties/PropertyRules.h"
 #include "Properties/PropertyGroup.h"
+#include "Properties/PropertyParsingError.h"
 
 namespace refureku
 {
 	class PropertyParser
 	{
 		private:
-			std::string								_errorMessage = "";
+			PropertyParsingError					_parsingError = PropertyParsingError::Count;
+
 			std::vector<std::vector<std::string>>	_splitProps;
 
 			bool									_hasCommonSeparator = true;
@@ -19,12 +21,14 @@ namespace refureku
 			/**
 			*	Returns true on a successful split, else false
 			*	On success, _splitProps is updated
-			*	On failure, _errorMessage is updated
+			*	On failure, _parsingError is updated
 			*/
 			bool splitProperties(std::string&& propertiesString) noexcept;
 
 			/**
 			*	Return true on a successful split, else false
+			*	On success, _splitProps is updated
+			*	On failure, _parsingError is updated
 			*/
 			bool splitSubProperties(std::vector<std::vector<std::string>>& splitProps) noexcept;
 
@@ -62,6 +66,6 @@ namespace refureku
 			std::optional<PropertyGroup> getEnumProperties(std::string&& annotateMessage) noexcept;
 			std::optional<PropertyGroup> getEnumValueProperties(std::string&& annotateMessage) noexcept;
 
-			std::string const& getErrorMessage() const noexcept;
+			PropertyParsingError getParsingError() const noexcept;
 	};
 }

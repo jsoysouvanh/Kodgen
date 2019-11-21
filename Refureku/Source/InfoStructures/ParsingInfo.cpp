@@ -4,7 +4,7 @@
 
 using namespace refureku;
 
-void ParsingInfo::startStructParsing(CXCursor const& structCursor)
+void ParsingInfo::startStructParsing(CXCursor const& structCursor) noexcept
 {
 	classStructLevel++;
 	currentClassCursor = structCursor;
@@ -14,7 +14,7 @@ void ParsingInfo::startStructParsing(CXCursor const& structCursor)
 	std::cout << "START STRUCT" << std::endl;
 }
 
-void ParsingInfo::startClassParsing(CXCursor const& classCursor)
+void ParsingInfo::startClassParsing(CXCursor const& classCursor) noexcept
 {
 	classStructLevel++;
 	currentClassCursor = classCursor;
@@ -24,7 +24,7 @@ void ParsingInfo::startClassParsing(CXCursor const& classCursor)
 	std::cout << "START CLASS" << std::endl;
 }
 
-void ParsingInfo::startFieldParsing(CXCursor const& fieldCursor)
+void ParsingInfo::startFieldParsing(CXCursor const& fieldCursor) noexcept
 {
 	isParsingField = true;
 	currentEnumFieldMethodCursor = fieldCursor;
@@ -32,7 +32,7 @@ void ParsingInfo::startFieldParsing(CXCursor const& fieldCursor)
 	std::cout << "START FIELD" << std::endl;
 }
 
-void ParsingInfo::startMethodParsing(CXCursor const& methodCursor)
+void ParsingInfo::startMethodParsing(CXCursor const& methodCursor) noexcept
 {
 	isParsingMethod = true;
 	currentEnumFieldMethodCursor = methodCursor;
@@ -40,7 +40,7 @@ void ParsingInfo::startMethodParsing(CXCursor const& methodCursor)
 	std::cout << "START METHOD" << std::endl;
 }
 
-void ParsingInfo::startEnumParsing(CXCursor const& enumCursor)
+void ParsingInfo::startEnumParsing(CXCursor const& enumCursor) noexcept
 {
 	isParsingEnum = true;
 	currentEnumFieldMethodCursor = enumCursor;
@@ -48,7 +48,7 @@ void ParsingInfo::startEnumParsing(CXCursor const& enumCursor)
 	std::cout << "START ENUM" << std::endl;
 }
 
-void ParsingInfo::endStructOrClassParsing()
+void ParsingInfo::endStructOrClassParsing() noexcept
 {
 	classStructLevel--;
 	currentClassCursor = clang_getNullCursor();
@@ -56,7 +56,7 @@ void ParsingInfo::endStructOrClassParsing()
 	std::cout << "END CLASS/STRUCT" << std::endl;
 }
 
-void ParsingInfo::endFieldParsing()
+void ParsingInfo::endFieldParsing() noexcept
 {
 	isParsingField = false;
 	currentEnumFieldMethodCursor = clang_getNullCursor();
@@ -64,7 +64,7 @@ void ParsingInfo::endFieldParsing()
 	std::cout << "END FIELD" << std::endl;
 }
 
-void ParsingInfo::endMethodParsing()
+void ParsingInfo::endMethodParsing() noexcept
 {
 	isParsingMethod = false;
 	currentEnumFieldMethodCursor = clang_getNullCursor();
@@ -72,7 +72,7 @@ void ParsingInfo::endMethodParsing()
 	std::cout << "END METHOD" << std::endl;
 }
 
-void ParsingInfo::endEnumParsing()
+void ParsingInfo::endEnumParsing() noexcept
 {
 	isParsingEnum = false;
 	currentEnumFieldMethodCursor = clang_getNullCursor();
@@ -80,7 +80,7 @@ void ParsingInfo::endEnumParsing()
 	std::cout << "END ENUM" << std::endl;
 }
 
-void ParsingInfo::updateAccessSpecifier(CXCursor const& enumCursor)
+void ParsingInfo::updateAccessSpecifier(CXCursor const& enumCursor) noexcept
 {
 	accessSpecifier = static_cast<AccessSpecifier>(1 << clang_getCXXAccessSpecifier(enumCursor));
 

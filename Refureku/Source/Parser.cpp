@@ -142,12 +142,24 @@ CXChildVisitResult Parser::parseClassContent(CXCursor currentCursor, ParsingInfo
 	{
 		if (isClassValid(currentCursor, parsingInfo))
 		{
+			//TODO create a class
+
 			return CXChildVisitResult::CXChildVisit_Recurse;
 		}
 		else
 		{
-			parsingInfo->endStructOrClassParsing();
-			return CXChildVisitResult::CXChildVisit_Continue;
+			if (parsingInfo->propertyParser->getParsingError() == PropertyParsingError::Count)
+			{
+				parsingInfo->endStructOrClassParsing();
+				return CXChildVisitResult::CXChildVisit_Continue;
+			}
+			else	//Fatal parsing error occured
+			{
+				std::cout << "Fatal error occured" << std::endl;
+				//TODO setupError
+				
+				return CXChildVisitResult::CXChildVisit_Break;
+			}
 		}
 	}
 
@@ -185,7 +197,7 @@ bool Parser::isClassValid(CXCursor currentCursor, ParsingInfo* parsingInfo) noex
 
 	if (cursorKind == CXCursorKind::CXCursor_AnnotateAttr)
 	{
-		std::optional<PropertyGroup> classProperties = parsingInfo->propertyParser->getClassProperties(Parser::getString(clang_getCursorSpelling(currentCursor)));
+		return parsingInfo->propertyParser->getClassProperties(Parser::getString(clang_getCursorSpelling(currentCursor))).has_value();
 	}
 
 	return (cursorKind == CXCursorKind::CXCursor_AnnotateAttr && true/* TODO If notation is valid for a class, add the class*/);
