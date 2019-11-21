@@ -4,7 +4,7 @@
 #include <vector>
 #include <clang-c/Index.h>
 
-#include "AccessSpecifier.h"
+#include "EAccessSpecifier.h"
 #include "InfoStructures/EntityInfo.h"
 
 namespace refureku
@@ -18,7 +18,7 @@ namespace refureku
 			ClassInfo() = default;
 			~ClassInfo() = default;
 
-			void AddField(AccessSpecifier accessSpecifier, CXCursor fieldCursor)	noexcept;
-			void AddMethod(AccessSpecifier accessSpecifier, CXCursor methodCursor)	noexcept;
+			void AddField(EAccessSpecifier accessSpecifier, CXCursor fieldCursor)	noexcept;
+			void AddMethod(EAccessSpecifier accessSpecifier, CXCursor methodCursor)	noexcept;
 	};
 }

@@ -21,10 +21,10 @@ std::optional<PropertyGroup> PropertyParser::getClassProperties(std::string&& an
 	else
 	{
 		//Tried to add properties to a class with the wrong macro
-		_parsingError = PropertyParsingError::WrongPropertyMacroUsed;
+		_parsingError = EParsingError::WrongPropertyMacroUsed;
 	}
 
-	assert(_parsingError != PropertyParsingError::Count);	//If fails, _parsing error must be updated
+	assert(_parsingError != EParsingError::Count);	//If fails, _parsing error must be updated
 	return std::nullopt;
 }
 
@@ -106,7 +106,7 @@ bool PropertyParser::splitSubProperties(std::vector<std::vector<std::string>>& s
 			//Make sure the last char is a subprops ending marker
 			if (fullProp.back() != _propertyParsingSettings->subPropertyEnclosers[1])
 			{
-				_parsingError = PropertyParsingError::SubPropertyEndEncloserMissing;
+				_parsingError = EParsingError::SubPropertyEndEncloserMissing;
 				return false;
 			}
 
@@ -145,7 +145,7 @@ void PropertyParser::setup(PropertyParsingSettings const* propertyParsingSetting
 	_hasCommonSeparator = _propertyParsingSettings->propertySeparator == _propertyParsingSettings->subPropertySeparator;
 }
 
-PropertyParsingError PropertyParser::getParsingError() const noexcept
+EParsingError PropertyParser::getParsingError() const noexcept
 {
 	return _parsingError;
 }

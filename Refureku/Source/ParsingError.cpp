@@ -4,17 +4,20 @@
 
 using namespace refureku;
 
-ParsingError::ParsingError(CXSourceLocation errorSourceLocation, PropertyParsingError ppe) noexcept:
+ParsingError::ParsingError(EParsingError parsingError, CXSourceLocation errorSourceLocation) noexcept:
 	_line{0},
 	_column{0},
 	_filename{""},
-	_propertyParsingError{ppe}
+	_propertyParsingError{parsingError}
 {
-	CXFile file;
+	if (!clang_equalLocations(errorSourceLocation, clang_getNullLocation()))
+	{
+		CXFile file;
 
-	clang_getExpansionLocation(errorSourceLocation, &file, &_line, &_column, nullptr);
+		clang_getExpansionLocation(errorSourceLocation, &file, &_line, &_column, nullptr);
 
-	_filename = Helpers::getString(clang_getFileName(file));
+		_filename = Helpers::getString(clang_getFileName(file));
+	}
 }
 
 std::string const& ParsingError::getFilename() const noexcept
@@ -32,7 +35,7 @@ unsigned ParsingError::getColumn() const noexcept
 	return _column;
 }
 
-PropertyParsingError ParsingError::getErrorValue() const noexcept
+EParsingError ParsingError::getErrorValue() const noexcept
 {
 	return _propertyParsingError;
 }

@@ -4,7 +4,7 @@
 
 namespace refureku
 {
-	enum class AccessSpecifier : uint8
+	enum class EAccessSpecifier : uint8
 	{
 		Invalid		= 1 << 0,
 		Public		= 1 << 1,

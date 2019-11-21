@@ -2,12 +2,12 @@
 
 using namespace refureku;
 
-void ClassInfo::AddField(AccessSpecifier accessSpecifier, CXCursor fieldCursor) noexcept
+void ClassInfo::AddField(EAccessSpecifier accessSpecifier, CXCursor fieldCursor) noexcept
 {
 	//TODO
 }
 
-void ClassInfo::AddMethod(AccessSpecifier accessSpecifier, CXCursor methodCursor) noexcept
+void ClassInfo::AddMethod(EAccessSpecifier accessSpecifier, CXCursor methodCursor) noexcept
 {
 	//TODO
 }

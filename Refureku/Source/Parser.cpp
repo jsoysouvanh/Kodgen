@@ -258,7 +258,8 @@ bool Parser::isEnumValid(CXCursor currentCursor, ParsingInfo* parsingInfo) noexc
 
 bool Parser::parse(fs::path const& parseFile) noexcept
 {
-	bool isSuccess = false;
+	bool		isSuccess = false;
+	ParsingInfo parsingInfo;
 
 	if (fs::exists(parseFile) && !fs::is_directory(parseFile))
 	{
@@ -267,8 +268,6 @@ bool Parser::parse(fs::path const& parseFile) noexcept
 
 		if (translationUnit != nullptr)
 		{
-			ParsingInfo parsingInfo;
-			
 			parsingInfo.setParsingSettings(&parsingSettings);
 
 			//Get the root cursor for this translation unit
@@ -283,12 +282,16 @@ bool Parser::parse(fs::path const& parseFile) noexcept
 				isSuccess = true;
 				//SUCCESS
 			}
-
-			_parsingResult = parsingInfo.extractParsingResult();
 		}
 
 		clang_disposeTranslationUnit(translationUnit);
 	}
+	else
+	{
+		parsingInfo.addParsingError(EParsingError::InexistantFile);
+	}
+
+	_parsingResult = parsingInfo.extractParsingResult();
 
 	return isSuccess;
 }

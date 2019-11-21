@@ -3,7 +3,7 @@
 #include <optional>
 
 #include "Properties/PropertyGroup.h"
-#include "Properties/PropertyParsingError.h"
+#include "Properties/EParsingError.h"
 #include "Properties/PropertyParsingSettings.h"
 
 namespace refureku
@@ -11,10 +11,10 @@ namespace refureku
 	class PropertyParser
 	{
 		private:
-			PropertyParsingSettings const*			_propertyParsingSettings	= nullptr;
-			bool									_hasCommonSeparator			= true;
+			PropertyParsingSettings const*	_propertyParsingSettings	= nullptr;
+			bool							_hasCommonSeparator			= true;
 
-			PropertyParsingError					_parsingError				= PropertyParsingError::Count;
+			EParsingError					_parsingError				= EParsingError::Count;
 
 			std::vector<std::vector<std::string>>	_splitProps;
 
@@ -47,13 +47,13 @@ namespace refureku
 			*	All get[...]Properties(std::string&& annotateMessage) below methods return an initialized optional
 			*	if the annotate message is valid, else an uninitialized one.
 			*/
-			std::optional<PropertyGroup> getClassProperties(std::string&& annotateMessage) noexcept;
-			std::optional<PropertyGroup> getStructProperties(std::string&& annotateMessage) noexcept;
-			std::optional<PropertyGroup> getFieldProperties(std::string&& annotateMessage) noexcept;
-			std::optional<PropertyGroup> getMethodProperties(std::string&& annotateMessage) noexcept;
-			std::optional<PropertyGroup> getEnumProperties(std::string&& annotateMessage) noexcept;
-			std::optional<PropertyGroup> getEnumValueProperties(std::string&& annotateMessage) noexcept;
+			std::optional<PropertyGroup>	getClassProperties(std::string&& annotateMessage) noexcept;
+			std::optional<PropertyGroup>	getStructProperties(std::string&& annotateMessage) noexcept;
+			std::optional<PropertyGroup>	getFieldProperties(std::string&& annotateMessage) noexcept;
+			std::optional<PropertyGroup>	getMethodProperties(std::string&& annotateMessage) noexcept;
+			std::optional<PropertyGroup>	getEnumProperties(std::string&& annotateMessage) noexcept;
+			std::optional<PropertyGroup>	getEnumValueProperties(std::string&& annotateMessage) noexcept;
 
-			PropertyParsingError getParsingError() const noexcept;
+			EParsingError					getParsingError() const noexcept;
 	};
 }

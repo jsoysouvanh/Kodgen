@@ -4,7 +4,7 @@
 #include <clang-c/Index.h>
 
 #include "FundamentalTypes.h"
-#include "AccessSpecifier.h"
+#include "EAccessSpecifier.h"
 #include "ParsingSettings.h"
 #include "ParsingResult.h"
 #include "Properties/PropertyParser.h"
@@ -67,12 +67,12 @@ namespace refureku
 			/*
 			*	Current class modifier
 			**/
-			AccessSpecifier	_accessSpecifier	= AccessSpecifier::Private;
+			EAccessSpecifier	_accessSpecifier	= EAccessSpecifier::Private;
 
 			/**
 			*	Final collected data
 			*/
-			ParsingResult	_parsingResult;
+			ParsingResult		_parsingResult;
 
 			/**
 			*	Returns true if the provided cursor describes a valid class, else false
@@ -114,6 +114,7 @@ namespace refureku
 			void					endEnumParsing()											noexcept;
 
 			void					updateAccessSpecifier(CXCursor const& enumCursor)			noexcept;
+			void					addParsingError(EParsingError parsingError)					noexcept;
 			CXChildVisitResult		tryToAddClass(CXCursor const& classAnnotationCursor)		noexcept;
 
 			ParsingResult			extractParsingResult()										noexcept;
@@ -126,7 +127,7 @@ namespace refureku
 			bool					isParsingEnum()										const	noexcept;
 			bool					isParsingField()									const	noexcept;
 			bool					isParsingMethod()									const	noexcept;
-			AccessSpecifier			getAccessSpecifier()								const	noexcept;
+			EAccessSpecifier		getAccessSpecifier()								const	noexcept;
 
 			ParsingSettings const*	getParsingSettings()								const	noexcept;
 			void					setParsingSettings(ParsingSettings const* parsingSettings)	noexcept;

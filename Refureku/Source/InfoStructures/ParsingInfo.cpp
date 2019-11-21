@@ -11,7 +11,7 @@ void ParsingInfo::startStructParsing(CXCursor const& structCursor) noexcept
 	_classStructLevel++;
 	_currentClassCursor = structCursor;
 	shouldCheckValidity = true;
-	_accessSpecifier = AccessSpecifier::Public;
+	_accessSpecifier = EAccessSpecifier::Public;
 
 	std::cout << "START STRUCT" << std::endl;
 }
@@ -21,7 +21,7 @@ void ParsingInfo::startClassParsing(CXCursor const& classCursor) noexcept
 	_classStructLevel++;
 	_currentClassCursor = classCursor;
 	shouldCheckValidity = true;
-	_accessSpecifier = AccessSpecifier::Private;
+	_accessSpecifier = EAccessSpecifier::Private;
 
 	std::cout << "START CLASS" << std::endl;
 }
@@ -84,24 +84,29 @@ void ParsingInfo::endEnumParsing() noexcept
 
 void ParsingInfo::updateAccessSpecifier(CXCursor const& enumCursor) noexcept
 {
-	_accessSpecifier = static_cast<AccessSpecifier>(1 << clang_getCXXAccessSpecifier(enumCursor));
+	_accessSpecifier = static_cast<EAccessSpecifier>(1 << clang_getCXXAccessSpecifier(enumCursor));
 
 	//TODO delete this
 	switch (_accessSpecifier)
 	{
-		case AccessSpecifier::Private:
+		case EAccessSpecifier::Private:
 			std::cout << " -- Private:" << std::endl;
 			break;
-		case AccessSpecifier::Protected:
+		case EAccessSpecifier::Protected:
 			std::cout << " -- Protected:" << std::endl;
 			break;
-		case AccessSpecifier::Public:
+		case EAccessSpecifier::Public:
 			std::cout << " -- Public:" << std::endl;
 			break;
 		default:
 			std::cout << " -- Invalid:" << std::endl;
 			break;
 	}
+}
+
+void ParsingInfo::addParsingError(EParsingError parsingError) noexcept
+{
+	_parsingResult.parsingErrors.emplace_back(ParsingError(parsingError));
 }
 
 CXChildVisitResult ParsingInfo::tryToAddClass(CXCursor const& classAnnotationCursor) noexcept
@@ -114,20 +119,18 @@ CXChildVisitResult ParsingInfo::tryToAddClass(CXCursor const& classAnnotationCur
 	}
 	else
 	{
-		if (_propertyParser.getParsingError() == PropertyParsingError::Count)
+		if (_propertyParser.getParsingError() == EParsingError::Count)
 		{
 			endStructOrClassParsing();
 			return CXChildVisitResult::CXChildVisit_Continue;
 		}
 		else	//Fatal parsing error occured
 		{
-			_parsingResult.parsingErrors.emplace_back(ParsingError(clang_getCursorLocation(classAnnotationCursor), _propertyParser.getParsingError()));
+			_parsingResult.parsingErrors.emplace_back(ParsingError(_propertyParser.getParsingError(), clang_getCursorLocation(classAnnotationCursor)));
 
 			return _parsingSettings->shouldAbortParsingOnFirstError ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
 		}
 	}
-
-	return CXChildVisitResult::CXChildVisit_Recurse;//TODO
 }
 
 bool ParsingInfo::isClassValid(CXCursor currentCursor) noexcept
@@ -189,7 +192,7 @@ CXCursor const& ParsingInfo::getCurrentMethodCursor()const noexcept
 	return _currentMethodCursor;
 }
 
-AccessSpecifier ParsingInfo::getAccessSpecifier() const noexcept
+EAccessSpecifier ParsingInfo::getAccessSpecifier() const noexcept
 {
 	return _accessSpecifier;
 }

@@ -3,21 +3,21 @@
 #include <clang-c/Index.h>
 #include <string>
 
-#include "Properties/PropertyParsingError.h"
+#include "Properties/EParsingError.h"
 
 namespace refureku
 {
 	class ParsingError
 	{
 		private:
-			unsigned				_line					= 0;
-			unsigned				_column					= 0;
-			std::string				_filename				= "";
-			PropertyParsingError	_propertyParsingError	= PropertyParsingError::Count;
+			unsigned		_line					= 0;
+			unsigned		_column					= 0;
+			std::string		_filename				= "";
+			EParsingError	_propertyParsingError	= EParsingError::Count;
 
 		public:
 			ParsingError()						= delete;
-			ParsingError(CXSourceLocation errorSourceLocation, PropertyParsingError ppe) noexcept;
+			ParsingError(EParsingError parsingError, CXSourceLocation errorSourceLocation = clang_getNullLocation()) noexcept;
 			ParsingError(ParsingError const&)	= default;
 			ParsingError(ParsingError&&)		= default;
 			~ParsingError()						= default;
@@ -25,6 +25,6 @@ namespace refureku
 			std::string const&		getFilename()	const noexcept;
 			unsigned				getLine()		const noexcept;
 			unsigned				getColumn()		const noexcept;
-			PropertyParsingError	getErrorValue()	const noexcept;
+			EParsingError			getErrorValue()	const noexcept;
 	};
 }

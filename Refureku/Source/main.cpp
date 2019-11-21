@@ -38,12 +38,12 @@ void propertyTests()
 void parsingTests()
 {
 	fs::path includeDirPath	= fs::current_path().parent_path().parent_path().parent_path() / "Include";
-	fs::path pathToFile		= includeDirPath / "TestClass.h";
+	fs::path pathToFile		= includeDirPath / "TestClas.h";
 
 	refureku::Parser parser;
 
 	//Setup parser settings
-	parser.parsingSettings.propertyParsingSettings.ignoredCharacters.insert(' ');	//Ignored white space
+	parser.parsingSettings.propertyParsingSettings.ignoredCharacters.insert(' ');	//Ignore white space
 	parser.parsingSettings.propertyParsingSettings.subPropertySeparator = '/';
 
 	assert(parser.retrieveParsingResult() == nullptr);
@@ -65,7 +65,7 @@ void parsingTests()
 		//Print errors
 		for (refureku::ParsingError const& error : result->parsingErrors)
 		{
-			std::cout << "Error: " << "file: " << error.getFilename() << ", line: " << error.getLine() << ", column: " << error.getColumn() << std::endl;
+			std::cout << "Error: " << static_cast<refureku::uint16>(error.getErrorValue()) << ", file: " << error.getFilename() << ", line: " << error.getLine() << ", column: " << error.getColumn() << std::endl;
 		}
 	}
 }
