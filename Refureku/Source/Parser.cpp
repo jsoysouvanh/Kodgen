@@ -93,7 +93,6 @@ CXChildVisitResult Parser::parseCursor(CXCursor currentCursor, CXCursor parentCu
 CXChildVisitResult Parser::parseDefault(CXCursor currentCursor, ParsingInfo* parsingInfo) noexcept
 {
 	CXCursorKind		cursorKind	= clang_getCursorKind(currentCursor);
-	std::string			cursorName	= Helpers::getString(clang_getCursorSpelling(currentCursor));
 
 	//Check for namespace, class or enum
 	switch (cursorKind)
@@ -273,7 +272,7 @@ bool Parser::parse(fs::path const& parseFile) noexcept
 			//Get the root cursor for this translation unit
 			CXCursor cursor = clang_getTranslationUnitCursor(translationUnit);
 			
-			if (clang_visitChildren(cursor, &Parser::staticParseCursor, &parsingInfo))
+			if (clang_visitChildren(cursor, &Parser::staticParseCursor, &parsingInfo) || parsingInfo.hasErrorOccured())
 			{
 				//ERROR
 			}
@@ -282,9 +281,13 @@ bool Parser::parse(fs::path const& parseFile) noexcept
 				isSuccess = true;
 				//SUCCESS
 			}
-		}
 
-		clang_disposeTranslationUnit(translationUnit);
+			clang_disposeTranslationUnit(translationUnit);
+		}
+		else
+		{
+			parsingInfo.addParsingError(EParsingError::TranslationUnitInitFailed);
+		}
 	}
 	else
 	{

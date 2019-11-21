@@ -4,14 +4,14 @@
 
 using namespace refureku;
 
-bool PropertyRules::addSimpleProperty(SimplePropertyRule&& simplePropertyRule) noexcept
+bool PropertyRules::addSimplePropertyRule(std::string&& propertyName) noexcept
 {
-	return _simplePropertyRules.insert(std::forward<SimplePropertyRule>(simplePropertyRule)).second;
+	return _simplePropertyRules.emplace(SimplePropertyRule(std::forward<std::string>(propertyName))).second;
 }
 
-bool PropertyRules::removeSimpleProperty(SimplePropertyRule&& simplePropertyRule) noexcept
+bool PropertyRules::removeSimplePropertyRule(std::string&& propertyName) noexcept
 {
-	std::set<SimplePropertyRule>::const_iterator it = _simplePropertyRules.find(simplePropertyRule);
+	std::set<SimplePropertyRule>::const_iterator it = _simplePropertyRules.find(SimplePropertyRule(std::forward<std::string>(propertyName)));
 
 	if (it != _simplePropertyRules.cend())
 	{
@@ -23,14 +23,14 @@ bool PropertyRules::removeSimpleProperty(SimplePropertyRule&& simplePropertyRule
 	return false;
 }
 
-bool PropertyRules::addComplexProperty(ComplexPropertyRule&& complexPropertyRule) noexcept
+bool PropertyRules::addComplexPropertyRule(std::string&& mainPropertyName, std::string&& subPropPattern) noexcept
 {
-	return _complexPropertyRules.insert(std::forward<ComplexPropertyRule>(complexPropertyRule)).second;
+	return _complexPropertyRules.insert(ComplexPropertyRule(std::forward<std::string>(mainPropertyName), std::forward<std::string>(subPropPattern))).second;
 }
 
-bool PropertyRules::removeComplexProperty(ComplexPropertyRule&& complexPropertyRule) noexcept
+bool PropertyRules::removeComplexPropertyRule(std::string&& mainPropertyName, std::string&& subPropPattern) noexcept
 {
-	std::set<ComplexPropertyRule>::const_iterator it = _complexPropertyRules.find(complexPropertyRule);
+	std::set<ComplexPropertyRule>::const_iterator it = _complexPropertyRules.find(ComplexPropertyRule(std::forward<std::string>(mainPropertyName), std::forward<std::string>(subPropPattern)));
 
 	if (it != _complexPropertyRules.cend())
 	{
@@ -42,30 +42,30 @@ bool PropertyRules::removeComplexProperty(ComplexPropertyRule&& complexPropertyR
 	return false;
 }
 
-void PropertyRules::clearSimpleProperties() noexcept
+void PropertyRules::clearSimplePropertyRules() noexcept
 {
 	_simplePropertyRules.clear();
 }
 
-void PropertyRules::clearComplexProperties() noexcept
+void PropertyRules::clearComplexPropertyRules() noexcept
 {
 	_complexPropertyRules.clear();
 }
 
-void PropertyRules::clear() noexcept
+void PropertyRules::clearAllPropertyRules() noexcept
 {
-	clearSimpleProperties();
-	clearComplexProperties();
+	clearSimplePropertyRules();
+	clearComplexPropertyRules();
 }
 
-SimplePropertyRule const* PropertyRules::getSimpleProperty(std::string const& propertyName) const noexcept
+SimplePropertyRule const* PropertyRules::getSimplePropertyRule(std::string const& propertyName) const noexcept
 {
 	decltype(_simplePropertyRules)::const_iterator it = std::find_if(_simplePropertyRules.cbegin(), _simplePropertyRules.cend(), [propertyName](SimplePropertyRule const& prop) { return prop.name == propertyName; });
 
 	return (it != _simplePropertyRules.cend()) ? &*it : nullptr;
 }
 
-ComplexPropertyRule const* PropertyRules::getComplexProperty(std::string const& propertyName) const noexcept
+ComplexPropertyRule const* PropertyRules::getComplexPropertyRule(std::string const& propertyName) const noexcept
 {
 	decltype(_complexPropertyRules)::const_iterator it = std::find_if(_complexPropertyRules.cbegin(), _complexPropertyRules.cend(), [propertyName](ComplexPropertyRule const& prop) { return prop.name == propertyName; });
 

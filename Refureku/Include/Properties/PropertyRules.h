@@ -19,16 +19,16 @@ namespace refureku
 			PropertyRules(PropertyRules&&)		= default;
 			~PropertyRules()					= default;
 
-			bool addSimpleProperty(SimplePropertyRule&& simplePropertyRule)			noexcept;
-			bool removeSimpleProperty(SimplePropertyRule&& simplePropertyRule)		noexcept;
-			bool addComplexProperty(ComplexPropertyRule&& complexPropertyRule)		noexcept;
-			bool removeComplexProperty(ComplexPropertyRule&& complexPropertyRule)	noexcept;
+			bool addSimplePropertyRule(std::string&& propertyName)										noexcept;
+			bool removeSimplePropertyRule(std::string&& propertyName)									noexcept;
+			bool addComplexPropertyRule(std::string&& mainPropertyName, std::string&& subPropPattern)	noexcept;
+			bool removeComplexPropertyRule(std::string&& mainPropertyName, std::string&& subPropPattern)noexcept;
 
-			void clearSimpleProperties()											noexcept;
-			void clearComplexProperties()											noexcept;
-			void clear()															noexcept;
+			void clearSimplePropertyRules()																noexcept;
+			void clearComplexPropertyRules()															noexcept;
+			void clearAllPropertyRules()																noexcept;
 
-			SimplePropertyRule const*	getSimpleProperty(std::string const& propertyName)	const noexcept;
-			ComplexPropertyRule const*	getComplexProperty(std::string const& propertyName)	const noexcept;
+			SimplePropertyRule const*	getSimplePropertyRule(std::string const& propertyName)	const	noexcept;
+			ComplexPropertyRule const*	getComplexPropertyRule(std::string const& propertyName)	const	noexcept;
 	};
 }

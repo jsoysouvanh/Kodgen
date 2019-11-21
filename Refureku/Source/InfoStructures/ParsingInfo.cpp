@@ -111,9 +111,9 @@ void ParsingInfo::addParsingError(EParsingError parsingError) noexcept
 
 CXChildVisitResult ParsingInfo::tryToAddClass(CXCursor const& classAnnotationCursor) noexcept
 {
-	if (isClassValid(classAnnotationCursor))
+	if (std::optional<PropertyGroup> propertyGroup = isClassValid(classAnnotationCursor))
 	{
-		//TODO create a class
+		_parsingResult.classes.emplace_back(ClassInfo(Helpers::getString(clang_getCursorDisplayName(_currentClassCursor)), std::move(*propertyGroup)));
 
 		return CXChildVisitResult::CXChildVisit_Recurse;
 	}
@@ -133,18 +133,22 @@ CXChildVisitResult ParsingInfo::tryToAddClass(CXCursor const& classAnnotationCur
 	}
 }
 
-bool ParsingInfo::isClassValid(CXCursor currentCursor) noexcept
+std::optional<PropertyGroup> ParsingInfo::isClassValid(CXCursor currentCursor) noexcept
 {
-	//std::string		cursorName	= ParsingInfo::getString(clang_getCursorSpelling(currentCursor));
-
 	shouldCheckValidity = false;
+	_propertyParser.clean();
 
 	if (clang_getCursorKind(currentCursor) == CXCursorKind::CXCursor_AnnotateAttr)
 	{
-		return _propertyParser.getClassProperties(Helpers::getString(clang_getCursorSpelling(currentCursor))).has_value();
+		return _propertyParser.getClassProperties(Helpers::getString(clang_getCursorSpelling(currentCursor)));
 	}
 
-	return false;
+	return std::nullopt;
+}
+
+bool ParsingInfo::hasErrorOccured() const noexcept
+{
+	return !_parsingResult.parsingErrors.empty();
 }
 
 ParsingResult ParsingInfo::extractParsingResult() noexcept

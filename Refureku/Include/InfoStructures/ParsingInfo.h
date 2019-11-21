@@ -75,9 +75,9 @@ namespace refureku
 			ParsingResult		_parsingResult;
 
 			/**
-			*	Returns true if the provided cursor describes a valid class, else false
+			*	Returns a filled PropertyGroup if the provided cursor describes a valid class, else an empty one
 			*/
-			bool isClassValid(CXCursor currentCursor) noexcept;
+			std::optional<PropertyGroup> isClassValid(CXCursor currentCursor) noexcept;
 
 		public:		
 			/*
@@ -117,6 +117,7 @@ namespace refureku
 			void					addParsingError(EParsingError parsingError)					noexcept;
 			CXChildVisitResult		tryToAddClass(CXCursor const& classAnnotationCursor)		noexcept;
 
+			bool					hasErrorOccured()									const	noexcept;
 			ParsingResult			extractParsingResult()										noexcept;
 
 			uint8					getClassStructLevel()								const	noexcept;

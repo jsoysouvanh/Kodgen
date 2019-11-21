@@ -13,9 +13,7 @@ std::optional<PropertyGroup> PropertyParser::getClassProperties(std::string&& an
 	{
 		if (splitProperties(annotateMessage.substr(classAnnotation.size())))
 		{
-			PropertyGroup pp;
-
-			return pp;
+			return checkAndFillClassPropertyGroup(_splitProps);
 		}
 	}
 	else
@@ -65,8 +63,6 @@ std::optional<PropertyGroup> PropertyParser::getEnumValueProperties(std::string&
 
 bool PropertyParser::splitProperties(std::string&& propertiesString) noexcept
 {
-	//_splitProps
-
 	cleanString(propertiesString);
 
 	if (_hasCommonSeparator)
@@ -139,10 +135,76 @@ void PropertyParser::cleanString(std::string& toCleanString) const noexcept
 	}
 }
 
+std::optional<PropertyGroup> PropertyParser::checkAndFillClassPropertyGroup(std::vector<std::vector<std::string>>& splitProps) noexcept
+{
+	PropertyGroup propertyGroup;
+
+	for (std::vector<std::string>& props : splitProps)
+	{
+		//Expect a simple prop
+		if (props.size() == 1)
+		{
+			std::string propName = std::move(props[0]);
+
+			if (_propertyParsingSettings->classPropertyRules.getSimplePropertyRule(propName) != nullptr)
+			{
+				propertyGroup.simpleProperties.emplace(SimpleProperty(std::move(propName)));
+			}
+			else
+			{
+				_parsingError = EParsingError::InvalidSimpleProperty;
+				return std::nullopt;
+			}
+		}
+		//Expect a complex prop
+		else
+		{
+			std::string mainProp = std::move(props[0]);
+
+			if (ComplexPropertyRule const* propertyRule = _propertyParsingSettings->classPropertyRules.getComplexPropertyRule(mainProp))
+			{
+				ComplexProperty complexProp;
+				complexProp.name = std::move(mainProp);
+
+				//Iterate over subproperties
+				for (uint8 i = 1u; i < props.size(); i++)
+				{
+					std::string subProp = std::move(props[i]);
+
+					if (propertyRule->isValidSubProperty(subProp))
+					{
+						complexProp.subProperties.emplace_back(std::move(subProp));
+					}
+					else
+					{
+						_parsingError = EParsingError::InvalidComplexSubProperty;
+						return std::nullopt;
+					}
+				}
+
+				propertyGroup.complexProperties.emplace(std::move(complexProp));
+			}
+			else
+			{
+				_parsingError = EParsingError::InvalidComplexMainProperty;
+				return std::nullopt;
+			}
+		}
+	}
+
+	return propertyGroup;
+}
+
 void PropertyParser::setup(PropertyParsingSettings const* propertyParsingSettings) noexcept
 {
 	_propertyParsingSettings = propertyParsingSettings;
 	_hasCommonSeparator = _propertyParsingSettings->propertySeparator == _propertyParsingSettings->subPropertySeparator;
+}
+
+void PropertyParser::clean() noexcept
+{
+	_splitProps.clear();
+	_parsingError = EParsingError::Count;
 }
 
 EParsingError PropertyParser::getParsingError() const noexcept

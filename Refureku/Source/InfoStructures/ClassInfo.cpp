@@ -2,12 +2,7 @@
 
 using namespace refureku;
 
-void ClassInfo::AddField(EAccessSpecifier accessSpecifier, CXCursor fieldCursor) noexcept
+ClassInfo::ClassInfo(std::string&& entityName, PropertyGroup&& propertyGroup)	noexcept:
+	StructClassInfo(std::forward<std::string>(entityName), std::forward<PropertyGroup>(propertyGroup))
 {
-	//TODO
-}
-
-void ClassInfo::AddMethod(EAccessSpecifier accessSpecifier, CXCursor methodCursor) noexcept
-{
-	//TODO
 }

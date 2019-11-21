@@ -11,11 +11,10 @@ namespace refureku
 	class PropertyParser
 	{
 		private:
-			PropertyParsingSettings const*	_propertyParsingSettings	= nullptr;
-			bool							_hasCommonSeparator			= true;
+			PropertyParsingSettings const*			_propertyParsingSettings	= nullptr;
+			bool									_hasCommonSeparator			= true;
 
-			EParsingError					_parsingError				= EParsingError::Count;
-
+			EParsingError							_parsingError				= EParsingError::Count;
 			std::vector<std::vector<std::string>>	_splitProps;
 
 			/**
@@ -37,11 +36,24 @@ namespace refureku
 			*/
 			void cleanString(std::string& toCleanString) const noexcept;
 
+			/**
+			*	Check for each prop / subprop validity and fill a propertyGroup consequently
+			*	On success, returns the filled propertyGroup object
+			*	On failure, returns an empty empty optional object
+			*/
+			std::optional<PropertyGroup> checkAndFillClassPropertyGroup(std::vector<std::vector<std::string>>& splitProps) noexcept;
+
 		public:
 			/**
 			*	Called by the parser to internally setup some acceleration data
 			*/
 			void setup(PropertyParsingSettings const* propertyParsingSettings) noexcept;
+
+			/**
+			*	Clear all collected data such as parsingErrors or split props.
+			*	Called to have a clean state and prepare for a new parse
+			*/
+			void clean() noexcept;
 
 			/**
 			*	All get[...]Properties(std::string&& annotateMessage) below methods return an initialized optional

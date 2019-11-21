@@ -12,7 +12,10 @@ namespace refureku
 			std::string		name = "";
 			PropertyGroup	properties;
 
-			EntityInfo() = default;
-			~EntityInfo() = default;
+			EntityInfo()														= default;
+			EntityInfo(std::string&& entityName, PropertyGroup&& propertyGroup)	noexcept;
+			EntityInfo(EntityInfo const&)										= default;
+			EntityInfo(EntityInfo&&)											= default;
+			~EntityInfo()														= default;
 	};
 }

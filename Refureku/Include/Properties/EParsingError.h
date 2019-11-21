@@ -27,19 +27,37 @@ namespace refureku
 		*	There might be a type miss, or you should register this simple property in the property rules
 		*	of the marked entity type
 		*/
-		UnkownSimpleProperty,
+		InvalidSimpleProperty,
 
 		/**
-		*	An unregistered complex property has been detected in a Property declaration
+		*	An unregistered complex main property has been detected in a Property declaration
 		*	There might be a type miss, or you should register this complex property in the property rules
 		*	of the marked entity type
+		*
+		*	i.e. RfrkEnum(Prop1, Prop2[SubProp1, SubProp2], Prop3)
+		*	Prop2 is invalid
 		*/
-		UnkownComplexProperty,
+		InvalidComplexMainProperty,
+
+		/**
+		*	An unregistered complex sub property has been detected in a Property declaration
+		*	There might be a type miss, or you should register this complex property in the property rules
+		*	of the marked entity type
+		*
+		*	i.e. RfrkEnum(Prop1, Prop2[SubProp1, SubProp2], Prop3)
+		*	SubProp1 or SubProp2 is invalid
+		*/
+		InvalidComplexSubProperty,
 
 		/**
 		*	The file the parser attempted to parse doesn't exist or is not a file (might be a directory)
 		*/
 		InexistantFile,
+
+		/**
+		*	Clang internally failed to init a translation unit
+		*/
+		TranslationUnitInitFailed,
 		
 		/**
 		*	Might be used in the future.

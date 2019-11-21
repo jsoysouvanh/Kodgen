@@ -10,7 +10,7 @@ namespace refureku
 	class ComplexProperty final : public SimpleProperty
 	{
 		public:
-			std::vector<std::string>	arguments;
+			std::vector<std::string>	subProperties;
 
 			ComplexProperty()						= default;
 			ComplexProperty(ComplexProperty const&)	= default;
