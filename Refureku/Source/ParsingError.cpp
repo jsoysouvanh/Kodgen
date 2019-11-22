@@ -39,3 +39,10 @@ EParsingError ParsingError::getErrorValue() const noexcept
 {
 	return _propertyParsingError;
 }
+
+std::ostream& refureku::operator<<(std::ostream& out_stream, ParsingError const& parsingError) noexcept
+{
+	out_stream << "Error: " << refureku::toString(parsingError.getErrorValue()) << ", " << parsingError.getFilename() << ": " << parsingError.getLine() << ":" << parsingError.getColumn();
+
+	return out_stream;
+}

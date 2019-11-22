@@ -50,8 +50,10 @@ add_executable(refureku
 				Source/Helpers.cpp
 				Source/Properties/SimplePropertyRule.cpp
 				Source/Properties/ComplexPropertyRule.cpp
+				Source/Properties/ComplexProperty.cpp
 				Source/Properties/PropertyRules.cpp
 				Source/Properties/PropertyParser.cpp
+				Source/Properties/PropertyGroup.cpp
 				Source/InfoStructures/EntityInfo.cpp
 				Source/InfoStructures/FieldInfo.cpp
 				Source/InfoStructures/MethodInfo.cpp
@@ -59,6 +61,7 @@ add_executable(refureku
 				Source/InfoStructures/ClassInfo.cpp
 				Source/InfoStructures/ParsingInfo.cpp
 				Source/FileGenerator.cpp
+				Source/EParsingError.cpp
 				Source/ParsingError.cpp
 				Source/Parser.cpp
 				Source/main.cpp

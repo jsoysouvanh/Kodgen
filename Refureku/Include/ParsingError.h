@@ -2,8 +2,9 @@
 
 #include <clang-c/Index.h>
 #include <string>
+#include <iostream>
 
-#include "Properties/EParsingError.h"
+#include "EParsingError.h"
 
 namespace refureku
 {
@@ -27,4 +28,6 @@ namespace refureku
 			unsigned				getColumn()		const noexcept;
 			EParsingError			getErrorValue()	const noexcept;
 	};
+
+	std::ostream& operator<<(std::ostream& out_stream, ParsingError const& parsingError) noexcept;
 }

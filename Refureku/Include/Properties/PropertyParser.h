@@ -3,8 +3,8 @@
 #include <optional>
 
 #include "Properties/PropertyGroup.h"
-#include "Properties/EParsingError.h"
 #include "Properties/PropertyParsingSettings.h"
+#include "EParsingError.h"
 
 namespace refureku
 {

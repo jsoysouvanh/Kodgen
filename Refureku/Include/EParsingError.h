@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "FundamentalTypes.h"
 
 namespace refureku
@@ -73,4 +75,6 @@ namespace refureku
 		*/
 		Count
 	};
+
+	std::string toString(EParsingError error) noexcept;
 }

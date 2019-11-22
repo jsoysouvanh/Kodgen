@@ -13,4 +13,6 @@ namespace refureku
 			ClassInfo(ClassInfo&&)												= default;
 			~ClassInfo()														= default;
 	};
+
+	std::ostream& operator<<(std::ostream& out_stream, refureku::ClassInfo const&) noexcept;
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <iostream>
 
 namespace refureku
 {
@@ -19,4 +20,6 @@ namespace refureku
 
 			bool operator<(SimplePropertyRule const& other)		const;
 	};
+
+	std::ostream& operator<<(std::ostream& out_stream, SimplePropertyRule const&) noexcept;
 }

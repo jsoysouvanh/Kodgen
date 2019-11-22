@@ -40,22 +40,7 @@ void printClasses(refureku::ParsingResult const* result)
 	//Print classes
 	for (refureku::ClassInfo const& c : result->classes)
 	{
-		std::cout << "Class: " << c.name << std::endl;
-		for (refureku::SimpleProperty const& sp : c.properties.simpleProperties)
-		{
-			std::cout << sp.name << std::endl;
-		}
-		for (refureku::ComplexProperty const& cp : c.properties.complexProperties)
-		{
-			std::cout << cp.name;
-
-			for (std::string const& subprop : cp.subProperties)
-			{
-				std::cout << " " << subprop;
-			}
-
-			std::cout << std::endl;
-		}
+		std::cout << c << std::endl;
 	}
 }
 
@@ -63,7 +48,7 @@ void printErrors(refureku::ParsingResult const* result)
 {
 	for (refureku::ParsingError const& error : result->parsingErrors)
 	{
-		std::cout << "Error: " << static_cast<refureku::uint16>(error.getErrorValue()) << ", file: " << error.getFilename() << ", line: " << error.getLine() << ", column: " << error.getColumn() << std::endl;
+		std::cout << error << std::endl;
 	}
 }
 

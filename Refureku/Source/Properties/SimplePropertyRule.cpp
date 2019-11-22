@@ -15,3 +15,10 @@ bool SimplePropertyRule::operator<(SimplePropertyRule const& other) const
 {
 	return name < other.name;
 }
+
+std::ostream& refureku::operator<<(std::ostream& out_stream, SimplePropertyRule const& simpleProp) noexcept
+{
+	out_stream << "SimpleProperty: " << simpleProp.name;
+
+	return out_stream;
+}

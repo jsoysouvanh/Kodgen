@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <iostream>
 
 #include "Properties/PropertyGroup.h"
 
@@ -18,4 +19,6 @@ namespace refureku
 			EntityInfo(EntityInfo&&)											= default;
 			~EntityInfo()														= default;
 	};
+
+	std::ostream& operator<<(std::ostream& out_stream, EntityInfo const&) noexcept;
 }

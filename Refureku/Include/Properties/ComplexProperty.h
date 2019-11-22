@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include "Properties/SimpleProperty.h"
 
@@ -17,4 +18,6 @@ namespace refureku
 			ComplexProperty(ComplexProperty&&)		= default;
 			~ComplexProperty()						= default;
 	};
+
+	std::ostream& operator<<(std::ostream& out_stream, ComplexProperty const& complexProp) noexcept;
 }
