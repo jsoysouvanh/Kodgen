@@ -65,63 +65,89 @@ bool PropertyParser::splitProperties(std::string&& propertiesString) noexcept
 {
 	cleanString(propertiesString);
 
-	if (_hasCommonSeparator)
-	{
-		//TODO
-		return true;
-	}
-	else
-	{
-		std::string::iterator it;
+	bool isParsingSubproperty = false;
 
-		//Split main properties first
-		while ((it = std::find_if(propertiesString.begin(), propertiesString.end(), [this](char c){ return c == _propertyParsingSettings->propertySeparator; })) != propertiesString.end())
+	while (!propertiesString.empty())
+	{
+		if (isParsingSubproperty)
 		{
-			_splitProps.push_back({ std::string(propertiesString.begin(), it) });
-			propertiesString.erase(propertiesString.cbegin(), it + 1);
-		}
-
-		//Retrieve last one
-		_splitProps.push_back({ std::string(propertiesString.begin(), it) });
-	}
-
-	return splitSubProperties(_splitProps);
-}
-
-bool PropertyParser::splitSubProperties(std::vector<std::vector<std::string>>& splitProps) noexcept
-{
-	std::string subProps;
-
-	for (std::vector<std::string>& vec : splitProps)
-	{
-		std::string& fullProp = vec.front();
-
-		size_t charIndex = fullProp.find_first_of(_propertyParsingSettings->subPropertyEnclosers[0], 0u);
-		if (charIndex != fullProp.npos)	//found subprops beginning marker
-		{
-			//Make sure the last char is a subprops ending marker
-			if (fullProp.back() != _propertyParsingSettings->subPropertyEnclosers[1])
+			if (!lookForNextSubProp(propertiesString, isParsingSubproperty))
 			{
-				_parsingError = EParsingError::SubPropertyEndEncloserMissing;
 				return false;
 			}
-
-			subProps = fullProp.substr(charIndex + 1, fullProp.size() - charIndex - 2);
-			fullProp.erase(charIndex);
-
-			//Split sub properties
-			std::string::iterator it;
-
-			//Split main properties first
-			while ((it = std::find_if(subProps.begin(), subProps.end(), [this](char c){ return c == _propertyParsingSettings->subPropertySeparator; })) != subProps.end())
-			{
-				vec.push_back({ std::string(subProps.begin(), it) });
-				subProps.erase(subProps.cbegin(), it + 1);
-			}
-
-			//Retrieve last one
-			vec.push_back({ std::string(subProps.begin(), it) });
 		}
+		else if (!lookForNextProp(propertiesString, isParsingSubproperty))
+		{
+			return false;
+		}
+	}
+
+	//propertyString has been fully parsed but no end subproperty mark found
+	if (isParsingSubproperty)
+	{
+		_parsingError = EParsingError::SubPropertyEndEncloserMissing;
+		return false;
+	}
+
+	return true;
+}
+
+bool PropertyParser::lookForNextProp(std::string& inout_parsingProps, bool& out_isParsingSubProp)
+{
+	//Find first occurence of propertySeparator or subprop start encloser in string
+	size_t index = inout_parsingProps.find_first_of(_relevantCharsForPropParsing);
+
+	//Was last prop
+	if (index == inout_parsingProps.npos)
+	{
+		_splitProps.push_back({ inout_parsingProps });
+		inout_parsingProps.clear();
+	}
+	else if (inout_parsingProps[index] == _propertyParsingSettings->propertySeparator)
+	{
+		_splitProps.push_back({ std::string(inout_parsingProps.cbegin(), inout_parsingProps.cbegin() + index) });
+		inout_parsingProps.erase(0, index + 1);
+	}
+	else	//_propertyParsingSettings->subPropertyEnclosers[0]
+	{
+		out_isParsingSubProp = true;
+
+		_splitProps.push_back({ std::string(inout_parsingProps.cbegin(), inout_parsingProps.cbegin() + index) });
+		inout_parsingProps.erase(0, index + 1);
+	}
+
+	return true;
+}
+
+bool PropertyParser::lookForNextSubProp(std::string& inout_parsingProps, bool& out_isParsingSubProp)
+{
+	//Find first occurence of propertySeparator or subprop start encloser in string
+	size_t index = inout_parsingProps.find_first_of(_relevantCharsForSubPropParsing);
+
+	//Was last prop
+	if (index == inout_parsingProps.npos)
+	{
+		_parsingError = EParsingError::SubPropertyEndEncloserMissing;
+		return false;
+	}
+	else if (inout_parsingProps[index] == _propertyParsingSettings->subPropertySeparator)
+	{
+		_splitProps.back().push_back(std::string(inout_parsingProps.cbegin(), inout_parsingProps.cbegin() + index));
+		inout_parsingProps.erase(0, index + 1);
+	}
+	else	//_propertyParsingSettings->subPropertyEnclosers[1]
+	{
+		//Make sure there is a property separator after the end encloser if is not the last char of the string
+		if (index != inout_parsingProps.size() - 1 && inout_parsingProps[index + 1] != _propertyParsingSettings->propertySeparator)
+		{
+			_parsingError = EParsingError::PropertySeparatorMissing;
+			return false;
+		}
+
+		out_isParsingSubProp = false;
+
+		_splitProps.back().push_back(std::string(inout_parsingProps.cbegin(), inout_parsingProps.cbegin() + index));
+		inout_parsingProps.erase(0, index + 2);	// + 2 to consume subprop end encloser and prop separator
 	}
 
 	return true;
@@ -144,61 +170,89 @@ std::optional<PropertyGroup> PropertyParser::checkAndFillClassPropertyGroup(std:
 		//Expect a simple prop
 		if (props.size() == 1)
 		{
-			std::string propName = std::move(props[0]);
-
-			if (_propertyParsingSettings->classPropertyRules.getSimplePropertyRule(propName) != nullptr)
+			if (!addSimpleProperty(props, propertyGroup))
 			{
-				propertyGroup.simpleProperties.emplace(SimpleProperty(std::move(propName)));
-			}
-			else
-			{
-				_parsingError = EParsingError::InvalidSimpleProperty;
 				return std::nullopt;
 			}
 		}
 		//Expect a complex prop
-		else
+		else if (!addComplexProperty(props, propertyGroup))
 		{
-			std::string mainProp = std::move(props[0]);
-
-			if (ComplexPropertyRule const* propertyRule = _propertyParsingSettings->classPropertyRules.getComplexPropertyRule(mainProp))
-			{
-				ComplexProperty complexProp;
-				complexProp.name = std::move(mainProp);
-
-				//Iterate over subproperties
-				for (uint8 i = 1u; i < props.size(); i++)
-				{
-					std::string subProp = std::move(props[i]);
-
-					if (propertyRule->isValidSubProperty(subProp))
-					{
-						complexProp.subProperties.emplace_back(std::move(subProp));
-					}
-					else
-					{
-						_parsingError = EParsingError::InvalidComplexSubProperty;
-						return std::nullopt;
-					}
-				}
-
-				propertyGroup.complexProperties.emplace(std::move(complexProp));
-			}
-			else
-			{
-				_parsingError = EParsingError::InvalidComplexMainProperty;
-				return std::nullopt;
-			}
+			return std::nullopt;
 		}
 	}
 
 	return propertyGroup;
 }
 
+bool PropertyParser::addSimpleProperty(std::vector<std::string>& propertyAsVector, PropertyGroup& out_propertyGroup) noexcept
+{
+	std::string propName = std::move(propertyAsVector[0]);
+
+	if (_propertyParsingSettings->classPropertyRules.getSimplePropertyRule(propName) != nullptr)
+	{
+		out_propertyGroup.simpleProperties.emplace(SimpleProperty(std::move(propName)));
+		return true;
+	}
+	else
+	{
+		_parsingError = EParsingError::InvalidSimpleProperty;
+		return false;
+	}
+}
+
+bool PropertyParser::addComplexProperty(std::vector<std::string>& propertyAsVector, PropertyGroup& out_propertyGroup) noexcept
+{
+	std::string mainProp = std::move(propertyAsVector[0]);
+
+	if (ComplexPropertyRule const* propertyRule = _propertyParsingSettings->classPropertyRules.getComplexPropertyRule(mainProp))
+	{
+		ComplexProperty complexProp;
+		complexProp.name = std::move(mainProp);
+
+		//Iterate over subproperties
+		for (uint8 i = 1u; i < propertyAsVector.size(); i++)
+		{
+			std::string subProp = std::move(propertyAsVector[i]);
+
+			if (propertyRule->isValidSubProperty(subProp))
+			{
+				complexProp.subProperties.emplace_back(std::move(subProp));
+			}
+			else
+			{
+				_parsingError = EParsingError::InvalidComplexSubProperty;
+				return false;
+			}
+		}
+
+		out_propertyGroup.complexProperties.emplace(std::move(complexProp));
+	}
+	else
+	{
+		_parsingError = EParsingError::InvalidComplexMainProperty;
+		return false;
+	}
+
+	return true;
+}
+
 void PropertyParser::setup(PropertyParsingSettings const* propertyParsingSettings) noexcept
 {
 	_propertyParsingSettings = propertyParsingSettings;
-	_hasCommonSeparator = _propertyParsingSettings->propertySeparator == _propertyParsingSettings->subPropertySeparator;
+
+	char charsForPropParsing[] =	{
+		_propertyParsingSettings->propertySeparator,
+		_propertyParsingSettings->subPropertyEnclosers[0]
+	};
+
+	char charsForSubPropParsing[] =	{
+		_propertyParsingSettings->subPropertySeparator,
+		_propertyParsingSettings->subPropertyEnclosers[1]
+	};
+
+	_relevantCharsForPropParsing = std::string(charsForPropParsing, 2);
+	_relevantCharsForSubPropParsing = std::string(charsForSubPropParsing, 2);
 }
 
 void PropertyParser::clean() noexcept

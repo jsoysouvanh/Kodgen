@@ -12,24 +12,19 @@ namespace refureku
 	{
 		private:
 			PropertyParsingSettings const*			_propertyParsingSettings	= nullptr;
-			bool									_hasCommonSeparator			= true;
 
 			EParsingError							_parsingError				= EParsingError::Count;
 			std::vector<std::vector<std::string>>	_splitProps;
+			std::string								_relevantCharsForPropParsing;
+			std::string								_relevantCharsForSubPropParsing;
 
 			/**
 			*	Returns true on a successful split, else false
+			*
 			*	On success, _splitProps is updated
 			*	On failure, _parsingError is updated
 			*/
 			bool splitProperties(std::string&& propertiesString) noexcept;
-
-			/**
-			*	Return true on a successful split, else false
-			*	On success, _splitProps is updated
-			*	On failure, _parsingError is updated
-			*/
-			bool splitSubProperties(std::vector<std::vector<std::string>>& splitProps) noexcept;
 
 			/**
 			*	Removes all ignored characters from the string
@@ -37,11 +32,43 @@ namespace refureku
 			void cleanString(std::string& toCleanString) const noexcept;
 
 			/**
+			*	Search the next property. inout_parsingProps will be updated to the current parsing state
+			*	and out_isParsingSubProp is filled consequently
+			*
+			*	On success, returns true & add the prop to _splitProps (new vector).
+			*	On failure, returns false
+			*/
+			bool lookForNextProp(std::string& inout_parsingProps, bool& out_isParsingSubProp);
+
+			/**
+			*	Search the next sub property. inout_parsingProps will be updated to the current parsing state
+			*	and out_isParsingSubProp is filled consequently
+			*
+			*	On success, returns true & add the prop to _splitProps (last added vector)
+			*	On failure, returns false
+			*/
+			bool lookForNextSubProp(std::string& inout_parsingProps, bool& out_isParsingSubProp);
+
+			/**
 			*	Check for each prop / subprop validity and fill a propertyGroup consequently
 			*	On success, returns the filled propertyGroup object
 			*	On failure, returns an empty empty optional object
 			*/
 			std::optional<PropertyGroup> checkAndFillClassPropertyGroup(std::vector<std::vector<std::string>>& splitProps) noexcept;
+
+			/**
+			*	Add a single property to the given property group using the provided data
+			*	On success, returns true and update the PropertyGroup object
+			*	On failure, returns false and update _parsingError value
+			*/
+			bool addSimpleProperty(std::vector<std::string>& propertyAsVector, PropertyGroup& out_propertyGroup) noexcept;
+
+			/**
+			*	Add a complex property to the given property group using the provided data
+			*	On success, returns true and update the PropertyGroup object
+			*	On failure, returns false and update _parsingError value
+			*/
+			bool addComplexProperty(std::vector<std::string>& propertyAsVector, PropertyGroup& out_propertyGroup) noexcept;
 
 		public:
 			/**

@@ -85,23 +85,6 @@ void ParsingInfo::endEnumParsing() noexcept
 void ParsingInfo::updateAccessSpecifier(CXCursor const& enumCursor) noexcept
 {
 	_accessSpecifier = static_cast<EAccessSpecifier>(1 << clang_getCXXAccessSpecifier(enumCursor));
-
-	//TODO delete this
-	switch (_accessSpecifier)
-	{
-		case EAccessSpecifier::Private:
-			std::cout << " -- Private:" << std::endl;
-			break;
-		case EAccessSpecifier::Protected:
-			std::cout << " -- Protected:" << std::endl;
-			break;
-		case EAccessSpecifier::Public:
-			std::cout << " -- Public:" << std::endl;
-			break;
-		default:
-			std::cout << " -- Invalid:" << std::endl;
-			break;
-	}
 }
 
 void ParsingInfo::addParsingError(EParsingError parsingError) noexcept

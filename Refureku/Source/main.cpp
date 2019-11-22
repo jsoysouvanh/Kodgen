@@ -78,10 +78,11 @@ void parsingTests()
 	parser.parsingSettings.shouldAbortParsingOnFirstError = false;
 
 	parser.parsingSettings.propertyParsingSettings.ignoredCharacters.insert(' ');	//Ignore white space
-	parser.parsingSettings.propertyParsingSettings.subPropertySeparator = '/';
+	parser.parsingSettings.propertyParsingSettings.subPropertySeparator = ',';
 
 	//Prop1, Prop2[SubProp21/ SubProp22], Prop3
 	parser.parsingSettings.propertyParsingSettings.classPropertyRules.addSimplePropertyRule("Prop1");
+	parser.parsingSettings.propertyParsingSettings.classPropertyRules.addSimplePropertyRule("Prop2");
 	parser.parsingSettings.propertyParsingSettings.classPropertyRules.addComplexPropertyRule("Prop2", "SubProp21|SubProp22");
 	parser.parsingSettings.propertyParsingSettings.classPropertyRules.addSimplePropertyRule("Prop3");
 
@@ -109,9 +110,49 @@ void parsingTests()
 
 void randomTests()
 {
-	std::string str = "abcdef";
+	std::string str = "Prop1,Prop2[Prop21,Prop22],Prop3";
 
-	std::cout << str.substr(0, 5) << std::endl;
+	char chars[4] = {',', ',', '[', ']'};
+	size_t index = 0;
+	bool shouldAdd = false;
+
+	while (index != str.npos)
+	{
+		shouldAdd = false;
+		index = 0;
+
+		while (!shouldAdd && index != str.npos)
+		{
+			index = str.find_first_of(chars, index, 4);
+
+			std::cout << "found: " << index << std::endl;
+
+			if (index == str.npos)
+				shouldAdd = true;
+			else if (str[index] == ',')
+				shouldAdd = true;
+			else if (str[index] == '[')
+				shouldAdd = true;
+			else if (str[index] == ']')
+				shouldAdd = true;
+			else
+				index++;
+		}
+
+		if (index == str.npos)
+		{
+			break;
+		}
+		else
+		{
+			std::cout << "erase: " << std::string(str.cbegin(), str.cbegin() + index + 1) << std::endl;
+			str.erase(str.cbegin(), str.cbegin() + index + 1);
+
+			std::cout << str << std::endl;
+		}
+	}
+
+	//std::cout << str.find_first_of("df", 0, 2) << std::endl;
 }
 
 int main()

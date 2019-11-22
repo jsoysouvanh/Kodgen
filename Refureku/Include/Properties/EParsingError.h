@@ -23,6 +23,14 @@ namespace refureku
 		SubPropertyEndEncloserMissing,
 
 		/**
+		*	A property separator is missing
+		*
+		*	i.e. RfrkEnum(Prop1, Prop2[SubProp1, SubProp2] Prop3)
+		*	The property separator is missing after SubProp2]
+		*/
+		PropertySeparatorMissing,
+
+		/**
 		*	An unregistered simple property has been detected in a Property declaration
 		*	There might be a type miss, or you should register this simple property in the property rules
 		*	of the marked entity type

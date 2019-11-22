@@ -136,7 +136,6 @@ CXChildVisitResult Parser::parseClassContent(CXCursor currentCursor, ParsingInfo
 	}
 
 	CXCursorKind	cursorKind	= clang_getCursorKind(currentCursor);
-	std::string		cursorName	= Helpers::getString(clang_getCursorSpelling(currentCursor));
 
 	//Check for class field or method
 	switch (cursorKind)
@@ -279,7 +278,6 @@ bool Parser::parse(fs::path const& parseFile) noexcept
 			else
 			{
 				isSuccess = true;
-				//SUCCESS
 			}
 
 			clang_disposeTranslationUnit(translationUnit);
