@@ -194,8 +194,3 @@ ParsingSettings const* ParsingInfo::getParsingSettings() const noexcept
 {
 	return _parsingSettings;
 }
-
-//PropertyParser& ParsingInfo::getPropertyParser() noexcept
-//{
-//	return _propertyParser;
-//}

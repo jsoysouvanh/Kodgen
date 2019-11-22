@@ -28,8 +28,8 @@ CXChildVisitResult Parser::staticParseCursor(CXCursor c, CXCursor parent, CXClie
 
 	Parser::updateParsingState(parent, parsingInfo);
 
-	//std::cout << "Parent is : " << ParsingInfo::getString(clang_getCursorKindSpelling(clang_getCursorKind(parent))) << std::endl;
-	//std::cout << "Cursor kind : " << cursorKindAsString << " : " << cursorName << std::endl;
+	std::cout << "Parent is : " << Helpers::getString(clang_getCursorKindSpelling(clang_getCursorKind(parent))) << std::endl;
+	std::cout << "Cursor kind : " << cursorKindAsString << " : " << cursorName << std::endl;
 	
 	return Parser::parseCursor(c, parent, parsingInfo);
 	//return CXChildVisitResult::CXChildVisit_Recurse;
@@ -37,39 +37,32 @@ CXChildVisitResult Parser::staticParseCursor(CXCursor c, CXCursor parent, CXClie
 
 void Parser::updateParsingState(CXCursor parent, ParsingInfo* parsingInfo) noexcept
 {
-	bool checkClassLeave = false;
-
 	if (parsingInfo->getClassStructLevel())
 	{
+		//Check if we're not parsing a field anymore
 		if (parsingInfo->isParsingField())
 		{
-			//Check if we're not parsing a field anymore
+			
 			if (!clang_equalCursors(parsingInfo->getCurrentFieldCursor(), parent))
 			{
 				parsingInfo->endFieldParsing();
-
-				checkClassLeave = true;
 			}
-
 		}
+		//Check if we're not parsing a method anymore
 		else if (parsingInfo->isParsingMethod())
 		{
-			//Check if we're not parsing a method anymore
 			if (!clang_equalCursors(parsingInfo->getCurrentMethodCursor(), parent))
 			{
 				parsingInfo->endMethodParsing();
-
-				checkClassLeave = true;
 			}
 		}
-
-		if (checkClassLeave)
+		
+		/**
+		*	Check if we're finishing parsing a class
+		*/
+		if (clang_equalCursors(clang_getCursorSemanticParent(parsingInfo->getCurrentClassCursor()), parent))
 		{
-			//Check if we left the "currently parsing" class by checking the parent
-			if (!clang_equalCursors(parsingInfo->getCurrentClassCursor(), parent))
-			{
-				parsingInfo->endStructOrClassParsing();
-			}
+			parsingInfo->endStructOrClassParsing();
 		}
 	}
 }
