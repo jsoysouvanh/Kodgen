@@ -54,21 +54,21 @@ namespace refureku
 			*	On success, returns the filled propertyGroup object
 			*	On failure, returns an empty empty optional object
 			*/
-			std::optional<PropertyGroup> checkAndFillClassPropertyGroup(std::vector<std::vector<std::string>>& splitProps) noexcept;
+			std::optional<PropertyGroup> checkAndFillPropertyGroup(std::vector<std::vector<std::string>>& splitProps, PropertyRules const& rules) noexcept;
 
 			/**
 			*	Add a single property to the given property group using the provided data
 			*	On success, returns true and update the PropertyGroup object
 			*	On failure, returns false and update _parsingError value
 			*/
-			bool addSimpleProperty(std::vector<std::string>& propertyAsVector, PropertyGroup& out_propertyGroup) noexcept;
+			bool addSimpleProperty(std::vector<std::string>& propertyAsVector, PropertyRules const& rules, PropertyGroup& out_propertyGroup) noexcept;
 
 			/**
 			*	Add a complex property to the given property group using the provided data
 			*	On success, returns true and update the PropertyGroup object
 			*	On failure, returns false and update _parsingError value
 			*/
-			bool addComplexProperty(std::vector<std::string>& propertyAsVector, PropertyGroup& out_propertyGroup) noexcept;
+			bool addComplexProperty(std::vector<std::string>& propertyAsVector, PropertyRules const& rules, PropertyGroup& out_propertyGroup) noexcept;
 
 		public:
 			/**

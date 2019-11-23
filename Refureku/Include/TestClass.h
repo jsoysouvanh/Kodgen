@@ -6,12 +6,12 @@ namespace TestNamespace
 {
 	class Class1{};
 
-	class RfrkClass(Prop1, Prop2[SubProp21, SubProp22], Prop3) TestClass final : public Class1
+	class RfrkClass(ClassProp1, ClassProp2[ClassSubProp21, ClassSubProp22], ClassProp3) TestClass final : public Class1
 	{
 		private:
 		#pragma region Variables
 
-		RfrkField(var1 is following)
+		RfrkField(FieldProp1, FieldProp2[FieldSubProp21, FieldSubProp22], FieldProp3)
 		int				var1 = 42;
 		float			var2;
 		//MyAwesomeType*	var3 = nullptr;
@@ -24,8 +24,8 @@ namespace TestNamespace
 		public:
 		#pragma region Methods
 
-		RfrkMethod(int someMethod(int) is following)
-		int someMethod(int);
+		RfrkMethod(MethodProp1, MethodProp2[MethodSubProp21, MethodSubProp22], MethodProp3)
+		int someMethod(int* param1);
 		int dsomeMethod3(int) noexcept;
 		//int someMethosd3(int) override;
 		virtual int someMethodd3(int) const;

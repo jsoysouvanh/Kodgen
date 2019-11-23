@@ -10,7 +10,7 @@ EntityInfo::EntityInfo(std::string&& entityName, PropertyGroup&& propertyGroup) 
 
 std::ostream& refureku::operator<<(std::ostream& out_stream, EntityInfo const& entityInfo) noexcept
 {
-	out_stream << "EntityInfo";
+	out_stream << entityInfo.name;
 
 	return out_stream;
 }

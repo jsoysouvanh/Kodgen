@@ -13,7 +13,7 @@ std::optional<PropertyGroup> PropertyParser::getClassProperties(std::string&& an
 	{
 		if (splitProperties(annotateMessage.substr(classAnnotation.size())))
 		{
-			return checkAndFillClassPropertyGroup(_splitProps);
+			return checkAndFillPropertyGroup(_splitProps, _propertyParsingSettings->classPropertyRules);
 		}
 	}
 	else
@@ -37,6 +37,20 @@ std::optional<PropertyGroup> PropertyParser::getFieldProperties(std::string&& an
 {
 	static std::string fieldAnnotation = "RfrkField:";
 
+	if (annotateMessage.substr(0, fieldAnnotation.size()) == fieldAnnotation)
+	{
+		if (splitProperties(annotateMessage.substr(fieldAnnotation.size())))
+		{
+			return checkAndFillPropertyGroup(_splitProps, _propertyParsingSettings->fieldPropertyRules);
+		}
+	}
+	else
+	{
+		//Tried to add properties to a class with the wrong macro
+		_parsingError = EParsingError::WrongPropertyMacroUsed;
+	}
+
+	assert(_parsingError != EParsingError::Count);	//If fails, _parsing error must be updated
 	return std::nullopt;
 }
 
@@ -44,6 +58,20 @@ std::optional<PropertyGroup> PropertyParser::getMethodProperties(std::string&& a
 {
 	static std::string methodAnnotation = "RfrkMethod:";
 
+	if (annotateMessage.substr(0, methodAnnotation.size()) == methodAnnotation)
+	{
+		if (splitProperties(annotateMessage.substr(methodAnnotation.size())))
+		{
+			return checkAndFillPropertyGroup(_splitProps, _propertyParsingSettings->methodPropertyRules);
+		}
+	}
+	else
+	{
+		//Tried to add properties to a class with the wrong macro
+		_parsingError = EParsingError::WrongPropertyMacroUsed;
+	}
+
+	assert(_parsingError != EParsingError::Count);	//If fails, _parsing error must be updated
 	return std::nullopt;
 }
 
@@ -161,7 +189,7 @@ void PropertyParser::cleanString(std::string& toCleanString) const noexcept
 	}
 }
 
-std::optional<PropertyGroup> PropertyParser::checkAndFillClassPropertyGroup(std::vector<std::vector<std::string>>& splitProps) noexcept
+std::optional<PropertyGroup> PropertyParser::checkAndFillPropertyGroup(std::vector<std::vector<std::string>>& splitProps, PropertyRules const& rules) noexcept
 {
 	PropertyGroup propertyGroup;
 
@@ -170,13 +198,13 @@ std::optional<PropertyGroup> PropertyParser::checkAndFillClassPropertyGroup(std:
 		//Expect a simple prop
 		if (props.size() == 1)
 		{
-			if (!addSimpleProperty(props, propertyGroup))
+			if (!addSimpleProperty(props, rules, propertyGroup))
 			{
 				return std::nullopt;
 			}
 		}
 		//Expect a complex prop
-		else if (!addComplexProperty(props, propertyGroup))
+		else if (!addComplexProperty(props, rules, propertyGroup))
 		{
 			return std::nullopt;
 		}
@@ -185,11 +213,11 @@ std::optional<PropertyGroup> PropertyParser::checkAndFillClassPropertyGroup(std:
 	return propertyGroup;
 }
 
-bool PropertyParser::addSimpleProperty(std::vector<std::string>& propertyAsVector, PropertyGroup& out_propertyGroup) noexcept
+bool PropertyParser::addSimpleProperty(std::vector<std::string>& propertyAsVector, PropertyRules const& rules, PropertyGroup& out_propertyGroup) noexcept
 {
 	std::string propName = std::move(propertyAsVector[0]);
 
-	if (_propertyParsingSettings->classPropertyRules.getSimplePropertyRule(propName) != nullptr)
+	if (rules.getSimplePropertyRule(propName) != nullptr)
 	{
 		out_propertyGroup.simpleProperties.emplace(SimpleProperty(std::move(propName)));
 		return true;
@@ -201,11 +229,11 @@ bool PropertyParser::addSimpleProperty(std::vector<std::string>& propertyAsVecto
 	}
 }
 
-bool PropertyParser::addComplexProperty(std::vector<std::string>& propertyAsVector, PropertyGroup& out_propertyGroup) noexcept
+bool PropertyParser::addComplexProperty(std::vector<std::string>& propertyAsVector, PropertyRules const& rules, PropertyGroup& out_propertyGroup) noexcept
 {
 	std::string mainProp = std::move(propertyAsVector[0]);
 
-	if (ComplexPropertyRule const* propertyRule = _propertyParsingSettings->classPropertyRules.getComplexPropertyRule(mainProp))
+	if (ComplexPropertyRule const* propertyRule = rules.getComplexPropertyRule(mainProp))
 	{
 		ComplexProperty complexProp;
 		complexProp.name = std::move(mainProp);
@@ -218,6 +246,10 @@ bool PropertyParser::addComplexProperty(std::vector<std::string>& propertyAsVect
 			if (propertyRule->isValidSubProperty(subProp))
 			{
 				complexProp.subProperties.emplace_back(std::move(subProp));
+			}
+			else if (subProp.empty() && propertyAsVector.size() == 2)
+			{
+				//If there is a single empty subprop, means there is no subprop at all
 			}
 			else
 			{

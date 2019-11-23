@@ -3,6 +3,7 @@
 #include "InfoStructures/EntityInfo.h"
 
 #include <vector>
+#include <unordered_map>
 #include <clang-c/Index.h>
 
 #include "EAccessSpecifier.h"
@@ -16,20 +17,20 @@ namespace refureku
 	*/
 	class StructClassInfo : public EntityInfo
 	{
+		private:
+			void initContainers() noexcept;
+
 		public:
 			bool						isFinal;
 
 			std::vector<std::string>	parents;
-			std::vector<FieldInfo>		fields;
-			std::vector<MethodInfo>		methods;
+			std::unordered_map<EAccessSpecifier, std::vector<FieldInfo>>	fields;
+			std::unordered_map<EAccessSpecifier, std::vector<MethodInfo>>	methods;
 
-			StructClassInfo()															= default;
+			StructClassInfo()															noexcept;
 			StructClassInfo(std::string&& entityName, PropertyGroup&& propertyGroup)	noexcept;
 			StructClassInfo(StructClassInfo const&)										= default;
 			StructClassInfo(StructClassInfo&&)											= default;
 			~StructClassInfo()															= default;
-
-			void AddField(EAccessSpecifier accessSpecifier, CXCursor fieldCursor)	noexcept;
-			void AddMethod(EAccessSpecifier accessSpecifier, CXCursor methodCursor)	noexcept;
 	};
 }

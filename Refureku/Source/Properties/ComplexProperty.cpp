@@ -4,7 +4,7 @@ using namespace refureku;
 
 std::ostream& refureku::operator<<(std::ostream& out_stream, ComplexProperty const& complexProp) noexcept
 {
-	std::string totalName = "ComplexProperty: " + complexProp.name + "[";
+	std::string totalName = complexProp.name + "[";
 
 	for (std::string const& subProp : complexProp.subProperties)
 	{

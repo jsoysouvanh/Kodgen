@@ -79,6 +79,16 @@ namespace refureku
 			*/
 			std::optional<PropertyGroup> isClassValid(CXCursor currentCursor) noexcept;
 
+			/**
+			*	Returns a filled PropertyGroup if the provided cursor describes a valid field, else an empty one
+			*/
+			std::optional<PropertyGroup> isFieldValid(CXCursor currentCursor) noexcept;
+
+			/**
+			*	Returns a filled PropertyGroup if the provided cursor describes a valid method, else an empty one
+			*/
+			std::optional<PropertyGroup> isMethodValid(CXCursor currentCursor) noexcept;
+
 		public:		
 			/*
 			*	Should check for any annotation
@@ -115,7 +125,14 @@ namespace refureku
 
 			void					updateAccessSpecifier(CXCursor const& enumCursor)			noexcept;
 			void					addParsingError(EParsingError parsingError)					noexcept;
+
 			CXChildVisitResult		tryToAddClass(CXCursor const& classAnnotationCursor)		noexcept;
+
+			CXChildVisitResult		parseField(CXCursor const& fieldCursor)						noexcept;
+			CXChildVisitResult		tryToAddField(CXCursor const& fieldAnnotationCursor)		noexcept;
+
+			CXChildVisitResult		parseMethod(CXCursor const& methodCursor)					noexcept;
+			CXChildVisitResult		tryToAddMethod(CXCursor const& methodAnnotationCursor)		noexcept;
 
 			bool					hasErrorOccured()									const	noexcept;
 			ParsingResult			extractParsingResult()										noexcept;

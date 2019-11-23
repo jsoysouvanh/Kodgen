@@ -2,17 +2,25 @@
 
 using namespace refureku;
 
-StructClassInfo::StructClassInfo(std::string&& entityName, PropertyGroup&& propertyGroup)	noexcept:
+StructClassInfo::StructClassInfo() noexcept
+{
+	initContainers();
+}
+
+StructClassInfo::StructClassInfo(std::string&& entityName, PropertyGroup&& propertyGroup) noexcept:
 	EntityInfo(std::forward<std::string>(entityName), std::forward<PropertyGroup>(propertyGroup))
 {
+	initContainers();
 }
 
-void StructClassInfo::AddField(EAccessSpecifier accessSpecifier, CXCursor fieldCursor) noexcept
+void StructClassInfo::initContainers() noexcept
 {
-	//TODO
-}
+	fields.emplace(EAccessSpecifier::Public, std::vector<FieldInfo>());
+	fields.emplace(EAccessSpecifier::Protected, std::vector<FieldInfo>());
+	fields.emplace(EAccessSpecifier::Private, std::vector<FieldInfo>());
 
-void StructClassInfo::AddMethod(EAccessSpecifier accessSpecifier, CXCursor methodCursor) noexcept
-{
-	//TODO
+	methods.emplace(EAccessSpecifier::Public, std::vector<MethodInfo>());
+	methods.emplace(EAccessSpecifier::Protected, std::vector<MethodInfo>());
+	methods.emplace(EAccessSpecifier::Private, std::vector<MethodInfo>());
+
 }

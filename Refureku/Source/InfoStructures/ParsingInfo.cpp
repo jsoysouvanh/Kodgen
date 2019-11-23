@@ -13,7 +13,7 @@ void ParsingInfo::startStructParsing(CXCursor const& structCursor) noexcept
 	shouldCheckValidity = true;
 	_accessSpecifier = EAccessSpecifier::Public;
 
-	std::cout << "START STRUCT" << std::endl;
+	//std::cout << "START STRUCT" << std::endl;
 }
 
 void ParsingInfo::startClassParsing(CXCursor const& classCursor) noexcept
@@ -23,7 +23,7 @@ void ParsingInfo::startClassParsing(CXCursor const& classCursor) noexcept
 	shouldCheckValidity = true;
 	_accessSpecifier = EAccessSpecifier::Private;
 
-	std::cout << "START CLASS" << std::endl;
+	//std::cout << "START CLASS" << std::endl;
 }
 
 void ParsingInfo::startFieldParsing(CXCursor const& fieldCursor) noexcept
@@ -31,7 +31,7 @@ void ParsingInfo::startFieldParsing(CXCursor const& fieldCursor) noexcept
 	_isParsingField = true;
 	_currentFieldCursor = fieldCursor;
 	shouldCheckValidity = true;
-	std::cout << "START FIELD" << std::endl;
+	//std::cout << "START FIELD" << std::endl;
 }
 
 void ParsingInfo::startMethodParsing(CXCursor const& methodCursor) noexcept
@@ -39,7 +39,7 @@ void ParsingInfo::startMethodParsing(CXCursor const& methodCursor) noexcept
 	_isParsingMethod = true;
 	_currentMethodCursor = methodCursor;
 	shouldCheckValidity = true;
-	std::cout << "START METHOD" << std::endl;
+	//std::cout << "START METHOD" << std::endl;
 }
 
 void ParsingInfo::startEnumParsing(CXCursor const& enumCursor) noexcept
@@ -47,7 +47,7 @@ void ParsingInfo::startEnumParsing(CXCursor const& enumCursor) noexcept
 	_isParsingEnum = true;
 	_currentEnumCursor = enumCursor;
 	shouldCheckValidity = true;
-	std::cout << "START ENUM" << std::endl;
+	//std::cout << "START ENUM" << std::endl;
 }
 
 void ParsingInfo::endStructOrClassParsing() noexcept
@@ -55,7 +55,7 @@ void ParsingInfo::endStructOrClassParsing() noexcept
 	_classStructLevel--;
 	_currentClassCursor = clang_getNullCursor();
 	shouldCheckValidity = false;
-	std::cout << "END CLASS/STRUCT" << std::endl;
+	//std::cout << "END CLASS/STRUCT" << std::endl;
 }
 
 void ParsingInfo::endFieldParsing() noexcept
@@ -63,7 +63,7 @@ void ParsingInfo::endFieldParsing() noexcept
 	_isParsingField = false;
 	_currentFieldCursor = clang_getNullCursor();
 	shouldCheckValidity = false;
-	std::cout << "END FIELD" << std::endl;
+	//std::cout << "END FIELD" << std::endl;
 }
 
 void ParsingInfo::endMethodParsing() noexcept
@@ -71,7 +71,7 @@ void ParsingInfo::endMethodParsing() noexcept
 	_isParsingMethod = false;
 	_currentMethodCursor = clang_getNullCursor();
 	shouldCheckValidity = false;
-	std::cout << "END METHOD" << std::endl;
+	//std::cout << "END METHOD" << std::endl;
 }
 
 void ParsingInfo::endEnumParsing() noexcept
@@ -79,7 +79,7 @@ void ParsingInfo::endEnumParsing() noexcept
 	_isParsingEnum = false;
 	_currentEnumCursor = clang_getNullCursor();
 	shouldCheckValidity = false;
-	std::cout << "END ENUM" << std::endl;
+	//std::cout << "END ENUM" << std::endl;
 }
 
 void ParsingInfo::updateAccessSpecifier(CXCursor const& enumCursor) noexcept
@@ -124,6 +124,125 @@ std::optional<PropertyGroup> ParsingInfo::isClassValid(CXCursor currentCursor) n
 	if (clang_getCursorKind(currentCursor) == CXCursorKind::CXCursor_AnnotateAttr)
 	{
 		return _propertyParser.getClassProperties(Helpers::getString(clang_getCursorSpelling(currentCursor)));
+	}
+
+	return std::nullopt;
+}
+
+CXChildVisitResult ParsingInfo::parseField(CXCursor const& fieldCursor) noexcept
+{
+	//Check for any annotation attribute if the flag is raised
+	if (shouldCheckValidity)
+	{
+		return tryToAddField(fieldCursor);
+	}
+
+	//TODO FROM HERE
+	std::string cursorName = Helpers::getString(clang_getCursorSpelling(fieldCursor));
+	std::string cursorKindAsString = Helpers::getString(clang_getCursorKindSpelling(clang_getCursorKind(fieldCursor)));
+	std::cout << "ParsingInfo::parseField: Cursor kind : " << cursorKindAsString << " : " << cursorName << std::endl;
+
+	CXType cursorType = clang_getCursorType(fieldCursor);
+
+	if (cursorType.kind != CXTypeKind::CXType_Invalid)
+	{
+		std::cout << Helpers::getString(clang_getTypeKindSpelling(cursorType.kind)) << std::endl;
+	}
+
+	return CXChildVisitResult::CXChildVisit_Recurse;
+}
+CXChildVisitResult ParsingInfo::tryToAddField(CXCursor const& fieldAnnotationCursor) noexcept
+{
+	if (std::optional<PropertyGroup> propertyGroup = isFieldValid(fieldAnnotationCursor))
+	{
+		//_parsingResult.classes.back().methods.at(_accessSpecifier).emplace_back(MethodInfo(Helpers::getString(clang_getCursorDisplayName(_currentMethodCursor)), std::move(*propertyGroup)));
+
+		return CXChildVisitResult::CXChildVisit_Recurse;
+	}
+	else
+	{
+		if (_propertyParser.getParsingError() == EParsingError::Count)
+		{
+			//endStructOrClassParsing();
+			return CXChildVisitResult::CXChildVisit_Continue;
+		}
+		else	//Fatal parsing error occured
+		{
+			_parsingResult.parsingErrors.emplace_back(ParsingError(_propertyParser.getParsingError(), clang_getCursorLocation(fieldAnnotationCursor)));
+
+			return _parsingSettings->shouldAbortParsingOnFirstError ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
+		}
+	}
+}
+
+std::optional<PropertyGroup> ParsingInfo::isFieldValid(CXCursor currentCursor) noexcept
+{
+	shouldCheckValidity = false;
+	_propertyParser.clean();
+
+	if (clang_getCursorKind(currentCursor) == CXCursorKind::CXCursor_AnnotateAttr)
+	{
+		return _propertyParser.getFieldProperties(Helpers::getString(clang_getCursorSpelling(currentCursor)));
+	}
+
+	return std::nullopt;
+}
+
+CXChildVisitResult ParsingInfo::parseMethod(CXCursor const& methodCursor) noexcept
+{
+	//Check for any annotation attribute if the flag is raised
+	if (shouldCheckValidity)
+	{
+		return tryToAddMethod(methodCursor);
+	}
+
+	//TODO FROM HERE
+	std::string cursorName = Helpers::getString(clang_getCursorSpelling(methodCursor));
+	std::string cursorKindAsString = Helpers::getString(clang_getCursorKindSpelling(clang_getCursorKind(methodCursor)));
+	std::cout << "ParsingInfo::parseMethod: Cursor kind : " << cursorKindAsString << " : " << cursorName << std::endl;
+	
+	CXType cursorType = clang_getCursorType(methodCursor);
+
+	if (cursorType.kind != CXTypeKind::CXType_Invalid)
+	{
+		std::cout << Helpers::getString(clang_getTypeKindSpelling(cursorType.kind)) << std::endl;
+	}
+
+	return CXChildVisitResult::CXChildVisit_Recurse;
+}
+
+CXChildVisitResult ParsingInfo::tryToAddMethod(CXCursor const& methodAnnotationCursor) noexcept
+{
+	if (std::optional<PropertyGroup> propertyGroup = isMethodValid(methodAnnotationCursor))
+	{
+		_parsingResult.classes.back().methods.at(_accessSpecifier).emplace_back(MethodInfo(Helpers::getString(clang_getCursorDisplayName(_currentMethodCursor)), std::move(*propertyGroup)));
+
+		return CXChildVisitResult::CXChildVisit_Recurse;
+	}
+	else
+	{
+		if (_propertyParser.getParsingError() == EParsingError::Count)
+		{
+			//endStructOrClassParsing();
+			return CXChildVisitResult::CXChildVisit_Continue;
+		}
+		else	//Fatal parsing error occured
+		{
+			_parsingResult.parsingErrors.emplace_back(ParsingError(_propertyParser.getParsingError(), clang_getCursorLocation(methodAnnotationCursor)));
+
+			return _parsingSettings->shouldAbortParsingOnFirstError ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
+		}
+	}
+}
+
+std::optional<PropertyGroup> ParsingInfo::isMethodValid(CXCursor currentCursor) noexcept
+{
+	shouldCheckValidity = false;
+	_propertyParser.clean();
+
+	if (clang_getCursorKind(currentCursor) == CXCursorKind::CXCursor_AnnotateAttr)
+	{
+		return _propertyParser.getMethodProperties(Helpers::getString(clang_getCursorSpelling(currentCursor)));
 	}
 
 	return std::nullopt;

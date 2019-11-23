@@ -117,11 +117,11 @@ CXChildVisitResult Parser::parseClassContent(CXCursor currentCursor, ParsingInfo
 {
 	if (parsingInfo->isParsingField())
 	{
-		return parseField(currentCursor, parsingInfo);
+		return parsingInfo->parseField(currentCursor);
 	}
 	else if (parsingInfo->isParsingMethod())
 	{
-		return parseMethod(currentCursor, parsingInfo);
+		return parsingInfo->parseMethod(currentCursor);
 	}
 	else if (parsingInfo->shouldCheckValidity)	//Check for any annotation attribute if the flag is raised
 	{
@@ -150,72 +150,6 @@ CXChildVisitResult Parser::parseClassContent(CXCursor currentCursor, ParsingInfo
 	}
 
 	return CXChildVisitResult::CXChildVisit_Recurse;
-}
-
-CXChildVisitResult Parser::parseField(CXCursor currentCursor, ParsingInfo* parsingInfo) noexcept
-{
-	//Check for any annotation attribute if the flag is raised
-	if (parsingInfo->shouldCheckValidity)
-	{
-		if (isFieldValid(currentCursor, parsingInfo))
-		{
-			std::cout << "VALID FIELD" << std::endl;
-			return CXChildVisitResult::CXChildVisit_Recurse;
-		}
-		else
-		{
-			return CXChildVisitResult::CXChildVisit_Continue;
-		}
-	}
-
-	std::string cursorName = Helpers::getString(clang_getCursorSpelling(currentCursor));
-	std::string cursorKindAsString = Helpers::getString(clang_getCursorKindSpelling(clang_getCursorKind(currentCursor)));
-	std::cout << "Cursor kind : " << cursorKindAsString << " : " << cursorName << std::endl;
-
-	return CXChildVisitResult::CXChildVisit_Recurse;
-}
-
-bool Parser::isFieldValid(CXCursor currentCursor, ParsingInfo* parsingInfo) noexcept
-{
-	CXCursorKind	cursorKind	= clang_getCursorKind(currentCursor);
-	//std::string		cursorName	= ParsingInfo::getString(clang_getCursorSpelling(currentCursor));
-
-	parsingInfo->shouldCheckValidity = false;
-
-	return (cursorKind == CXCursorKind::CXCursor_AnnotateAttr && true/* TODO If notation is valid for a field, add the field*/);
-}
-
-CXChildVisitResult Parser::parseMethod(CXCursor currentCursor, ParsingInfo* parsingInfo) noexcept
-{
-	//Check for any annotation attribute if the flag is raised
-	if (parsingInfo->shouldCheckValidity)
-	{
-		if (isMethodValid(currentCursor, parsingInfo))
-		{
-			std::cout << "VALID METHOD" << std::endl;
-			return CXChildVisitResult::CXChildVisit_Recurse;
-		}
-		else
-		{
-			return CXChildVisitResult::CXChildVisit_Continue;
-		}
-	}
-
-	std::string cursorName = Helpers::getString(clang_getCursorSpelling(currentCursor));
-	std::string cursorKindAsString = Helpers::getString(clang_getCursorKindSpelling(clang_getCursorKind(currentCursor)));
-	std::cout << "Cursor kind : " << cursorKindAsString << " : " << cursorName << std::endl;
-
-	return CXChildVisitResult::CXChildVisit_Recurse;
-}
-
-bool Parser::isMethodValid(CXCursor currentCursor, ParsingInfo* parsingInfo) noexcept
-{
-	CXCursorKind	cursorKind	= clang_getCursorKind(currentCursor);
-	//std::string		cursorName	= ParsingInfo::getString(clang_getCursorSpelling(currentCursor));
-
-	parsingInfo->shouldCheckValidity = false;
-
-	return (cursorKind == CXCursorKind::CXCursor_AnnotateAttr && true/* TODO If notation is valid for a method, add the method*/);
 }
 
 CXChildVisitResult Parser::parseEnumContent(CXCursor currentCursor, ParsingInfo* parsingInfo) noexcept

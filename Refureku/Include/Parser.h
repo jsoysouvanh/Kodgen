@@ -26,11 +26,6 @@ namespace refureku
 			static CXChildVisitResult	parseDefault(CXCursor currentCursor, ParsingInfo* parsingInfo)							noexcept;
 
 			static CXChildVisitResult	parseClassContent(CXCursor currentCursor, ParsingInfo* parsingInfo)						noexcept;
-			static bool					isClassValid(CXCursor currentCursor, ParsingInfo* parsingInfo)							noexcept;
-			static CXChildVisitResult	parseField(CXCursor currentCursor, ParsingInfo* parsingInfo)							noexcept;
-			static bool					isFieldValid(CXCursor currentCursor, ParsingInfo* parsingInfo)							noexcept;
-			static CXChildVisitResult	parseMethod(CXCursor currentCursor, ParsingInfo* parsingInfo)							noexcept;
-			static bool					isMethodValid(CXCursor currentCursor, ParsingInfo* parsingInfo)							noexcept;
 
 			static CXChildVisitResult	parseEnumContent(CXCursor currentCursor, ParsingInfo* parsingInfo)						noexcept;
 			static bool					isEnumValid(CXCursor currentCursor, ParsingInfo* parsingInfo)							noexcept;

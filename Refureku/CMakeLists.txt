@@ -62,6 +62,7 @@ add_executable(refureku
 				Source/InfoStructures/ParsingInfo.cpp
 				Source/FileGenerator.cpp
 				Source/EParsingError.cpp
+				Source/EAccessSpecifier.cpp
 				Source/ParsingError.cpp
 				Source/Parser.cpp
 				Source/main.cpp

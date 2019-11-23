@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "FundamentalTypes.h"
 
 namespace refureku
@@ -11,4 +13,6 @@ namespace refureku
 		Protected	= 1 << 2,
 		Private		= 1 << 3
 	};
+
+	std::string toString(EAccessSpecifier error) noexcept;
 }

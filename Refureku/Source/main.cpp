@@ -52,6 +52,39 @@ void printErrors(refureku::ParsingResult const* result)
 	}
 }
 
+void setupParser(refureku::Parser& parser)
+{
+	//Setup parser settings
+	parser.parsingSettings.shouldAbortParsingOnFirstError = false;
+
+	parser.parsingSettings.propertyParsingSettings.ignoredCharacters.insert(' ');	//Ignore white space
+	parser.parsingSettings.propertyParsingSettings.subPropertySeparator = ',';
+
+	//ClassProp1, ClassProp2[ClassSubProp21, ClassSubProp22], ClassProp3
+	refureku::PropertyRules& classPropertyRules = parser.parsingSettings.propertyParsingSettings.classPropertyRules;
+
+	classPropertyRules.addSimplePropertyRule("ClassProp1");
+	classPropertyRules.addSimplePropertyRule("ClassProp2");
+	classPropertyRules.addComplexPropertyRule("ClassProp2", "ClassSubProp2[1-9]");
+	classPropertyRules.addSimplePropertyRule("ClassProp3");
+
+	//MethodProp1, MethodProp2[MethodSubProp21, MethodSubProp22], MethodProp3
+	refureku::PropertyRules& methodPropertyRules = parser.parsingSettings.propertyParsingSettings.methodPropertyRules;
+
+	methodPropertyRules.addSimplePropertyRule("MethodProp1");
+	methodPropertyRules.addSimplePropertyRule("MethodProp2");
+	methodPropertyRules.addComplexPropertyRule("MethodProp2", "MethodSubProp2[1-9]");
+	methodPropertyRules.addSimplePropertyRule("MethodProp3");
+
+	//FieldProp1, FieldProp2[FieldSubProp21, FieldSubProp22], FieldProp3
+	refureku::PropertyRules& fieldPropertyRules = parser.parsingSettings.propertyParsingSettings.fieldPropertyRules;
+
+	fieldPropertyRules.addSimplePropertyRule("FieldProp1");
+	fieldPropertyRules.addSimplePropertyRule("FieldProp2");
+	fieldPropertyRules.addComplexPropertyRule("FieldProp2", "FieldSubProp2[1-9]");
+	fieldPropertyRules.addSimplePropertyRule("FieldProp3");
+}
+
 void parsingTests()
 {
 	fs::path includeDirPath	= fs::current_path().parent_path().parent_path().parent_path() / "Include";
@@ -59,17 +92,7 @@ void parsingTests()
 
 	refureku::Parser parser;
 
-	//Setup parser settings
-	parser.parsingSettings.shouldAbortParsingOnFirstError = false;
-
-	parser.parsingSettings.propertyParsingSettings.ignoredCharacters.insert(' ');	//Ignore white space
-	parser.parsingSettings.propertyParsingSettings.subPropertySeparator = ',';
-
-	//Prop1, Prop2[SubProp21/ SubProp22], Prop3
-	parser.parsingSettings.propertyParsingSettings.classPropertyRules.addSimplePropertyRule("Prop1");
-	parser.parsingSettings.propertyParsingSettings.classPropertyRules.addSimplePropertyRule("Prop2");
-	parser.parsingSettings.propertyParsingSettings.classPropertyRules.addComplexPropertyRule("Prop2", "SubProp21|SubProp22");
-	parser.parsingSettings.propertyParsingSettings.classPropertyRules.addSimplePropertyRule("Prop3");
+	setupParser(parser);
 
 	assert(parser.retrieveParsingResult() == nullptr);
 
