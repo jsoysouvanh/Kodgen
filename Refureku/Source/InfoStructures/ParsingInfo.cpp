@@ -1,5 +1,6 @@
 #include "InfoStructures/ParsingInfo.h"
 
+#include <cassert>
 #include <iostream>	//TO DELETE
 
 #include "Helpers.h"
@@ -137,25 +138,14 @@ CXChildVisitResult ParsingInfo::parseField(CXCursor const& fieldCursor) noexcept
 		return tryToAddField(fieldCursor);
 	}
 
-	//TODO FROM HERE
-	std::string cursorName = Helpers::getString(clang_getCursorSpelling(fieldCursor));
-	std::string cursorKindAsString = Helpers::getString(clang_getCursorKindSpelling(clang_getCursorKind(fieldCursor)));
-	std::cout << "ParsingInfo::parseField: Cursor kind : " << cursorKindAsString << " : " << cursorName << std::endl;
-
-	CXType cursorType = clang_getCursorType(fieldCursor);
-
-	if (cursorType.kind != CXTypeKind::CXType_Invalid)
-	{
-		std::cout << Helpers::getString(clang_getTypeKindSpelling(cursorType.kind)) << std::endl;
-	}
-
 	return CXChildVisitResult::CXChildVisit_Recurse;
 }
 CXChildVisitResult ParsingInfo::tryToAddField(CXCursor const& fieldAnnotationCursor) noexcept
 {
 	if (std::optional<PropertyGroup> propertyGroup = isFieldValid(fieldAnnotationCursor))
 	{
-		//_parsingResult.classes.back().methods.at(_accessSpecifier).emplace_back(MethodInfo(Helpers::getString(clang_getCursorDisplayName(_currentMethodCursor)), std::move(*propertyGroup)));
+		FieldInfo& field = _parsingResult.classes.back().fields.at(_accessSpecifier).emplace_back(FieldInfo(Helpers::getString(clang_getCursorDisplayName(_currentFieldCursor)), std::move(*propertyGroup)));
+		field.type = *extractTypeInfo(_currentFieldCursor);
 
 		return CXChildVisitResult::CXChildVisit_Recurse;
 	}
@@ -217,6 +207,8 @@ CXChildVisitResult ParsingInfo::tryToAddMethod(CXCursor const& methodAnnotationC
 	{
 		_parsingResult.classes.back().methods.at(_accessSpecifier).emplace_back(MethodInfo(Helpers::getString(clang_getCursorDisplayName(_currentMethodCursor)), std::move(*propertyGroup)));
 
+		//clang_Cursor_isFunctionInlined
+
 		return CXChildVisitResult::CXChildVisit_Recurse;
 	}
 	else
@@ -246,6 +238,26 @@ std::optional<PropertyGroup> ParsingInfo::isMethodValid(CXCursor currentCursor) 
 	}
 
 	return std::nullopt;
+}
+
+std::optional<TypeInfo> ParsingInfo::extractTypeInfo(CXCursor const& typedCursor) const noexcept
+{
+	TypeInfo result;
+
+	CXType cursorType = clang_getCursorType(typedCursor);
+
+	if (cursorType.kind != CXTypeKind::CXType_Invalid)
+	{
+		cursorType = clang_getCanonicalType(cursorType);
+
+		result.initialize(Helpers::getString(clang_getTypeSpelling(cursorType)));
+	}
+	else
+	{
+		assert(false);	//Should never reach this point
+	}
+
+	return result;
 }
 
 bool ParsingInfo::hasErrorOccured() const noexcept

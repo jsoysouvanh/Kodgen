@@ -15,6 +15,16 @@ std::ostream& refureku::operator<<(std::ostream& out_stream, ClassInfo const& cl
 	out_stream << " " << classInfo.properties << std::endl;
 
 	//Fields
+	out_stream << " - Fields" << std::endl;
+	for (auto const& [access, fieldVector] : classInfo.fields)
+	{
+		out_stream << "   - " << toString(access) << std::endl;
+
+		for (FieldInfo const& field : fieldVector)
+		{
+			out_stream << "       " << field << std::endl;
+		}
+	}
 
 	//Methods
 	out_stream << " - Methods" << std::endl;

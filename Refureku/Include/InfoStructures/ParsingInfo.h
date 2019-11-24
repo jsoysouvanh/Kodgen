@@ -9,6 +9,7 @@
 #include "ParsingResult.h"
 #include "Properties/PropertyParser.h"
 #include "InfoStructures/ClassInfo.h"
+#include "InfoStructures/TypeInfo.h"
 
 namespace refureku
 {
@@ -74,6 +75,11 @@ namespace refureku
 			*/
 			ParsingResult		_parsingResult;
 
+			CXChildVisitResult		tryToAddField(CXCursor const& fieldAnnotationCursor)			noexcept;
+			CXChildVisitResult		tryToAddMethod(CXCursor const& methodAnnotationCursor)			noexcept;
+
+			std::optional<TypeInfo>	extractTypeInfo(CXCursor const& typedCursor)			const	noexcept;
+
 			/**
 			*	Returns a filled PropertyGroup if the provided cursor describes a valid class, else an empty one
 			*/
@@ -129,10 +135,8 @@ namespace refureku
 			CXChildVisitResult		tryToAddClass(CXCursor const& classAnnotationCursor)		noexcept;
 
 			CXChildVisitResult		parseField(CXCursor const& fieldCursor)						noexcept;
-			CXChildVisitResult		tryToAddField(CXCursor const& fieldAnnotationCursor)		noexcept;
 
 			CXChildVisitResult		parseMethod(CXCursor const& methodCursor)					noexcept;
-			CXChildVisitResult		tryToAddMethod(CXCursor const& methodAnnotationCursor)		noexcept;
 
 			bool					hasErrorOccured()									const	noexcept;
 			ParsingResult			extractParsingResult()										noexcept;

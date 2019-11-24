@@ -21,18 +21,18 @@ CXChildVisitResult Parser::staticParseCursor(CXCursor c, CXCursor parent, CXClie
 {
 	ParsingInfo* parsingInfo = reinterpret_cast<ParsingInfo*>(clientData);
 
-	std::string cursorName = Helpers::getString(clang_getCursorSpelling(c));
-	std::string cursorKindAsString = Helpers::getString(clang_getCursorKindSpelling(clang_getCursorKind(c)));
+	//Parse the given file ONLY, ignore headers
+	if (clang_Location_isFromMainFile(clang_getCursorLocation (c)) || clang_getCursorKind(c) == CXCursorKind::CXCursor_AnnotateAttr)
+	{
+		Parser::updateParsingState(parent, parsingInfo);
 
-	CXCursorKind cursorKind = clang_getCursorKind(c);
+		std::cout << "Parent is : " << Helpers::getString(clang_getCursorKindSpelling(clang_getCursorKind(parent))) << std::endl;
+		std::cout << "Cursor kind : " << Helpers::getString(clang_getCursorKindSpelling(clang_getCursorKind(c))) << " : " << Helpers::getString(clang_getCursorSpelling(c)) << std::endl;
 
-	Parser::updateParsingState(parent, parsingInfo);
-
-	//std::cout << "Parent is : " << Helpers::getString(clang_getCursorKindSpelling(clang_getCursorKind(parent))) << std::endl;
-	//std::cout << "Cursor kind : " << cursorKindAsString << " : " << cursorName << std::endl;
+		return Parser::parseCursor(c, parent, parsingInfo);
+	}
 	
-	return Parser::parseCursor(c, parent, parsingInfo);
-	//return CXChildVisitResult::CXChildVisit_Recurse;
+	return CXChildVisitResult::CXChildVisit_Continue;
 }
 
 void Parser::updateParsingState(CXCursor parent, ParsingInfo* parsingInfo) noexcept
@@ -69,7 +69,7 @@ void Parser::updateParsingState(CXCursor parent, ParsingInfo* parsingInfo) noexc
 
 CXChildVisitResult Parser::parseCursor(CXCursor currentCursor, CXCursor parentCursor, ParsingInfo* parsingInfo) noexcept
 {
-	if (parsingInfo->getClassStructLevel())		//Currently parsing a class of struct
+	if (parsingInfo->getClassStructLevel())	//Currently parsing a class of struct
 	{
 		return parseClassContent(currentCursor, parsingInfo);
 	}

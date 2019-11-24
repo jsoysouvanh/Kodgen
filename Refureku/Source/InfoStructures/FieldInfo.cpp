@@ -6,3 +6,10 @@ FieldInfo::FieldInfo(std::string&& entityName, PropertyGroup&& propertyGroup) no
 	EntityInfo(std::forward<std::string>(entityName), std::forward<PropertyGroup>(propertyGroup))
 {
 }
+
+std::ostream& refureku::operator<<(std::ostream& out_stream, FieldInfo const& fieldInfo) noexcept
+{
+	out_stream << fieldInfo.type << "   " << fieldInfo.name << "   " << fieldInfo.properties;
+
+	return out_stream;
+}
