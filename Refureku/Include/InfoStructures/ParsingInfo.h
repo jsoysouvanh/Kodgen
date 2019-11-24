@@ -65,6 +65,9 @@ namespace refureku
 				CXCursor	_currentMethodCursor;
 			};
 
+			ClassInfo	_currentClassInfo;
+			MethodInfo*	_currentMethodInfo;
+
 			/*
 			*	Current class modifier
 			**/
@@ -75,10 +78,11 @@ namespace refureku
 			*/
 			ParsingResult		_parsingResult;
 
-			CXChildVisitResult		tryToAddField(CXCursor const& fieldAnnotationCursor)			noexcept;
-			CXChildVisitResult		tryToAddMethod(CXCursor const& methodAnnotationCursor)			noexcept;
+			CXChildVisitResult		tryToAddField(CXCursor const& fieldAnnotationCursor)				noexcept;
+			CXChildVisitResult		tryToAddMethod(CXCursor const& methodAnnotationCursor)				noexcept;
+			void					setupMethod(CXCursor const& methodCursor, MethodInfo& methodInfo)	noexcept;
 
-			std::optional<TypeInfo>	extractTypeInfo(CXCursor const& typedCursor)			const	noexcept;
+			std::optional<TypeInfo>	extractTypeInfo(CXType const& cursorType)					const	noexcept;
 
 			/**
 			*	Returns a filled PropertyGroup if the provided cursor describes a valid class, else an empty one

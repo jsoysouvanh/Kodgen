@@ -26,8 +26,8 @@ CXChildVisitResult Parser::staticParseCursor(CXCursor c, CXCursor parent, CXClie
 	{
 		Parser::updateParsingState(parent, parsingInfo);
 
-		std::cout << "Parent is : " << Helpers::getString(clang_getCursorKindSpelling(clang_getCursorKind(parent))) << std::endl;
-		std::cout << "Cursor kind : " << Helpers::getString(clang_getCursorKindSpelling(clang_getCursorKind(c))) << " : " << Helpers::getString(clang_getCursorSpelling(c)) << std::endl;
+		//std::cout << "Parent is : " << Helpers::getString(clang_getCursorKindSpelling(clang_getCursorKind(parent))) << std::endl;
+		//std::cout << "Cursor kind : " << Helpers::getString(clang_getCursorKindSpelling(clang_getCursorKind(c))) << " : " << Helpers::getString(clang_getCursorSpelling(c)) << std::endl;
 
 		return Parser::parseCursor(c, parent, parsingInfo);
 	}

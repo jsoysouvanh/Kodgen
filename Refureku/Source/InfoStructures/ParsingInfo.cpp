@@ -140,12 +140,13 @@ CXChildVisitResult ParsingInfo::parseField(CXCursor const& fieldCursor) noexcept
 
 	return CXChildVisitResult::CXChildVisit_Recurse;
 }
+
 CXChildVisitResult ParsingInfo::tryToAddField(CXCursor const& fieldAnnotationCursor) noexcept
 {
 	if (std::optional<PropertyGroup> propertyGroup = isFieldValid(fieldAnnotationCursor))
 	{
 		FieldInfo& field = _parsingResult.classes.back().fields.at(_accessSpecifier).emplace_back(FieldInfo(Helpers::getString(clang_getCursorDisplayName(_currentFieldCursor)), std::move(*propertyGroup)));
-		field.type = *extractTypeInfo(_currentFieldCursor);
+		field.type = *extractTypeInfo(clang_getCanonicalType(clang_getCursorType(_currentFieldCursor)));
 
 		return CXChildVisitResult::CXChildVisit_Recurse;
 	}
@@ -186,16 +187,28 @@ CXChildVisitResult ParsingInfo::parseMethod(CXCursor const& methodCursor) noexce
 		return tryToAddMethod(methodCursor);
 	}
 
-	//TODO FROM HERE
+	CXCursorKind cursorKind = clang_getCursorKind(methodCursor);
 	std::string cursorName = Helpers::getString(clang_getCursorSpelling(methodCursor));
 	std::string cursorKindAsString = Helpers::getString(clang_getCursorKindSpelling(clang_getCursorKind(methodCursor)));
-	std::cout << "ParsingInfo::parseMethod: Cursor kind : " << cursorKindAsString << " : " << cursorName << std::endl;
-	
-	CXType cursorType = clang_getCursorType(methodCursor);
+	//std::cout << "ParsingInfo::parseMethod: Cursor kind : " << cursorKindAsString << " : " << cursorName << std::endl;
 
-	if (cursorType.kind != CXTypeKind::CXType_Invalid)
+	switch (cursorKind)
 	{
-		std::cout << Helpers::getString(clang_getTypeKindSpelling(cursorType.kind)) << std::endl;
+		case CXCursorKind::CXCursor_CXXFinalAttr:
+			_currentMethodInfo->qualifiers |= MethodInfo::EMethodQualifier::Final;
+			break;
+
+		case CXCursorKind::CXCursor_CXXOverrideAttr:
+			_currentMethodInfo->qualifiers |= MethodInfo::EMethodQualifier::Override;
+			break;
+
+		case CXCursorKind::CXCursor_ParmDecl:
+			//TODO: handle parameters here
+			break;
+
+		default:
+			std::cout << "Unknown method sub cursor: " << cursorKindAsString << std::endl;
+			break;
 	}
 
 	return CXChildVisitResult::CXChildVisit_Recurse;
@@ -205,9 +218,8 @@ CXChildVisitResult ParsingInfo::tryToAddMethod(CXCursor const& methodAnnotationC
 {
 	if (std::optional<PropertyGroup> propertyGroup = isMethodValid(methodAnnotationCursor))
 	{
-		_parsingResult.classes.back().methods.at(_accessSpecifier).emplace_back(MethodInfo(Helpers::getString(clang_getCursorDisplayName(_currentMethodCursor)), std::move(*propertyGroup)));
-
-		//clang_Cursor_isFunctionInlined
+		_currentMethodInfo = &_parsingResult.classes.back().methods.at(_accessSpecifier).emplace_back(MethodInfo(Helpers::getString(clang_getCursorDisplayName(_currentMethodCursor)), std::move(*propertyGroup)));
+		setupMethod(_currentMethodCursor, *_currentMethodInfo);
 
 		return CXChildVisitResult::CXChildVisit_Recurse;
 	}
@@ -215,7 +227,6 @@ CXChildVisitResult ParsingInfo::tryToAddMethod(CXCursor const& methodAnnotationC
 	{
 		if (_propertyParser.getParsingError() == EParsingError::Count)
 		{
-			//endStructOrClassParsing();
 			return CXChildVisitResult::CXChildVisit_Continue;
 		}
 		else	//Fatal parsing error occured
@@ -224,6 +235,42 @@ CXChildVisitResult ParsingInfo::tryToAddMethod(CXCursor const& methodAnnotationC
 
 			return _parsingSettings->shouldAbortParsingOnFirstError ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
 		}
+	}
+}
+
+void ParsingInfo::setupMethod(CXCursor const& methodCursor, MethodInfo& methodInfo)	noexcept
+{
+	CXType methodType = clang_getCursorType(methodCursor);
+
+	assert(methodType.kind == CXTypeKind::CXType_FunctionProto);
+
+	//Define return type
+	methodInfo.returnType =	*extractTypeInfo(clang_getCanonicalType(clang_getResultType(methodType)));
+
+	//Define method qualifiers
+	if (clang_CXXMethod_isDefaulted(methodCursor))
+	{
+		methodInfo.qualifiers |= MethodInfo::EMethodQualifier::Default;
+	}
+	if (clang_CXXMethod_isStatic(methodCursor))
+	{
+		methodInfo.qualifiers |= MethodInfo::EMethodQualifier::Static;
+	}
+	if (clang_CXXMethod_isVirtual(methodCursor))
+	{
+		methodInfo.qualifiers |= MethodInfo::EMethodQualifier::Virtual;
+	}
+	if (clang_CXXMethod_isPureVirtual(methodCursor))
+	{
+		methodInfo.qualifiers |= MethodInfo::EMethodQualifier::PureVirtual;
+	}
+	if (clang_CXXMethod_isConst(methodCursor))
+	{
+		methodInfo.qualifiers |= MethodInfo::EMethodQualifier::Const;
+	}
+	if (clang_Cursor_isFunctionInlined(methodCursor))
+	{
+		methodInfo.qualifiers |= MethodInfo::EMethodQualifier::Inline;
 	}
 }
 
@@ -240,16 +287,14 @@ std::optional<PropertyGroup> ParsingInfo::isMethodValid(CXCursor currentCursor) 
 	return std::nullopt;
 }
 
-std::optional<TypeInfo> ParsingInfo::extractTypeInfo(CXCursor const& typedCursor) const noexcept
+std::optional<TypeInfo> ParsingInfo::extractTypeInfo(CXType const& cursorType) const noexcept
 {
 	TypeInfo result;
 
-	CXType cursorType = clang_getCursorType(typedCursor);
+	//CXType cursorType = clang_getCursorType(typedCursor);
 
 	if (cursorType.kind != CXTypeKind::CXType_Invalid)
 	{
-		cursorType = clang_getCanonicalType(cursorType);
-
 		result.initialize(Helpers::getString(clang_getTypeSpelling(cursorType)));
 	}
 	else
