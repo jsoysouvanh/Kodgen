@@ -35,18 +35,18 @@ void propertyTests()
 	assert(propertyRules.getComplexPropertyRule("RefurekuProp3") == nullptr);
 }
 
-void printClasses(refureku::ParsingResult const* result)
+void printClasses(refureku::ParsingResult const& result)
 {
 	//Print classes
-	for (refureku::ClassInfo const& c : result->classes)
+	for (refureku::ClassInfo const& c : result.classes)
 	{
 		std::cout << c << std::endl;
 	}
 }
 
-void printErrors(refureku::ParsingResult const* result)
+void printErrors(refureku::ParsingResult const& result)
 {
-	for (refureku::ParsingError const& error : result->parsingErrors)
+	for (refureku::ParsingError const& error : result.parsingErrors)
 	{
 		std::cout << error << std::endl;
 	}
@@ -94,25 +94,21 @@ void parsingTests()
 
 	setupParser(parser);
 
-	assert(parser.retrieveParsingResult() == nullptr);
-
-	bool success = parser.parse(pathToFile);
-
 	//Check result
-	refureku::ParsingResult const* result = parser.retrieveParsingResult();
-	assert(result != nullptr);
+	refureku::ParsingResult parsingResult;
+	bool success = parser.parse(pathToFile, parsingResult);
 
 	if (success)
 	{
 		std::cout << "Parse success" << std::endl;
 
-		printClasses(result);
+		printClasses(parsingResult);
 	}
 	else
 	{
 		std::cout << "Parse ended with errors" << std::endl;
 
-		printErrors(result);
+		printErrors(parsingResult);
 	}
 }
 

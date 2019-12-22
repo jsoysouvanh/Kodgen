@@ -32,11 +32,10 @@ namespace refureku
 			~ClassParser()					= default;
 
 			CXChildVisitResult	parse(CXCursor currentCursor, ParsingInfo& parsingInfo)						noexcept;
-
-			void				updateParsingState(CXCursor parent)											noexcept;
-
 			void				startClassParsing(CXCursor currentCursor, ParsingInfo& parsingInfo)			noexcept;
 			void				startStructParsing(CXCursor currentCursor, ParsingInfo& parsingInfo)		noexcept;
+
+			void				updateParsingState(CXCursor parent)											noexcept;
 
 			bool				isCurrentlyParsing()												const	noexcept;
 	};

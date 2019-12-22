@@ -45,22 +45,22 @@ CXChildVisitResult ClassParser::tryToAddClass(CXCursor classAnnotationCursor, Pa
 {
 	if (std::optional<PropertyGroup> propertyGroup = isClassValid(classAnnotationCursor, parsingInfo))
 	{
-		parsingInfo._parsingResult.classes.emplace_back(ClassInfo(Helpers::getString(clang_getCursorDisplayName(_currentCursor)), std::move(*propertyGroup)));
+		parsingInfo.parsingResult.classes.emplace_back(ClassInfo(Helpers::getString(clang_getCursorDisplayName(_currentCursor)), std::move(*propertyGroup)));
 
 		return CXChildVisitResult::CXChildVisit_Recurse;
 	}
 	else
 	{
-		if (parsingInfo._propertyParser.getParsingError() == EParsingError::Count)
+		if (parsingInfo.propertyParser.getParsingError() == EParsingError::Count)
 		{
 			endStructOrClassParsing();
 			return CXChildVisitResult::CXChildVisit_Continue;
 		}
 		else	//Fatal parsing error occured
 		{
-			parsingInfo._parsingResult.parsingErrors.emplace_back(ParsingError(parsingInfo._propertyParser.getParsingError(), clang_getCursorLocation(classAnnotationCursor)));
+			parsingInfo.parsingResult.parsingErrors.emplace_back(ParsingError(parsingInfo.propertyParser.getParsingError(), clang_getCursorLocation(classAnnotationCursor)));
 
-			return parsingInfo._parsingSettings->shouldAbortParsingOnFirstError ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
+			return parsingInfo.parsingSettings->shouldAbortParsingOnFirstError ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
 		}
 	}
 }
@@ -68,11 +68,11 @@ CXChildVisitResult ClassParser::tryToAddClass(CXCursor classAnnotationCursor, Pa
 std::optional<PropertyGroup> ClassParser::isClassValid(CXCursor currentCursor, ParsingInfo& parsingInfo) noexcept
 {
 	_shouldCheckValidity = false;
-	parsingInfo._propertyParser.clean();
+	parsingInfo.propertyParser.clean();
 
 	if (clang_getCursorKind(currentCursor) == CXCursorKind::CXCursor_AnnotateAttr)
 	{
-		return parsingInfo._propertyParser.getClassProperties(Helpers::getString(clang_getCursorSpelling(currentCursor)));
+		return parsingInfo.propertyParser.getClassProperties(Helpers::getString(clang_getCursorSpelling(currentCursor)));
 	}
 
 	return std::nullopt;

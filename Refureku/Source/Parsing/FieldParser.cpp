@@ -19,22 +19,22 @@ CXChildVisitResult FieldParser::tryToAddField(CXCursor fieldAnnotationCursor, Pa
 {
 	if (std::optional<PropertyGroup> propertyGroup = isFieldValid(fieldAnnotationCursor, parsingInfo))
 	{
-		FieldInfo& field = parsingInfo._parsingResult.classes.back().fields.at(parsingInfo.accessSpecifier).emplace_back(FieldInfo(Helpers::getString(clang_getCursorDisplayName(_currentCursor)), std::move(*propertyGroup)));
+		FieldInfo& field = parsingInfo.parsingResult.classes.back().fields.at(parsingInfo.accessSpecifier).emplace_back(FieldInfo(Helpers::getString(clang_getCursorDisplayName(_currentCursor)), std::move(*propertyGroup)));
 		field.type = TypeInfo(clang_getCanonicalType(clang_getCursorType(_currentCursor)));
 
 		return CXChildVisitResult::CXChildVisit_Recurse;
 	}
 	else
 	{
-		if (parsingInfo._propertyParser.getParsingError() == EParsingError::Count)
+		if (parsingInfo.propertyParser.getParsingError() == EParsingError::Count)
 		{
 			return CXChildVisitResult::CXChildVisit_Continue;
 		}
 		else	//Fatal parsing error occured
 		{
-			parsingInfo._parsingResult.parsingErrors.emplace_back(ParsingError(parsingInfo._propertyParser.getParsingError(), clang_getCursorLocation(fieldAnnotationCursor)));
+			parsingInfo.parsingResult.parsingErrors.emplace_back(ParsingError(parsingInfo.propertyParser.getParsingError(), clang_getCursorLocation(fieldAnnotationCursor)));
 
-			return parsingInfo._parsingSettings->shouldAbortParsingOnFirstError ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
+			return parsingInfo.parsingSettings->shouldAbortParsingOnFirstError ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
 		}
 	}
 }
@@ -42,11 +42,11 @@ CXChildVisitResult FieldParser::tryToAddField(CXCursor fieldAnnotationCursor, Pa
 std::optional<PropertyGroup> FieldParser::isFieldValid(CXCursor currentCursor, ParsingInfo& parsingInfo) noexcept
 {
 	_shouldCheckValidity = false;
-	parsingInfo._propertyParser.clean();
+	parsingInfo.propertyParser.clean();
 
 	if (clang_getCursorKind(currentCursor) == CXCursorKind::CXCursor_AnnotateAttr)
 	{
-		return parsingInfo._propertyParser.getFieldProperties(Helpers::getString(clang_getCursorSpelling(currentCursor)));
+		return parsingInfo.propertyParser.getFieldProperties(Helpers::getString(clang_getCursorSpelling(currentCursor)));
 	}
 
 	return std::nullopt;

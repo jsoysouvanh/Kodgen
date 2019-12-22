@@ -23,6 +23,34 @@ CXChildVisitResult EnumParser::parse(CXCursor currentCursor, ParsingInfo& parsin
 	}
 }
 
+void EnumParser::updateParsingState(CXCursor parent) noexcept
+{
+
+}
+
+void EnumParser::startParsing(CXCursor currentCursor, ParsingInfo& parsingInfo) noexcept
+{
+	_isCurrentlyParsing		= true;
+	_currentCursor			= currentCursor;
+	_shouldCheckValidity	= true;
+
+	//std::cout << "START ENUM" << std::endl;
+}
+
+void EnumParser::endParsing() noexcept
+{
+	_isCurrentlyParsing		= false;
+	_currentCursor			= clang_getNullCursor();
+	_shouldCheckValidity	= false;
+
+	//std::cout << "END ENUM" << std::endl;
+}
+
+bool EnumParser::isCurrentlyParsing() const noexcept
+{
+	return _isCurrentlyParsing;
+}
+
 bool EnumParser::isEnumValid(CXCursor currentCursor) noexcept
 {
 	CXCursorKind	cursorKind	= clang_getCursorKind(currentCursor);

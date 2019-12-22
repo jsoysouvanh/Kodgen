@@ -5,6 +5,27 @@
 
 using namespace refureku;
 
+std::optional<PropertyGroup> PropertyParser::getProperties(std::string&& annotateMessage, std::string const& annotationId, PropertyRules const& rules) noexcept
+{
+	if (annotateMessage.substr(0, annotationId.size()) == annotationId)
+	{
+		if (splitProperties(annotateMessage.substr(annotationId.size())))
+		{
+			return checkAndFillPropertyGroup(_splitProps, rules);
+		}
+	}
+	else
+	{
+		//Tried to add properties to a class with the wrong macro
+		_parsingError = EParsingError::WrongPropertyMacroUsed;
+	}
+
+	assert(_parsingError != EParsingError::Count);	//If fails, _parsing error must be updated
+	return std::nullopt;
+}
+
+//TODO DELETE FROM HERE, use above method instead
+
 std::optional<PropertyGroup> PropertyParser::getClassProperties(std::string&& annotateMessage) noexcept
 {
 	static std::string classAnnotation = "RfrkClass:";
@@ -88,6 +109,8 @@ std::optional<PropertyGroup> PropertyParser::getEnumValueProperties(std::string&
 
 	return std::nullopt;
 }
+
+// DELETE UNTIL HERE
 
 bool PropertyParser::splitProperties(std::string&& propertiesString) noexcept
 {

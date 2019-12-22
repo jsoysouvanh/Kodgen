@@ -86,6 +86,8 @@ namespace refureku
 			*	All get[...]Properties(std::string&& annotateMessage) below methods return an initialized optional
 			*	if the annotate message is valid, else an uninitialized one.
 			*/
+			std::optional<PropertyGroup>	getProperties(std::string&& annotateMessage, std::string const& annotationId, PropertyRules const& rules) noexcept;
+
 			std::optional<PropertyGroup>	getClassProperties(std::string&& annotateMessage) noexcept;
 			std::optional<PropertyGroup>	getStructProperties(std::string&& annotateMessage) noexcept;
 			std::optional<PropertyGroup>	getFieldProperties(std::string&& annotateMessage) noexcept;

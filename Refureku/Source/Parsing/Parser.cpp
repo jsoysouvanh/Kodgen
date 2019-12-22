@@ -17,6 +17,13 @@ Parser::~Parser() noexcept
 	clang_disposeIndex(_clangIndex);
 }
 
+void Parser::setupForParsing() noexcept
+{
+	clear();
+
+	_parsingInfo.propertyParser.setup(&parsingSettings.propertyParsingSettings);
+}
+
 CXChildVisitResult Parser::staticParseCursor(CXCursor c, CXCursor parent, CXClientData clientData) noexcept
 {
 	Parser*	parser = reinterpret_cast<Parser*>(clientData);
@@ -49,7 +56,7 @@ CXChildVisitResult Parser::parseCursor(CXCursor currentCursor, CXCursor parentCu
 	{
 		return _classParser.parse(currentCursor, _parsingInfo);
 	}
-	else if (_parsingInfo.isParsingEnum())	//Currently parsing an enum
+	else if (_enumParser.isCurrentlyParsing())	//Currently parsing an enum
 	{	
 		return _enumParser.parse(currentCursor, _parsingInfo);
 	}
@@ -79,7 +86,7 @@ CXChildVisitResult Parser::parseDefault(CXCursor currentCursor) noexcept
 			break;
 
 		case CXCursorKind::CXCursor_EnumDecl:
-			_parsingInfo.startEnumParsing(currentCursor);
+			_enumParser.startParsing(currentCursor, _parsingInfo);
 			break;
 
 		default:
@@ -89,12 +96,11 @@ CXChildVisitResult Parser::parseDefault(CXCursor currentCursor) noexcept
 	return CXChildVisitResult::CXChildVisit_Recurse;
 }
 
-bool Parser::parse(fs::path const& parseFile) noexcept
+bool Parser::parse(fs::path const& parseFile, ParsingResult& out_result) noexcept
 {
-	bool		isSuccess = false;
+	bool isSuccess = false;
 
-	// Make sure the parser has a clean state before beginning parsing
-	clear();
+	setupForParsing();
 
 	if (fs::exists(parseFile) && !fs::is_directory(parseFile))
 	{
@@ -103,8 +109,6 @@ bool Parser::parse(fs::path const& parseFile) noexcept
 
 		if (translationUnit != nullptr)
 		{
-			_parsingInfo.setParsingSettings(&parsingSettings);
-
 			//Get the root cursor for this translation unit
 			CXCursor cursor = clang_getTranslationUnitCursor(translationUnit);
 			
@@ -121,27 +125,22 @@ bool Parser::parse(fs::path const& parseFile) noexcept
 		}
 		else
 		{
-			_parsingInfo.addParsingError(EParsingError::TranslationUnitInitFailed);
+			_parsingInfo.parsingResult.parsingErrors.emplace_back(ParsingError(EParsingError::TranslationUnitInitFailed));
 		}
 	}
 	else
 	{
-		_parsingInfo.addParsingError(EParsingError::InexistantFile);
+		_parsingInfo.parsingResult.parsingErrors.emplace_back(ParsingError(EParsingError::InexistantFile));
 	}
 
-	_parsingResult = _parsingInfo.extractParsingResult();
+	out_result = std::move(_parsingInfo.parsingResult);
 
 	return isSuccess;
 }
 
-ParsingResult const* Parser::retrieveParsingResult() const noexcept
-{
-	return _parsingResult.has_value() ? &*_parsingResult : nullptr;
-}
-
 void Parser::clear() noexcept
 {
-	std::cout << "Parser::clear(): TODO" << std::endl;
-
-	//TODO clear ParsingInfo
+	_parsingInfo.parsingResult.classes.clear();
+	_parsingInfo.parsingResult.enums.clear();
+	_parsingInfo.parsingResult.parsingErrors.clear();
 }

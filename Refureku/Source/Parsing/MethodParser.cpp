@@ -14,16 +14,14 @@ CXChildVisitResult MethodParser::parse(CXCursor cursor, ParsingInfo& parsingInfo
 		return tryToAddMethod(cursor, parsingInfo);
 	}
 
-	CXCursorKind cursorKind = clang_getCursorKind(cursor);
-
-	switch (cursorKind)
+	switch (clang_getCursorKind(cursor))
 	{
 		case CXCursorKind::CXCursor_CXXFinalAttr:
-			parsingInfo._currentMethodInfo->qualifiers |= MethodInfo::EMethodQualifier::Final;
+			parsingInfo.parsingResult.classes.back().methods.at(parsingInfo.accessSpecifier).back().qualifiers.Final = true;
 			break;
 
 		case CXCursorKind::CXCursor_CXXOverrideAttr:
-			parsingInfo._currentMethodInfo->qualifiers |= MethodInfo::EMethodQualifier::Override;
+			parsingInfo.parsingResult.classes.back().methods.at(parsingInfo.accessSpecifier).back().qualifiers.Override = true;
 			break;
 
 		case CXCursorKind::CXCursor_ParmDecl:
@@ -42,22 +40,22 @@ CXChildVisitResult MethodParser::tryToAddMethod(CXCursor const& methodAnnotation
 {
 	if (std::optional<PropertyGroup> propertyGroup = isMethodValid(methodAnnotationCursor, parsingInfo))
 	{
-		parsingInfo._currentMethodInfo = &parsingInfo._parsingResult.classes.back().methods.at(parsingInfo.accessSpecifier).emplace_back(MethodInfo(Helpers::getString(clang_getCursorDisplayName(_currentCursor)), std::move(*propertyGroup)));
-		setupMethod(_currentCursor, *parsingInfo._currentMethodInfo);
+		MethodInfo& methodInfo = parsingInfo.parsingResult.classes.back().methods.at(parsingInfo.accessSpecifier).emplace_back(MethodInfo(Helpers::getString(clang_getCursorDisplayName(_currentCursor)), std::move(*propertyGroup)));
+		setupMethod(_currentCursor, methodInfo);
 
 		return CXChildVisitResult::CXChildVisit_Recurse;
 	}
 	else
 	{
-		if (parsingInfo._propertyParser.getParsingError() == EParsingError::Count)
+		if (parsingInfo.propertyParser.getParsingError() == EParsingError::Count)
 		{
 			return CXChildVisitResult::CXChildVisit_Continue;
 		}
 		else	//Fatal parsing error occured
 		{
-			parsingInfo._parsingResult.parsingErrors.emplace_back(ParsingError(parsingInfo._propertyParser.getParsingError(), clang_getCursorLocation(methodAnnotationCursor)));
+			parsingInfo.parsingResult.parsingErrors.emplace_back(ParsingError(parsingInfo.propertyParser.getParsingError(), clang_getCursorLocation(methodAnnotationCursor)));
 
-			return parsingInfo._parsingSettings->shouldAbortParsingOnFirstError ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
+			return parsingInfo.parsingSettings->shouldAbortParsingOnFirstError ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
 		}
 	}
 }
@@ -74,38 +72,38 @@ void MethodParser::setupMethod(CXCursor const& methodCursor, MethodInfo& methodI
 	//Define method qualifiers
 	if (clang_CXXMethod_isDefaulted(methodCursor))
 	{
-		methodInfo.qualifiers |= MethodInfo::EMethodQualifier::Default;
+		methodInfo.qualifiers.Default = true;
 	}
 	if (clang_CXXMethod_isStatic(methodCursor))
 	{
-		methodInfo.qualifiers |= MethodInfo::EMethodQualifier::Static;
+		methodInfo.qualifiers.Static = true;
 	}
 	if (clang_CXXMethod_isVirtual(methodCursor))
 	{
-		methodInfo.qualifiers |= MethodInfo::EMethodQualifier::Virtual;
+		methodInfo.qualifiers.Virtual = true;
 	}
 	if (clang_CXXMethod_isPureVirtual(methodCursor))
 	{
-		methodInfo.qualifiers |= MethodInfo::EMethodQualifier::PureVirtual;
+		methodInfo.qualifiers.PureVirtual = true;
 	}
 	if (clang_CXXMethod_isConst(methodCursor))
 	{
-		methodInfo.qualifiers |= MethodInfo::EMethodQualifier::Const;
+		methodInfo.qualifiers.Const = true;
 	}
 	if (clang_Cursor_isFunctionInlined(methodCursor))
 	{
-		methodInfo.qualifiers |= MethodInfo::EMethodQualifier::Inline;
+		methodInfo.qualifiers.Inline = true;
 	}
 }
 
 std::optional<PropertyGroup> MethodParser::isMethodValid(CXCursor currentCursor, ParsingInfo& parsingInfo) noexcept
 {
 	_shouldCheckValidity = false;
-	parsingInfo._propertyParser.clean();
+	parsingInfo.propertyParser.clean();
 
 	if (clang_getCursorKind(currentCursor) == CXCursorKind::CXCursor_AnnotateAttr)
 	{
-		return parsingInfo._propertyParser.getMethodProperties(Helpers::getString(clang_getCursorSpelling(currentCursor)));
+		return parsingInfo.propertyParser.getMethodProperties(Helpers::getString(clang_getCursorSpelling(currentCursor)));
 	}
 
 	return std::nullopt;

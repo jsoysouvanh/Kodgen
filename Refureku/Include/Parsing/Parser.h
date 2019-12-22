@@ -19,7 +19,6 @@ namespace refureku
 			static constexpr char const*	_parseArguments[] = { "-x", "c++", "-D", "REFUREKU_PARSING" };
 			
 			CXIndex							_clangIndex;
-			std::optional<ParsingResult>	_parsingResult	= std::nullopt;
 			
 			ClassParser						_classParser;
 			EnumParser						_enumParser;
@@ -27,6 +26,8 @@ namespace refureku
 
 			static CXChildVisitResult	staticParseCursor(CXCursor c, CXCursor parent, CXClientData clientData)		noexcept;
 			
+			void						setupForParsing()															noexcept;
+
 			void						updateParsingState(CXCursor parent)											noexcept;
 			CXChildVisitResult			parseCursor(CXCursor currentCursor, CXCursor parentCursor)					noexcept;
 
@@ -40,12 +41,7 @@ namespace refureku
 			Parser(Parser&&)		= default;
 			~Parser()				noexcept;
 
-			virtual bool			parse(fs::path const& parseFile)		noexcept;
-
-			/**
-			*	Get the parsing result of the previous parsing operation if available, else nullptr
-			*/
-			ParsingResult const*	retrieveParsingResult()			const	noexcept;
+			bool	parse(fs::path const& parseFile, ParsingResult& out_result)		noexcept;
 
 			/**
 			*	Remove all previously parsed information from the class
