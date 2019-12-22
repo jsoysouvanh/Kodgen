@@ -3,11 +3,15 @@
 #include <iostream>
 #include <cassert>
 
+#include "Helpers.h"
+
 using namespace refureku;
 
-TypeInfo::TypeInfo(std::string&& fullTypeName) noexcept
+TypeInfo::TypeInfo(CXType cursorType) noexcept
 {
-	initialize(std::forward<std::string>(fullTypeName));
+	assert(cursorType.kind != CXTypeKind::CXType_Invalid);
+
+	initialize(Helpers::getString(clang_getTypeSpelling(cursorType)));
 }
 
 void TypeInfo::incrementParsingStep(EParsingStep& ps) noexcept

@@ -5,8 +5,8 @@
 
 #include "FundamentalTypes.h"
 #include "EAccessSpecifier.h"
-#include "ParsingSettings.h"
-#include "ParsingResult.h"
+#include "Parsing/ParsingSettings.h"
+#include "Parsing/ParsingResult.h"
 #include "Properties/PropertyParser.h"
 #include "InfoStructures/ClassInfo.h"
 #include "InfoStructures/TypeInfo.h"
@@ -15,7 +15,7 @@ namespace refureku
 {
 	class ParsingInfo
 	{
-		private:
+		public:
 			/**
 			*	
 			*/
@@ -71,33 +71,12 @@ namespace refureku
 			/*
 			*	Current class modifier
 			**/
-			EAccessSpecifier	_accessSpecifier	= EAccessSpecifier::Private;
+			EAccessSpecifier	accessSpecifier	= EAccessSpecifier::Private;
 
 			/**
 			*	Final collected data
 			*/
 			ParsingResult		_parsingResult;
-
-			CXChildVisitResult		tryToAddField(CXCursor const& fieldAnnotationCursor)				noexcept;
-			CXChildVisitResult		tryToAddMethod(CXCursor const& methodAnnotationCursor)				noexcept;
-			void					setupMethod(CXCursor const& methodCursor, MethodInfo& methodInfo)	noexcept;
-
-			std::optional<TypeInfo>	extractTypeInfo(CXType const& cursorType)					const	noexcept;
-
-			/**
-			*	Returns a filled PropertyGroup if the provided cursor describes a valid class, else an empty one
-			*/
-			std::optional<PropertyGroup> isClassValid(CXCursor currentCursor) noexcept;
-
-			/**
-			*	Returns a filled PropertyGroup if the provided cursor describes a valid field, else an empty one
-			*/
-			std::optional<PropertyGroup> isFieldValid(CXCursor currentCursor) noexcept;
-
-			/**
-			*	Returns a filled PropertyGroup if the provided cursor describes a valid method, else an empty one
-			*/
-			std::optional<PropertyGroup> isMethodValid(CXCursor currentCursor) noexcept;
 
 		public:		
 			/*
@@ -122,25 +101,11 @@ namespace refureku
 			ParsingInfo()	= default;
 			~ParsingInfo()	= default;
 
-			void					startStructParsing(CXCursor const& structCursor)			noexcept;
-			void					startClassParsing(CXCursor const& classCursor)				noexcept;
-			void					startFieldParsing(CXCursor const& fieldCursor)				noexcept;
-			void					startMethodParsing(CXCursor const& methodCursor)			noexcept;
 			void					startEnumParsing(CXCursor const& enumCursor)				noexcept;
 
-			void					endStructOrClassParsing()									noexcept;
-			void					endFieldParsing()											noexcept;
-			void					endMethodParsing()											noexcept;
 			void					endEnumParsing()											noexcept;
 
-			void					updateAccessSpecifier(CXCursor const& enumCursor)			noexcept;
 			void					addParsingError(EParsingError parsingError)					noexcept;
-
-			CXChildVisitResult		tryToAddClass(CXCursor const& classAnnotationCursor)		noexcept;
-
-			CXChildVisitResult		parseField(CXCursor const& fieldCursor)						noexcept;
-
-			CXChildVisitResult		parseMethod(CXCursor const& methodCursor)					noexcept;
 
 			bool					hasErrorOccured()									const	noexcept;
 			ParsingResult			extractParsingResult()										noexcept;

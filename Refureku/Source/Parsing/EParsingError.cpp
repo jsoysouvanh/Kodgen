@@ -1,4 +1,4 @@
-#include "EParsingError.h"
+#include "Parsing/EParsingError.h"
 
 using namespace refureku;
 
@@ -9,7 +9,7 @@ std::string refureku::toString(EParsingError error) noexcept
 	switch (error)
 	{
 		case EParsingError::WrongPropertyMacroUsed:
-			result = "WrontPropertyMacroUsed";
+			result = "WrongPropertyMacroUsed";
 			break;
 
 		case EParsingError::SubPropertyEndEncloserMissing:

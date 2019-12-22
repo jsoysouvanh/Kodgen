@@ -1,5 +1,6 @@
 #pragma once
 
+#include "clang-c/Index.h"
 #include <string>
 #include <vector>
 
@@ -67,11 +68,11 @@ namespace refureku
 			bool		isPointer	= false;
 			bool		isReference	= false;
 
-			TypeInfo()								= default;
-			TypeInfo(std::string&& fullTypeName)	noexcept;
-			TypeInfo(TypeInfo const&)				= default;
-			TypeInfo(TypeInfo&&)					= default;
-			~TypeInfo()								= default;
+			TypeInfo()						= default;
+			TypeInfo(CXType cursorType)		noexcept;
+			TypeInfo(TypeInfo const&)		= default;
+			TypeInfo(TypeInfo&&)			= default;
+			~TypeInfo()						= default;
 
 			/**
 			*	Init all internal flags according to the provided full name

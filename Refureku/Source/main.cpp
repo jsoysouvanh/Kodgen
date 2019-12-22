@@ -4,7 +4,7 @@
 #include "SafeFilesystem.h"
 
 #include "FileGenerator.h"
-#include "Parser.h"
+#include "Parsing/Parser.h"
 
 #include "Properties/ComplexPropertyRule.h"
 #include "Properties/PropertyRules.h"

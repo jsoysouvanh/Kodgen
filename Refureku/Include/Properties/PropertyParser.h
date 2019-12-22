@@ -4,7 +4,7 @@
 
 #include "Properties/PropertyGroup.h"
 #include "Properties/PropertyParsingSettings.h"
-#include "EParsingError.h"
+#include "Parsing/EParsingError.h"
 
 namespace refureku
 {

@@ -18,8 +18,6 @@ namespace TestNamespace
 			RfrkField(FieldProp1, FieldProp2[FieldSubProp21, FieldSubProp22], FieldProp3)
 			const volatile int* const&	var1;
 
-			float const		var3;
-
 			#pragma endregion
 
 		protected:
@@ -46,6 +44,9 @@ namespace TestNamespace
 			virtual int someMethodd3(int) const;
 
 			#pragma endregion
+
+			RfrkField()
+			float const		var3;
 	};
 
 	class TestClass2
