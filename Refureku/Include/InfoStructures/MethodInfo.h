@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "FundamentalTypes.h"
+#include "Misc/FundamentalTypes.h"
 
 #include "InfoStructures/EntityInfo.h"
 #include "TypeInfo.h"

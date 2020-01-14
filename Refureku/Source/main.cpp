@@ -1,9 +1,9 @@
 #include <iostream>
 #include <cassert>
 
-#include "SafeFilesystem.h"
+#include "Misc/SafeFilesystem.h"
 
-#include "FileGenerator.h"
+#include "CodeGen/FileGenerator.h"
 #include "Parsing/Parser.h"
 
 #include "Properties/ComplexPropertyRule.h"

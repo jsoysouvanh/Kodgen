@@ -3,8 +3,8 @@
 #include <vector>
 #include <clang-c/Index.h>
 
-#include "FundamentalTypes.h"
-#include "EAccessSpecifier.h"
+#include "Misc/FundamentalTypes.h"
+#include "Misc/EAccessSpecifier.h"
 #include "Parsing/ParsingSettings.h"
 #include "Parsing/ParsingResult.h"
 #include "Properties/PropertyParser.h"

@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "FundamentalTypes.h"
+#include "Misc/FundamentalTypes.h"
 
 namespace refureku
 {

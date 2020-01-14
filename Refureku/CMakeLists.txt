@@ -47,13 +47,13 @@ endif()
 
 # Setup executable / lib
 add_executable(refureku
-				Source/Helpers.cpp
 				Source/Properties/SimplePropertyRule.cpp
 				Source/Properties/ComplexPropertyRule.cpp
 				Source/Properties/ComplexProperty.cpp
 				Source/Properties/PropertyRules.cpp
 				Source/Properties/PropertyParser.cpp
 				Source/Properties/PropertyGroup.cpp
+
 				Source/InfoStructures/EntityInfo.cpp
 				Source/InfoStructures/FieldInfo.cpp
 				Source/InfoStructures/MethodInfo.cpp
@@ -61,6 +61,7 @@ add_executable(refureku
 				Source/InfoStructures/ClassInfo.cpp
 				Source/InfoStructures/ParsingInfo.cpp
 				Source/InfoStructures/TypeInfo.cpp
+
 				Source/Parsing/EParsingError.cpp
 				Source/Parsing/ParsingError.cpp
 				Source/Parsing/ClassParser.cpp
@@ -68,8 +69,12 @@ add_executable(refureku
 				Source/Parsing/MethodParser.cpp
 				Source/Parsing/EnumParser.cpp
 				Source/Parsing/Parser.cpp
-				Source/FileGenerator.cpp
-				Source/EAccessSpecifier.cpp
+
+				Source/Misc/EAccessSpecifier.cpp
+				Source/Misc/Helpers.cpp
+
+				Source/CodeGen/FileGenerator.cpp
+
 				Source/main.cpp
 				)
 

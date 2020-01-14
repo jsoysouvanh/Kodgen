@@ -3,7 +3,7 @@
 #include <clang-c/Index.h>
 #include <optional>
 
-#include "SafeFilesystem.h"
+#include "Misc/SafeFilesystem.h"
 #include "InfoStructures/ParsingInfo.h"
 #include "Parsing/ClassParser.h"
 #include "Parsing/EnumParser.h"

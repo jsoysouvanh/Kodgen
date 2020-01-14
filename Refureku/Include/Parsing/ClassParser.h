@@ -2,8 +2,8 @@
 
 #include <clang-c/Index.h>
 
-#include "FundamentalTypes.h"
-#include "EAccessSpecifier.h"
+#include "Misc/FundamentalTypes.h"
+#include "Misc/EAccessSpecifier.h"
 #include "InfoStructures/ParsingInfo.h"
 #include "Parsing/FieldParser.h"
 #include "Parsing/MethodParser.h"

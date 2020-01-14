@@ -1,6 +1,6 @@
 #include "Parsing/ClassParser.h"
 
-#include "Helpers.h"
+#include "Misc/Helpers.h"
 
 using namespace refureku;
 

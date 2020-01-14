@@ -1,6 +1,6 @@
 #pragma once
 
-#include "PropertyMacros.h"
+#include "Misc/PropertyMacros.h"
 
 #include <filesystem>
 #include <vector>
@@ -54,7 +54,7 @@ namespace TestNamespace
 		private:
 			#pragma region Variables
 
-			RfrkMethod(var1 is following)
+			RfrkField()
 			int				var1 = 42;
 			float			var2;
 
@@ -65,7 +65,7 @@ namespace TestNamespace
 			public:
 			#pragma region Methods
 
-			RfrkMethod(int someMethod(int) is following)
+			RfrkMethod()
 			int someMethod(int);
 			int dsomeMethod3(int) noexcept;
 			virtual int someMethodd3(int) const;

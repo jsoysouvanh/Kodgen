@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <clang-c/Index.h>
 
-#include "EAccessSpecifier.h"
+#include "Misc/EAccessSpecifier.h"
 #include "InfoStructures/FieldInfo.h"
 #include "InfoStructures/MethodInfo.h"
 

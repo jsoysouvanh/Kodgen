@@ -2,7 +2,7 @@
 
 #include <clang-c/Index.h>
 
-#include "FundamentalTypes.h"
+#include "Misc/FundamentalTypes.h"
 #include "InfoStructures/ParsingInfo.h"
 
 namespace refureku

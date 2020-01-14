@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "FundamentalTypes.h"
+#include "Misc/FundamentalTypes.h"
 
 namespace refureku
 {
