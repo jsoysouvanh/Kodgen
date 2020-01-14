@@ -22,6 +22,7 @@ void Parser::setupForParsing() noexcept
 	clear();
 
 	_parsingInfo.propertyParser.setup(&parsingSettings.propertyParsingSettings);
+	_parsingInfo.parsingSettings = &parsingSettings;
 }
 
 CXChildVisitResult Parser::staticParseCursor(CXCursor c, CXCursor parent, CXClientData clientData) noexcept

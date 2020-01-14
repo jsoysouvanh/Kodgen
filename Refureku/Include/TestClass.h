@@ -49,7 +49,7 @@ namespace TestNamespace
 			float const		var3;
 	};
 
-	class TestClass2
+	class RfrkClass() TestClass2
 	{
 		private:
 			#pragma region Variables
