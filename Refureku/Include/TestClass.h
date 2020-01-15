@@ -10,7 +10,7 @@ namespace TestNamespace
 {
 	class Class1{};
 
-	class RfrkClass(ClassProp1, ClassProp2[ClassSubProp21, ClassSubProp22], ClassProp3) TestClass final : public Class1
+	class RfrkClass(CodeTemplate[TestTemplate], ClassProp1, ClassProp2[ClassSubProp21, ClassSubProp22], ClassProp3) TestClass final : public Class1
 	{
 		private:
 			#pragma region Variables

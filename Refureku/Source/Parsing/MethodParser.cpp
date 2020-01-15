@@ -14,14 +14,19 @@ CXChildVisitResult MethodParser::parse(CXCursor cursor, ParsingInfo& parsingInfo
 		return tryToAddMethod(cursor, parsingInfo);
 	}
 
+	if (!parsingInfo.currentClass.has_value())
+	{
+		return CXChildVisitResult::CXChildVisit_Continue;
+	}
+
 	switch (clang_getCursorKind(cursor))
 	{
 		case CXCursorKind::CXCursor_CXXFinalAttr:
-			parsingInfo.parsingResult.classes.back().methods.at(parsingInfo.accessSpecifier).back().qualifiers.Final = true;
+			parsingInfo.currentClass->methods.at(parsingInfo.accessSpecifier).back().qualifiers.Final = true;
 			break;
 
 		case CXCursorKind::CXCursor_CXXOverrideAttr:
-			parsingInfo.parsingResult.classes.back().methods.at(parsingInfo.accessSpecifier).back().qualifiers.Override = true;
+			parsingInfo.currentClass->methods.at(parsingInfo.accessSpecifier).back().qualifiers.Override = true;
 			break;
 
 		case CXCursorKind::CXCursor_ParmDecl:
@@ -40,10 +45,17 @@ CXChildVisitResult MethodParser::tryToAddMethod(CXCursor const& methodAnnotation
 {
 	if (std::optional<PropertyGroup> propertyGroup = isMethodValid(methodAnnotationCursor, parsingInfo))
 	{
-		MethodInfo& methodInfo = parsingInfo.parsingResult.classes.back().methods.at(parsingInfo.accessSpecifier).emplace_back(MethodInfo(Helpers::getString(clang_getCursorDisplayName(_currentCursor)), std::move(*propertyGroup)));
-		setupMethod(_currentCursor, methodInfo);
+		if (parsingInfo.currentClass.has_value())
+		{
+			MethodInfo& methodInfo = parsingInfo.currentClass->methods.at(parsingInfo.accessSpecifier).emplace_back(MethodInfo(Helpers::getString(clang_getCursorDisplayName(_currentCursor)), std::move(*propertyGroup)));
+			setupMethod(_currentCursor, methodInfo);
 
-		return CXChildVisitResult::CXChildVisit_Recurse;
+			return CXChildVisitResult::CXChildVisit_Recurse;
+		}
+		else
+		{
+			return CXChildVisitResult::CXChildVisit_Continue;
+		}
 	}
 	else
 	{

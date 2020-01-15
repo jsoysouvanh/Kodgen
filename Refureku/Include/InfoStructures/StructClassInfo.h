@@ -21,9 +21,9 @@ namespace refureku
 			void initContainers() noexcept;
 
 		public:
-			bool						isFinal;
+			bool															isFinal;
 
-			std::vector<std::string>	parents;
+			std::vector<std::string>										parents;
 			std::unordered_map<EAccessSpecifier, std::vector<FieldInfo>>	fields;
 			std::unordered_map<EAccessSpecifier, std::vector<MethodInfo>>	methods;
 

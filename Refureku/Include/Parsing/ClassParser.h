@@ -22,7 +22,7 @@ namespace refureku
 
 			CXChildVisitResult				tryToAddClass(CXCursor classAnnotationCursor, ParsingInfo& parsingInfo)	noexcept;
 			std::optional<PropertyGroup>	isClassValid(CXCursor currentCursor, ParsingInfo& parsingInfo)			noexcept;
-			void							endStructOrClassParsing()												noexcept;
+			void							endStructOrClassParsing(ParsingInfo& parsingInfo)						noexcept;
 			void							updateAccessSpecifier(CXCursor cursor, ParsingInfo& parsingInfo)		noexcept;
 
 		public:
@@ -35,7 +35,7 @@ namespace refureku
 			void				startClassParsing(CXCursor currentCursor, ParsingInfo& parsingInfo)			noexcept;
 			void				startStructParsing(CXCursor currentCursor, ParsingInfo& parsingInfo)		noexcept;
 
-			void				updateParsingState(CXCursor parent)											noexcept;
+			void				updateParsingState(CXCursor parent, ParsingInfo& parsingInfo)				noexcept;
 
 			bool				isCurrentlyParsing()												const	noexcept;
 	};

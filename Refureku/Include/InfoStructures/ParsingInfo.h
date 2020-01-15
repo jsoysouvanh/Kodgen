@@ -19,29 +19,34 @@ namespace refureku
 			/**
 			*
 			*/
-			ParsingSettings const*	parsingSettings = nullptr;
+			ParsingSettings const*		parsingSettings = nullptr;
 
 			/**
 			*	PropertyParser.
 			*	used by the Parser to retrieve information
 			*/
-			PropertyParser			propertyParser;
+			PropertyParser				propertyParser;
 
-			/*
+			/**
 			*	Current class modifier
-			**/
-			EAccessSpecifier		accessSpecifier	= EAccessSpecifier::Private;
+			*/
+			EAccessSpecifier			accessSpecifier	= EAccessSpecifier::Private;
+
+			/**
+			*	Current parsing class (if valid)
+			*/
+			std::optional<ClassInfo>	currentClass;
 
 			/**
 			*	Final collected data
 			*/
-			ParsingResult			parsingResult;
+			ParsingResult				parsingResult;
 
 			ParsingInfo()	= default;
 			~ParsingInfo()	= default;
 
-			bool					hasErrorOccured()									const	noexcept;
+			bool	hasErrorOccured()									const	noexcept;
 
-			void					setParsingSettings(ParsingSettings const* parsingSettings)	noexcept;
+			void	setParsingSettings(ParsingSettings const* parsingSettings)	noexcept;
 	};
 }

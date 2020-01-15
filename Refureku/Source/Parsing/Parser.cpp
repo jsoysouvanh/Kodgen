@@ -47,7 +47,7 @@ void Parser::updateParsingState(CXCursor parent) noexcept
 {
 	if (_classParser.isCurrentlyParsing())
 	{
-		_classParser.updateParsingState(parent);
+		_classParser.updateParsingState(parent, _parsingInfo);
 	}
 }
 

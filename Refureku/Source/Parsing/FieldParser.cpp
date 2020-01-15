@@ -19,10 +19,17 @@ CXChildVisitResult FieldParser::tryToAddField(CXCursor fieldAnnotationCursor, Pa
 {
 	if (std::optional<PropertyGroup> propertyGroup = isFieldValid(fieldAnnotationCursor, parsingInfo))
 	{
-		FieldInfo& field = parsingInfo.parsingResult.classes.back().fields.at(parsingInfo.accessSpecifier).emplace_back(FieldInfo(Helpers::getString(clang_getCursorDisplayName(_currentCursor)), std::move(*propertyGroup)));
-		field.type = TypeInfo(clang_getCanonicalType(clang_getCursorType(_currentCursor)));
+		if (parsingInfo.currentClass.has_value())
+		{
+			FieldInfo& field = parsingInfo.currentClass->fields.at(parsingInfo.accessSpecifier).emplace_back(FieldInfo(Helpers::getString(clang_getCursorDisplayName(_currentCursor)), std::move(*propertyGroup)));
+			field.type = TypeInfo(clang_getCanonicalType(clang_getCursorType(_currentCursor)));
 
-		return CXChildVisitResult::CXChildVisit_Recurse;
+			return CXChildVisitResult::CXChildVisit_Recurse;
+		}
+		else
+		{
+			return CXChildVisitResult::CXChildVisit_Continue;
+		}
 	}
 	else
 	{

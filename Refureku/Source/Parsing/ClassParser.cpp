@@ -45,7 +45,7 @@ CXChildVisitResult ClassParser::tryToAddClass(CXCursor classAnnotationCursor, Pa
 {
 	if (std::optional<PropertyGroup> propertyGroup = isClassValid(classAnnotationCursor, parsingInfo))
 	{
-		parsingInfo.parsingResult.classes.emplace_back(ClassInfo(Helpers::getString(clang_getCursorDisplayName(_currentCursor)), std::move(*propertyGroup)));
+		parsingInfo.currentClass.emplace(ClassInfo(Helpers::getString(clang_getCursorDisplayName(_currentCursor)), std::move(*propertyGroup)));
 
 		return CXChildVisitResult::CXChildVisit_Recurse;
 	}
@@ -53,12 +53,13 @@ CXChildVisitResult ClassParser::tryToAddClass(CXCursor classAnnotationCursor, Pa
 	{
 		if (parsingInfo.propertyParser.getParsingError() == EParsingError::Count)
 		{
-			endStructOrClassParsing();
+			endStructOrClassParsing(parsingInfo);
 			return CXChildVisitResult::CXChildVisit_Continue;
 		}
 		else	//Fatal parsing error occured
 		{
 			parsingInfo.parsingResult.parsingErrors.emplace_back(ParsingError(parsingInfo.propertyParser.getParsingError(), clang_getCursorLocation(classAnnotationCursor)));
+			parsingInfo.currentClass.reset();
 
 			return parsingInfo.parsingSettings->shouldAbortParsingOnFirstError ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
 		}
@@ -98,16 +99,22 @@ void ClassParser::startStructParsing(CXCursor currentCursor, ParsingInfo& parsin
 	//std::cout << "START STRUCT" << std::endl;
 }
 
-void ClassParser::endStructOrClassParsing()	noexcept
+void ClassParser::endStructOrClassParsing(ParsingInfo& parsingInfo)	noexcept
 {
 	_classLevel--;
 	_currentCursor			= clang_getNullCursor();
 	_shouldCheckValidity	= false;
 
+	if (parsingInfo.currentClass.has_value())
+	{
+		parsingInfo.parsingResult.classes.emplace_back(std::move(parsingInfo.currentClass.value()));
+		parsingInfo.currentClass.reset();
+	}
+
 	//std::cout << "END CLASS/STRUCT" << std::endl;
 }
 
-void ClassParser::updateParsingState(CXCursor parent) noexcept
+void ClassParser::updateParsingState(CXCursor parent, ParsingInfo& parsingInfo) noexcept
 {
 	//Check if we're not parsing a field anymore
 	if (_fieldParser.isCurrentlyParsing())
@@ -125,7 +132,7 @@ void ClassParser::updateParsingState(CXCursor parent) noexcept
 	*/
 	if (clang_equalCursors(clang_getCursorSemanticParent(_currentCursor), parent))
 	{
-		endStructOrClassParsing();
+		endStructOrClassParsing(parsingInfo);
 	}
 }
 

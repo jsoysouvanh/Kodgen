@@ -74,6 +74,7 @@ add_executable(refureku
 				Source/Misc/Helpers.cpp
 
 				Source/CodeGen/FileGenerator.cpp
+				Source/CodeGen/GeneratedCodeTemplate.cpp
 
 				Source/main.cpp
 				)

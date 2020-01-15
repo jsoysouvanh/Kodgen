@@ -46,6 +46,6 @@ namespace refureku
 			/**
 			*	Remove all previously parsed information from the class
 			*/
-			void					clear()									noexcept;
+			void	clear()															noexcept;
 	};
 }

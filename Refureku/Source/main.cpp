@@ -1,11 +1,9 @@
 #include <iostream>
 #include <cassert>
 
-#include "Misc/SafeFilesystem.h"
-
 #include "CodeGen/FileGenerator.h"
+#include "CodeGen/TestGeneratedCodeTemplate.h"
 #include "Parsing/Parser.h"
-
 #include "Properties/ComplexPropertyRule.h"
 #include "Properties/PropertyRules.h"
 
@@ -112,51 +110,22 @@ void parsingTests()
 	}
 }
 
-void randomTests()
+void fileGeneratorTests()
 {
-	std::string str = "Prop1,Prop2[Prop21,Prop22],Prop3";
+	fs::path includeDirPath	= fs::current_path().parent_path().parent_path().parent_path() / "Include";
+	fs::path pathToFile		= includeDirPath / "TestClass.h";
 
-	char chars[4] = {',', ',', '[', ']'};
-	size_t index = 0;
-	bool shouldAdd = false;
+	refureku::Parser parser;
 
-	while (index != str.npos)
-	{
-		shouldAdd = false;
-		index = 0;
+	setupParser(parser);
 
-		while (!shouldAdd && index != str.npos)
-		{
-			index = str.find_first_of(chars, index, 4);
+	refureku::FileGenerator fg;
 
-			std::cout << "found: " << index << std::endl;
+	fg.addGeneratedCodeTemplate<refureku::TestGeneratedCodeTemplate>("TestTemplate");
 
-			if (index == str.npos)
-				shouldAdd = true;
-			else if (str[index] == ',')
-				shouldAdd = true;
-			else if (str[index] == '[')
-				shouldAdd = true;
-			else if (str[index] == ']')
-				shouldAdd = true;
-			else
-				index++;
-		}
+	fg.addFile(pathToFile);
 
-		if (index == str.npos)
-		{
-			break;
-		}
-		else
-		{
-			std::cout << "erase: " << std::string(str.cbegin(), str.cbegin() + index + 1) << std::endl;
-			str.erase(str.cbegin(), str.cbegin() + index + 1);
-
-			std::cout << str << std::endl;
-		}
-	}
-
-	//std::cout << str.find_first_of("df", 0, 2) << std::endl;
+	fg.generateFiles(parser, true);
 }
 
 int main()
@@ -165,7 +134,7 @@ int main()
 
 	parsingTests();
 
-	//randomTests();
+	//fileGeneratorTests();
 
 	return EXIT_SUCCESS;
 }
