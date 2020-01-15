@@ -10,6 +10,8 @@ namespace refureku
 		{
 			fs::path filepath = parsedFile;
 
+			filepath.replace_filename(entityInfo.name);
+
 			return filepath.replace_extension(".generated");
 		}
 
@@ -17,10 +19,12 @@ namespace refureku
 		{
 			GeneratedCodeTemplate::generateCode(parsedFile, entityInfo);
 
-			write(	"class" + entityInfo.name + 
+			write("#pragma once");
+
+			write(	"class " + entityInfo.name + 
 					"{"
-						"//TODO"
-					"}");
+						"/*TODO*/"
+					"};");
 		}
 	};
 }

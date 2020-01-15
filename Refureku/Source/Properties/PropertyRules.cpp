@@ -42,6 +42,20 @@ bool PropertyRules::removeComplexPropertyRule(std::string&& mainPropertyName, st
 	return false;
 }
 
+bool PropertyRules::removeComplexPropertyRule(std::string&& mainPropertyName) noexcept
+{
+	decltype(_complexPropertyRules)::const_iterator it = std::find_if(_complexPropertyRules.cbegin(), _complexPropertyRules.cend(), [mainPropertyName](ComplexPropertyRule const& prop) { return prop.name == mainPropertyName; });
+
+	if (it != _complexPropertyRules.cend())
+	{
+		_complexPropertyRules.erase(it);
+
+		return true;
+	}
+
+	return false;
+}
+
 void PropertyRules::clearSimplePropertyRules() noexcept
 {
 	_simplePropertyRules.clear();

@@ -14,6 +14,18 @@ FileGenerator::~FileGenerator() noexcept
 
 }
 
+void FileGenerator::updateSupportedCodeTemplateRegex() noexcept
+{
+	_supportedCodeTemplateRegex.clear();
+
+	for (auto& [key, value] : _generatedCodeTemplates)
+	{
+		_supportedCodeTemplateRegex += key + "|";
+	}
+
+	_supportedCodeTemplateRegex.pop_back();
+}
+
 bool FileGenerator::addFile(fs::path filePath) noexcept
 {
 	if (fs::exists(filePath) && !fs::is_directory(filePath))
@@ -38,6 +50,10 @@ bool FileGenerator::generateFiles(Parser& parser, bool forceRegenerateAll) noexc
 {
 	bool success;
 
+	//Make sure the CodeTemplate property is setup
+	parser.parsingSettings.propertyParsingSettings.classPropertyRules.removeComplexPropertyRule(std::string(codeTemplateMainComplexPropertyName));
+	parser.parsingSettings.propertyParsingSettings.classPropertyRules.addComplexPropertyRule(std::string(codeTemplateMainComplexPropertyName), std::string(_supportedCodeTemplateRegex));
+
 	for (fs::path path : _includedFiles)
 	{
 		parser.clear();
@@ -52,7 +68,7 @@ bool FileGenerator::generateFiles(Parser& parser, bool forceRegenerateAll) noexc
 			{
 				//Find the specified code template
 				std::set<ComplexProperty>::const_iterator it = std::find_if(classInfo.properties.complexProperties.cbegin(), classInfo.properties.complexProperties.cend(),
-																			[](ComplexProperty const& prop) { return prop.name == "CodeTemplate"; });
+																			[this](ComplexProperty const& prop) { return prop.name == codeTemplateMainComplexPropertyName; });
 				
 				if (it == classInfo.properties.complexProperties.cend())
 				{
@@ -63,7 +79,7 @@ bool FileGenerator::generateFiles(Parser& parser, bool forceRegenerateAll) noexc
 					}
 					else
 					{
-						std::cout << "Missing CodeTemplate property and no default code template is specified, can't generate file";
+						std::cout << "Missing GenTemplate property and no default code template is specified, can't generate file";
 						continue;
 					}
 				}
@@ -91,6 +107,15 @@ bool FileGenerator::generateFiles(Parser& parser, bool forceRegenerateAll) noexc
 						std::cout << "Unsupported CodeTemplate";
 					}
 				}
+			}
+		}
+		else
+		{
+			std::cout << "Parse ended with errors" << std::endl;
+
+			for (refureku::ParsingError const& error : result.parsingErrors)
+			{
+				std::cout << error << std::endl;
 			}
 		}
 	}

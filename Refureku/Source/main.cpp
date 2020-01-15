@@ -121,7 +121,7 @@ void fileGeneratorTests()
 
 	refureku::FileGenerator fg;
 
-	fg.addGeneratedCodeTemplate<refureku::TestGeneratedCodeTemplate>("TestTemplate");
+	fg.addGeneratedCodeTemplate<refureku::TestGeneratedCodeTemplate>("TestTemplate", true);
 
 	fg.addFile(pathToFile);
 
@@ -132,9 +132,9 @@ int main()
 {
 	//propertyTests();
 
-	parsingTests();
+	//parsingTests();
 
-	//fileGeneratorTests();
+	fileGeneratorTests();
 
 	return EXIT_SUCCESS;
 }

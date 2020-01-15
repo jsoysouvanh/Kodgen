@@ -17,11 +17,14 @@ namespace refureku
 			std::set<fs::path>										_includedFiles;
 			std::set<fs::path>										_includedDirectories;
 			std::unordered_map<std::string,	GeneratedCodeTemplate*>	_generatedCodeTemplates;
-			GeneratedCodeTemplate*									_defaultCodeTemplate = nullptr;
+			GeneratedCodeTemplate*									_defaultCodeTemplate		= nullptr;
+			std::string												_supportedCodeTemplateRegex = "";
 
-		protected:
+			void updateSupportedCodeTemplateRegex()	noexcept;
 
 		public:
+			std::string	codeTemplateMainComplexPropertyName = "GenTemplate";
+
 			FileGenerator()		noexcept;
 			~FileGenerator()	noexcept;
 

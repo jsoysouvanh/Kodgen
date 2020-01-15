@@ -11,4 +11,6 @@ void FileGenerator::addGeneratedCodeTemplate(std::string templateName, bool isDe
 
 	if (isDefault)
 		_defaultCodeTemplate = codeTemplate;
+
+	updateSupportedCodeTemplateRegex();
 }

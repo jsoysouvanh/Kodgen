@@ -17,5 +17,5 @@ void GeneratedCodeTemplate::releaseGeneratedFile() noexcept
 
 void GeneratedCodeTemplate::write(std::string&& text) noexcept
 {
-	_writingFile << text;
+	_writingFile << text << std::endl;
 }
