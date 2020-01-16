@@ -1,7 +1,5 @@
 #include "CodeGen/FileGenerator.h"
 
-
-
 using namespace refureku;
 
 FileGenerator::FileGenerator() noexcept
@@ -49,6 +47,41 @@ bool FileGenerator::addDirectory(fs::path dirPath) noexcept
 	return false;
 }
 
+void FileGenerator::addGeneratedCodeTemplate(std::string templateName, GeneratedCodeTemplate* codeTemplate) noexcept
+{
+	_generatedCodeTemplates[templateName] = codeTemplate;
+
+	updateSupportedCodeTemplateRegex();
+}
+
+bool FileGenerator::setDefaultClassTemplate(std::string templateName) noexcept
+{
+	decltype(_generatedCodeTemplates)::const_iterator it = _generatedCodeTemplates.find(templateName);
+
+	if (it != _generatedCodeTemplates.cend())
+	{
+		_defaultClassTemplate = it->second;
+		
+		return true;
+	}
+
+	return false;
+}
+
+bool FileGenerator::setDefaultEnumTemplate(std::string templateName) noexcept
+{
+	decltype(_generatedCodeTemplates)::const_iterator it = _generatedCodeTemplates.find(templateName);
+
+	if (it != _generatedCodeTemplates.cend())
+	{
+		_defaultEnumTemplate = it->second;
+
+		return true;
+	}
+
+	return false;
+}
+
 bool FileGenerator::generateFiles(Parser& parser, bool forceRegenerateAll) noexcept
 {
 	bool success;
@@ -75,10 +108,10 @@ bool FileGenerator::generateFiles(Parser& parser, bool forceRegenerateAll) noexc
 				
 				if (it == classInfo.properties.complexProperties.cend())
 				{
-					if (_defaultCodeTemplate != nullptr)
+					if (_defaultClassTemplate != nullptr)
 					{
-						_defaultCodeTemplate->generateCode(path, classInfo);
-						_defaultCodeTemplate->releaseGeneratedFile();
+						_defaultClassTemplate->generateCode(path, classInfo);
+						_defaultClassTemplate->releaseGeneratedFile();
 					}
 					else
 					{

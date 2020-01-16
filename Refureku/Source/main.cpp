@@ -121,7 +121,8 @@ void fileGeneratorTests()
 
 	refureku::FileGenerator fg;
 
-	fg.addGeneratedCodeTemplate<refureku::TestGeneratedCodeTemplate>("TestTemplate", true);
+	fg.addGeneratedCodeTemplate("TestTemplate", new refureku::TestGeneratedCodeTemplate());
+	fg.setDefaultClassTemplate("TestTemplate");
 
 	fg.addFile(pathToFile);
 
