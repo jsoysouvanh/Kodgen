@@ -12,7 +12,7 @@ namespace refureku
 		private:
 			bool		_shouldCheckValidity	= false;
 			bool		_isCurrentlyParsing		= false;
-			CXCursor	_currentCursor;
+			CXCursor	_currentCursor			= clang_getNullCursor();
 
 			bool	isEnumValid(CXCursor currentCursor)	noexcept;
 			void	endParsing()						noexcept;

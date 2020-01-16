@@ -12,7 +12,7 @@ namespace refureku
 			bool		_shouldCheckValidity	= false;
 			bool		_isCurrentlyParsing		= false;
 
-			CXCursor	_currentCursor;
+			CXCursor	_currentCursor			= clang_getNullCursor();
 
 			CXChildVisitResult				tryToAddMethod(CXCursor const& methodAnnotationCursor, ParsingInfo& parsingInfo)	noexcept;
 			std::optional<PropertyGroup>	isMethodValid(CXCursor currentCursor, ParsingInfo& parsingInfo)						noexcept;

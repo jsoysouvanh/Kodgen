@@ -27,6 +27,9 @@ namespace refureku
 			unsigned				getLine()		const noexcept;
 			unsigned				getColumn()		const noexcept;
 			EParsingError			getErrorValue()	const noexcept;
+
+			ParsingError& operator=(ParsingError const&)	= default;
+			ParsingError& operator=(ParsingError&&)			= default;
 	};
 
 	std::ostream& operator<<(std::ostream& out_stream, ParsingError const& parsingError) noexcept;

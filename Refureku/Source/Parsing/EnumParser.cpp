@@ -6,8 +6,7 @@ using namespace refureku;
 
 CXChildVisitResult EnumParser::parse(CXCursor currentCursor, ParsingInfo& parsingInfo) noexcept
 {
-	CXCursorKind	cursorKind	= clang_getCursorKind(currentCursor);
-	std::string		cursorName	= Helpers::getString(clang_getCursorSpelling(currentCursor));
+	parsingInfo;
 
 	//Check for any annotation if the flag is raised
 	if (_shouldCheckValidity)
@@ -21,11 +20,14 @@ CXChildVisitResult EnumParser::parse(CXCursor currentCursor, ParsingInfo& parsin
 			return CXChildVisitResult::CXChildVisit_Continue;
 		}
 	}
+
+	//TODO
+	return CXChildVisit_Recurse;
 }
 
 void EnumParser::updateParsingState(CXCursor parent) noexcept
 {
-
+	parent;
 }
 
 void EnumParser::startParsing(CXCursor currentCursor, ParsingInfo& parsingInfo) noexcept
@@ -34,6 +36,7 @@ void EnumParser::startParsing(CXCursor currentCursor, ParsingInfo& parsingInfo) 
 	_currentCursor			= currentCursor;
 	_shouldCheckValidity	= true;
 
+	parsingInfo;
 	//std::cout << "START ENUM" << std::endl;
 }
 

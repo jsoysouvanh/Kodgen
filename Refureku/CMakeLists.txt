@@ -75,6 +75,8 @@ add_executable(refureku
 
 				Source/CodeGen/FileGenerator.cpp
 				Source/CodeGen/GeneratedCodeTemplate.cpp
+				Source/CodeGen/EFileGenerationError.cpp
+				Source/CodeGen/FileGenerationError.cpp
 
 				Source/main.cpp
 				)

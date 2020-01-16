@@ -7,6 +7,7 @@
 
 #include "Misc/SafeFilesystem.h"
 #include "CodeGen/GeneratedCodeTemplate.h"
+#include "CodeGen/FileGenerationResult.h"
 #include "Parsing/Parser.h"
 
 namespace refureku
@@ -21,7 +22,9 @@ namespace refureku
 			GeneratedCodeTemplate*									_defaultEnumTemplate		= nullptr;
 			std::string												_supportedCodeTemplateRegex = "";
 
-			void updateSupportedCodeTemplateRegex()	noexcept;
+			void updateSupportedCodeTemplateRegex()																					noexcept;
+			void generateClassFiles(FileGenerationResult& genResult, fs::path const& filePath, ParsingResult const& parsingResult)	noexcept;
+			void generateEnumFiles(FileGenerationResult& genResult, fs::path const& filePath, ParsingResult const& parsingResult)	noexcept;
 
 		public:
 			std::string	codeTemplateMainComplexPropertyName = "GenTemplate";
@@ -77,8 +80,14 @@ namespace refureku
 			bool setDefaultEnumTemplate(std::string templateName)											noexcept;
 
 			/**
-			*	@brief Generate all registered files using
+			*	@brief Parse registered files if they were changes since last generation
+			*			and try to generate corresponding files using code templates
+			*
+			*	@param parser The parser to use for the parsing
+			*	@param forceRegenerateAll Ignore the last write time check and reparse / regenerate all files
+			*
+			*	@return Structure containing result report
 			*/
-			bool generateFiles(Parser& parser, bool forceRegenerateAll = false)								noexcept;
+			FileGenerationResult generateFiles(Parser& parser, bool forceRegenerateAll = false)				noexcept;
 	};
 }

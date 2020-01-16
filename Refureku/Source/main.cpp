@@ -126,7 +126,12 @@ void fileGeneratorTests()
 
 	fg.addFile(pathToFile);
 
-	fg.generateFiles(parser, true);
+	refureku::FileGenerationResult fgr = fg.generateFiles(parser, true);
+
+	for (refureku::ParsingError& pe : fgr.parsingErrors)
+	{
+		std::cout << pe << std::endl;
+	}
 }
 
 int main()

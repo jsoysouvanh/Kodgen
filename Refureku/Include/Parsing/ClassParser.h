@@ -15,7 +15,7 @@ namespace refureku
 		private:
 			bool					_shouldCheckValidity	= false;
 			uint8					_classLevel				= 0u;
-			CXCursor				_currentCursor;
+			CXCursor				_currentCursor			= clang_getNullCursor();
 
 			FieldParser				_fieldParser;
 			MethodParser			_methodParser;
