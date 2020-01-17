@@ -27,92 +27,57 @@ void FileGenerator::updateSupportedCodeTemplateRegex() noexcept
 	_supportedCodeTemplateRegex.pop_back();
 }
 
-void FileGenerator::generateClassFiles(FileGenerationResult& genResult, fs::path const& filePath, ParsingResult const& parsingResult) noexcept
+void FileGenerator::generateEntityFiles(FileGenerationResult& genResult, fs::path const& filePath, ParsingResult const& parsingResult)	noexcept
 {
 	for (ClassInfo classInfo : parsingResult.classes)
 	{
-		//Find the specified code template
-		std::set<ComplexProperty>::const_iterator it = std::find_if(classInfo.properties.complexProperties.cbegin(), classInfo.properties.complexProperties.cend(),
-																	[this](ComplexProperty const& prop) { return prop.name == codeTemplateMainComplexPropertyName; });
+		generateFileFromEntity(classInfo, filePath, genResult, parsingResult);
+	}
 
-		if (it == classInfo.properties.complexProperties.cend())
-		{
-			if (_defaultClassTemplate != nullptr)
-			{
-				_defaultClassTemplate->generateCode(filePath, classInfo);
-				_defaultClassTemplate->releaseGeneratedFile();
-			}
-			else
-			{
-				genResult.fileGenerationErrors.emplace_back(FileGenerationError(filePath, classInfo.name, FileGenerationError::EEntityType::Class, EFileGenerationError::MissingGeneratedCodeTemplateComplexProperty));
-			}
-		}
-		else if (it->subProperties.empty())
-		{
-			genResult.fileGenerationErrors.emplace_back(FileGenerationError(filePath, classInfo.name, FileGenerationError::EEntityType::Class, EFileGenerationError::NoGeneratedCodeTemplateProvided));
-		}
-		else if (it->subProperties.size() > 1)
-		{
-			genResult.fileGenerationErrors.emplace_back(FileGenerationError(filePath, classInfo.name, FileGenerationError::EEntityType::Class, EFileGenerationError::TooManyGeneratedCodeTemplateProvided));
-		}
-		else
-		{
-			std::unordered_map<std::string,	GeneratedCodeTemplate*>::const_iterator it2 = _generatedCodeTemplates.find(it->subProperties[0]);
-
-			if (it2 != _generatedCodeTemplates.cend())
-			{
-				it2->second->generateCode(filePath, classInfo);
-				it2->second->releaseGeneratedFile();
-			}
-			else
-			{
-				genResult.fileGenerationErrors.emplace_back(FileGenerationError(filePath, classInfo.name, FileGenerationError::EEntityType::Class, EFileGenerationError::UnregisteredGeneratedCodeTemplateProvided));
-			}
-		}
+	for (EnumInfo enumInfo : parsingResult.enums)
+	{
+		generateFileFromEntity(enumInfo, filePath, genResult, parsingResult);
 	}
 }
 
-void FileGenerator::generateEnumFiles(FileGenerationResult& genResult, fs::path const& filePath, ParsingResult const& parsingResult) noexcept
+void FileGenerator::generateFileFromEntity(EntityInfo& entityInfo, fs::path const& filePath, FileGenerationResult& genResult, ParsingResult const& parsingResult)	noexcept
 {
-	for (EnumInfo enumInfo : parsingResult.enums)
+	//Find the specified code template
+	std::set<ComplexProperty>::const_iterator it = std::find_if(entityInfo.properties.complexProperties.cbegin(), entityInfo.properties.complexProperties.cend(),
+																[this](ComplexProperty const& prop) { return prop.name == codeTemplateMainComplexPropertyName; });
+	
+	if (it == entityInfo.properties.complexProperties.cend())	//No main property corresponding to codeTemplateMainComplexPropertyName found
 	{
-		//Find the specified code template
-		std::set<ComplexProperty>::const_iterator it = std::find_if(enumInfo.properties.complexProperties.cbegin(), enumInfo.properties.complexProperties.cend(),
-																	[this](ComplexProperty const& prop) { return prop.name == codeTemplateMainComplexPropertyName; });
-
-		if (it == enumInfo.properties.complexProperties.cend())
+		if (_defaultClassTemplate != nullptr)
 		{
-			if (_defaultClassTemplate != nullptr)
-			{
-				_defaultClassTemplate->generateCode(filePath, enumInfo);
-				_defaultClassTemplate->releaseGeneratedFile();
-			}
-			else
-			{
-				genResult.fileGenerationErrors.emplace_back(FileGenerationError(filePath, enumInfo.name, FileGenerationError::EEntityType::Enum, EFileGenerationError::MissingGeneratedCodeTemplateComplexProperty));
-			}
-		}
-		else if (it->subProperties.empty())
-		{
-			genResult.fileGenerationErrors.emplace_back(FileGenerationError(filePath, enumInfo.name, FileGenerationError::EEntityType::Enum, EFileGenerationError::NoGeneratedCodeTemplateProvided));
-		}
-		else if (it->subProperties.size() > 1)
-		{
-			genResult.fileGenerationErrors.emplace_back(FileGenerationError(filePath, enumInfo.name, FileGenerationError::EEntityType::Enum, EFileGenerationError::TooManyGeneratedCodeTemplateProvided));
+			_defaultClassTemplate->generateCode(filePath, entityInfo);
+			_defaultClassTemplate->releaseGeneratedFile();
 		}
 		else
 		{
-			std::unordered_map<std::string,	GeneratedCodeTemplate*>::const_iterator it2 = _generatedCodeTemplates.find(it->subProperties[0]);
+			genResult.fileGenerationErrors.emplace_back(FileGenerationError(filePath, entityInfo.name, EFileGenerationError::MissingGeneratedCodeTemplateComplexProperty));
+		}
+	}
+	else if (it->subProperties.empty())	//No sub prop provided to the codeTemplateMainComplexPropertyName main prop
+	{
+		genResult.fileGenerationErrors.emplace_back(FileGenerationError(filePath, entityInfo.name, EFileGenerationError::NoGeneratedCodeTemplateProvided));
+	}
+	else if (it->subProperties.size() > 1)	//More than one prop provided to the codeTemplateMainComplexPropertyName main prop
+	{
+		genResult.fileGenerationErrors.emplace_back(FileGenerationError(filePath, entityInfo.name, EFileGenerationError::TooManyGeneratedCodeTemplateProvided));
+	}
+	else
+	{
+		std::unordered_map<std::string,	GeneratedCodeTemplate*>::const_iterator it2 = _generatedCodeTemplates.find(it->subProperties[0]);
 
-			if (it2 != _generatedCodeTemplates.cend())
-			{
-				it2->second->generateCode(filePath, enumInfo);
-				it2->second->releaseGeneratedFile();
-			}
-			else
-			{
-				genResult.fileGenerationErrors.emplace_back(FileGenerationError(filePath, enumInfo.name, FileGenerationError::EEntityType::Enum, EFileGenerationError::UnregisteredGeneratedCodeTemplateProvided));
-			}
+		if (it2 != _generatedCodeTemplates.cend())
+		{
+			it2->second->generateCode(filePath, entityInfo);
+			it2->second->releaseGeneratedFile();
+		}
+		else
+		{
+			genResult.fileGenerationErrors.emplace_back(FileGenerationError(filePath, entityInfo.name, EFileGenerationError::UnregisteredGeneratedCodeTemplateProvided));
 		}
 	}
 }
@@ -193,8 +158,7 @@ FileGenerationResult FileGenerator::generateFiles(Parser& parser, bool forceRege
 
 			if (parsingSuccess)
 			{
-				generateClassFiles(genResult, path, parsingResult);
-				generateEnumFiles(genResult, path, parsingResult);
+				generateEntityFiles(genResult, path, parsingResult);
 			}
 			else
 			{

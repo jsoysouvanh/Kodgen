@@ -23,7 +23,7 @@ namespace refureku
 
 			write(	"class " + entityInfo.name + 
 					"{"
-						"/*TODO*/"
+						"/* TODO */"
 					"};");
 		}
 	};

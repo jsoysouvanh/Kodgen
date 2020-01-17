@@ -23,8 +23,8 @@ namespace refureku
 			std::string												_supportedCodeTemplateRegex = "";
 
 			void updateSupportedCodeTemplateRegex()																					noexcept;
-			void generateClassFiles(FileGenerationResult& genResult, fs::path const& filePath, ParsingResult const& parsingResult)	noexcept;
-			void generateEnumFiles(FileGenerationResult& genResult, fs::path const& filePath, ParsingResult const& parsingResult)	noexcept;
+			void generateEntityFiles(FileGenerationResult& genResult, fs::path const& filePath, ParsingResult const& parsingResult)	noexcept;
+			void generateFileFromEntity(EntityInfo& entityInfo, fs::path const& filePath, FileGenerationResult& genResult, ParsingResult const& parsingResult)	noexcept;
 
 		public:
 			std::string	codeTemplateMainComplexPropertyName = "GenTemplate";
