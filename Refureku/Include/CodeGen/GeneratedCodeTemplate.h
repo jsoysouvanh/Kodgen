@@ -12,7 +12,7 @@ namespace refureku
 	class GeneratedCodeTemplate
 	{
 		private:
-			std::ofstream	_writingFile;
+			std::ofstream*	_writingFile;
 
 		protected:
 			void write(std::string&& text) noexcept;
@@ -23,26 +23,16 @@ namespace refureku
 			GeneratedCodeTemplate(GeneratedCodeTemplate&&)		= delete;
 
 			/**
-			*	@brief Get the name of the file to generate
-			*	
-			*	@param parsedFile Path to the parsed file
-			*	@param parsingResult Structure containing info about the parsed file
-			*
-			*	@return Path to the file to generate
-			*/
-			virtual fs::path getGeneratedFilename(fs::path const& parsedFile, EntityInfo const& entityInfo)	noexcept = 0;
-
-			/**
 			*	@brief Write lines into the generated file
 			*
 			*	@param parsedFile Path to the parsed file
 			*	@param entityInfo Structure containing info about the entity. You may cast this into the derived class you expect
 			*/
-			virtual void generateCode(fs::path const& parsedFile, EntityInfo const& entityInfo)				noexcept;
+			virtual void generateCode(fs::path const& parsedFile, EntityInfo const& entityInfo)	noexcept = 0;
 
 			/**
-			*	@brief Close the stream to the file if any is open
+			*	Setup the stream to use for writing
 			*/
-			void releaseGeneratedFile()																		noexcept;
+			void setWritingStream(std::ofstream* writingFile)										noexcept;
 	};
 }

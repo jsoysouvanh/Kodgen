@@ -22,12 +22,28 @@ namespace refureku
 			GeneratedCodeTemplate*									_defaultEnumTemplate		= nullptr;
 			std::string												_supportedCodeTemplateRegex = "";
 
-			void updateSupportedCodeTemplateRegex()																					noexcept;
-			void generateEntityFiles(FileGenerationResult& genResult, fs::path const& filePath, ParsingResult const& parsingResult)	noexcept;
-			void generateFileFromEntity(EntityInfo& entityInfo, fs::path const& filePath, FileGenerationResult& genResult, ParsingResult const& parsingResult)	noexcept;
+			void					updateSupportedCodeTemplateRegex()																											noexcept;
+			void					generateEntityFile(FileGenerationResult& genResult, fs::path const& filePath, ParsingResult const& parsingResult)							noexcept;
+			GeneratedCodeTemplate*	getEntityGeneratedCodeTemplate(EntityInfo& entityInfo, fs::path const& filePath, FileGenerationResult& genResult, bool isClass)				noexcept;
+			void					writeEntityToFile(EntityInfo& entityInfo, fs::path const& filePath, std::ofstream* stream, FileGenerationResult& genResult, bool isClass)	noexcept;
+			bool					shouldRegenerateFile(fs::path const& filePath)																						const	noexcept;
+			fs::path				makePathToGeneratedFile(fs::path const& sourceFilePath)																				const	noexcept;
 
 		public:
+			/**
+			*	@brief Main (complex) property name used to specify code generator in source code
+			*/
 			std::string	codeTemplateMainComplexPropertyName = "GenTemplate";
+
+			/**
+			*	@brief Extension used for generated files
+			*/
+			std::string generatedFilesExtension = ".refureku.h";
+
+			/**
+			*	@brief Path to the folder all files should be generated (and where existing ones are)
+			*/
+			fs::path pathToGeneratedFilesFolder;
 
 			FileGenerator()		noexcept;
 			~FileGenerator()	noexcept;

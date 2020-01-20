@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Misc/PropertyMacros.h"
-//#include "TestClass.generated"
+//#include "Generated/TestClass.refureku.h"
 
 #include <filesystem>
 #include <vector>
@@ -11,8 +11,10 @@ namespace TestNamespace
 {
 	class Class1{};
 
-	class RfrkClass(GenTemplate[TestTemplate], ClassProp1, ClassProp2[ClassSubProp21, ClassSubProp22], ClassProp3) TestClass final : public Class1
+	class RfrkClass(GenTemplate[TestTemplate ], ClassProp1, ClassProp2[ClassSubProp21, ClassSubProp22], ClassProp3) TestClass final : public Class1
 	{
+		//_RFRK_GENERATED_TestClass
+
 		private:
 			#pragma region Variables
 
@@ -52,6 +54,8 @@ namespace TestNamespace
 
 	class RfrkClass() TestClass2
 	{
+		//_RFRK_GENERATED_TestClass2
+
 		private:
 			#pragma region Variables
 

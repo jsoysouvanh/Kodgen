@@ -1,21 +1,17 @@
 #include "CodeGen/GeneratedCodeTemplate.h"
 
+#include <assert.h>
+
 using namespace refureku;
 
-void GeneratedCodeTemplate::generateCode(fs::path const& parsedFile, EntityInfo const& entityInfo) noexcept
+void GeneratedCodeTemplate::setWritingStream(std::ofstream* writingFile) noexcept
 {
-	_writingFile.open(getGeneratedFilename(parsedFile, entityInfo).string(), std::ios::out | std::ios::trunc);
-}
-
-void GeneratedCodeTemplate::releaseGeneratedFile() noexcept
-{
-	if (_writingFile.is_open())
-	{
-		_writingFile.close();
-	}
+	_writingFile = writingFile;
 }
 
 void GeneratedCodeTemplate::write(std::string&& text) noexcept
 {
-	_writingFile << text << std::endl;
+	assert(_writingFile != nullptr);
+
+	*_writingFile << text << std::endl;
 }

@@ -27,35 +27,55 @@ void FileGenerator::updateSupportedCodeTemplateRegex() noexcept
 	_supportedCodeTemplateRegex.pop_back();
 }
 
-void FileGenerator::generateEntityFiles(FileGenerationResult& genResult, fs::path const& filePath, ParsingResult const& parsingResult)	noexcept
+void FileGenerator::generateEntityFile(FileGenerationResult& genResult, fs::path const& filePath, ParsingResult const& parsingResult) noexcept
 {
+	std::ofstream generatedFile(makePathToGeneratedFile(filePath).string(), std::ios::out | std::ios::trunc);
+	generatedFile << "#pragma once" << std::endl << std::endl;
+
 	for (ClassInfo classInfo : parsingResult.classes)
 	{
-		generateFileFromEntity(classInfo, filePath, genResult, parsingResult);
+		writeEntityToFile(classInfo, filePath, &generatedFile, genResult, true);
 	}
 
 	for (EnumInfo enumInfo : parsingResult.enums)
 	{
-		generateFileFromEntity(enumInfo, filePath, genResult, parsingResult);
+		writeEntityToFile(enumInfo, filePath, &generatedFile, genResult, false);
 	}
+
+	generatedFile.close();
 }
 
-void FileGenerator::generateFileFromEntity(EntityInfo& entityInfo, fs::path const& filePath, FileGenerationResult& genResult, ParsingResult const& parsingResult)	noexcept
+GeneratedCodeTemplate* FileGenerator::getEntityGeneratedCodeTemplate(EntityInfo& entityInfo, fs::path const& filePath, FileGenerationResult& genResult, bool isClass) noexcept
 {
+	GeneratedCodeTemplate* result = nullptr;
+
 	//Find the specified code template
 	std::set<ComplexProperty>::const_iterator it = std::find_if(entityInfo.properties.complexProperties.cbegin(), entityInfo.properties.complexProperties.cend(),
 																[this](ComplexProperty const& prop) { return prop.name == codeTemplateMainComplexPropertyName; });
-	
+
 	if (it == entityInfo.properties.complexProperties.cend())	//No main property corresponding to codeTemplateMainComplexPropertyName found
 	{
-		if (_defaultClassTemplate != nullptr)
+		if (isClass)
 		{
-			_defaultClassTemplate->generateCode(filePath, entityInfo);
-			_defaultClassTemplate->releaseGeneratedFile();
+			if (_defaultClassTemplate != nullptr)
+			{
+				result = _defaultClassTemplate;
+			}
+			else
+			{
+				genResult.fileGenerationErrors.emplace_back(FileGenerationError(filePath, entityInfo.name, EFileGenerationError::MissingGeneratedCodeTemplateComplexProperty));
+			}
 		}
-		else
+		else	//isEnum
 		{
-			genResult.fileGenerationErrors.emplace_back(FileGenerationError(filePath, entityInfo.name, EFileGenerationError::MissingGeneratedCodeTemplateComplexProperty));
+			if (_defaultEnumTemplate != nullptr)
+			{
+				result = _defaultEnumTemplate;
+			}
+			else
+			{
+				genResult.fileGenerationErrors.emplace_back(FileGenerationError(filePath, entityInfo.name, EFileGenerationError::MissingGeneratedCodeTemplateComplexProperty));
+			}
 		}
 	}
 	else if (it->subProperties.empty())	//No sub prop provided to the codeTemplateMainComplexPropertyName main prop
@@ -72,14 +92,38 @@ void FileGenerator::generateFileFromEntity(EntityInfo& entityInfo, fs::path cons
 
 		if (it2 != _generatedCodeTemplates.cend())
 		{
-			it2->second->generateCode(filePath, entityInfo);
-			it2->second->releaseGeneratedFile();
+			result = it2->second;
 		}
 		else
 		{
 			genResult.fileGenerationErrors.emplace_back(FileGenerationError(filePath, entityInfo.name, EFileGenerationError::UnregisteredGeneratedCodeTemplateProvided));
 		}
 	}
+
+	return result;
+}
+
+void FileGenerator::writeEntityToFile(EntityInfo& entityInfo, fs::path const& filePath, std::ofstream* stream, FileGenerationResult& genResult, bool isClass) noexcept
+{
+	GeneratedCodeTemplate* codeTemplate = getEntityGeneratedCodeTemplate(entityInfo, filePath, genResult, isClass);
+
+	if (codeTemplate != nullptr)
+	{
+		codeTemplate->setWritingStream(stream);
+		codeTemplate->generateCode(filePath, entityInfo);
+	}
+}
+
+bool FileGenerator::shouldRegenerateFile(fs::path const& filePath) const noexcept
+{
+	fs::path pathToGeneratedFile = makePathToGeneratedFile(filePath);
+
+	return !fs::exists(pathToGeneratedFile) || fs::last_write_time(filePath) > fs::last_write_time(pathToGeneratedFile);
+}
+
+fs::path FileGenerator::makePathToGeneratedFile(fs::path const& sourceFilePath) const noexcept
+{
+	return (pathToGeneratedFilesFolder / sourceFilePath.filename()).replace_extension(generatedFilesExtension);
 }
 
 bool FileGenerator::addFile(fs::path filePath) noexcept
@@ -142,30 +186,45 @@ FileGenerationResult FileGenerator::generateFiles(Parser& parser, bool forceRege
 	FileGenerationResult	genResult;
 	bool					parsingSuccess;
 
-	//Make sure the CodeTemplate property is setup
-	parser.parsingSettings.propertyParsingSettings.classPropertyRules.removeComplexPropertyRule(std::string(codeTemplateMainComplexPropertyName));
-	parser.parsingSettings.propertyParsingSettings.classPropertyRules.addComplexPropertyRule(std::string(codeTemplateMainComplexPropertyName), std::string(_supportedCodeTemplateRegex));
+	//Before doing anything, make sure destination folder exists
+	if (!fs::exists(pathToGeneratedFilesFolder))
+		genResult.completed = fs::create_directories(pathToGeneratedFilesFolder);
 
-	for (fs::path path : _includedFiles)
+	if (fs::is_directory(pathToGeneratedFilesFolder))
 	{
-		if (forceRegenerateAll || true /* TODO FILE DOESN'T EXIST YET */ || true /* TODO CHECK DATE TIME */)
+		//Make sure the CodeTemplate property is setup in class, struct and enum
+		parser.parsingSettings.propertyParsingSettings.classPropertyRules.removeComplexPropertyRule(std::string(codeTemplateMainComplexPropertyName));
+		parser.parsingSettings.propertyParsingSettings.classPropertyRules.addComplexPropertyRule(std::string(codeTemplateMainComplexPropertyName), std::string(_supportedCodeTemplateRegex));
+
+		parser.parsingSettings.propertyParsingSettings.structPropertyRules.removeComplexPropertyRule(std::string(codeTemplateMainComplexPropertyName));
+		parser.parsingSettings.propertyParsingSettings.structPropertyRules.addComplexPropertyRule(std::string(codeTemplateMainComplexPropertyName), std::string(_supportedCodeTemplateRegex));
+
+		parser.parsingSettings.propertyParsingSettings.enumPropertyRules.removeComplexPropertyRule(std::string(codeTemplateMainComplexPropertyName));
+		parser.parsingSettings.propertyParsingSettings.enumPropertyRules.addComplexPropertyRule(std::string(codeTemplateMainComplexPropertyName), std::string(_supportedCodeTemplateRegex));
+
+		for (fs::path path : _includedFiles)
 		{
-			parser.clear();
-
-			//Parse file
-			ParsingResult parsingResult;
-			parsingSuccess = parser.parse(path, parsingResult);
-
-			if (parsingSuccess)
+			if (forceRegenerateAll || shouldRegenerateFile(path))
 			{
-				generateEntityFiles(genResult, path, parsingResult);
-			}
-			else
-			{
-				//Transfer parsing errors into the file generation result
-				genResult.parsingErrors.insert(genResult.parsingErrors.end(), std::make_move_iterator(parsingResult.parsingErrors.begin()), std::make_move_iterator(parsingResult.parsingErrors.end()));
+				parser.clear();
+
+				//Parse file
+				ParsingResult parsingResult;
+				parsingSuccess = parser.parse(path, parsingResult);
+
+				if (parsingSuccess)
+				{
+					generateEntityFile(genResult, path, parsingResult);
+				}
+				else
+				{
+					//Transfer parsing errors into the file generation result
+					genResult.parsingErrors.insert(genResult.parsingErrors.end(), std::make_move_iterator(parsingResult.parsingErrors.begin()), std::make_move_iterator(parsingResult.parsingErrors.end()));
+				}
 			}
 		}
+
+		genResult.completed = true;
 	}
 
 	return genResult;
