@@ -9,13 +9,13 @@ CXChildVisitResult FieldParser::parse(CXCursor cursor, ParsingInfo& parsingInfo)
 	//Check for any annotation attribute if the flag is raised
 	if (_shouldCheckValidity)
 	{
-		return tryToAddField(cursor, parsingInfo);
+		return addToCurrentClassIfValid(cursor, parsingInfo);
 	}
 
 	return CXChildVisitResult::CXChildVisit_Recurse;
 }
 
-CXChildVisitResult FieldParser::tryToAddField(CXCursor fieldAnnotationCursor, ParsingInfo& parsingInfo) noexcept
+CXChildVisitResult FieldParser::addToCurrentClassIfValid(CXCursor fieldAnnotationCursor, ParsingInfo& parsingInfo) noexcept
 {
 	if (std::optional<PropertyGroup> propertyGroup = isFieldValid(fieldAnnotationCursor, parsingInfo))
 	{

@@ -16,7 +16,8 @@ CXChildVisitResult ClassParser::parse(CXCursor currentCursor, ParsingInfo& parsi
 	}
 	else if (_shouldCheckValidity)	//Check for any annotation attribute if the flag is raised
 	{
-		return tryToAddClass(currentCursor, parsingInfo);
+		_shouldCheckValidity = false;
+		return setAsCurrentClassIfValid(currentCursor, parsingInfo);
 	}
 
 	//Check for class field or method
@@ -41,7 +42,7 @@ CXChildVisitResult ClassParser::parse(CXCursor currentCursor, ParsingInfo& parsi
 	return CXChildVisitResult::CXChildVisit_Recurse;
 }
 
-CXChildVisitResult ClassParser::tryToAddClass(CXCursor classAnnotationCursor, ParsingInfo& parsingInfo) noexcept
+CXChildVisitResult ClassParser::setAsCurrentClassIfValid(CXCursor classAnnotationCursor, ParsingInfo& parsingInfo) noexcept
 {
 	if (std::optional<PropertyGroup> propertyGroup = isClassValid(classAnnotationCursor, parsingInfo))
 	{
@@ -53,13 +54,12 @@ CXChildVisitResult ClassParser::tryToAddClass(CXCursor classAnnotationCursor, Pa
 	{
 		if (parsingInfo.propertyParser.getParsingError() == EParsingError::Count)
 		{
-			endStructOrClassParsing(parsingInfo);
+			endParsing(parsingInfo);
 			return CXChildVisitResult::CXChildVisit_Continue;
 		}
 		else	//Fatal parsing error occured
 		{
 			parsingInfo.parsingResult.parsingErrors.emplace_back(ParsingError(parsingInfo.propertyParser.getParsingError(), clang_getCursorLocation(classAnnotationCursor)));
-			parsingInfo.currentClass.reset();
 
 			return parsingInfo.parsingSettings->shouldAbortParsingOnFirstError ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
 		}
@@ -68,7 +68,6 @@ CXChildVisitResult ClassParser::tryToAddClass(CXCursor classAnnotationCursor, Pa
 
 std::optional<PropertyGroup> ClassParser::isClassValid(CXCursor currentCursor, ParsingInfo& parsingInfo) noexcept
 {
-	_shouldCheckValidity = false;
 	parsingInfo.propertyParser.clean();
 
 	if (clang_getCursorKind(currentCursor) == CXCursorKind::CXCursor_AnnotateAttr)
@@ -99,17 +98,13 @@ void ClassParser::startStructParsing(CXCursor currentCursor, ParsingInfo& parsin
 	//std::cout << "START STRUCT" << std::endl;
 }
 
-void ClassParser::endStructOrClassParsing(ParsingInfo& parsingInfo)	noexcept
+void ClassParser::endParsing(ParsingInfo& parsingInfo)	noexcept
 {
 	_classLevel--;
 	_currentCursor			= clang_getNullCursor();
 	_shouldCheckValidity	= false;
 
-	if (parsingInfo.currentClass.has_value())
-	{
-		parsingInfo.parsingResult.classes.emplace_back(std::move(parsingInfo.currentClass.value()));
-		parsingInfo.currentClass.reset();
-	}
+	parsingInfo.flushCurrentClass();
 
 	//std::cout << "END CLASS/STRUCT" << std::endl;
 }
@@ -132,7 +127,7 @@ void ClassParser::updateParsingState(CXCursor parent, ParsingInfo& parsingInfo) 
 	*/
 	if (clang_equalCursors(clang_getCursorSemanticParent(_currentCursor), parent))
 	{
-		endStructOrClassParsing(parsingInfo);
+		endParsing(parsingInfo);
 	}
 }
 

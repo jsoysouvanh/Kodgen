@@ -59,6 +59,8 @@ add_executable(refureku
 				Source/InfoStructures/MethodInfo.cpp
 				Source/InfoStructures/StructClassInfo.cpp
 				Source/InfoStructures/ClassInfo.cpp
+				Source/InfoStructures/EnumInfo.cpp
+				Source/InfoStructures/EnumValueInfo.cpp
 				Source/InfoStructures/ParsingInfo.cpp
 				Source/InfoStructures/TypeInfo.cpp
 
@@ -68,6 +70,7 @@ add_executable(refureku
 				Source/Parsing/FieldParser.cpp
 				Source/Parsing/MethodParser.cpp
 				Source/Parsing/EnumParser.cpp
+				Source/Parsing/EnumValueParser.cpp
 				Source/Parsing/Parser.cpp
 
 				Source/Misc/EAccessSpecifier.cpp

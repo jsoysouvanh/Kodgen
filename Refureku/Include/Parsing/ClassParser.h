@@ -20,10 +20,10 @@ namespace refureku
 			FieldParser				_fieldParser;
 			MethodParser			_methodParser;
 
-			CXChildVisitResult				tryToAddClass(CXCursor classAnnotationCursor, ParsingInfo& parsingInfo)	noexcept;
-			std::optional<PropertyGroup>	isClassValid(CXCursor currentCursor, ParsingInfo& parsingInfo)			noexcept;
-			void							endStructOrClassParsing(ParsingInfo& parsingInfo)						noexcept;
-			void							updateAccessSpecifier(CXCursor cursor, ParsingInfo& parsingInfo)		noexcept;
+			std::optional<PropertyGroup>	isClassValid(CXCursor currentCursor, ParsingInfo& parsingInfo)						noexcept;
+			CXChildVisitResult				setAsCurrentClassIfValid(CXCursor classAnnotationCursor, ParsingInfo& parsingInfo)	noexcept;
+			void							endParsing(ParsingInfo& parsingInfo)												noexcept;
+			void							updateAccessSpecifier(CXCursor cursor, ParsingInfo& parsingInfo)					noexcept;
 
 		public:
 			ClassParser()					= default;

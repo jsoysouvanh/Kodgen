@@ -1,5 +1,7 @@
 #include "CodeGen/FileGenerator.h"
 
+#include <assert.h>
+
 using namespace refureku;
 
 FileGenerator::FileGenerator() noexcept
@@ -45,7 +47,7 @@ void FileGenerator::generateEntityFile(FileGenerationResult& genResult, fs::path
 	generatedFile.close();
 }
 
-GeneratedCodeTemplate* FileGenerator::getEntityGeneratedCodeTemplate(EntityInfo& entityInfo, fs::path const& filePath, FileGenerationResult& genResult, bool isClass) noexcept
+GeneratedCodeTemplate* FileGenerator::getEntityGeneratedCodeTemplate(EntityInfo& entityInfo, fs::path const& filePath, FileGenerationResult& genResult, bool isClass, EFileGenerationError& out_error) const noexcept
 {
 	GeneratedCodeTemplate* result = nullptr;
 
@@ -63,7 +65,7 @@ GeneratedCodeTemplate* FileGenerator::getEntityGeneratedCodeTemplate(EntityInfo&
 			}
 			else
 			{
-				genResult.fileGenerationErrors.emplace_back(FileGenerationError(filePath, entityInfo.name, EFileGenerationError::MissingGeneratedCodeTemplateComplexProperty));
+				out_error = EFileGenerationError::MissingGeneratedCodeTemplateComplexProperty;
 			}
 		}
 		else	//isEnum
@@ -74,17 +76,17 @@ GeneratedCodeTemplate* FileGenerator::getEntityGeneratedCodeTemplate(EntityInfo&
 			}
 			else
 			{
-				genResult.fileGenerationErrors.emplace_back(FileGenerationError(filePath, entityInfo.name, EFileGenerationError::MissingGeneratedCodeTemplateComplexProperty));
+				out_error = EFileGenerationError::MissingGeneratedCodeTemplateComplexProperty;
 			}
 		}
 	}
 	else if (it->subProperties.empty())	//No sub prop provided to the codeTemplateMainComplexPropertyName main prop
 	{
-		genResult.fileGenerationErrors.emplace_back(FileGenerationError(filePath, entityInfo.name, EFileGenerationError::NoGeneratedCodeTemplateProvided));
+		out_error = EFileGenerationError::NoGeneratedCodeTemplateProvided;
 	}
 	else if (it->subProperties.size() > 1)	//More than one prop provided to the codeTemplateMainComplexPropertyName main prop
 	{
-		genResult.fileGenerationErrors.emplace_back(FileGenerationError(filePath, entityInfo.name, EFileGenerationError::TooManyGeneratedCodeTemplateProvided));
+		out_error = EFileGenerationError::TooManyGeneratedCodeTemplateProvided;
 	}
 	else
 	{
@@ -96,21 +98,29 @@ GeneratedCodeTemplate* FileGenerator::getEntityGeneratedCodeTemplate(EntityInfo&
 		}
 		else
 		{
-			genResult.fileGenerationErrors.emplace_back(FileGenerationError(filePath, entityInfo.name, EFileGenerationError::UnregisteredGeneratedCodeTemplateProvided));
+			out_error = EFileGenerationError::UnregisteredGeneratedCodeTemplateProvided;
 		}
 	}
+
+	//make sure an error is set if we have no result
+	assert(result != nullptr || out_error != EFileGenerationError::Count);
 
 	return result;
 }
 
 void FileGenerator::writeEntityToFile(EntityInfo& entityInfo, fs::path const& filePath, std::ofstream* stream, FileGenerationResult& genResult, bool isClass) noexcept
 {
-	GeneratedCodeTemplate* codeTemplate = getEntityGeneratedCodeTemplate(entityInfo, filePath, genResult, isClass);
+	EFileGenerationError error = EFileGenerationError::Count;
+	GeneratedCodeTemplate* codeTemplate = getEntityGeneratedCodeTemplate(entityInfo, filePath, genResult, isClass, error);
 
 	if (codeTemplate != nullptr)
 	{
 		codeTemplate->setWritingStream(stream);
 		codeTemplate->generateCode(filePath, entityInfo);
+	}
+	else
+	{
+		genResult.fileGenerationErrors.emplace_back(FileGenerationError(filePath, entityInfo.name, error));
 	}
 }
 

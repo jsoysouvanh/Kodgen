@@ -11,7 +11,7 @@ namespace TestNamespace
 {
 	class Class1{};
 
-	class RfrkClass(GenTemplate[TestTemplate ], ClassProp1, ClassProp2[ClassSubProp21, ClassSubProp22], ClassProp3) TestClass final : public Class1
+	class RfrkClass(GenTemplate[TestTemplate], ClassProp1, ClassProp2[ClassSubProp21, ClassSubProp22], ClassProp3) TestClass final : public Class1
 	{
 		//_RFRK_GENERATED_TestClass
 
@@ -52,6 +52,13 @@ namespace TestNamespace
 			float const		var3;
 	};
 
+	enum class RfrkEnum(GenTemplate[TestTemplate], EnumProp1, EnumProp2[EnumSubProp21, EnumSubProp22], EnumProp3) MyEnum : uint8_t
+	{
+		EVal1 RfrkEnumVal(EnumValueProp1, EnumValueProp2[EnumValueSubProp21, EnumValueSubProp22], EnumValueProp3) = 1 << 0,
+		EVal2 = 1 << 1,
+		Count = 42
+	};
+
 	class RfrkClass() TestClass2
 	{
 		//_RFRK_GENERATED_TestClass2
@@ -76,12 +83,5 @@ namespace TestNamespace
 			virtual int someMethodd3(int) const;
 
 			#pragma endregion
-	};
-
-	enum class RfrkEnum(Some enum) MyEnum
-	{
-		EVal1 RfrkEnumVal(heyhey) = 1 << 0,
-		EVal2 = 1 << 1,
-		Count
 	};
 }

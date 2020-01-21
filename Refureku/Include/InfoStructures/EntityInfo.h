@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 
+#include "Misc/FundamentalTypes.h"
 #include "Properties/PropertyGroup.h"
 
 namespace refureku
@@ -10,14 +11,34 @@ namespace refureku
 	class EntityInfo
 	{
 		public:
-			std::string		name = "";
+			/**
+			*	Enum representing type of an entity
+			*	This avoids unecessary dynamic casts and allows EntityInfo to be a non-polymorphic class
+			*/
+			enum class EType : uint8
+			{
+				Class,
+				Struct,
+				Enum,
+				Field,
+				Method,
+				EnumValue,
+
+				/**
+				*	Unset
+				*/
+				Count
+			};
+
+			EType			type		= EType::Count;
+			std::string		name		= "";
 			PropertyGroup	properties;
 
-			EntityInfo()														= default;
-			EntityInfo(std::string&& entityName, PropertyGroup&& propertyGroup)	noexcept;
-			EntityInfo(EntityInfo const&)										= default;
-			EntityInfo(EntityInfo&&)											= default;
-			~EntityInfo()														= default;
+			EntityInfo()																			= default;
+			EntityInfo(std::string&& entityName, PropertyGroup&& propertyGroup, EType&& entityType)	noexcept;
+			EntityInfo(EntityInfo const&)															= default;
+			EntityInfo(EntityInfo&&)																= default;
+			~EntityInfo()																			= default;
 	};
 
 	std::ostream& operator<<(std::ostream& out_stream, EntityInfo const&) noexcept;

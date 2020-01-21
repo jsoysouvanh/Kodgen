@@ -81,6 +81,22 @@ void setupParser(refureku::Parser& parser)
 	fieldPropertyRules.addSimplePropertyRule("FieldProp2");
 	fieldPropertyRules.addComplexPropertyRule("FieldProp2", "FieldSubProp2[1-9]");
 	fieldPropertyRules.addSimplePropertyRule("FieldProp3");
+
+	//EnumProp1, EnumProp2[EnumSubProp21, EnumSubProp22], EnumProp3
+	refureku::PropertyRules& enumPropertyRules = parser.parsingSettings.propertyParsingSettings.enumPropertyRules;
+
+	enumPropertyRules.addSimplePropertyRule("EnumProp1");
+	enumPropertyRules.addSimplePropertyRule("EnumProp2");
+	enumPropertyRules.addComplexPropertyRule("EnumProp2", "EnumSubProp2[1-9]");
+	enumPropertyRules.addSimplePropertyRule("EnumProp3");
+
+	//EnumValueProp1, EnumValueProp2[EnumValueSubProp21, EnumValueSubProp22], EnumValueProp3
+	refureku::PropertyRules& enumValuePropertyRules = parser.parsingSettings.propertyParsingSettings.enumValuePropertyRules;
+
+	enumValuePropertyRules.addSimplePropertyRule("EnumValueProp1");
+	enumValuePropertyRules.addSimplePropertyRule("EnumValueProp2");
+	enumValuePropertyRules.addComplexPropertyRule("EnumValueProp2", "EnumValueSubProp2[1-9]");
+	enumValuePropertyRules.addSimplePropertyRule("EnumValueProp3");
 }
 
 void parsingTests()
@@ -131,7 +147,7 @@ void fileGeneratorTests()
 	//Add files/directories to parse
 	fg.addFile(pathToFile);
 
-	refureku::FileGenerationResult fgr = fg.generateFiles(parser, false);
+	refureku::FileGenerationResult fgr = fg.generateFiles(parser, true);
 
 	std::cout << "File generation: " << ((fgr.completed) ? "Success" : "Failure") << std::endl;
 
@@ -140,10 +156,10 @@ void fileGeneratorTests()
 		std::cout << pe << std::endl;
 	}
 
-	/*for (refureku::FileGenerationError& fge : fgr.fileGenerationErrors)
+	for (refureku::FileGenerationError& fge : fgr.fileGenerationErrors)
 	{
 		std::cout << fge << std::endl;
-	}*/
+	}
 }
 
 int main()

@@ -11,7 +11,7 @@ CXChildVisitResult MethodParser::parse(CXCursor cursor, ParsingInfo& parsingInfo
 	//Check for any annotation attribute if the flag is raised
 	if (_shouldCheckValidity)
 	{
-		return tryToAddMethod(cursor, parsingInfo);
+		return addToCurrentClassIfValid(cursor, parsingInfo);
 	}
 
 	if (!parsingInfo.currentClass.has_value())
@@ -41,7 +41,7 @@ CXChildVisitResult MethodParser::parse(CXCursor cursor, ParsingInfo& parsingInfo
 	return CXChildVisitResult::CXChildVisit_Recurse;
 }
 
-CXChildVisitResult MethodParser::tryToAddMethod(CXCursor const& methodAnnotationCursor, ParsingInfo& parsingInfo) noexcept
+CXChildVisitResult MethodParser::addToCurrentClassIfValid(CXCursor const& methodAnnotationCursor, ParsingInfo& parsingInfo) noexcept
 {
 	if (std::optional<PropertyGroup> propertyGroup = isMethodValid(methodAnnotationCursor, parsingInfo))
 	{

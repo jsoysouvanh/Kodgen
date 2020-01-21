@@ -2,9 +2,10 @@
 
 using namespace refureku;
 
-EntityInfo::EntityInfo(std::string&& entityName, PropertyGroup&& propertyGroup) noexcept:
+EntityInfo::EntityInfo(std::string&& entityName, PropertyGroup&& propertyGroup, EType&& entityType) noexcept:
 	name{std::forward<std::string>(entityName)}, 
-	properties{std::forward<PropertyGroup>(propertyGroup)}
+	properties{std::forward<PropertyGroup>(propertyGroup)},
+	type{std::forward<EType>(entityType)}
 {
 }
 

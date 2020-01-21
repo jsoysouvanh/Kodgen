@@ -27,10 +27,10 @@ namespace refureku
 			std::unordered_map<EAccessSpecifier, std::vector<FieldInfo>>	fields;
 			std::unordered_map<EAccessSpecifier, std::vector<MethodInfo>>	methods;
 
-			StructClassInfo()															noexcept;
-			StructClassInfo(std::string&& entityName, PropertyGroup&& propertyGroup)	noexcept;
-			StructClassInfo(StructClassInfo const&)										= default;
-			StructClassInfo(StructClassInfo&&)											= default;
-			~StructClassInfo()															= default;
+			StructClassInfo()																				noexcept;
+			StructClassInfo(std::string&& entityName, PropertyGroup&& propertyGroup, EType&& entityType)	noexcept;
+			StructClassInfo(StructClassInfo const&)															= default;
+			StructClassInfo(StructClassInfo&&)																= default;
+			~StructClassInfo()																				= default;
 	};
 }

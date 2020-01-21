@@ -49,6 +49,10 @@ void Parser::updateParsingState(CXCursor parent) noexcept
 	{
 		_classParser.updateParsingState(parent, _parsingInfo);
 	}
+	else if (_enumParser.isCurrentlyParsing())
+	{
+		_enumParser.updateParsingState(parent, _parsingInfo);
+	}
 }
 
 CXChildVisitResult Parser::parseCursor(CXCursor currentCursor, CXCursor parentCursor) noexcept
@@ -119,6 +123,9 @@ bool Parser::parse(fs::path const& parseFile, ParsingResult& out_result) noexcep
 			}
 			else
 			{
+				_parsingInfo.flushCurrentClass();
+				_parsingInfo.flushCurrentEnum();
+
 				isSuccess = true;
 			}
 

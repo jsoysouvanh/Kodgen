@@ -100,13 +100,41 @@ std::optional<PropertyGroup> PropertyParser::getEnumProperties(std::string&& ann
 {
 	static std::string enumAnnotation = "RfrkEnum:";
 
+	if (annotateMessage.substr(0, enumAnnotation.size()) == enumAnnotation)
+	{
+		if (splitProperties(annotateMessage.substr(enumAnnotation.size())))
+		{
+			return checkAndFillPropertyGroup(_splitProps, _propertyParsingSettings->enumPropertyRules);
+		}
+	}
+	else
+	{
+		//Tried to add properties to a class with the wrong macro
+		_parsingError = EParsingError::WrongPropertyMacroUsed;
+	}
+
+	assert(_parsingError != EParsingError::Count);	//If fails, _parsing error must be updated
 	return std::nullopt;
 }
 
 std::optional<PropertyGroup> PropertyParser::getEnumValueProperties(std::string&& annotateMessage) noexcept
 {
-	static std::string enumAnnotation = "RfrkEnumVal:";
+	static std::string enumValueAnnotation = "RfrkEnumVal:";
 
+	if (annotateMessage.substr(0, enumValueAnnotation.size()) == enumValueAnnotation)
+	{
+		if (splitProperties(annotateMessage.substr(enumValueAnnotation.size())))
+		{
+			return checkAndFillPropertyGroup(_splitProps, _propertyParsingSettings->enumValuePropertyRules);
+		}
+	}
+	else
+	{
+		//Tried to add properties to a class with the wrong macro
+		_parsingError = EParsingError::WrongPropertyMacroUsed;
+	}
+
+	assert(_parsingError != EParsingError::Count);	//If fails, _parsing error must be updated
 	return std::nullopt;
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <iostream>
 
 #include "Misc/SafeFilesystem.h"
 #include "CodeGen/EFileGenerationError.h"
@@ -27,4 +28,6 @@ namespace refureku
 			FileGenerationError& operator=(FileGenerationError const&)	= default;
 			FileGenerationError& operator=(FileGenerationError&&)		= default;
 	};
+
+	std::ostream& operator<<(std::ostream& out_stream, FileGenerationError const& fileGenerationError) noexcept;
 }

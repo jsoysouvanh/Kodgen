@@ -16,9 +16,9 @@ namespace refureku
 			
 			CXCursor	_currentCursor			= clang_getNullCursor();
 
-			CXChildVisitResult				tryToAddField(CXCursor fieldAnnotationCursor, ParsingInfo& parsingInfo)	noexcept;
-			std::optional<PropertyGroup>	isFieldValid(CXCursor currentCursor, ParsingInfo& parsingInfo)			noexcept;
-			void							endParsing()															noexcept;
+			CXChildVisitResult				addToCurrentClassIfValid(CXCursor fieldAnnotationCursor, ParsingInfo& parsingInfo)	noexcept;
+			std::optional<PropertyGroup>	isFieldValid(CXCursor currentCursor, ParsingInfo& parsingInfo)						noexcept;
+			void							endParsing()																		noexcept;
 
 		public:
 			FieldParser()					= default;

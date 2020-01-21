@@ -8,7 +8,20 @@ namespace refureku
 	{
 		virtual void generateCode(fs::path const& parsedFile, EntityInfo const& entityInfo) noexcept override
 		{
-			write(	"#define _RFRK_GENERATED_" + entityInfo.name + " //TODO something");
+			switch (entityInfo.type)
+			{
+				case EntityInfo::EType::Class:
+					write(	"#define _RFRK_GENERATED_CLASS_" + entityInfo.name + " //TODO something");
+					break;
+
+				case EntityInfo::EType::Struct:
+					write(	"#define _RFRK_GENERATED_STRUCT_" + entityInfo.name + " //TODO something");
+					break;
+
+				case EntityInfo::EType::Enum:
+					write(	"#define _RFRK_GENERATED_ENUM_" + entityInfo.name + " //TODO something");
+					break;
+			}
 		}
 	};
 }
