@@ -56,7 +56,10 @@ namespace TestNamespace
 	{
 		EVal1 RfrkEnumVal(EnumValueProp1, EnumValueProp2[EnumValueSubProp21, EnumValueSubProp22], EnumValueProp3) = 1 << 0,
 		EVal2 = 1 << 1,
-		Count = 42
+		a,
+		b,
+		Count = 42,
+		c
 	};
 
 	class RfrkClass() TestClass2

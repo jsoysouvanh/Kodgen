@@ -13,7 +13,7 @@ namespace refureku
 		public:
 			/**
 			*	Enum representing type of an entity
-			*	This avoids unecessary dynamic casts and allows EntityInfo to be a non-polymorphic class
+			*	This avoids unnecessary dynamic casts and allows EntityInfo to be a non-polymorphic class
 			*/
 			enum class EType : uint8
 			{

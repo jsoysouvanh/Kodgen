@@ -6,11 +6,6 @@ using namespace refureku;
 
 CXChildVisitResult EnumValueParser::parse(CXCursor currentCursor, ParsingInfo& parsingInfo) noexcept
 {
-	//std::cout << "Cursor kind : " << Helpers::getString(clang_getCursorKindSpelling(clang_getCursorKind(currentCursor))) << " : " << Helpers::getString(clang_getCursorSpelling(currentCursor)) << std::endl;
-	//std::cout << "Cursor display name: " << Helpers::getString(clang_getCursorDisplayName(currentCursor)) << std::endl;
-
-	//clang_getEnum
-
 	if (_shouldCheckValidity)
 	{
 		_shouldCheckValidity = false;
@@ -63,6 +58,12 @@ void EnumValueParser::updateParsingState(CXCursor parent, ParsingInfo& parsingIn
 {
 	if (!clang_equalCursors(_currentCursor, parent))
 	{
+		//If the checkValidity flag is set, the current cursor is necessary true
+		if (_shouldCheckValidity)
+		{
+			addToCurrentEnumValue(_currentCursor, PropertyGroup(), parsingInfo);
+		}
+
 		endParsing(parsingInfo);
 	}
 }

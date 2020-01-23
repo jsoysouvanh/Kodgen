@@ -9,9 +9,22 @@ void GeneratedCodeTemplate::setWritingStream(std::ofstream* writingFile) noexcep
 	_writingFile = writingFile;
 }
 
-void GeneratedCodeTemplate::write(std::string&& text) noexcept
+void GeneratedCodeTemplate::write(std::string const& line) noexcept
 {
 	assert(_writingFile != nullptr);
 
-	*_writingFile << text << std::endl;
+	*_writingFile << line << std::endl;
+}
+
+void GeneratedCodeTemplate::write(std::string&& line) noexcept
+{
+	assert(_writingFile != nullptr);
+
+	*_writingFile << std::forward<std::string>(line) << std::endl;
+}
+
+void GeneratedCodeTemplate::expandWriteMacroLines(std::string&& line) noexcept
+{
+	write("\t" + std::forward<std::string>(line));
+	write("");
 }

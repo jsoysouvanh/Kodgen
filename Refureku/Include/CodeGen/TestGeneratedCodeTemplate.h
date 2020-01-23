@@ -19,7 +19,31 @@ namespace refureku
 					break;
 
 				case EntityInfo::EType::Enum:
+					
+					EnumInfo const& enumInfo = static_cast<EnumInfo const&>(entityInfo);
+
 					write(	"#define _RFRK_GENERATED_ENUM_" + entityInfo.name + " //TODO something");
+
+					write("/*");
+
+					write("enum class " + enumInfo.name + "Reflect : " + enumInfo.underlyingType);
+					write("{");
+
+					for (EnumValueInfo const& evi : enumInfo.enumValues)
+					{
+						write("\t" + evi.name + " = " + std::to_string(evi.defaultValue) + ",");
+					}
+
+					write("};");
+
+					write("*/");
+
+					writeMacro(	"SOME_MACRO(...)",
+								"here",
+								"is",
+								"a",
+								"test");
+
 					break;
 			}
 		}

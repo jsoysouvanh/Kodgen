@@ -6,9 +6,6 @@ using namespace refureku;
 
 CXChildVisitResult EnumParser::parse(CXCursor currentCursor, ParsingInfo& parsingInfo) noexcept
 {
-	//std::cout << "Cursor kind : " << Helpers::getString(clang_getCursorKindSpelling(clang_getCursorKind(currentCursor))) << " : " << Helpers::getString(clang_getCursorSpelling(currentCursor)) << std::endl;
-	//std::cout << "Cursor display name: " << Helpers::getString(clang_getCursorDisplayName(currentCursor)) << std::endl;
-
 	if (_enumValueParser.isCurrentlyParsing())
 	{
 		_enumValueParser.parse(currentCursor, parsingInfo);
