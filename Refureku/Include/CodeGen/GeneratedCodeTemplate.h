@@ -14,14 +14,33 @@ namespace refureku
 		private:
 			std::ofstream*	_writingFile;
 
+			/**
+			*	@brief Write a single line in the generated file
+			*	@brief This method is the same as writeLine(std::string const& line) but is here to end the variadic writeLines(...) recurrency
+			*/
+			void writeLines(std::string const& line)								noexcept;
+			void writeLines(std::string&& line)										noexcept;
+
 		protected:
 			/**
 			*	@brief Write a line in the generated file
 			*
 			*	@param line Line to write in the generated file
 			*/
-			void write(std::string const& line)	noexcept;
-			void write(std::string&& line)		noexcept;
+			void writeLine(std::string const& line)									noexcept;
+			void writeLine(std::string&& line)										noexcept;
+
+			/**
+			*	@brief Write multiple lines in the generated file
+			*
+			*	@param line First line to write
+			*	@param... otherLines Other lines to write
+			*/
+			template <typename... Lines>
+			void writeLines(std::string const& line, Lines&&... otherLines)			noexcept;
+
+			template <typename... Lines>
+			void writeLines(std::string&& line, Lines&&... otherLines)				noexcept;
 
 			/**
 			*	@brief Write a macro in the generated file

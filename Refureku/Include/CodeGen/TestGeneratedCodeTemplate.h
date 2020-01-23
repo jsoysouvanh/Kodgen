@@ -11,32 +11,34 @@ namespace refureku
 			switch (entityInfo.type)
 			{
 				case EntityInfo::EType::Class:
-					write(	"#define _RFRK_GENERATED_CLASS_" + entityInfo.name + " //TODO something");
+					writeLine(	"#define _RFRK_GENERATED_CLASS_" + entityInfo.name + " //TODO something");
 					break;
 
 				case EntityInfo::EType::Struct:
-					write(	"#define _RFRK_GENERATED_STRUCT_" + entityInfo.name + " //TODO something");
+					writeLine(	"#define _RFRK_GENERATED_STRUCT_" + entityInfo.name + " //TODO something");
 					break;
 
 				case EntityInfo::EType::Enum:
 					
 					EnumInfo const& enumInfo = static_cast<EnumInfo const&>(entityInfo);
 
-					write(	"#define _RFRK_GENERATED_ENUM_" + entityInfo.name + " //TODO something");
+					writeLine(	"#define _RFRK_GENERATED_ENUM_" + entityInfo.name + " //TODO something");
 
-					write("/*");
+					writeLine("/*");
 
-					write("enum class " + enumInfo.name + "Reflect : " + enumInfo.underlyingType);
-					write("{");
+					writeLine("enum class " + enumInfo.name + "Reflect : " + enumInfo.underlyingType);
+					writeLine("{");
 
 					for (EnumValueInfo const& evi : enumInfo.enumValues)
 					{
-						write("\t" + evi.name + " = " + std::to_string(evi.defaultValue) + ",");
+						writeLine("\t" + evi.name + " = " + std::to_string(evi.defaultValue) + ",");
 					}
 
-					write("};");
+					writeLine("};");
 
-					write("*/");
+					writeLines("this", "is", "a", "test");
+
+					writeLine("*/");
 
 					writeMacro(	"SOME_MACRO(...)",
 								"here",
