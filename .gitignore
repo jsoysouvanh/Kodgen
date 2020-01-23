@@ -1,9 +1,10 @@
-#Temp folders
+#Folders
 Build/
 Bin/
 Binaries/
 Lib/
 Logs/
+Generated/
 enc_temp_folder/
 
 #logs
