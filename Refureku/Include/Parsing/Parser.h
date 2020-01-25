@@ -29,7 +29,7 @@ namespace refureku
 			void						setupForParsing()															noexcept;
 
 			void						updateParsingState(CXCursor parent)											noexcept;
-			CXChildVisitResult			parseCursor(CXCursor currentCursor, CXCursor parentCursor)					noexcept;
+			CXChildVisitResult			parseCursor(CXCursor currentCursor)											noexcept;
 
 			CXChildVisitResult			parseDefault(CXCursor currentCursor)										noexcept;
 

@@ -20,7 +20,7 @@ CXChildVisitResult EnumParser::parse(CXCursor currentCursor, ParsingInfo& parsin
 	switch (clang_getCursorKind(currentCursor))
 	{
 		case CXCursorKind::CXCursor_EnumConstantDecl:
-			_enumValueParser.startParsing(currentCursor, parsingInfo);
+			_enumValueParser.startParsing(currentCursor);
 			break;
 
 		default:

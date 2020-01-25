@@ -51,6 +51,8 @@ std::optional<PropertyGroup> PropertyParser::getStructProperties(std::string&& a
 {
 	static std::string structAnnotation = "RfrkStruct:";
 
+	//TODO
+
 	return std::nullopt;
 }
 

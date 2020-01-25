@@ -37,7 +37,7 @@ CXChildVisitResult Parser::staticParseCursor(CXCursor c, CXCursor parent, CXClie
 		//std::cout << "Parent is : " << Helpers::getString(clang_getCursorKindSpelling(clang_getCursorKind(parent))) << std::endl;
 		//std::cout << "Cursor kind : " << Helpers::getString(clang_getCursorKindSpelling(clang_getCursorKind(c))) << " : " << Helpers::getString(clang_getCursorSpelling(c)) << std::endl;
 
-		return parser->parseCursor(c, parent);
+		return parser->parseCursor(c);
 	}
 	
 	return CXChildVisitResult::CXChildVisit_Continue;
@@ -55,7 +55,7 @@ void Parser::updateParsingState(CXCursor parent) noexcept
 	}
 }
 
-CXChildVisitResult Parser::parseCursor(CXCursor currentCursor, CXCursor parentCursor) noexcept
+CXChildVisitResult Parser::parseCursor(CXCursor currentCursor) noexcept
 {
 	if (_classParser.isCurrentlyParsing())	//Currently parsing a class of struct
 	{

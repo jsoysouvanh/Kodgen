@@ -15,7 +15,7 @@ namespace refureku
 
 			std::optional<PropertyGroup>	isValidEnumValueAnnotation(CXCursor currentCursor, ParsingInfo& parsingInfo)					noexcept;
 			CXChildVisitResult				addToCurrentEnumIfValid(CXCursor annotationCursor, ParsingInfo& parsingInfo)					noexcept;
-			void							endParsing(ParsingInfo& parsingInfo)															noexcept;
+			void							endParsing()																					noexcept;
 			void							addToCurrentEnumValue(CXCursor enumValueCursor, PropertyGroup&& pg, ParsingInfo& parsingInfo)	noexcept;
 
 		public:
@@ -25,7 +25,7 @@ namespace refureku
 			~EnumValueParser()						= default;
 
 			CXChildVisitResult	parse(CXCursor currentCursor, ParsingInfo& parsingInfo)					noexcept;
-			void				startParsing(CXCursor currentCursor, ParsingInfo& parsingInfo)			noexcept;
+			void				startParsing(CXCursor currentCursor)									noexcept;
 
 			void				updateParsingState(CXCursor parent, ParsingInfo& parsingInfo)			noexcept;
 

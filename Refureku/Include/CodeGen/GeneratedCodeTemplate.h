@@ -12,7 +12,7 @@ namespace refureku
 	class GeneratedCodeTemplate
 	{
 		private:
-			std::ofstream*	_writingFile;
+			std::ofstream*	_writingFile = nullptr;
 
 			/**
 			*	@brief Write a single line in the generated file

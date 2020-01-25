@@ -33,14 +33,14 @@ CXChildVisitResult EnumValueParser::parse(CXCursor currentCursor, ParsingInfo& p
 	return CXChildVisitResult::CXChildVisit_Continue;
 }
 
-void EnumValueParser::startParsing(CXCursor currentCursor, ParsingInfo& parsingInfo) noexcept
+void EnumValueParser::startParsing(CXCursor currentCursor) noexcept
 {
 	_isCurrentlyParsing		= true;
 	_currentCursor			= currentCursor;
 	_shouldCheckValidity	= true;
 }
 
-void EnumValueParser::endParsing(ParsingInfo& parsingInfo) noexcept
+void EnumValueParser::endParsing() noexcept
 {
 	_isCurrentlyParsing		= false;
 	_currentCursor			= clang_getNullCursor();
@@ -64,7 +64,7 @@ void EnumValueParser::updateParsingState(CXCursor parent, ParsingInfo& parsingIn
 			addToCurrentEnumValue(_currentCursor, PropertyGroup(), parsingInfo);
 		}
 
-		endParsing(parsingInfo);
+		endParsing();
 	}
 }
 

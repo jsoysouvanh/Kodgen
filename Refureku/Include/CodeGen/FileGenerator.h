@@ -24,7 +24,7 @@ namespace refureku
 
 			void					updateSupportedCodeTemplateRegex()																																			noexcept;
 			void					generateEntityFile(FileGenerationResult& genResult, fs::path const& filePath, ParsingResult const& parsingResult)															noexcept;
-			GeneratedCodeTemplate*	getEntityGeneratedCodeTemplate(EntityInfo& entityInfo, fs::path const& filePath, FileGenerationResult& genResult, bool isClass, EFileGenerationError& out_error)	const	noexcept;
+			GeneratedCodeTemplate*	getEntityGeneratedCodeTemplate(EntityInfo& entityInfo, bool isClass, EFileGenerationError& out_error)																const	noexcept;
 			void					writeEntityToFile(EntityInfo& entityInfo, fs::path const& filePath, std::ofstream* stream, FileGenerationResult& genResult, bool isClass)									noexcept;
 			bool					shouldRegenerateFile(fs::path const& filePath)																														const	noexcept;
 			fs::path				makePathToGeneratedFile(fs::path const& sourceFilePath)																												const	noexcept;

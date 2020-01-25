@@ -47,7 +47,7 @@ void FileGenerator::generateEntityFile(FileGenerationResult& genResult, fs::path
 	generatedFile.close();
 }
 
-GeneratedCodeTemplate* FileGenerator::getEntityGeneratedCodeTemplate(EntityInfo& entityInfo, fs::path const& filePath, FileGenerationResult& genResult, bool isClass, EFileGenerationError& out_error) const noexcept
+GeneratedCodeTemplate* FileGenerator::getEntityGeneratedCodeTemplate(EntityInfo& entityInfo, bool isClass, EFileGenerationError& out_error) const noexcept
 {
 	GeneratedCodeTemplate* result = nullptr;
 
@@ -111,7 +111,7 @@ GeneratedCodeTemplate* FileGenerator::getEntityGeneratedCodeTemplate(EntityInfo&
 void FileGenerator::writeEntityToFile(EntityInfo& entityInfo, fs::path const& filePath, std::ofstream* stream, FileGenerationResult& genResult, bool isClass) noexcept
 {
 	EFileGenerationError error = EFileGenerationError::Count;
-	GeneratedCodeTemplate* codeTemplate = getEntityGeneratedCodeTemplate(entityInfo, filePath, genResult, isClass, error);
+	GeneratedCodeTemplate* codeTemplate = getEntityGeneratedCodeTemplate(entityInfo, isClass, error);
 
 	if (codeTemplate != nullptr)
 	{
