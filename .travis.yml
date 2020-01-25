@@ -75,7 +75,6 @@ matrix:
 #        - CMAKE_GENERATOR="Visual Studio 15 2017 Win64"
 
 script:
-  - cd Refureku
   - mkdir -p Build
   - cd Build
 
@@ -85,7 +84,7 @@ script:
   - cmake --config Debug ../..
   - cmake --build . -- VERBOSE=1
   - ls -l
-  - ./Bin/refureku
+#  - ./Bin/refureku
  
   - cd ..
   - tree
@@ -95,7 +94,7 @@ script:
   - cd Release
   - cmake --config Release ../..
   - cmake --build . -- VERBOSE=1
-  - ./Bin/refureku
+#  - ./Bin/refureku
 
 
 branches:
