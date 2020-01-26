@@ -79,22 +79,15 @@ script:
   - cd Build
 
   # Debug test
-  - mkdir -p Debug
-  - cd Debug
-  - cmake --config Debug ../..
-  - cmake --build . -- VERBOSE=1
-  - ls -l
-#  - ./Bin/refureku
- 
-  - cd ..
-  - tree
+  - cmake -A x64 ..
+  - cmake --build . --config Debug -- VERBOSE=1
+  - ctest -C Debug -V
 
   # Release test
-  - mkdir -p Release
-  - cd Release
-  - cmake --config Release ../..
-  - cmake --build . -- VERBOSE=1
-#  - ./Bin/refureku
+  - cmake --build . --config Release -- VERBOSE=1
+  - ctest -C Release -V
+
+  - tree
 
 
 branches:

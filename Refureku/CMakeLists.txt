@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
+project(Refureku)
+
 # Handle specific flags for each supported compiler
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	
@@ -31,9 +33,9 @@ include_directories(Libraries/Include)
 link_directories(Libraries/x64/Static)
 
 # Setup output directory
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Lib)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY Lib/${CMAKE_BUILD_TYPE}/${CMAKE_CXX_COMPILER_ARCHITECTURE_ID})	# .dll / .so
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY Lib/${CMAKE_BUILD_TYPE}/${CMAKE_CXX_COMPILER_ARCHITECTURE_ID})	# .lib / .a
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY Bin/${CMAKE_BUILD_TYPE}/${CMAKE_CXX_COMPILER_ARCHITECTURE_ID})	# .exe
 
 # Setup warning level
 if (MSVC)
@@ -241,3 +243,5 @@ target_link_libraries(${TargetLibraryName} PRIVATE
 							Threads::Threads
 							LLVMDemangle
 )
+
+add_subdirectory(Tests)
