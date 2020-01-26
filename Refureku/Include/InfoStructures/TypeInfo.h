@@ -13,10 +13,10 @@ namespace refureku
 		private:
 			using EParsingStepUnderlyingType = uint16;
 
-			static constexpr char*	_constQualifier		= "const ";
-			static constexpr char*	_volatileQualifier	= "volatile ";
-			static constexpr char	_pointerSymbol		= '*';
-			static constexpr char	_referenceSymbol	= '&';
+			static constexpr char const*	_constQualifier		= "const ";
+			static constexpr char const*	_volatileQualifier	= "volatile ";
+			static constexpr char const		_pointerSymbol		= '*';
+			static constexpr char const		_referenceSymbol	= '&';
 
 			enum class EParsingStep : EParsingStepUnderlyingType
 			{
