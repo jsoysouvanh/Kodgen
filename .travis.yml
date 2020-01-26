@@ -79,7 +79,7 @@ script:
   - cd Build
 
   # Debug test
-  - cmake -A x64 ..
+  - cmake ..
   - cmake --build . --config Debug -- VERBOSE=1
   - ctest -C Debug -V
 
