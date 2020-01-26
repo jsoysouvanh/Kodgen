@@ -1,8 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
 
-#True to compile into a static library, false to make an executable
-set(BuildLib true)
-
 # Handle specific flags for each supported compiler
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	
@@ -34,9 +31,9 @@ include_directories(Libraries/Include)
 link_directories(Libraries/x64/Static)
 
 # Setup output directory
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY Lib)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY Lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY Bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Bin)
 
 # Setup warning level
 if (MSVC)
@@ -45,89 +42,46 @@ else()	# Clang or GCC
 	add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# Setup executable / lib
-if (BuildLib)
+set(TargetLibraryName Refureku_${CMAKE_CXX_COMPILER_ARCHITECTURE_ID}_${CMAKE_BUILD_TYPE})
 
-	add_library(refureku STATIC
-					Source/Properties/SimplePropertyRule.cpp
-					Source/Properties/ComplexPropertyRule.cpp
-					Source/Properties/ComplexProperty.cpp
-					Source/Properties/PropertyRules.cpp
-					Source/Properties/PropertyParser.cpp
-					Source/Properties/PropertyGroup.cpp
+add_library(${TargetLibraryName} STATIC
+				Source/Properties/SimplePropertyRule.cpp
+				Source/Properties/ComplexPropertyRule.cpp
+				Source/Properties/ComplexProperty.cpp
+				Source/Properties/PropertyRules.cpp
+				Source/Properties/PropertyParser.cpp
+				Source/Properties/PropertyGroup.cpp
 	
-					Source/InfoStructures/EntityInfo.cpp
-					Source/InfoStructures/FieldInfo.cpp
-					Source/InfoStructures/MethodInfo.cpp
-					Source/InfoStructures/StructClassInfo.cpp
-					Source/InfoStructures/ClassInfo.cpp
-					Source/InfoStructures/EnumInfo.cpp
-					Source/InfoStructures/EnumValueInfo.cpp
-					Source/InfoStructures/ParsingInfo.cpp
-					Source/InfoStructures/TypeInfo.cpp
+				Source/InfoStructures/EntityInfo.cpp
+				Source/InfoStructures/FieldInfo.cpp
+				Source/InfoStructures/MethodInfo.cpp
+				Source/InfoStructures/StructClassInfo.cpp
+				Source/InfoStructures/ClassInfo.cpp
+				Source/InfoStructures/EnumInfo.cpp
+				Source/InfoStructures/EnumValueInfo.cpp
+				Source/InfoStructures/ParsingInfo.cpp
+				Source/InfoStructures/TypeInfo.cpp
 	
-					Source/Parsing/EParsingError.cpp
-					Source/Parsing/ParsingError.cpp
-					Source/Parsing/ClassParser.cpp
-					Source/Parsing/FieldParser.cpp
-					Source/Parsing/MethodParser.cpp
-					Source/Parsing/EnumParser.cpp
-					Source/Parsing/EnumValueParser.cpp
-					Source/Parsing/Parser.cpp
+				Source/Parsing/EParsingError.cpp
+				Source/Parsing/ParsingError.cpp
+				Source/Parsing/ClassParser.cpp
+				Source/Parsing/FieldParser.cpp
+				Source/Parsing/MethodParser.cpp
+				Source/Parsing/EnumParser.cpp
+				Source/Parsing/EnumValueParser.cpp
+				Source/Parsing/Parser.cpp
 	
-					Source/Misc/EAccessSpecifier.cpp
-					Source/Misc/Helpers.cpp
+				Source/Misc/EAccessSpecifier.cpp
+				Source/Misc/Helpers.cpp
 	
-					Source/CodeGen/FileGenerator.cpp
-					Source/CodeGen/GeneratedCodeTemplate.cpp
-					Source/CodeGen/EFileGenerationError.cpp
-					Source/CodeGen/FileGenerationError.cpp
-					)
-
-else()
-
-	add_executable(refureku
-					Source/Properties/SimplePropertyRule.cpp
-					Source/Properties/ComplexPropertyRule.cpp
-					Source/Properties/ComplexProperty.cpp
-					Source/Properties/PropertyRules.cpp
-					Source/Properties/PropertyParser.cpp
-					Source/Properties/PropertyGroup.cpp
-
-					Source/InfoStructures/EntityInfo.cpp
-					Source/InfoStructures/FieldInfo.cpp
-					Source/InfoStructures/MethodInfo.cpp
-					Source/InfoStructures/StructClassInfo.cpp
-					Source/InfoStructures/ClassInfo.cpp
-					Source/InfoStructures/EnumInfo.cpp
-					Source/InfoStructures/EnumValueInfo.cpp
-					Source/InfoStructures/ParsingInfo.cpp
-					Source/InfoStructures/TypeInfo.cpp
-
-					Source/Parsing/EParsingError.cpp
-					Source/Parsing/ParsingError.cpp
-					Source/Parsing/ClassParser.cpp
-					Source/Parsing/FieldParser.cpp
-					Source/Parsing/MethodParser.cpp
-					Source/Parsing/EnumParser.cpp
-					Source/Parsing/EnumValueParser.cpp
-					Source/Parsing/Parser.cpp
-
-					Source/Misc/EAccessSpecifier.cpp
-					Source/Misc/Helpers.cpp
-
-					Source/CodeGen/FileGenerator.cpp
-					Source/CodeGen/GeneratedCodeTemplate.cpp
-					Source/CodeGen/EFileGenerationError.cpp
-					Source/CodeGen/FileGenerationError.cpp
-
-					Source/main.cpp
-					)
-
-endif()
+				Source/CodeGen/FileGenerator.cpp
+				Source/CodeGen/GeneratedCodeTemplate.cpp
+				Source/CodeGen/EFileGenerationError.cpp
+				Source/CodeGen/FileGenerationError.cpp
+				)
 
 # Setup language requirements
-set_target_properties(refureku
+set_target_properties(${TargetLibraryName}
 					PROPERTIES
 					CXX_STANDARD 17
 					CXX_STANDARD_REQUIRED ON
@@ -138,7 +92,7 @@ set_target_properties(refureku
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-target_link_libraries(refureku PRIVATE
+target_link_libraries(${TargetLibraryName} PRIVATE
 							$<$<CXX_COMPILER_ID:Clang>:c++>
 							$<$<CXX_COMPILER_ID:Clang>:c++abi>
 							clang
