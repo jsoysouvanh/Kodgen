@@ -64,8 +64,6 @@ void FieldParser::startParsing(CXCursor cursor) noexcept
 	_isCurrentlyParsing		= true;
 	_currentCursor			= cursor;
 	_shouldCheckValidity	= true;
-
-	//std::cout << "START FIELD: " << Helpers::getString(clang_getCursorDisplayName(cursor)) << std::endl;
 }
 
 void FieldParser::endParsing() noexcept
@@ -73,8 +71,6 @@ void FieldParser::endParsing() noexcept
 	_isCurrentlyParsing		= false;
 	_currentCursor			= clang_getNullCursor();
 	_shouldCheckValidity	= false;
-
-	//std::cout << "END FIELD: " << Helpers::getString(clang_getCursorDisplayName(_currentCursor)) << std::endl;
 }
 
 void FieldParser::updateParsingState(CXCursor parent) noexcept

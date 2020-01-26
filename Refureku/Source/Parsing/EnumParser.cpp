@@ -45,14 +45,11 @@ void EnumParser::updateParsingState(CXCursor parent, ParsingInfo& parsingInfo) n
 	}
 }
 
-void EnumParser::startParsing(CXCursor currentCursor, ParsingInfo& parsingInfo) noexcept
+void EnumParser::startParsing(CXCursor currentCursor) noexcept
 {
 	_isCurrentlyParsing		= true;
 	_currentCursor			= currentCursor;
 	_shouldCheckValidity	= true;
-
-	parsingInfo;
-	//std::cout << "START ENUM" << std::endl;
 }
 
 void EnumParser::endParsing(ParsingInfo& parsingInfo) noexcept
@@ -62,8 +59,6 @@ void EnumParser::endParsing(ParsingInfo& parsingInfo) noexcept
 	_shouldCheckValidity	= false;
 
 	parsingInfo.flushCurrentEnum();
-
-	//std::cout << "END ENUM" << std::endl;
 }
 
 bool EnumParser::isCurrentlyParsing() const noexcept

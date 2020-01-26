@@ -73,6 +73,7 @@ namespace refureku
 			GeneratedCodeTemplate()								= default;
 			GeneratedCodeTemplate(GeneratedCodeTemplate const&) = delete;
 			GeneratedCodeTemplate(GeneratedCodeTemplate&&)		= delete;
+			virtual ~GeneratedCodeTemplate()					= default;
 
 			/**
 			*	@brief Write lines into the generated file

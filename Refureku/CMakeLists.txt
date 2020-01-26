@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(Refureku)
+project(RefurekuLibrary)
 
 # Handle specific flags for each supported compiler
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")

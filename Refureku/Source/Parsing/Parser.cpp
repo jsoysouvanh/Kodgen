@@ -34,9 +34,6 @@ CXChildVisitResult Parser::staticParseCursor(CXCursor c, CXCursor parent, CXClie
 	{
 		parser->updateParsingState(parent);
 
-		//std::cout << "Parent is : " << Helpers::getString(clang_getCursorKindSpelling(clang_getCursorKind(parent))) << std::endl;
-		//std::cout << "Cursor kind : " << Helpers::getString(clang_getCursorKindSpelling(clang_getCursorKind(c))) << " : " << Helpers::getString(clang_getCursorSpelling(c)) << std::endl;
-
 		return parser->parseCursor(c);
 	}
 	
@@ -91,11 +88,11 @@ CXChildVisitResult Parser::parseDefault(CXCursor currentCursor) noexcept
 			break;
 
 		case CXCursorKind::CXCursor_EnumDecl:
-			_enumParser.startParsing(currentCursor, _parsingInfo);
+			_enumParser.startParsing(currentCursor);
 			break;
 
 		default:
-			CXChildVisitResult::CXChildVisit_Continue; 
+			return CXChildVisitResult::CXChildVisit_Continue; 
 	}
 
 	return CXChildVisitResult::CXChildVisit_Recurse;

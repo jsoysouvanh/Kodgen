@@ -126,8 +126,6 @@ void MethodParser::startParsing(CXCursor cursor) noexcept
 	_isCurrentlyParsing		= true;
 	_currentCursor			= cursor;
 	_shouldCheckValidity	= true;
-
-	//std::cout << "START METHOD" << std::endl;
 }
 
 void MethodParser::endParsing() noexcept
@@ -135,8 +133,6 @@ void MethodParser::endParsing() noexcept
 	_isCurrentlyParsing		= false;
 	_currentCursor			= clang_getNullCursor();
 	_shouldCheckValidity	= false;
-
-	//std::cout << "END METHOD" << std::endl;
 }
 
 void MethodParser::updateParsingState(CXCursor parent) noexcept

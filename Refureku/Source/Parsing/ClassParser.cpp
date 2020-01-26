@@ -84,8 +84,6 @@ void ClassParser::startClassParsing(CXCursor currentCursor, ParsingInfo& parsing
 	_currentCursor					= currentCursor;
 	_shouldCheckValidity			= true;
 	parsingInfo.accessSpecifier		= EAccessSpecifier::Private;
-
-	//std::cout << "START CLASS" << std::endl;
 }
 
 void ClassParser::startStructParsing(CXCursor currentCursor, ParsingInfo& parsingInfo)	noexcept
@@ -94,8 +92,6 @@ void ClassParser::startStructParsing(CXCursor currentCursor, ParsingInfo& parsin
 	_currentCursor					= currentCursor;
 	_shouldCheckValidity			= true;
 	parsingInfo.accessSpecifier		= EAccessSpecifier::Public;
-
-	//std::cout << "START STRUCT" << std::endl;
 }
 
 void ClassParser::endParsing(ParsingInfo& parsingInfo)	noexcept
@@ -105,8 +101,6 @@ void ClassParser::endParsing(ParsingInfo& parsingInfo)	noexcept
 	_shouldCheckValidity	= false;
 
 	parsingInfo.flushCurrentClass();
-
-	//std::cout << "END CLASS/STRUCT" << std::endl;
 }
 
 void ClassParser::updateParsingState(CXCursor parent, ParsingInfo& parsingInfo) noexcept

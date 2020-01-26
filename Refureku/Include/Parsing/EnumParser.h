@@ -28,7 +28,7 @@ namespace refureku
 			~EnumParser()					= default;
 
 			CXChildVisitResult	parse(CXCursor currentCursor, ParsingInfo& parsingInfo)					noexcept;
-			void				startParsing(CXCursor currentCursor, ParsingInfo& parsingInfo)			noexcept;
+			void				startParsing(CXCursor currentCursor)									noexcept;
 
 			void				updateParsingState(CXCursor parent, ParsingInfo& parsingInfo)			noexcept;
 			
