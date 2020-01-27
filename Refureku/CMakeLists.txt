@@ -25,13 +25,6 @@ endif()
 message("Cmake:		${CMAKE_VERSION}")
 message("Compiler:	${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
 
-# Setup include directories
-include_directories(Include)
-include_directories(Libraries/Include)
-
-# Setup link directories
-link_directories(Libraries/x64/Static)
-
 # Setup output directory
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY Lib/${CMAKE_BUILD_TYPE}/${CMAKE_CXX_COMPILER_ARCHITECTURE_ID})	# .dll / .so
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY Lib/${CMAKE_BUILD_TYPE}/${CMAKE_CXX_COMPILER_ARCHITECTURE_ID})	# .lib / .a
@@ -89,11 +82,19 @@ set_target_properties(${TargetLibraryName}
 					CXX_EXTENSIONS OFF
 					)
 
+# Setup include directories
+target_include_directories(${TargetLibraryName} PUBLIC
+							Include
+							Libraries/Include)
+
+# Setup link directories
+target_link_directories(${TargetLibraryName} PUBLIC Libraries/x64/Static)
+
 # Link to required libraries
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-target_link_libraries(${TargetLibraryName} PRIVATE
+target_link_libraries(${TargetLibraryName} PUBLIC
 							$<$<CXX_COMPILER_ID:Clang>:c++>
 							$<$<CXX_COMPILER_ID:Clang>:c++abi>
 							clang
