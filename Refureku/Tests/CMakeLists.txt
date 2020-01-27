@@ -9,9 +9,11 @@ add_executable(${ParsingTestsTargetName} ParsingTests.cpp)
 add_executable(${FileGeneratorTestsTargetName} FileGeneratorTests.cpp)
 
 # Setup language requirements
-set_target_properties(${PropertyRulesTestsTargetName} PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
-set_target_properties(${ParsingTestsTargetName} PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
-set_target_properties(${FileGeneratorTestsTargetName} PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
+set_target_properties(${PropertyRulesTestsTargetName} ${ParsingTestsTargetName} ${FileGeneratorTestsTargetName}
+						PROPERTIES
+						CXX_STANDARD 17
+						CXX_STANDARD_REQUIRED ON
+						CXX_EXTENSIONS OFF)
 
 # Link to Refureku library to test it
 target_link_libraries(${PropertyRulesTestsTargetName} PRIVATE ${TargetLibraryName})

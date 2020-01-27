@@ -5,7 +5,7 @@ project(Refureku)
 # Handle specific flags for each supported compiler
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	
-	add_compile_options(-stdlib=libc++)
+	# Nothing at the moment
 
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	
