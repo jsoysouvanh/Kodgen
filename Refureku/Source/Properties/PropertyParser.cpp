@@ -24,123 +24,47 @@ std::optional<PropertyGroup> PropertyParser::getProperties(std::string&& annotat
 	return std::nullopt;
 }
 
-//TODO DELETE FROM HERE, use above method instead
-
 std::optional<PropertyGroup> PropertyParser::getClassProperties(std::string&& annotateMessage) noexcept
 {
 	static std::string classAnnotation = "RfrkClass:";
 
-	if (annotateMessage.substr(0, classAnnotation.size()) == classAnnotation)
-	{
-		if (splitProperties(annotateMessage.substr(classAnnotation.size())))
-		{
-			return checkAndFillPropertyGroup(_splitProps, _propertyParsingSettings->classPropertyRules);
-		}
-	}
-	else
-	{
-		//Tried to add properties to a class with the wrong macro
-		_parsingError = EParsingError::WrongPropertyMacroUsed;
-	}
-
-	assert(_parsingError != EParsingError::Count);	//If fails, _parsing error must be updated
-	return std::nullopt;
+	return getProperties(std::forward<std::string>(annotateMessage), classAnnotation, _propertyParsingSettings->classPropertyRules);
 }
 
 std::optional<PropertyGroup> PropertyParser::getStructProperties(std::string&& annotateMessage) noexcept
 {
 	static std::string structAnnotation = "RfrkStruct:";
 
-	//TODO
-
-	return std::nullopt;
+	return getProperties(std::forward<std::string>(annotateMessage), structAnnotation, _propertyParsingSettings->structPropertyRules);
 }
 
 std::optional<PropertyGroup> PropertyParser::getFieldProperties(std::string&& annotateMessage) noexcept
 {
 	static std::string fieldAnnotation = "RfrkField:";
 
-	if (annotateMessage.substr(0, fieldAnnotation.size()) == fieldAnnotation)
-	{
-		if (splitProperties(annotateMessage.substr(fieldAnnotation.size())))
-		{
-			return checkAndFillPropertyGroup(_splitProps, _propertyParsingSettings->fieldPropertyRules);
-		}
-	}
-	else
-	{
-		//Tried to add properties to a class with the wrong macro
-		_parsingError = EParsingError::WrongPropertyMacroUsed;
-	}
-
-	assert(_parsingError != EParsingError::Count);	//If fails, _parsing error must be updated
-	return std::nullopt;
+	return getProperties(std::forward<std::string>(annotateMessage), fieldAnnotation, _propertyParsingSettings->fieldPropertyRules);
 }
 
 std::optional<PropertyGroup> PropertyParser::getMethodProperties(std::string&& annotateMessage) noexcept
 {
 	static std::string methodAnnotation = "RfrkMethod:";
 
-	if (annotateMessage.substr(0, methodAnnotation.size()) == methodAnnotation)
-	{
-		if (splitProperties(annotateMessage.substr(methodAnnotation.size())))
-		{
-			return checkAndFillPropertyGroup(_splitProps, _propertyParsingSettings->methodPropertyRules);
-		}
-	}
-	else
-	{
-		//Tried to add properties to a class with the wrong macro
-		_parsingError = EParsingError::WrongPropertyMacroUsed;
-	}
-
-	assert(_parsingError != EParsingError::Count);	//If fails, _parsing error must be updated
-	return std::nullopt;
+	return getProperties(std::forward<std::string>(annotateMessage), methodAnnotation, _propertyParsingSettings->methodPropertyRules);
 }
 
 std::optional<PropertyGroup> PropertyParser::getEnumProperties(std::string&& annotateMessage) noexcept
 {
 	static std::string enumAnnotation = "RfrkEnum:";
 
-	if (annotateMessage.substr(0, enumAnnotation.size()) == enumAnnotation)
-	{
-		if (splitProperties(annotateMessage.substr(enumAnnotation.size())))
-		{
-			return checkAndFillPropertyGroup(_splitProps, _propertyParsingSettings->enumPropertyRules);
-		}
-	}
-	else
-	{
-		//Tried to add properties to a class with the wrong macro
-		_parsingError = EParsingError::WrongPropertyMacroUsed;
-	}
-
-	assert(_parsingError != EParsingError::Count);	//If fails, _parsing error must be updated
-	return std::nullopt;
+	return getProperties(std::forward<std::string>(annotateMessage), enumAnnotation, _propertyParsingSettings->enumPropertyRules);
 }
 
 std::optional<PropertyGroup> PropertyParser::getEnumValueProperties(std::string&& annotateMessage) noexcept
 {
 	static std::string enumValueAnnotation = "RfrkEnumVal:";
 
-	if (annotateMessage.substr(0, enumValueAnnotation.size()) == enumValueAnnotation)
-	{
-		if (splitProperties(annotateMessage.substr(enumValueAnnotation.size())))
-		{
-			return checkAndFillPropertyGroup(_splitProps, _propertyParsingSettings->enumValuePropertyRules);
-		}
-	}
-	else
-	{
-		//Tried to add properties to a class with the wrong macro
-		_parsingError = EParsingError::WrongPropertyMacroUsed;
-	}
-
-	assert(_parsingError != EParsingError::Count);	//If fails, _parsing error must be updated
-	return std::nullopt;
+	return getProperties(std::forward<std::string>(annotateMessage), enumValueAnnotation, _propertyParsingSettings->enumValuePropertyRules);
 }
-
-// DELETE UNTIL HERE
 
 bool PropertyParser::splitProperties(std::string&& propertiesString) noexcept
 {

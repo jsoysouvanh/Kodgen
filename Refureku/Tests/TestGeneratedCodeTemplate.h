@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GeneratedCodeTemplate.h"
+#include "CodeGen/GeneratedCodeTemplate.h"
 
 namespace refureku
 {
