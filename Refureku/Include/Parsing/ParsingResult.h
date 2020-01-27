@@ -3,16 +3,17 @@
 #include <vector>
 
 #include "ParsingError.h"
-#include "InfoStructures/ClassInfo.h"
+#include "InfoStructures/StructClassInfo.h"
 #include "InfoStructures/EnumInfo.h"
 
 namespace refureku
 {
 	struct ParsingResult
 	{
-		std::vector<ClassInfo>		classes;
-		std::vector<EnumInfo>		enums;
+		std::vector<StructClassInfo>	classes;
+		std::vector<StructClassInfo>	structs;
+		std::vector<EnumInfo>			enums;
 		
-		std::vector<ParsingError>	parsingErrors;
+		std::vector<ParsingError>		parsingErrors;
 	};
 }

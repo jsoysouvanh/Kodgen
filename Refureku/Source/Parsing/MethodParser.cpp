@@ -14,7 +14,7 @@ CXChildVisitResult MethodParser::parse(CXCursor cursor, ParsingInfo& parsingInfo
 		return addToCurrentClassIfValid(cursor, parsingInfo);
 	}
 
-	if (!parsingInfo.currentClass.has_value())
+	if (!parsingInfo.currentStructOrClass.has_value())
 	{
 		return CXChildVisitResult::CXChildVisit_Continue;
 	}
@@ -22,11 +22,11 @@ CXChildVisitResult MethodParser::parse(CXCursor cursor, ParsingInfo& parsingInfo
 	switch (clang_getCursorKind(cursor))
 	{
 		case CXCursorKind::CXCursor_CXXFinalAttr:
-			parsingInfo.currentClass->methods.at(parsingInfo.accessSpecifier).back().qualifiers.Final = true;
+			parsingInfo.currentStructOrClass->methods.at(parsingInfo.accessSpecifier).back().qualifiers.Final = true;
 			break;
 
 		case CXCursorKind::CXCursor_CXXOverrideAttr:
-			parsingInfo.currentClass->methods.at(parsingInfo.accessSpecifier).back().qualifiers.Override = true;
+			parsingInfo.currentStructOrClass->methods.at(parsingInfo.accessSpecifier).back().qualifiers.Override = true;
 			break;
 
 		case CXCursorKind::CXCursor_ParmDecl:
@@ -45,9 +45,9 @@ CXChildVisitResult MethodParser::addToCurrentClassIfValid(CXCursor const& method
 {
 	if (std::optional<PropertyGroup> propertyGroup = isMethodValid(methodAnnotationCursor, parsingInfo))
 	{
-		if (parsingInfo.currentClass.has_value())
+		if (parsingInfo.currentStructOrClass.has_value())
 		{
-			MethodInfo& methodInfo = parsingInfo.currentClass->methods.at(parsingInfo.accessSpecifier).emplace_back(MethodInfo(Helpers::getString(clang_getCursorDisplayName(_currentCursor)), std::move(*propertyGroup)));
+			MethodInfo& methodInfo = parsingInfo.currentStructOrClass->methods.at(parsingInfo.accessSpecifier).emplace_back(MethodInfo(Helpers::getString(clang_getCursorDisplayName(_currentCursor)), std::move(*propertyGroup)));
 			setupMethod(_currentCursor, methodInfo);
 
 			return CXChildVisitResult::CXChildVisit_Recurse;

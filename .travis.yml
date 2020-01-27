@@ -14,7 +14,7 @@ matrix:
          - export PATH=/usr/local/clang_9.0.0/bin:$PATH
          - export LD_LIBRARY_PATH=/usr/local/clang_9.0.0/lib:$LD_LIBRARY_PATH
       install:
-        # Install Cmake 3.8.2
+        # Install Cmake 3.10.0
         - DEPS_DIR="${TRAVIS_BUILD_DIR}/Dependencies"
         - mkdir ${DEPS_DIR} && cd ${DEPS_DIR}
         - travis_retry wget --no-check-certificate https://cmake.org/files/v3.10/cmake-3.10.0-Linux-x86_64.tar.gz
@@ -37,7 +37,7 @@ matrix:
         - sudo apt-get -y install gcc-9 g++-9
         - eval "${MATRIX_EVAL}"
       install:
-        # Install Cmake 3.8.2
+        # Install Cmake 3.10.0
         - DEPS_DIR="${TRAVIS_BUILD_DIR}/Dependencies"
         - mkdir ${DEPS_DIR} && cd ${DEPS_DIR}
         - travis_retry wget --no-check-certificate https://cmake.org/files/v3.10/cmake-3.10.0-Linux-x86_64.tar.gz

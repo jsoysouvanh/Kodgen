@@ -19,9 +19,9 @@ CXChildVisitResult FieldParser::addToCurrentClassIfValid(CXCursor fieldAnnotatio
 {
 	if (std::optional<PropertyGroup> propertyGroup = isFieldValid(fieldAnnotationCursor, parsingInfo))
 	{
-		if (parsingInfo.currentClass.has_value())
+		if (parsingInfo.currentStructOrClass.has_value())
 		{
-			FieldInfo& field = parsingInfo.currentClass->fields.at(parsingInfo.accessSpecifier).emplace_back(FieldInfo(Helpers::getString(clang_getCursorDisplayName(_currentCursor)), std::move(*propertyGroup)));
+			FieldInfo& field = parsingInfo.currentStructOrClass->fields.at(parsingInfo.accessSpecifier).emplace_back(FieldInfo(Helpers::getString(clang_getCursorDisplayName(_currentCursor)), std::move(*propertyGroup)));
 			field.type = TypeInfo(clang_getCanonicalType(clang_getCursorType(_currentCursor)));
 
 			return CXChildVisitResult::CXChildVisit_Recurse;

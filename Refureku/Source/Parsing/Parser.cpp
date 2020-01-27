@@ -120,7 +120,7 @@ bool Parser::parse(fs::path const& parseFile, ParsingResult& out_result) noexcep
 			}
 			else
 			{
-				_parsingInfo.flushCurrentClass();
+				_parsingInfo.flushCurrentStructOrClass();
 				_parsingInfo.flushCurrentEnum();
 
 				isSuccess = true;

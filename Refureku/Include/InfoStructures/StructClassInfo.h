@@ -33,4 +33,6 @@ namespace refureku
 			StructClassInfo(StructClassInfo&&)																= default;
 			~StructClassInfo()																				= default;
 	};
+
+	std::ostream& operator<<(std::ostream& out_stream, refureku::StructClassInfo const&) noexcept;
 }

@@ -58,7 +58,6 @@ add_library(${TargetLibraryName} STATIC
 				Source/InfoStructures/FieldInfo.cpp
 				Source/InfoStructures/MethodInfo.cpp
 				Source/InfoStructures/StructClassInfo.cpp
-				Source/InfoStructures/ClassInfo.cpp
 				Source/InfoStructures/EnumInfo.cpp
 				Source/InfoStructures/EnumValueInfo.cpp
 				Source/InfoStructures/ParsingInfo.cpp

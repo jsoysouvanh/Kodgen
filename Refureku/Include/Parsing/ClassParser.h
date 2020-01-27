@@ -16,14 +16,15 @@ namespace refureku
 			bool					_shouldCheckValidity	= false;
 			uint8					_classLevel				= 0u;
 			CXCursor				_currentCursor			= clang_getNullCursor();
+			EntityInfo::EType		_structOrClass			= EntityInfo::EType::Count;
 
 			FieldParser				_fieldParser;
 			MethodParser			_methodParser;
 
-			std::optional<PropertyGroup>	isClassValid(CXCursor currentCursor, ParsingInfo& parsingInfo)						noexcept;
-			CXChildVisitResult				setAsCurrentClassIfValid(CXCursor classAnnotationCursor, ParsingInfo& parsingInfo)	noexcept;
-			void							endParsing(ParsingInfo& parsingInfo)												noexcept;
-			void							updateAccessSpecifier(CXCursor cursor, ParsingInfo& parsingInfo)					noexcept;
+			std::optional<PropertyGroup>	isStructOrClassValid(CXCursor currentCursor, ParsingInfo& parsingInfo)						noexcept;
+			CXChildVisitResult				setAsCurrentStructOrClassIfValid(CXCursor classAnnotationCursor, ParsingInfo& parsingInfo)	noexcept;
+			void							endParsing(ParsingInfo& parsingInfo)														noexcept;
+			void							updateAccessSpecifier(CXCursor cursor, ParsingInfo& parsingInfo)							noexcept;
 
 		public:
 			ClassParser()					= default;

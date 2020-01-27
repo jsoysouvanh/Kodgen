@@ -1,5 +1,7 @@
 #include "InfoStructures/ParsingInfo.h"
 
+#include <cassert>
+
 using namespace refureku;
 
 bool ParsingInfo::hasErrorOccured() const noexcept
@@ -7,12 +9,25 @@ bool ParsingInfo::hasErrorOccured() const noexcept
 	return !parsingResult.parsingErrors.empty();
 }
 
-bool ParsingInfo::flushCurrentClass() noexcept
+bool ParsingInfo::flushCurrentStructOrClass() noexcept
 {
-	if (currentClass.has_value())
+	if (currentStructOrClass.has_value())
 	{
-		parsingResult.classes.emplace_back(std::move(currentClass.value()));
-		currentClass.reset();
+		switch (currentStructOrClass->type)
+		{
+			case EntityInfo::EType::Class:
+				parsingResult.classes.emplace_back(std::move(currentStructOrClass.value()));
+				break;
+
+			case EntityInfo::EType::Struct:
+				parsingResult.structs.emplace_back(std::move(currentStructOrClass.value()));
+				break;
+
+			default:
+				assert(false);	//Should never pass here
+		}
+
+		currentStructOrClass.reset();
 
 		return true;
 	}

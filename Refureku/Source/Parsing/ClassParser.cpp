@@ -1,5 +1,7 @@
 #include "Parsing/ClassParser.h"
 
+#include <cassert>
+
 #include "Misc/Helpers.h"
 
 using namespace refureku;
@@ -17,7 +19,7 @@ CXChildVisitResult ClassParser::parse(CXCursor currentCursor, ParsingInfo& parsi
 	else if (_shouldCheckValidity)	//Check for any annotation attribute if the flag is raised
 	{
 		_shouldCheckValidity = false;
-		return setAsCurrentClassIfValid(currentCursor, parsingInfo);
+		return setAsCurrentStructOrClassIfValid(currentCursor, parsingInfo);
 	}
 
 	//Check for class field or method
@@ -42,11 +44,11 @@ CXChildVisitResult ClassParser::parse(CXCursor currentCursor, ParsingInfo& parsi
 	return CXChildVisitResult::CXChildVisit_Recurse;
 }
 
-CXChildVisitResult ClassParser::setAsCurrentClassIfValid(CXCursor classAnnotationCursor, ParsingInfo& parsingInfo) noexcept
+CXChildVisitResult ClassParser::setAsCurrentStructOrClassIfValid(CXCursor classAnnotationCursor, ParsingInfo& parsingInfo) noexcept
 {
-	if (std::optional<PropertyGroup> propertyGroup = isClassValid(classAnnotationCursor, parsingInfo))
+	if (std::optional<PropertyGroup> propertyGroup = isStructOrClassValid(classAnnotationCursor, parsingInfo))
 	{
-		parsingInfo.currentClass.emplace(ClassInfo(Helpers::getString(clang_getCursorDisplayName(_currentCursor)), std::move(*propertyGroup)));
+		parsingInfo.currentStructOrClass.emplace(StructClassInfo(Helpers::getString(clang_getCursorDisplayName(_currentCursor)), std::move(*propertyGroup), std::move(_structOrClass)));
 
 		return CXChildVisitResult::CXChildVisit_Recurse;
 	}
@@ -66,13 +68,25 @@ CXChildVisitResult ClassParser::setAsCurrentClassIfValid(CXCursor classAnnotatio
 	}
 }
 
-std::optional<PropertyGroup> ClassParser::isClassValid(CXCursor currentCursor, ParsingInfo& parsingInfo) noexcept
+std::optional<PropertyGroup> ClassParser::isStructOrClassValid(CXCursor currentCursor, ParsingInfo& parsingInfo) noexcept
 {
 	parsingInfo.propertyParser.clean();
 
 	if (clang_getCursorKind(currentCursor) == CXCursorKind::CXCursor_AnnotateAttr)
 	{
-		return parsingInfo.propertyParser.getClassProperties(Helpers::getString(clang_getCursorSpelling(currentCursor)));
+		switch (_structOrClass)
+		{
+			case EntityInfo::EType::Class:
+				return parsingInfo.propertyParser.getClassProperties(Helpers::getString(clang_getCursorSpelling(currentCursor)));
+				break;
+
+			case EntityInfo::EType::Struct:
+				return parsingInfo.propertyParser.getStructProperties(Helpers::getString(clang_getCursorSpelling(currentCursor)));
+				break;
+
+			default:
+				assert(false);	//Should never pass here
+		}
 	}
 
 	return std::nullopt;
@@ -84,6 +98,7 @@ void ClassParser::startClassParsing(CXCursor currentCursor, ParsingInfo& parsing
 	_currentCursor					= currentCursor;
 	_shouldCheckValidity			= true;
 	parsingInfo.accessSpecifier		= EAccessSpecifier::Private;
+	_structOrClass					= EntityInfo::EType::Class;
 }
 
 void ClassParser::startStructParsing(CXCursor currentCursor, ParsingInfo& parsingInfo)	noexcept
@@ -92,15 +107,18 @@ void ClassParser::startStructParsing(CXCursor currentCursor, ParsingInfo& parsin
 	_currentCursor					= currentCursor;
 	_shouldCheckValidity			= true;
 	parsingInfo.accessSpecifier		= EAccessSpecifier::Public;
+	_structOrClass					= EntityInfo::EType::Struct;
 }
 
 void ClassParser::endParsing(ParsingInfo& parsingInfo)	noexcept
 {
 	_classLevel--;
-	_currentCursor			= clang_getNullCursor();
-	_shouldCheckValidity	= false;
+	_currentCursor					= clang_getNullCursor();
+	_shouldCheckValidity			= false;
+	parsingInfo.accessSpecifier		= EAccessSpecifier::Invalid;
+	_structOrClass					= EntityInfo::EType::Count;
 
-	parsingInfo.flushCurrentClass();
+	parsingInfo.flushCurrentStructOrClass();
 }
 
 void ClassParser::updateParsingState(CXCursor parent, ParsingInfo& parsingInfo) noexcept

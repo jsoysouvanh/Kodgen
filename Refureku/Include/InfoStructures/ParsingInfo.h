@@ -8,7 +8,6 @@
 #include "Parsing/ParsingSettings.h"
 #include "Parsing/ParsingResult.h"
 #include "Properties/PropertyParser.h"
-#include "InfoStructures/ClassInfo.h"
 #include "InfoStructures/TypeInfo.h"
 
 namespace refureku
@@ -19,33 +18,33 @@ namespace refureku
 			/**
 			*
 			*/
-			ParsingSettings const*		parsingSettings = nullptr;
+			ParsingSettings const*			parsingSettings = nullptr;
 
 			/**
 			*	PropertyParser.
 			*	used by the Parser to retrieve information
 			*/
-			PropertyParser				propertyParser;
+			PropertyParser					propertyParser;
 
 			/**
 			*	Current class modifier
 			*/
-			EAccessSpecifier			accessSpecifier	= EAccessSpecifier::Private;
+			EAccessSpecifier				accessSpecifier	= EAccessSpecifier::Private;
 
 			/**
 			*	Current parsing class (if valid)
 			*/
-			std::optional<ClassInfo>	currentClass;
+			std::optional<StructClassInfo>	currentStructOrClass;
 
 			/**
 			*	Current parsing enum (if valid)
 			*/
-			std::optional<EnumInfo>		currentEnum;
+			std::optional<EnumInfo>			currentEnum;
 
 			/**
 			*	Final collected data
 			*/
-			ParsingResult				parsingResult;
+			ParsingResult					parsingResult;
 
 			ParsingInfo()	= default;
 			~ParsingInfo()	= default;
@@ -56,11 +55,11 @@ namespace refureku
 			bool	hasErrorOccured()									const	noexcept;
 
 			/**
-			*	@brief Tries to flush the current class into the ParsingResult
+			*	@brief Tries to flush the current class or struct into the ParsingResult
 			*
-			*	@return true if a class was flushed (currentClass had a value), else false
+			*	@return true if a class/struct was flushed (currentStructOrClass had a value), else false
 			*/
-			bool	flushCurrentClass()											noexcept;
+			bool	flushCurrentStructOrClass()									noexcept;
 
 			/**
 			*	@brief Tries to flush the current enum into the ParsingResult

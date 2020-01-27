@@ -34,15 +34,19 @@ void FileGenerator::generateEntityFile(FileGenerationResult& genResult, fs::path
 	std::ofstream generatedFile(makePathToGeneratedFile(filePath).string(), std::ios::out | std::ios::trunc);
 	generatedFile << "#pragma once" << std::endl << std::endl;
 
-	for (ClassInfo classInfo : parsingResult.classes)
+	//TODO: Write header
+
+	for (StructClassInfo structOrClassInfo : parsingResult.classes)
 	{
-		writeEntityToFile(classInfo, filePath, &generatedFile, genResult, true);
+		writeEntityToFile(structOrClassInfo, filePath, &generatedFile, genResult, true);
 	}
 
 	for (EnumInfo enumInfo : parsingResult.enums)
 	{
 		writeEntityToFile(enumInfo, filePath, &generatedFile, genResult, false);
 	}
+
+	//TODO: Write footer
 
 	generatedFile.close();
 }

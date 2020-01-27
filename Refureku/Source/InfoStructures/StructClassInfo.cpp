@@ -25,3 +25,37 @@ void StructClassInfo::initContainers() noexcept
 	methods.emplace(EAccessSpecifier::Protected, std::vector<MethodInfo>());
 	methods.emplace(EAccessSpecifier::Private, std::vector<MethodInfo>());
 }
+
+std::ostream& refureku::operator<<(std::ostream& out_stream, StructClassInfo const& structClassInfo) noexcept
+{
+	out_stream << (structClassInfo.type == EntityInfo::EType::Class ? "Class: " : "Struct: ") << structClassInfo.name;
+
+	//Properties
+	out_stream << " " << structClassInfo.properties << std::endl;
+
+	//Fields
+	out_stream << " - Fields" << std::endl;
+	for (auto const& [access, fieldVector] : structClassInfo.fields)
+	{
+		out_stream << "   - " << toString(access) << std::endl;
+
+		for (FieldInfo const& field : fieldVector)
+		{
+			out_stream << "       " << field << std::endl;
+		}
+	}
+
+	//Methods
+	out_stream << " - Methods" << std::endl;
+	for (auto const& [access, methodVector] : structClassInfo.methods)
+	{
+		out_stream << "   - " << toString(access) << std::endl;
+
+		for (MethodInfo const& method : methodVector)
+		{
+			out_stream << "       " << method << std::endl;
+		}
+	}
+
+	return out_stream;
+}
