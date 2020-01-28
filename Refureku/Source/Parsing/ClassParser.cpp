@@ -46,7 +46,7 @@ CXChildVisitResult ClassParser::parse(CXCursor currentCursor, ParsingInfo& parsi
 
 CXChildVisitResult ClassParser::setAsCurrentStructOrClassIfValid(CXCursor classAnnotationCursor, ParsingInfo& parsingInfo) noexcept
 {
-	if (std::optional<PropertyGroup> propertyGroup = isStructOrClassValid(classAnnotationCursor, parsingInfo))
+	if (opt::optional<PropertyGroup> propertyGroup = isStructOrClassValid(classAnnotationCursor, parsingInfo))
 	{
 		parsingInfo.currentStructOrClass.emplace(StructClassInfo(Helpers::getString(clang_getCursorDisplayName(_currentCursor)), std::move(*propertyGroup), std::move(_structOrClass)));
 
@@ -68,7 +68,7 @@ CXChildVisitResult ClassParser::setAsCurrentStructOrClassIfValid(CXCursor classA
 	}
 }
 
-std::optional<PropertyGroup> ClassParser::isStructOrClassValid(CXCursor currentCursor, ParsingInfo& parsingInfo) noexcept
+opt::optional<PropertyGroup> ClassParser::isStructOrClassValid(CXCursor currentCursor, ParsingInfo& parsingInfo) noexcept
 {
 	parsingInfo.propertyParser.clean();
 
@@ -89,7 +89,7 @@ std::optional<PropertyGroup> ClassParser::isStructOrClassValid(CXCursor currentC
 		}
 	}
 
-	return std::nullopt;
+	return opt::nullopt;
 }
 
 void ClassParser::startClassParsing(CXCursor currentCursor, ParsingInfo& parsingInfo)	noexcept

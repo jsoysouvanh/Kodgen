@@ -21,7 +21,7 @@ namespace refureku
 			FieldParser				_fieldParser;
 			MethodParser			_methodParser;
 
-			std::optional<PropertyGroup>	isStructOrClassValid(CXCursor currentCursor, ParsingInfo& parsingInfo)						noexcept;
+			opt::optional<PropertyGroup>	isStructOrClassValid(CXCursor currentCursor, ParsingInfo& parsingInfo)						noexcept;
 			CXChildVisitResult				setAsCurrentStructOrClassIfValid(CXCursor classAnnotationCursor, ParsingInfo& parsingInfo)	noexcept;
 			void							endParsing(ParsingInfo& parsingInfo)														noexcept;
 			void							updateAccessSpecifier(CXCursor cursor, ParsingInfo& parsingInfo)							noexcept;

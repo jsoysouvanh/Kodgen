@@ -43,7 +43,7 @@ CXChildVisitResult MethodParser::parse(CXCursor cursor, ParsingInfo& parsingInfo
 
 CXChildVisitResult MethodParser::addToCurrentClassIfValid(CXCursor const& methodAnnotationCursor, ParsingInfo& parsingInfo) noexcept
 {
-	if (std::optional<PropertyGroup> propertyGroup = isMethodValid(methodAnnotationCursor, parsingInfo))
+	if (opt::optional<PropertyGroup> propertyGroup = isMethodValid(methodAnnotationCursor, parsingInfo))
 	{
 		if (parsingInfo.currentStructOrClass.has_value())
 		{
@@ -108,7 +108,7 @@ void MethodParser::setupMethod(CXCursor const& methodCursor, MethodInfo& methodI
 	}
 }
 
-std::optional<PropertyGroup> MethodParser::isMethodValid(CXCursor currentCursor, ParsingInfo& parsingInfo) noexcept
+opt::optional<PropertyGroup> MethodParser::isMethodValid(CXCursor currentCursor, ParsingInfo& parsingInfo) noexcept
 {
 	_shouldCheckValidity = false;
 	parsingInfo.propertyParser.clean();
@@ -118,7 +118,7 @@ std::optional<PropertyGroup> MethodParser::isMethodValid(CXCursor currentCursor,
 		return parsingInfo.propertyParser.getMethodProperties(Helpers::getString(clang_getCursorSpelling(currentCursor)));
 	}
 
-	return std::nullopt;
+	return opt::nullopt;
 }
 
 void MethodParser::startParsing(CXCursor cursor) noexcept

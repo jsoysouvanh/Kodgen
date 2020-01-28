@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cassert>
 
-#include "Misc/SafeFilesystem.h"
+#include "Misc/Filesystem.h"
 #include "Properties/PropertyRules.h"
 
 int main()

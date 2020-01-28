@@ -13,7 +13,7 @@ namespace refureku
 			bool		_isCurrentlyParsing		= false;
 			CXCursor	_currentCursor			= clang_getNullCursor();
 
-			std::optional<PropertyGroup>	isValidEnumValueAnnotation(CXCursor currentCursor, ParsingInfo& parsingInfo)					noexcept;
+			opt::optional<PropertyGroup>	isValidEnumValueAnnotation(CXCursor currentCursor, ParsingInfo& parsingInfo)					noexcept;
 			CXChildVisitResult				addToCurrentEnumIfValid(CXCursor annotationCursor, ParsingInfo& parsingInfo)					noexcept;
 			void							endParsing()																					noexcept;
 			void							addToCurrentEnumValue(CXCursor enumValueCursor, PropertyGroup&& pg, ParsingInfo& parsingInfo)	noexcept;

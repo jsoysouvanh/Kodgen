@@ -1,7 +1,6 @@
 #pragma once
 
-#include <optional>
-
+#include "Misc/Optional.h"
 #include "Properties/PropertyGroup.h"
 #include "Properties/PropertyParsingSettings.h"
 #include "Parsing/EParsingError.h"
@@ -54,7 +53,7 @@ namespace refureku
 			*	On success, returns the filled propertyGroup object
 			*	On failure, returns an empty empty optional object
 			*/
-			std::optional<PropertyGroup> checkAndFillPropertyGroup(std::vector<std::vector<std::string>>& splitProps, PropertyRules const& rules) noexcept;
+			opt::optional<PropertyGroup> checkAndFillPropertyGroup(std::vector<std::vector<std::string>>& splitProps, PropertyRules const& rules) noexcept;
 
 			/**
 			*	Add a single property to the given property group using the provided data
@@ -86,14 +85,14 @@ namespace refureku
 			*	All get[...]Properties(std::string&& annotateMessage) below methods return an initialized optional
 			*	if the annotate message is valid, else an uninitialized one.
 			*/
-			std::optional<PropertyGroup>	getProperties(std::string&& annotateMessage, std::string const& annotationId, PropertyRules const& rules) noexcept;
+			opt::optional<PropertyGroup>	getProperties(std::string&& annotateMessage, std::string const& annotationId, PropertyRules const& rules) noexcept;
 
-			std::optional<PropertyGroup>	getClassProperties(std::string&& annotateMessage) noexcept;
-			std::optional<PropertyGroup>	getStructProperties(std::string&& annotateMessage) noexcept;
-			std::optional<PropertyGroup>	getFieldProperties(std::string&& annotateMessage) noexcept;
-			std::optional<PropertyGroup>	getMethodProperties(std::string&& annotateMessage) noexcept;
-			std::optional<PropertyGroup>	getEnumProperties(std::string&& annotateMessage) noexcept;
-			std::optional<PropertyGroup>	getEnumValueProperties(std::string&& annotateMessage) noexcept;
+			opt::optional<PropertyGroup>	getClassProperties(std::string&& annotateMessage) noexcept;
+			opt::optional<PropertyGroup>	getStructProperties(std::string&& annotateMessage) noexcept;
+			opt::optional<PropertyGroup>	getFieldProperties(std::string&& annotateMessage) noexcept;
+			opt::optional<PropertyGroup>	getMethodProperties(std::string&& annotateMessage) noexcept;
+			opt::optional<PropertyGroup>	getEnumProperties(std::string&& annotateMessage) noexcept;
+			opt::optional<PropertyGroup>	getEnumValueProperties(std::string&& annotateMessage) noexcept;
 
 			EParsingError					getParsingError() const noexcept;
 	};

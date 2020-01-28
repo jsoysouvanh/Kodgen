@@ -1,8 +1,8 @@
 #pragma once
 
 #include <clang-c/Index.h>
-#include <optional>
 
+#include "Misc/Optional.h"
 #include "InfoStructures/ParsingInfo.h"
 #include "Properties/PropertyGroup.h"
 
@@ -17,7 +17,7 @@ namespace refureku
 			CXCursor	_currentCursor			= clang_getNullCursor();
 
 			CXChildVisitResult				addToCurrentClassIfValid(CXCursor fieldAnnotationCursor, ParsingInfo& parsingInfo)	noexcept;
-			std::optional<PropertyGroup>	isFieldValid(CXCursor currentCursor, ParsingInfo& parsingInfo)						noexcept;
+			opt::optional<PropertyGroup>	isFieldValid(CXCursor currentCursor, ParsingInfo& parsingInfo)						noexcept;
 			void							endParsing()																		noexcept;
 
 		public:

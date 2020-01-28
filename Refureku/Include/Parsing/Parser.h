@@ -1,9 +1,9 @@
 #pragma once
 
 #include <clang-c/Index.h>
-#include <optional>
 
-#include "Misc/SafeFilesystem.h"
+#include "Misc/Filesystem.h"
+#include "Misc/Optional.h"
 #include "InfoStructures/ParsingInfo.h"
 #include "Parsing/ClassParser.h"
 #include "Parsing/EnumParser.h"

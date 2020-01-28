@@ -5,7 +5,7 @@
 #include <string>
 #include <type_traits>
 
-#include "Misc/SafeFilesystem.h"
+#include "Misc/Filesystem.h"
 #include "CodeGen/GeneratedCodeTemplate.h"
 #include "CodeGen/FileGenerationResult.h"
 #include "Parsing/Parser.h"

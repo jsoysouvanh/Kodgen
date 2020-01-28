@@ -5,7 +5,7 @@
 
 using namespace refureku;
 
-std::optional<PropertyGroup> PropertyParser::getProperties(std::string&& annotateMessage, std::string const& annotationId, PropertyRules const& rules) noexcept
+opt::optional<PropertyGroup> PropertyParser::getProperties(std::string&& annotateMessage, std::string const& annotationId, PropertyRules const& rules) noexcept
 {
 	if (annotateMessage.substr(0, annotationId.size()) == annotationId)
 	{
@@ -21,45 +21,45 @@ std::optional<PropertyGroup> PropertyParser::getProperties(std::string&& annotat
 	}
 
 	assert(_parsingError != EParsingError::Count);	//If fails, _parsing error must be updated
-	return std::nullopt;
+	return opt::nullopt;
 }
 
-std::optional<PropertyGroup> PropertyParser::getClassProperties(std::string&& annotateMessage) noexcept
+opt::optional<PropertyGroup> PropertyParser::getClassProperties(std::string&& annotateMessage) noexcept
 {
 	static std::string classAnnotation = "RfrkClass:";
 
 	return getProperties(std::forward<std::string>(annotateMessage), classAnnotation, _propertyParsingSettings->classPropertyRules);
 }
 
-std::optional<PropertyGroup> PropertyParser::getStructProperties(std::string&& annotateMessage) noexcept
+opt::optional<PropertyGroup> PropertyParser::getStructProperties(std::string&& annotateMessage) noexcept
 {
 	static std::string structAnnotation = "RfrkStruct:";
 
 	return getProperties(std::forward<std::string>(annotateMessage), structAnnotation, _propertyParsingSettings->structPropertyRules);
 }
 
-std::optional<PropertyGroup> PropertyParser::getFieldProperties(std::string&& annotateMessage) noexcept
+opt::optional<PropertyGroup> PropertyParser::getFieldProperties(std::string&& annotateMessage) noexcept
 {
 	static std::string fieldAnnotation = "RfrkField:";
 
 	return getProperties(std::forward<std::string>(annotateMessage), fieldAnnotation, _propertyParsingSettings->fieldPropertyRules);
 }
 
-std::optional<PropertyGroup> PropertyParser::getMethodProperties(std::string&& annotateMessage) noexcept
+opt::optional<PropertyGroup> PropertyParser::getMethodProperties(std::string&& annotateMessage) noexcept
 {
 	static std::string methodAnnotation = "RfrkMethod:";
 
 	return getProperties(std::forward<std::string>(annotateMessage), methodAnnotation, _propertyParsingSettings->methodPropertyRules);
 }
 
-std::optional<PropertyGroup> PropertyParser::getEnumProperties(std::string&& annotateMessage) noexcept
+opt::optional<PropertyGroup> PropertyParser::getEnumProperties(std::string&& annotateMessage) noexcept
 {
 	static std::string enumAnnotation = "RfrkEnum:";
 
 	return getProperties(std::forward<std::string>(annotateMessage), enumAnnotation, _propertyParsingSettings->enumPropertyRules);
 }
 
-std::optional<PropertyGroup> PropertyParser::getEnumValueProperties(std::string&& annotateMessage) noexcept
+opt::optional<PropertyGroup> PropertyParser::getEnumValueProperties(std::string&& annotateMessage) noexcept
 {
 	static std::string enumValueAnnotation = "RfrkEnumVal:";
 
@@ -166,7 +166,7 @@ void PropertyParser::cleanString(std::string& toCleanString) const noexcept
 	}
 }
 
-std::optional<PropertyGroup> PropertyParser::checkAndFillPropertyGroup(std::vector<std::vector<std::string>>& splitProps, PropertyRules const& rules) noexcept
+opt::optional<PropertyGroup> PropertyParser::checkAndFillPropertyGroup(std::vector<std::vector<std::string>>& splitProps, PropertyRules const& rules) noexcept
 {
 	PropertyGroup propertyGroup;
 
@@ -177,13 +177,13 @@ std::optional<PropertyGroup> PropertyParser::checkAndFillPropertyGroup(std::vect
 		{
 			if (!addSimpleProperty(props, rules, propertyGroup))
 			{
-				return std::nullopt;
+				return opt::nullopt;
 			}
 		}
 		//Expect a complex prop
 		else if (!addComplexProperty(props, rules, propertyGroup))
 		{
-			return std::nullopt;
+			return opt::nullopt;
 		}
 	}
 

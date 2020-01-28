@@ -34,12 +34,12 @@ namespace refureku
 			/**
 			*	Current parsing class (if valid)
 			*/
-			std::optional<StructClassInfo>	currentStructOrClass;
+			opt::optional<StructClassInfo>	currentStructOrClass;
 
 			/**
 			*	Current parsing enum (if valid)
 			*/
-			std::optional<EnumInfo>			currentEnum;
+			opt::optional<EnumInfo>			currentEnum;
 
 			/**
 			*	Final collected data

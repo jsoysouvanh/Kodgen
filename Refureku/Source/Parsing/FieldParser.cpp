@@ -17,7 +17,7 @@ CXChildVisitResult FieldParser::parse(CXCursor cursor, ParsingInfo& parsingInfo)
 
 CXChildVisitResult FieldParser::addToCurrentClassIfValid(CXCursor fieldAnnotationCursor, ParsingInfo& parsingInfo) noexcept
 {
-	if (std::optional<PropertyGroup> propertyGroup = isFieldValid(fieldAnnotationCursor, parsingInfo))
+	if (opt::optional<PropertyGroup> propertyGroup = isFieldValid(fieldAnnotationCursor, parsingInfo))
 	{
 		if (parsingInfo.currentStructOrClass.has_value())
 		{
@@ -46,7 +46,7 @@ CXChildVisitResult FieldParser::addToCurrentClassIfValid(CXCursor fieldAnnotatio
 	}
 }
 
-std::optional<PropertyGroup> FieldParser::isFieldValid(CXCursor currentCursor, ParsingInfo& parsingInfo) noexcept
+opt::optional<PropertyGroup> FieldParser::isFieldValid(CXCursor currentCursor, ParsingInfo& parsingInfo) noexcept
 {
 	_shouldCheckValidity = false;
 	parsingInfo.propertyParser.clean();
@@ -56,7 +56,7 @@ std::optional<PropertyGroup> FieldParser::isFieldValid(CXCursor currentCursor, P
 		return parsingInfo.propertyParser.getFieldProperties(Helpers::getString(clang_getCursorSpelling(currentCursor)));
 	}
 
-	return std::nullopt;
+	return opt::nullopt;
 }
 
 void FieldParser::startParsing(CXCursor cursor) noexcept

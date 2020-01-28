@@ -66,7 +66,7 @@ bool EnumParser::isCurrentlyParsing() const noexcept
 	return _isCurrentlyParsing;
 }
 
-std::optional<PropertyGroup> EnumParser::isEnumValid(CXCursor currentCursor, ParsingInfo& parsingInfo) noexcept
+opt::optional<PropertyGroup> EnumParser::isEnumValid(CXCursor currentCursor, ParsingInfo& parsingInfo) noexcept
 {
 	parsingInfo.propertyParser.clean();
 
@@ -75,12 +75,12 @@ std::optional<PropertyGroup> EnumParser::isEnumValid(CXCursor currentCursor, Par
 		return parsingInfo.propertyParser.getEnumProperties(Helpers::getString(clang_getCursorSpelling(currentCursor)));
 	}
 
-	return std::nullopt;
+	return opt::nullopt;
 }
 
 CXChildVisitResult EnumParser::setAsCurrentEnumIfValid(CXCursor classAnnotationCursor, ParsingInfo& parsingInfo) noexcept
 {
-	if (std::optional<PropertyGroup> propertyGroup = isEnumValid(classAnnotationCursor, parsingInfo))
+	if (opt::optional<PropertyGroup> propertyGroup = isEnumValid(classAnnotationCursor, parsingInfo))
 	{
 		EnumInfo& enumInfo = parsingInfo.currentEnum.emplace(EnumInfo(Helpers::getString(clang_getCursorDisplayName(_currentCursor)), std::move(*propertyGroup)));
 

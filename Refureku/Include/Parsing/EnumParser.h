@@ -17,7 +17,7 @@ namespace refureku
 
 			EnumValueParser	_enumValueParser;
 
-			std::optional<PropertyGroup>	isEnumValid(CXCursor currentCursor, ParsingInfo& parsingInfo)						noexcept;
+			opt::optional<PropertyGroup>	isEnumValid(CXCursor currentCursor, ParsingInfo& parsingInfo)						noexcept;
 			CXChildVisitResult				setAsCurrentEnumIfValid(CXCursor classAnnotationCursor, ParsingInfo& parsingInfo)	noexcept;
 			void							endParsing(ParsingInfo& parsingInfo)												noexcept;
 

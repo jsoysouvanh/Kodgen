@@ -3,7 +3,7 @@
 #include <string>
 #include <iostream>
 
-#include "Misc/SafeFilesystem.h"
+#include "Misc/Filesystem.h"
 #include "CodeGen/EFileGenerationError.h"
 
 namespace refureku

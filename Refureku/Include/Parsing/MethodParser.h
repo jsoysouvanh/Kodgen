@@ -15,7 +15,7 @@ namespace refureku
 			CXCursor	_currentCursor			= clang_getNullCursor();
 
 			CXChildVisitResult				addToCurrentClassIfValid(CXCursor const& methodAnnotationCursor, ParsingInfo& parsingInfo)	noexcept;
-			std::optional<PropertyGroup>	isMethodValid(CXCursor currentCursor, ParsingInfo& parsingInfo)								noexcept;
+			opt::optional<PropertyGroup>	isMethodValid(CXCursor currentCursor, ParsingInfo& parsingInfo)								noexcept;
 			void							setupMethod(CXCursor const& methodCursor, MethodInfo& methodInfo)							noexcept;
 
 			void	endParsing()	noexcept;
