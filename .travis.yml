@@ -5,17 +5,29 @@ dist: trusty
 
 jobs:
   include:
+   # clang 6
    - env: CC=clang-6.0 CXX=clang++-6.0
      addons: { apt: { packages: ["clang-6.0"], sources: ["ubuntu-toolchain-r-test", "llvm-toolchain-trusty-6.0"] } }
 
+   # clang 7
    - env: CC=clang-7 CXX=clang++-7
      addons: { apt: { packages: ["clang-7"], sources: ["ubuntu-toolchain-r-test", "llvm-toolchain-trusty-7"] } }
 
-   - env: CC=gcc-5 CXX=g++-5
-     addons: { apt: { packages: ["g++-5"], sources: ["ubuntu-toolchain-r-test"] } }
-
+   # GCC 6
    - env: CC=gcc-6 CXX=g++-6
      addons: { apt: { packages: ["g++-6"], sources: ["ubuntu-toolchain-r-test"] } }
+
+   # GCC 7
+   - env: CC=gcc-7 CXX=g++-7
+     addons: { apt: { packages: ["g++-7"], sources: ["ubuntu-toolchain-r-test"] } }
+
+   # GCC 8
+   - env: CC=gcc-8 CXX=g++-8
+     addons: { apt: { packages: ["g++-8"], sources: ["ubuntu-toolchain-r-test"] } }
+
+   # GCC 9
+   - env: CC=gcc-9 CXX=g++-9
+     addons: { apt: { packages: ["g++-9"], sources: ["ubuntu-toolchain-r-test"] } }
 
 pre-install:
  - ${CC} --version

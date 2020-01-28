@@ -35,11 +35,11 @@ std::ostream& refureku::operator<<(std::ostream& out_stream, StructClassInfo con
 
 	//Fields
 	out_stream << " - Fields" << std::endl;
-	for (auto const& [access, fieldVector] : structClassInfo.fields)
+	for (decltype(structClassInfo.fields)::const_iterator it = structClassInfo.fields.cbegin(); it != structClassInfo.fields.cend(); it++)
 	{
-		out_stream << "   - " << toString(access) << std::endl;
+		out_stream << "   - " << toString(it->first) << std::endl;
 
-		for (FieldInfo const& field : fieldVector)
+		for (FieldInfo const& field : it->second)
 		{
 			out_stream << "       " << field << std::endl;
 		}
@@ -47,11 +47,11 @@ std::ostream& refureku::operator<<(std::ostream& out_stream, StructClassInfo con
 
 	//Methods
 	out_stream << " - Methods" << std::endl;
-	for (auto const& [access, methodVector] : structClassInfo.methods)
+	for (decltype(structClassInfo.methods)::const_iterator it = structClassInfo.methods.cbegin(); it != structClassInfo.methods.cend(); it++)
 	{
-		out_stream << "   - " << toString(access) << std::endl;
+		out_stream << "   - " << toString(it->first) << std::endl;
 
-		for (MethodInfo const& method : methodVector)
+		for (MethodInfo const& method : it->second)
 		{
 			out_stream << "       " << method << std::endl;
 		}
