@@ -1,44 +1,25 @@
 language: cpp
 
 os: linux
-dist: bionic
+dist: trusty
 
-matrix:
+jobs:
   include:
-    - compiler: clang
-    - compiler: gcc
-      before_install:
-        # Install gcc 9
-        - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-        - sudo apt-get -q update
-        - sudo apt-get -y install gcc-8 g++-8
-        - eval "${MATRIX_EVAL}"
-      env:
-         - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
+   - env: CC=clang-6.0 CXX=clang++-6.0
+     addons: { apt: { packages: ["clang-6.0"], sources: ["ubuntu-toolchain-r-test", "llvm-toolchain-trusty-6.0"] } }
 
-#    - os: windows
-#      compiler: clang
-#      before_install:
-#        # Install llvm 9.0
-#        - choco feature enable -n=allowGlobalConfirmation
-#        - choco upgrade llvm
+   - env: CC=clang-7 CXX=clang++-7
+     addons: { apt: { packages: ["clang-7"], sources: ["ubuntu-toolchain-r-test", "llvm-toolchain-trusty-7"] } }
 
-        # Install Cmake 3.8.1
-#        - choco upgrade cmake --version=3.8.1
-#      env:
-#        - CMAKE_GENERATOR="Visual Studio 15 2017 Win64"
+   - env: CC=gcc-5 CXX=g++-5
+     addons: { apt: { packages: ["g++-5"], sources: ["ubuntu-toolchain-r-test"] } }
 
-#    - os: windows
-#      before_install:
-        # Install gcc 9.0
-#        - choco feature enable -n=allowGlobalConfirmation
-#        - choco upgrade visualstudio2017buildtools
+   - env: CC=gcc-6 CXX=g++-6
+     addons: { apt: { packages: ["g++-6"], sources: ["ubuntu-toolchain-r-test"] } }
 
-        # Install Cmake 3.8.1
-#        - choco upgrade cmake --version=3.8.1
-#      env:
-#        - CMAKE_GENERATOR="Visual Studio 15 2017 Win64"
-
+pre-install:
+ - ${CC} --version
+ - ${CXX} --version
 
 install:
   # All the dependencies are installed in ${HOME}/deps/
