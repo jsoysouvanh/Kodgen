@@ -80,6 +80,7 @@ target_link_libraries(${TargetLibraryName}
 						INTERFACE
 							$<$<CXX_COMPILER_ID:Clang>:c++>
 							$<$<CXX_COMPILER_ID:Clang>:c++abi>
+							$<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_LESS:${CMAKE_CXX_COMPILER_VERSION},9.0>>:stdc++fs>	#filesystem	pre GCC-9
 						PUBLIC
 							clang
 							clangAST
