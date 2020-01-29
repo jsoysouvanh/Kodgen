@@ -1,33 +1,39 @@
 language: cpp
 
 os: linux
-dist: trusty
+dist: bionic
 
 jobs:
   include:
    # clang 6
    - env: CC=clang-6.0 CXX=clang++-6.0
-     addons: { apt: { packages: ["clang-6.0"], sources: ["ubuntu-toolchain-r-test", "llvm-toolchain-trusty-6.0"] } }
+     addons: { apt: { packages: ["clang-6.0"], sources: ["llvm-toolchain-bionic-6.0"] } }
 
    # clang 7
    - env: CC=clang-7 CXX=clang++-7
-     addons: { apt: { packages: ["clang-7"], sources: ["ubuntu-toolchain-r-test", "llvm-toolchain-trusty-7"] } }
+     addons: { apt: { packages: ["clang-7"], sources: ["llvm-toolchain-bionic-7"] } }
 
-   # GCC 6
-   - env: CC=gcc-6 CXX=g++-6
-     addons: { apt: { packages: ["g++-6"], sources: ["ubuntu-toolchain-r-test"] } }
+   # clang 8
+   - env: CC=clang-8 CXX=clang++-8
+     addons: { apt: { packages: ["clang-8"], sources: ["llvm-toolchain-bionic-8"] } }
+
+   # clang 9
+   - env: CC=clang-9 CXX=clang++-9
+     addons: { apt: { packages: ["clang-9"], sources: ["llvm-toolchain-bionic-9"] } }
+
+#     addons: { apt: { packages: ["clang-9"], sources: ["ubuntu-toolchain-r-test", "llvm-toolchain-bionic-9"] } }
 
    # GCC 7
    - env: CC=gcc-7 CXX=g++-7
-     addons: { apt: { packages: ["g++-7"], sources: ["ubuntu-toolchain-r-test"] } }
+     addons: { apt: { packages: ["gcc-7", "g++-7"] } }
 
    # GCC 8
    - env: CC=gcc-8 CXX=g++-8
-     addons: { apt: { packages: ["g++-8"], sources: ["ubuntu-toolchain-r-test"] } }
+     addons: { apt: { packages: ["gcc-8", "g++-8"] } }
 
    # GCC 9
    - env: CC=gcc-9 CXX=g++-9
-     addons: { apt: { packages: ["g++-9"], sources: ["ubuntu-toolchain-r-test"] } }
+     addons: { apt: { packages: ["g++-9"], sources: [ sourceline: "ppa:ubuntu-toolchain-r/test"] } }
 
 pre-install:
  - ${CC} --version
