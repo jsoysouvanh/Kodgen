@@ -31,26 +31,24 @@ void FileGenerator::updateSupportedCodeTemplateRegex() noexcept
 
 void FileGenerator::generateEntityFile(FileGenerationResult& genResult, fs::path const& filePath, ParsingResult const& parsingResult) noexcept
 {
-	std::ofstream generatedFile(makePathToGeneratedFile(filePath).string(), std::ios::out | std::ios::trunc);
-	
+	GeneratedFile generatedFile(filePath, makePathToGeneratedFile(filePath));
+
 	//Header
-	writeHeader(generatedFile, filePath, parsingResult);
+	writeHeader(generatedFile, parsingResult);
 
 	//Actual file content (per entity)
 	for (StructClassInfo structOrClassInfo : parsingResult.classes)
 	{
-		writeEntityToFile(structOrClassInfo, filePath, &generatedFile, genResult, true);
+		writeEntityToFile(generatedFile, structOrClassInfo, genResult, true);
 	}
 
 	for (EnumInfo enumInfo : parsingResult.enums)
 	{
-		writeEntityToFile(enumInfo, filePath, &generatedFile, genResult, false);
+		writeEntityToFile(generatedFile, enumInfo, genResult, false);
 	}
 
 	//Footer
-	writeFooter(generatedFile, filePath, parsingResult);
-
-	generatedFile.close();
+	writeFooter(generatedFile, parsingResult);
 }
 
 GeneratedCodeTemplate* FileGenerator::getEntityGeneratedCodeTemplate(EntityInfo& entityInfo, bool isClass, EFileGenerationError& out_error) const noexcept
@@ -114,19 +112,18 @@ GeneratedCodeTemplate* FileGenerator::getEntityGeneratedCodeTemplate(EntityInfo&
 	return result;
 }
 
-void FileGenerator::writeEntityToFile(EntityInfo& entityInfo, fs::path const& filePath, std::ofstream* stream, FileGenerationResult& genResult, bool isClass) noexcept
+void FileGenerator::writeEntityToFile(GeneratedFile& generatedFile, EntityInfo& entityInfo, FileGenerationResult& genResult, bool isClass) noexcept
 {
 	EFileGenerationError error = EFileGenerationError::Count;
 	GeneratedCodeTemplate* codeTemplate = getEntityGeneratedCodeTemplate(entityInfo, isClass, error);
 
 	if (codeTemplate != nullptr)
 	{
-		codeTemplate->setWritingStream(stream);
-		codeTemplate->generateCode(filePath, entityInfo);
+		codeTemplate->generateCode(generatedFile, entityInfo);
 	}
 	else
 	{
-		genResult.fileGenerationErrors.emplace_back(FileGenerationError(filePath, entityInfo.name, error));
+		genResult.fileGenerationErrors.emplace_back(FileGenerationError(generatedFile.getSourceFile(), entityInfo.name, error));
 	}
 }
 
@@ -142,20 +139,20 @@ fs::path FileGenerator::makePathToGeneratedFile(fs::path const& sourceFilePath) 
 	return (pathToGeneratedFilesFolder / sourceFilePath.filename()).replace_extension(generatedFilesExtension);
 }
 
-void FileGenerator::writeHeader(std::ofstream& stream, fs::path const& filePath, ParsingResult const& parsingResult) const noexcept
+void FileGenerator::writeHeader(GeneratedFile& file, ParsingResult const& parsingResult) const noexcept
 {
-	stream << "#pragma once" << std::endl << std::endl;
+	file.writeLine("#pragma once\n");
 
-	stream << "/**" << std::endl;
-	stream << "*	This is the generated file header" << std::endl;
-	stream << "*/" << std::endl << std::endl;
+	file.writeLine("/**");
+	file.writeLine("*	This is the generated file header");
+	file.writeLine("*/");
 }
 
-void FileGenerator::writeFooter(std::ofstream& stream, fs::path const& filePath, ParsingResult const& parsingResult) const noexcept
+void FileGenerator::writeFooter(GeneratedFile& file, ParsingResult const& parsingResult) const noexcept
 {
-	stream << std::endl << "/**" << std::endl;
-	stream << "*	This is the generated file footer" << std::endl;
-	stream << "*/" << std::endl;
+	file.writeLine("\n/**");
+	file.writeLine("*	This is the generated file footer");
+	file.writeLine("*/");
 }
 
 bool FileGenerator::addFile(fs::path filePath) noexcept

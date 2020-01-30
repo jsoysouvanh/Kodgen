@@ -8,6 +8,7 @@
 #include "Misc/Filesystem.h"
 #include "CodeGen/GeneratedCodeTemplate.h"
 #include "CodeGen/FileGenerationResult.h"
+#include "CodeGen/GeneratedFile.h"
 #include "Parsing/Parser.h"
 
 namespace refureku
@@ -22,29 +23,29 @@ namespace refureku
 			GeneratedCodeTemplate*									_defaultEnumTemplate		= nullptr;
 			std::string												_supportedCodeTemplateRegex = "";
 
-			void					updateSupportedCodeTemplateRegex()																																			noexcept;
-			void					generateEntityFile(FileGenerationResult& genResult, fs::path const& filePath, ParsingResult const& parsingResult)															noexcept;
-			GeneratedCodeTemplate*	getEntityGeneratedCodeTemplate(EntityInfo& entityInfo, bool isClass, EFileGenerationError& out_error)																const	noexcept;
-			void					writeEntityToFile(EntityInfo& entityInfo, fs::path const& filePath, std::ofstream* stream, FileGenerationResult& genResult, bool isClass)									noexcept;
-			bool					shouldRegenerateFile(fs::path const& filePath)																														const	noexcept;
-			fs::path				makePathToGeneratedFile(fs::path const& sourceFilePath)																												const	noexcept;
+			void					updateSupportedCodeTemplateRegex()																								noexcept;
+			void					generateEntityFile(FileGenerationResult& genResult, fs::path const& filePath, ParsingResult const& parsingResult)				noexcept;
+			GeneratedCodeTemplate*	getEntityGeneratedCodeTemplate(EntityInfo& entityInfo, bool isClass, EFileGenerationError& out_error)					const	noexcept;
+			void					writeEntityToFile(GeneratedFile& generatedFile, EntityInfo& entityInfo, FileGenerationResult& genResult, bool isClass)			noexcept;
+			bool					shouldRegenerateFile(fs::path const& filePath)																			const	noexcept;
+			fs::path				makePathToGeneratedFile(fs::path const& sourceFilePath)																	const	noexcept;
 
 		protected:
 			/**
 			*	@brief Write a header for any generated file
 			*
-			*	@param filePath Path to the parsed file
+			*	@param file Object which allows to write into the generated file
 			*	@param parsingResult Structure containing info about the parsed file
 			*/
-			virtual void	writeHeader(std::ofstream& stream, fs::path const& filePath, ParsingResult const& parsingResult)	const	noexcept;
+			virtual void	writeHeader(GeneratedFile& file, ParsingResult const& parsingResult)	const	noexcept;
 
 			/**
 			*	@brief Write a footer for any generated file
 			*
-			*	@param filePath Path to the parsed file
+			*	@param file Object which allows to write into the generated file
 			*	@param parsingResult Structure containing info about the parsed file
 			*/
-			virtual void	writeFooter(std::ofstream& stream, fs::path const& filePath, ParsingResult const& parsingResult)	const	noexcept;
+			virtual void	writeFooter(GeneratedFile& file, ParsingResult const& parsingResult)	const	noexcept;
 
 		public:
 			/**

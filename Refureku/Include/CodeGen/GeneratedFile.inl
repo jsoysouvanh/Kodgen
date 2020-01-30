@@ -1,27 +1,27 @@
 
 template <typename... Lines>
-void GeneratedCodeTemplate::expandWriteMacroLines(std::string&& line, Lines&&... otherLines) noexcept
+void GeneratedFile::expandWriteMacroLines(std::string&& line, Lines&&... otherLines) noexcept
 {
 	writeLine("\t" + std::forward<std::string>(line) + "\t\\");
 	expandWriteMacroLines(std::forward<Lines>(otherLines)...);
 }
 
 template <typename... Lines>
-void GeneratedCodeTemplate::writeMacro(std::string&& macroPrototype, Lines&&... lines) noexcept
+void GeneratedFile::writeMacro(std::string&& macroPrototype, Lines&&... lines) noexcept
 {
 	writeLine("#define " + std::forward<std::string>(macroPrototype) + "\t\\");
 	expandWriteMacroLines(std::forward<Lines>(lines)...);
 }
 
 template <typename... Lines>
-void GeneratedCodeTemplate::writeLines(std::string const& line, Lines&&... otherLines) noexcept
+void GeneratedFile::writeLines(std::string const& line, Lines&&... otherLines) noexcept
 {
 	writeLine(line);
 	writeLines(std::forward<Lines>(otherLines)...);
 }
 
 template <typename... Lines>
-void GeneratedCodeTemplate::writeLines(std::string&& line, Lines&&... otherLines) noexcept
+void GeneratedFile::writeLines(std::string&& line, Lines&&... otherLines) noexcept
 {
 	writeLine(std::forward<std::string>(line));
 	writeLines(std::forward<Lines>(otherLines)...);

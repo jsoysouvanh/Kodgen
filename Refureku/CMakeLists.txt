@@ -47,9 +47,9 @@ add_library(${TargetLibraryName}
 					Source/Misc/Helpers.cpp
 	
 					Source/CodeGen/FileGenerator.cpp
-					Source/CodeGen/GeneratedCodeTemplate.cpp
 					Source/CodeGen/EFileGenerationError.cpp
 					Source/CodeGen/FileGenerationError.cpp
+					Source/CodeGen/GeneratedFile.cpp
 			)
 
 # Setup compilation options
