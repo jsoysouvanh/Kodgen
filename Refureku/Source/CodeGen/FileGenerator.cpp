@@ -32,10 +32,11 @@ void FileGenerator::updateSupportedCodeTemplateRegex() noexcept
 void FileGenerator::generateEntityFile(FileGenerationResult& genResult, fs::path const& filePath, ParsingResult const& parsingResult) noexcept
 {
 	std::ofstream generatedFile(makePathToGeneratedFile(filePath).string(), std::ios::out | std::ios::trunc);
-	generatedFile << "#pragma once" << std::endl << std::endl;
+	
+	//Header
+	writeHeader(generatedFile, filePath, parsingResult);
 
-	//TODO: Write header
-
+	//Actual file content (per entity)
 	for (StructClassInfo structOrClassInfo : parsingResult.classes)
 	{
 		writeEntityToFile(structOrClassInfo, filePath, &generatedFile, genResult, true);
@@ -46,7 +47,8 @@ void FileGenerator::generateEntityFile(FileGenerationResult& genResult, fs::path
 		writeEntityToFile(enumInfo, filePath, &generatedFile, genResult, false);
 	}
 
-	//TODO: Write footer
+	//Footer
+	writeFooter(generatedFile, filePath, parsingResult);
 
 	generatedFile.close();
 }
@@ -138,6 +140,22 @@ bool FileGenerator::shouldRegenerateFile(fs::path const& filePath) const noexcep
 fs::path FileGenerator::makePathToGeneratedFile(fs::path const& sourceFilePath) const noexcept
 {
 	return (pathToGeneratedFilesFolder / sourceFilePath.filename()).replace_extension(generatedFilesExtension);
+}
+
+void FileGenerator::writeHeader(std::ofstream& stream, fs::path const& filePath, ParsingResult const& parsingResult) const noexcept
+{
+	stream << "#pragma once" << std::endl << std::endl;
+
+	stream << "/**" << std::endl;
+	stream << "*	This is the generated file header" << std::endl;
+	stream << "*/" << std::endl << std::endl;
+}
+
+void FileGenerator::writeFooter(std::ofstream& stream, fs::path const& filePath, ParsingResult const& parsingResult) const noexcept
+{
+	stream << std::endl << "/**" << std::endl;
+	stream << "*	This is the generated file footer" << std::endl;
+	stream << "*/" << std::endl;
 }
 
 bool FileGenerator::addFile(fs::path filePath) noexcept

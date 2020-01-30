@@ -29,6 +29,23 @@ namespace refureku
 			bool					shouldRegenerateFile(fs::path const& filePath)																														const	noexcept;
 			fs::path				makePathToGeneratedFile(fs::path const& sourceFilePath)																												const	noexcept;
 
+		protected:
+			/**
+			*	@brief Write a header for any generated file
+			*
+			*	@param filePath Path to the parsed file
+			*	@param parsingResult Structure containing info about the parsed file
+			*/
+			virtual void	writeHeader(std::ofstream& stream, fs::path const& filePath, ParsingResult const& parsingResult)	const	noexcept;
+
+			/**
+			*	@brief Write a footer for any generated file
+			*
+			*	@param filePath Path to the parsed file
+			*	@param parsingResult Structure containing info about the parsed file
+			*/
+			virtual void	writeFooter(std::ofstream& stream, fs::path const& filePath, ParsingResult const& parsingResult)	const	noexcept;
+
 		public:
 			/**
 			*	@brief Main (complex) property name used to specify code generator in source code
