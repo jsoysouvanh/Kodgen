@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <vector>
 
 #include "Misc/FundamentalTypes.h"
 
@@ -23,9 +24,10 @@ namespace refureku
 				bool Final			: 1;
 				bool Const			: 1;
 
-			}			qualifiers;
+			}						qualifiers;
 
-			TypeInfo	returnType;
+			TypeInfo				returnType;
+			std::vector<TypeInfo>	parameters;
 
 			MethodInfo()														= default;
 			MethodInfo(std::string&& entityName, PropertyGroup&& propertyGroup)	noexcept;

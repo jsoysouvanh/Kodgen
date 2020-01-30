@@ -8,20 +8,43 @@ namespace refureku
 	{
 		virtual void generateCode(GeneratedFile& generatedFile, EntityInfo const& entityInfo) noexcept override
 		{
-			switch (entityInfo.type)
+			switch (entityInfo.entityType)
 			{
 				case EntityInfo::EType::Class:
-					generatedFile.writeLine(	"#define _RFRK_GENERATED_CLASS_" + entityInfo.name + " //TODO something");
+					generatedFile.writeLines(	"#define _RFRK_GENERATED_CLASS_" + entityInfo.name + " //TODO something",
+												"",
+												"/**");
 
-					generatedFile.writeLine("/**");
+					generatedFile.writeLine("Fields");
+					for (std::pair<EAccessSpecifier, std::vector<FieldInfo>> const fieldIt : static_cast<StructClassInfo const&>(entityInfo).fields)
+					{
+						generatedFile.writeLine(toString(fieldIt.first));
 
+						for (FieldInfo const& field : fieldIt.second)
+						{
+							generatedFile.writeLine(field.type.pureName + " -> " + field.type.canonicalPureName + " " + field.name);
+						}
+					}
+
+					generatedFile.writeLine("Methods");
 					for (std::pair<EAccessSpecifier, std::vector<MethodInfo>> const methodIt : static_cast<StructClassInfo const&>(entityInfo).methods)
 					{
 						generatedFile.writeLine(toString(methodIt.first));
 
 						for (MethodInfo const& method : methodIt.second)
 						{
-							generatedFile.writeLine(method.returnType.fullName + " " + method.name);
+							std::string methodAsString;
+
+							methodAsString += method.name + "(";
+
+							for (TypeInfo typeInfo : method.parameters)
+							{
+								methodAsString += typeInfo.pureName + " -> " + typeInfo.canonicalPureName + ", ";
+							}
+
+							methodAsString += ")";
+
+							generatedFile.writeLine(methodAsString);
 						}
 					}
 
@@ -37,23 +60,22 @@ namespace refureku
 					
 					EnumInfo const& enumInfo = static_cast<EnumInfo const&>(entityInfo);
 
-					generatedFile.writeLine(	"#define _RFRK_GENERATED_ENUM_" + entityInfo.name + " //TODO something");
-
-					generatedFile.writeLine("/*");
-
-					generatedFile.writeLine("enum class " + enumInfo.name + "Reflect : " + enumInfo.underlyingType);
-					generatedFile.writeLine("{");
+					generatedFile.writeLines(	"#define _RFRK_GENERATED_ENUM_" + entityInfo.name + " //TODO something",
+												"/*",
+												"enum class " + enumInfo.name + "Reflect : " + enumInfo.underlyingType,
+												"{");
 
 					for (EnumValueInfo const& evi : enumInfo.enumValues)
 					{
 						generatedFile.writeLine("\t" + evi.name + " = " + std::to_string(evi.defaultValue) + ",");
 					}
 
-					generatedFile.writeLine("};");
-
-					generatedFile.writeLines("this", "is", "a", "test");
-
-					generatedFile.writeLine("*/");
+					generatedFile.writeLines(	"};",
+												"this",
+												"is",
+												"a",
+												"test",
+												"*/");
 
 					generatedFile.writeMacro(	"SOME_MACRO(...)",
 												"here",

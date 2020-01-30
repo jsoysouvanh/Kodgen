@@ -30,7 +30,7 @@ CXChildVisitResult MethodParser::parse(CXCursor cursor, ParsingInfo& parsingInfo
 			break;
 
 		case CXCursorKind::CXCursor_ParmDecl:
-			//TODO: handle parameters here
+			parsingInfo.currentStructOrClass->methods.at(parsingInfo.accessSpecifier).back().parameters.emplace_back(TypeInfo(clang_getCursorType(cursor)));
 			break;
 
 		default:
@@ -79,7 +79,7 @@ void MethodParser::setupMethod(CXCursor const& methodCursor, MethodInfo& methodI
 	assert(methodType.kind == CXTypeKind::CXType_FunctionProto);
 
 	//Define return type
-	methodInfo.returnType =	TypeInfo(clang_getCanonicalType(clang_getResultType(methodType)));
+	methodInfo.returnType =	TypeInfo(clang_getResultType(methodType));
 
 	//Define method qualifiers
 	if (clang_CXXMethod_isDefaulted(methodCursor))

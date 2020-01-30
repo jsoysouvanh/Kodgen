@@ -28,7 +28,7 @@ void StructClassInfo::initContainers() noexcept
 
 std::ostream& refureku::operator<<(std::ostream& out_stream, StructClassInfo const& structClassInfo) noexcept
 {
-	out_stream << (structClassInfo.type == EntityInfo::EType::Class ? "Class: " : "Struct: ") << structClassInfo.name;
+	out_stream << (structClassInfo.entityType == EntityInfo::EType::Class ? "Class: " : "Struct: ") << structClassInfo.name;
 
 	//Properties
 	out_stream << " " << structClassInfo.properties << std::endl;

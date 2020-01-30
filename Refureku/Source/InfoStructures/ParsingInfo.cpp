@@ -13,7 +13,7 @@ bool ParsingInfo::flushCurrentStructOrClass() noexcept
 {
 	if (currentStructOrClass.has_value())
 	{
-		switch (currentStructOrClass->type)
+		switch (currentStructOrClass->entityType)
 		{
 			case EntityInfo::EType::Class:
 				parsingResult.classes.emplace_back(std::move(currentStructOrClass.value()));

@@ -22,7 +22,7 @@ CXChildVisitResult FieldParser::addToCurrentClassIfValid(CXCursor fieldAnnotatio
 		if (parsingInfo.currentStructOrClass.has_value())
 		{
 			FieldInfo& field = parsingInfo.currentStructOrClass->fields.at(parsingInfo.accessSpecifier).emplace_back(FieldInfo(Helpers::getString(clang_getCursorDisplayName(_currentCursor)), std::move(*propertyGroup)));
-			field.type = TypeInfo(clang_getCanonicalType(clang_getCursorType(_currentCursor)));
+			field.type = TypeInfo(clang_getCursorType(_currentCursor));
 
 			return CXChildVisitResult::CXChildVisit_Recurse;
 		}

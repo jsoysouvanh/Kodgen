@@ -30,7 +30,7 @@ namespace refureku
 				Count
 			};
 
-			EType			type		= EType::Count;
+			EType			entityType	= EType::Count;
 			std::string		name		= "";
 			PropertyGroup	properties;
 
