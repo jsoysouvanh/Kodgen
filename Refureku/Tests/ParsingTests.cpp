@@ -81,9 +81,5 @@ void setupParser(refureku::Parser& parser)
 
 int main()
 {
-	std::cout << fs::current_path().string() << std::endl;
-
-	//TODO
-
 	return EXIT_SUCCESS;
 }

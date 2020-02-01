@@ -14,9 +14,9 @@ else()	# Clang or GCC
 	add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-set(TargetLibraryName Refureku_${CMAKE_CXX_COMPILER_ARCHITECTURE_ID}_${CMAKE_BUILD_TYPE})
+set(RefurekuTargetLibrary Refureku_${CMAKE_CXX_COMPILER_ARCHITECTURE_ID}_${CMAKE_BUILD_TYPE})
 
-add_library(${TargetLibraryName}
+add_library(${RefurekuTargetLibrary}
 				STATIC
 					Source/Properties/SimplePropertyRule.cpp
 					Source/Properties/ComplexPropertyRule.cpp
@@ -53,10 +53,10 @@ add_library(${TargetLibraryName}
 			)
 
 # Setup compilation options
-target_compile_options(${TargetLibraryName} PUBLIC $<$<CXX_COMPILER_ID:Clang>:-stdlib=libc++>)
+target_compile_options(${RefurekuTargetLibrary} PUBLIC $<$<CXX_COMPILER_ID:Clang>:-stdlib=libc++>)
 
 # Setup language requirements
-set_target_properties(${TargetLibraryName}
+set_target_properties(${RefurekuTargetLibrary}
 						PROPERTIES
 							CXX_STANDARD 17
 							CXX_STANDARD_REQUIRED ON
@@ -64,19 +64,19 @@ set_target_properties(${TargetLibraryName}
 						)
 
 # Setup include directories
-target_include_directories(${TargetLibraryName}
+target_include_directories(${RefurekuTargetLibrary}
 							PUBLIC
 								Include
 								Libraries/Include)
 
 # Setup link directories
-target_link_directories(${TargetLibraryName} PUBLIC Libraries/x64/Static)
+target_link_directories(${RefurekuTargetLibrary} PUBLIC Libraries/x64/Static)
 
 # Link to required libraries (mostly libclang dependencies)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-target_link_libraries(${TargetLibraryName}
+target_link_libraries(${RefurekuTargetLibrary}
 						INTERFACE
 							$<$<CXX_COMPILER_ID:Clang>:c++>
 							$<$<CXX_COMPILER_ID:Clang>:c++abi>
@@ -249,3 +249,4 @@ target_link_libraries(${TargetLibraryName}
 )
 
 add_subdirectory(Tests)
+add_subdirectory(Examples)

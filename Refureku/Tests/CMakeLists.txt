@@ -1,25 +1,29 @@
 cmake_minimum_required(VERSION 3.13.5)
 
-set(PropertyRulesTestsTargetName Refureku_${CMAKE_CXX_COMPILER_ARCHITECTURE_ID}_${CMAKE_BUILD_TYPE}_PropertyRulesTests)
-set(ParsingTestsTargetName Refureku_${CMAKE_CXX_COMPILER_ARCHITECTURE_ID}_${CMAKE_BUILD_TYPE}_ParsingTests)
-set(FileGeneratorTestsTargetName Refureku_${CMAKE_CXX_COMPILER_ARCHITECTURE_ID}_${CMAKE_BUILD_TYPE}_FileGeneratorTests)
+set(PropertyRulesTestsTarget Refureku_${CMAKE_CXX_COMPILER_ARCHITECTURE_ID}_${CMAKE_BUILD_TYPE}_PropertyRulesTests)
+set(ParsingTestsTarget Refureku_${CMAKE_CXX_COMPILER_ARCHITECTURE_ID}_${CMAKE_BUILD_TYPE}_ParsingTests)
+set(FileGeneratorTestsTarget Refureku_${CMAKE_CXX_COMPILER_ARCHITECTURE_ID}_${CMAKE_BUILD_TYPE}_FileGeneratorTests)
 
-add_executable(${PropertyRulesTestsTargetName} PropertyRulesTests.cpp)
-add_executable(${ParsingTestsTargetName} ParsingTests.cpp)
-add_executable(${FileGeneratorTestsTargetName} FileGeneratorTests.cpp)
+add_executable(${PropertyRulesTestsTarget} PropertyRulesTests.cpp)
+add_executable(${ParsingTestsTarget} ParsingTests.cpp)
+add_executable(${FileGeneratorTestsTarget} FileGeneratorTests.cpp)
 
 # Setup language requirements
-set_target_properties(${PropertyRulesTestsTargetName} ${ParsingTestsTargetName} ${FileGeneratorTestsTargetName}
+set_target_properties(${PropertyRulesTestsTarget} ${ParsingTestsTarget} ${FileGeneratorTestsTarget}
 						PROPERTIES
 						CXX_STANDARD 17
 						CXX_STANDARD_REQUIRED ON
 						CXX_EXTENSIONS OFF)
 
 # Link to Refureku library to test it
-target_link_libraries(${PropertyRulesTestsTargetName} PRIVATE ${TargetLibraryName})
-target_link_libraries(${ParsingTestsTargetName} PRIVATE ${TargetLibraryName})
-target_link_libraries(${FileGeneratorTestsTargetName} PRIVATE ${TargetLibraryName})
+target_link_libraries(${PropertyRulesTestsTarget} PRIVATE ${RefurekuTargetLibrary})
+target_link_libraries(${ParsingTestsTarget} PRIVATE ${RefurekuTargetLibrary})
+target_link_libraries(${FileGeneratorTestsTarget} PRIVATE ${RefurekuTargetLibrary})
 
-add_test(NAME ${PropertyRulesTestsTargetName} COMMAND ${PropertyRulesTestsTargetName})
-add_test(NAME ${ParsingTestsTargetName} COMMAND ${ParsingTestsTargetName})
-add_test(NAME ${FileGeneratorTestsTargetName} COMMAND ${FileGeneratorTestsTargetName})
+add_dependencies(${PropertyRulesTestsTarget} ${RefurekuTargetLibrary})
+add_dependencies(${ParsingTestsTarget} ${RefurekuTargetLibrary})
+add_dependencies(${FileGeneratorTestsTarget} ${RefurekuTargetLibrary})
+
+add_test(NAME ${PropertyRulesTestsTarget} COMMAND ${PropertyRulesTestsTarget})
+add_test(NAME ${ParsingTestsTarget} COMMAND ${ParsingTestsTarget})
+add_test(NAME ${FileGeneratorTestsTarget} COMMAND ${FileGeneratorTestsTarget})
