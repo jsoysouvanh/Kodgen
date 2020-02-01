@@ -29,6 +29,8 @@ CXChildVisitResult ClassParser::parse(CXCursor currentCursor, ParsingInfo& parsi
 			updateAccessSpecifier(currentCursor, parsingInfo);
 			break;
 
+		case CXCursorKind::CXCursor_VarDecl:
+			[[fallthrough]];
 		case CXCursorKind::CXCursor_FieldDecl:
 			_fieldParser.startParsing(currentCursor);
 			break;

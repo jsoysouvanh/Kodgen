@@ -3,7 +3,8 @@
 using namespace refureku;
 
 FieldInfo::FieldInfo(std::string&& entityName, PropertyGroup&& propertyGroup) noexcept:
-	EntityInfo(std::forward<std::string>(entityName), std::forward<PropertyGroup>(propertyGroup), EType::Field)
+	EntityInfo(std::forward<std::string>(entityName), std::forward<PropertyGroup>(propertyGroup), EType::Field),
+	qualifiers{false}
 {
 }
 

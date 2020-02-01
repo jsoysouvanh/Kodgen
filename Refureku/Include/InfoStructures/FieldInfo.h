@@ -8,7 +8,13 @@ namespace refureku
 	class FieldInfo : public EntityInfo
 	{
 		public:
-			TypeInfo type;
+			struct FieldQualifier
+			{
+				bool Static			: 1;
+
+			}			qualifiers;
+
+			TypeInfo	type;
 
 			FieldInfo()															= default;
 			FieldInfo(std::string&& entityName, PropertyGroup&& propertyGroup)	noexcept;
