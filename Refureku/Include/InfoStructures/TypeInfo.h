@@ -15,6 +15,7 @@ namespace refureku
 			static constexpr char const*	_structQualifier	= "struct ";
 			static constexpr char const*	_constQualifier		= "const";
 			static constexpr char const*	_volatileQualifier	= "volatile";
+			static constexpr char const*	_restrictQualifier	= "restrict";
 
 			/**
 			*	The full name represents the type name, containing all its qualifiers
@@ -39,6 +40,7 @@ namespace refureku
 			void removeNamespacesAndNestedClasses(std::string& typeString)		const	noexcept;
 			bool removeConstQualifier(std::string& typeString)					const	noexcept;
 			bool removeVolatileQualifier(std::string& typeString)				const	noexcept;
+			bool removeRestrictQualifier(std::string& typeString)				const	noexcept;
 
 		public:
 			enum class EPointerType : uint8

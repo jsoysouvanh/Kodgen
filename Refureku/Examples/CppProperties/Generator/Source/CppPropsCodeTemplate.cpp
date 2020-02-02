@@ -146,8 +146,6 @@ std::string CppPropsCodeTemplate::generateSetter(refureku::FieldInfo const& fiel
 
 	methodName += ")";
 
-	std::cout << methodName << std::endl;
-
 	if (fieldInfo.qualifiers.isStatic)
 	{
 		preTypeQualifiers = "static";

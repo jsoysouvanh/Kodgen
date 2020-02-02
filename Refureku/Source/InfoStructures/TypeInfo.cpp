@@ -165,6 +165,23 @@ bool TypeInfo::removeVolatileQualifier(std::string& typeString) const noexcept
 	return false;
 }
 
+bool TypeInfo::removeRestrictQualifier(std::string& typeString) const noexcept
+{
+	if (qualifiers.isRestricted)
+	{
+		size_t charIndex = typeString.rfind(_restrictQualifier);
+
+		if (charIndex != typeString.npos)
+		{
+			typeString.erase(charIndex, 8);
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
 std::string TypeInfo::getName(bool removeQualifiers, bool shouldRemoveNamespacesAndNestedClasses) const noexcept
 {
 	std::string result = fullName;
@@ -173,6 +190,7 @@ std::string TypeInfo::getName(bool removeQualifiers, bool shouldRemoveNamespaces
 	{
 		removeConstQualifier(result);
 		removeVolatileQualifier(result);
+		removeRestrictQualifier(result);
 	}
 
 	if (shouldRemoveNamespacesAndNestedClasses)
@@ -191,6 +209,7 @@ std::string TypeInfo::getCanonicalName(bool removeQualifiers, bool shouldRemoveN
 	{
 		removeConstQualifier(result);
 		removeVolatileQualifier(result);
+		removeRestrictQualifier(result);
 	}
 
 	if (shouldRemoveNamespacesAndNestedClasses)
