@@ -41,4 +41,6 @@ void CppPropsParser::postParse(fs::path const& parseFile, refureku::ParsingResul
 	}
 
 	std::cout << "Found " << result.classes.size() << " classes and " << result.enums.size() << " enums." << std::endl;
+
+	static_cast<void>(parseFile);
 }

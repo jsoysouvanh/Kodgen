@@ -10,10 +10,15 @@ void CppPropsCodeTemplate::generateCode(refureku::GeneratedFile& generatedFile, 
 	static std::string GetterPropName = "Get";
 	static std::string SetterPropName = "Set";
 
-	generatedFile.writeMacro(entityInfo.name + "_GENERATED", "DEFINE_GETTERS_AND_SETTERS");
+	std::string mainMacroName = entityInfo.name + "_GENERATED";
 
-	generatedFile.writeLine("#define DEFINE_GETTERS_AND_SETTERS		\\");
-	generatedFile.writeLine("public:	\\");
+	undefMacros(generatedFile, mainMacroName);
+
+	//Main macro
+	generatedFile.writeMacro(std::move(mainMacroName), "DEFINE_GETTERS_AND_SETTERS");
+
+	//Getters and setters macro
+	generatedFile.writeLines("#define DEFINE_GETTERS_AND_SETTERS		\\", "public:	\\");
 
 	refureku::StructClassInfo const& classInfo = static_cast<refureku::StructClassInfo const&>(entityInfo);
 
@@ -40,6 +45,12 @@ void CppPropsCodeTemplate::generateCode(refureku::GeneratedFile& generatedFile, 
 	generatedFile.writeLine("private:");
 }
 
+void CppPropsCodeTemplate::undefMacros(refureku::GeneratedFile& generatedFile, std::string const& generatedMacroName) const noexcept
+{
+	generatedFile.writeLines("#ifdef " + generatedMacroName, "\t#undef " + generatedMacroName, "#endif");
+	generatedFile.writeLines("#ifdef DEFINE_GETTERS_AND_SETTERS", "\t#undef DEFINE_GETTERS_AND_SETTERS", "#endif\n");
+}
+
 std::string CppPropsCodeTemplate::generateGetter(refureku::FieldInfo const& fieldInfo, refureku::ComplexProperty const& complexProp) const noexcept
 {
 	std::string postQualifiers;
@@ -49,6 +60,8 @@ std::string CppPropsCodeTemplate::generateGetter(refureku::FieldInfo const& fiel
 	bool		isRef				= false;
 	bool		isPtr				= false;
 	bool		isExplicit			= false;
+
+	std::cout << "Generate getter: " << fieldInfo.type.getName() << "	" << fieldInfo.name << std::endl;
 
 	for (std::string const& subprop : complexProp.subProperties)
 	{
@@ -77,7 +90,7 @@ std::string CppPropsCodeTemplate::generateGetter(refureku::FieldInfo const& fiel
 		
 	//Upper case the first field info char if applicable
 	std::string methodName = fieldInfo.name;
-	methodName.replace(0, 1, 1, std::toupper(methodName.at(0)));
+	methodName.replace(0, 1, 1, static_cast<char>(std::toupper(methodName.at(0))));
 	methodName.insert(0, "get");
 	methodName += "()";
 
@@ -130,13 +143,13 @@ std::string CppPropsCodeTemplate::generateSetter(refureku::FieldInfo const& fiel
 	bool		isExplicit		= false;
 
 	if (!complexProp.subProperties.empty())	//explicit is the only supported subprop, so if it is not empty is must be explicit
-			isExplicit = true;
+		isExplicit = true;
 
 	std::string preTypeQualifiers;
 
 	//Upper case the first field info char if applicable
 	std::string methodName = fieldInfo.name;
-	methodName.replace(0, 1, 1, std::toupper(methodName.at(0)));
+	methodName.replace(0, 1, 1, static_cast<char>(std::toupper(methodName.at(0))));
 	methodName.insert(0, "set");
 	methodName += "(";
 

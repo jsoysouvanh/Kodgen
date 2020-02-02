@@ -141,11 +141,20 @@ fs::path FileGenerator::makePathToGeneratedFile(fs::path const& sourceFilePath) 
 void FileGenerator::writeHeader(GeneratedFile& file, ParsingResult const& parsingResult) const noexcept
 {
 	file.writeLine("#pragma once\n");
+
+	file.writeLines("/**", "*	Source file: " + file.getSourceFile().string(), "*/\n");
+
+	//Fake use to remove warnings
+	static_cast<void>(parsingResult);
 }
 
 void FileGenerator::writeFooter(GeneratedFile& file, ParsingResult const& parsingResult) const noexcept
 {
 	//Default implementation has no footer
+
+	//Fake use to remove warnings
+	static_cast<void>(file);
+	static_cast<void>(parsingResult);
 }
 
 bool FileGenerator::addFile(fs::path filePath) noexcept

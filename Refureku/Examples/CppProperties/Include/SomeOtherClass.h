@@ -13,7 +13,7 @@ namespace SomeNamespace
 	{
 		private:
 			RfrkField(Get[const, &])
-			std::vector<SomeClass*>		_someClasses;
+			std::vector<SomeClass*>		_someVectorOfClasses;
 
 			RfrkField(Get[const, &], Get[&])
 			int							_int;

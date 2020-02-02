@@ -144,6 +144,9 @@ void Parser::preParse(fs::path const& parseFile) noexcept
 	/**
 	*	Default implementation does nothing special
 	*/
+
+	//Fake use to remove warning
+	static_cast<void>(parseFile);
 }
 
 void Parser::postParse(fs::path const& parseFile, ParsingResult const& result) noexcept
@@ -151,6 +154,10 @@ void Parser::postParse(fs::path const& parseFile, ParsingResult const& result) n
 	/**
 	*	Default implementation does nothing special
 	*/
+
+	//Fake use to remove warning
+	static_cast<void>(parseFile);
+	static_cast<void>(result);
 }
 
 void Parser::reset() noexcept

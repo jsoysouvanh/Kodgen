@@ -11,7 +11,8 @@ void EntityParser::startParsing(CXCursor const& currentCursor) noexcept
 
 void EntityParser::endParsing(ParsingInfo& parsingInfo) noexcept
 {
-	parsingInfo;	//Fake use to remove warning
+	//Fake use to remove warning
+	static_cast<void>(parsingInfo);
 
 	_parsingLevel--;
 	_currentCursor			= clang_getNullCursor();

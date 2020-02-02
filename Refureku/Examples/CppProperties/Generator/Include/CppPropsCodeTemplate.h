@@ -9,6 +9,8 @@ class CppPropsCodeTemplate : public refureku::GeneratedCodeTemplate
 		std::string generateGetter(refureku::FieldInfo const& fieldInfo, refureku::ComplexProperty const& complexProp)	const	noexcept;
 		std::string generateSetter(refureku::FieldInfo const& fieldInfo, refureku::ComplexProperty const& complexProp)	const	noexcept;
 
+		void		undefMacros(refureku::GeneratedFile& generatedFile, std::string const& generatedMacroName)			const	noexcept;
+
 	protected:
 		virtual void generateCode(refureku::GeneratedFile& generatedFile, refureku::EntityInfo const& entityInfo) const noexcept override;
 };
