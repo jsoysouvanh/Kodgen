@@ -24,7 +24,7 @@ int main(int argc, char** argv)
 			refureku::FileGenerator fileGenerator;
 
 			//Parse WorkingDir/Include/SomeClass.h
-			fileGenerator.addFile(includeDirectory / "SomeClass.h");
+			//fileGenerator.addFile(includeDirectory / "SomeClass.h");
 			fileGenerator.addFile(includeDirectory / "SomeOtherClass.h");
 
 			//All generated files will be located in WorkingDir/Include/Generated

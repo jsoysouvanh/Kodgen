@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <string>
 #include <type_traits>
+#include <vector>
 
 #include "Misc/Filesystem.h"
 #include "CodeGen/GeneratedCodeTemplate.h"

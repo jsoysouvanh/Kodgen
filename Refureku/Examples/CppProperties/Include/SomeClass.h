@@ -4,7 +4,7 @@
 
 #include "RefurekuConfig.h"
 
-#include "Generated/SomeClass.myCustomExtension.h"
+//#include "Generated/SomeClass.myCustomExtension.h"
 
 namespace SomeNamespace
 {
@@ -35,6 +35,6 @@ namespace SomeNamespace
 		public:
 			SomeClass() = default;
 
-		SomeClass_GENERATED
+//		SomeClass_GENERATED
 	};
 }
