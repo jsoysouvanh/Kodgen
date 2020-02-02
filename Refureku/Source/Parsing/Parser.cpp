@@ -104,6 +104,8 @@ bool Parser::parse(fs::path const& parseFile, ParsingResult& out_result) noexcep
 
 	setupForParsing();
 
+	preParse(parseFile);
+
 	if (fs::exists(parseFile) && !fs::is_directory(parseFile))
 	{
 		//Parse the given file
@@ -140,7 +142,23 @@ bool Parser::parse(fs::path const& parseFile, ParsingResult& out_result) noexcep
 
 	out_result = std::move(_parsingInfo.parsingResult);
 
+	postParse(parseFile, out_result);
+
 	return isSuccess;
+}
+
+void Parser::preParse(fs::path const& parseFile) noexcept
+{
+	/**
+	*	Default implementation does nothing special
+	*/
+}
+
+void Parser::postParse(fs::path const& parseFile, ParsingResult const& result) noexcept
+{
+	/**
+	*	Default implementation does nothing special
+	*/
 }
 
 void Parser::clear() noexcept

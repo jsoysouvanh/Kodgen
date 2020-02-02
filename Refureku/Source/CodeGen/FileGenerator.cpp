@@ -6,7 +6,6 @@ using namespace refureku;
 
 FileGenerator::FileGenerator() noexcept
 {
-
 }
 
 FileGenerator::~FileGenerator() noexcept

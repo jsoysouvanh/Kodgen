@@ -33,6 +33,23 @@ namespace refureku
 
 			CXChildVisitResult			parseDefault(CXCursor currentCursor)										noexcept;
 
+		protected:
+			/**
+			*	@brief Overridable method called just before starting the parsing process of a file
+			*
+			*	@param parseFile Path to the file which is about to be parsed
+			*/
+			virtual void preParse(fs::path const& parseFile)								noexcept;
+
+			/**
+			*	@brief Overridable method called just after the parsing process has been finished
+			*	@brief Even if the parsing process ended prematurely, this method is called
+			*
+			*	@param parseFile Path to the file which has been parsed
+			*	@param result Result of the parsing
+			*/
+			virtual void postParse(fs::path const& parseFile, ParsingResult const& result)	noexcept;
+
 		public:
 			ParsingSettings	parsingSettings;
 

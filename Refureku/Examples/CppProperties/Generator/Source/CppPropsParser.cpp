@@ -25,3 +25,18 @@ CppPropsParser::CppPropsParser() noexcept:
 	fieldPropertyRules.addComplexPropertyRule("Get", "&|\\*|const|explicit");
 	fieldPropertyRules.addComplexPropertyRule("Set", "explicit");
 }
+
+void CppPropsParser::preParse(fs::path const& parseFile) noexcept
+{
+	std::cout << "Start parsing: " << parseFile.string() << std::endl;
+}
+
+void CppPropsParser::postParse(fs::path const& parseFile, refureku::ParsingResult const& result) noexcept
+{
+	for (refureku::ParsingError const& parsingError : result.parsingErrors)
+	{
+		std::cout << parsingError << std::endl;
+	}
+
+	std::cout << "Found " << result.classes.size() << " classes and " << result.enums.size() << " enums." << std::endl;
+}
