@@ -36,6 +36,7 @@ add_library(${RefurekuTargetLibrary}
 	
 					Source/Parsing/EParsingError.cpp
 					Source/Parsing/ParsingError.cpp
+					Source/Parsing/EntityParser.cpp
 					Source/Parsing/ClassParser.cpp
 					Source/Parsing/FieldParser.cpp
 					Source/Parsing/MethodParser.cpp

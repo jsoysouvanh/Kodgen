@@ -5,21 +5,18 @@
 #include "Misc/FundamentalTypes.h"
 #include "InfoStructures/ParsingInfo.h"
 #include "Parsing/EnumValueParser.h"
+#include "Parsing/EntityParser.h"
 
 namespace refureku
 {
-	class EnumParser
+	class EnumParser final : public EntityParser
 	{
 		private:
-			bool			_shouldCheckValidity	= false;
-			bool			_isCurrentlyParsing		= false;
-			CXCursor		_currentCursor			= clang_getNullCursor();
-
 			EnumValueParser	_enumValueParser;
 
-			opt::optional<PropertyGroup>	isEnumValid(CXCursor currentCursor, ParsingInfo& parsingInfo)						noexcept;
-			CXChildVisitResult				setAsCurrentEnumIfValid(CXCursor classAnnotationCursor, ParsingInfo& parsingInfo)	noexcept;
-			void							endParsing(ParsingInfo& parsingInfo)												noexcept;
+			virtual opt::optional<PropertyGroup>	isEntityValid(CXCursor const& currentCursor, ParsingInfo& parsingInfo)						noexcept override final;
+			virtual CXChildVisitResult				setAsCurrentEntityIfValid(CXCursor const& classAnnotationCursor, ParsingInfo& parsingInfo)	noexcept override final;
+			virtual void							endParsing(ParsingInfo& parsingInfo)														noexcept override final;
 
 		public:
 			EnumParser()					= default;
@@ -27,11 +24,10 @@ namespace refureku
 			EnumParser(EnumParser&&)		= default;
 			~EnumParser()					= default;
 
-			CXChildVisitResult	parse(CXCursor currentCursor, ParsingInfo& parsingInfo)					noexcept;
-			void				startParsing(CXCursor currentCursor)									noexcept;
+			virtual CXChildVisitResult	parse(CXCursor const& currentCursor, ParsingInfo& parsingInfo)			noexcept override final;
+			virtual void				updateParsingState(CXCursor const& parent, ParsingInfo& parsingInfo)	noexcept override final;
+			virtual void				reset()																	noexcept override final;
 
-			void				updateParsingState(CXCursor parent, ParsingInfo& parsingInfo)			noexcept;
-			
-			bool				isCurrentlyParsing()											const	noexcept;
+			using EntityParser::startParsing;
 	};
 }

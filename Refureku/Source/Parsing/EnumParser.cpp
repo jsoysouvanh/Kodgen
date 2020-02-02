@@ -4,9 +4,16 @@
 
 using namespace refureku;
 
-CXChildVisitResult EnumParser::parse(CXCursor currentCursor, ParsingInfo& parsingInfo) noexcept
+void EnumParser::reset() noexcept
 {
-	if (_enumValueParser.isCurrentlyParsing())
+	EntityParser::reset();
+
+	_enumValueParser.reset();
+}
+
+CXChildVisitResult EnumParser::parse(CXCursor const& currentCursor, ParsingInfo& parsingInfo) noexcept
+{
+	if (_enumValueParser.getParsingLevel())
 	{
 		_enumValueParser.parse(currentCursor, parsingInfo);
 	}
@@ -14,7 +21,7 @@ CXChildVisitResult EnumParser::parse(CXCursor currentCursor, ParsingInfo& parsin
 	{
 		_shouldCheckValidity = false;
 
-		return setAsCurrentEnumIfValid(currentCursor, parsingInfo);
+		return setAsCurrentEntityIfValid(currentCursor, parsingInfo);
 	}
 
 	switch (clang_getCursorKind(currentCursor))
@@ -30,43 +37,29 @@ CXChildVisitResult EnumParser::parse(CXCursor currentCursor, ParsingInfo& parsin
 	return CXChildVisitResult::CXChildVisit_Recurse;
 }
 
-void EnumParser::updateParsingState(CXCursor parent, ParsingInfo& parsingInfo) noexcept
+void EnumParser::updateParsingState(CXCursor const& parent, ParsingInfo& parsingInfo) noexcept
 {
 	//Check if we finished parsing an enum value
-	if (_enumValueParser.isCurrentlyParsing())
+	if (_enumValueParser.getParsingLevel())
 	{
 		_enumValueParser.updateParsingState(parent, parsingInfo);
 	}
 
 	//Check if we finished parsing the enum
-	if (clang_equalCursors(clang_getCursorSemanticParent(_currentCursor), parent))
+	if (clang_equalCursors(clang_getCursorSemanticParent(getCurrentCursor()), parent))
 	{
 		endParsing(parsingInfo);
 	}
 }
 
-void EnumParser::startParsing(CXCursor currentCursor) noexcept
-{
-	_isCurrentlyParsing		= true;
-	_currentCursor			= currentCursor;
-	_shouldCheckValidity	= true;
-}
-
 void EnumParser::endParsing(ParsingInfo& parsingInfo) noexcept
 {
-	_isCurrentlyParsing		= false;
-	_currentCursor			= clang_getNullCursor();
-	_shouldCheckValidity	= false;
+	EntityParser::endParsing(parsingInfo);
 
 	parsingInfo.flushCurrentEnum();
 }
 
-bool EnumParser::isCurrentlyParsing() const noexcept
-{
-	return _isCurrentlyParsing;
-}
-
-opt::optional<PropertyGroup> EnumParser::isEnumValid(CXCursor currentCursor, ParsingInfo& parsingInfo) noexcept
+opt::optional<PropertyGroup> EnumParser::isEntityValid(CXCursor const& currentCursor, ParsingInfo& parsingInfo) noexcept
 {
 	parsingInfo.propertyParser.clean();
 
@@ -78,13 +71,13 @@ opt::optional<PropertyGroup> EnumParser::isEnumValid(CXCursor currentCursor, Par
 	return opt::nullopt;
 }
 
-CXChildVisitResult EnumParser::setAsCurrentEnumIfValid(CXCursor classAnnotationCursor, ParsingInfo& parsingInfo) noexcept
+CXChildVisitResult EnumParser::setAsCurrentEntityIfValid(CXCursor const& classAnnotationCursor, ParsingInfo& parsingInfo) noexcept
 {
-	if (opt::optional<PropertyGroup> propertyGroup = isEnumValid(classAnnotationCursor, parsingInfo))
+	if (opt::optional<PropertyGroup> propertyGroup = isEntityValid(classAnnotationCursor, parsingInfo))
 	{
-		EnumInfo& enumInfo = parsingInfo.currentEnum.emplace(EnumInfo(Helpers::getString(clang_getCursorDisplayName(_currentCursor)), std::move(*propertyGroup)));
+		EnumInfo& enumInfo = parsingInfo.currentEnum.emplace(EnumInfo(Helpers::getString(clang_getCursorDisplayName(getCurrentCursor())), std::move(*propertyGroup)));
 
-		CXType underlyingType				= clang_getEnumDeclIntegerType(_currentCursor);
+		CXType underlyingType				= clang_getEnumDeclIntegerType(getCurrentCursor());
 		enumInfo.underlyingType				= Helpers::getString(clang_getTypeSpelling(underlyingType));
 		enumInfo.canonicalUnderlyingType	= Helpers::getString(clang_getTypeSpelling(clang_getCanonicalType(underlyingType)));
 
@@ -101,7 +94,7 @@ CXChildVisitResult EnumParser::setAsCurrentEnumIfValid(CXCursor classAnnotationC
 		{
 			parsingInfo.parsingResult.parsingErrors.emplace_back(ParsingError(parsingInfo.propertyParser.getParsingError(), clang_getCursorLocation(classAnnotationCursor)));
 
-			return parsingInfo.parsingSettings->shouldAbortParsingOnFirstError ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
+			return parsingInfo.parsingSettings.shouldAbortParsingOnFirstError ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
 		}
 	}
 }

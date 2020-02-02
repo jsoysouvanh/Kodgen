@@ -17,14 +17,6 @@ Parser::~Parser() noexcept
 	clang_disposeIndex(_clangIndex);
 }
 
-void Parser::setupForParsing() noexcept
-{
-	clear();
-
-	_parsingInfo.propertyParser.setup(&parsingSettings.propertyParsingSettings);
-	_parsingInfo.parsingSettings = &parsingSettings;
-}
-
 CXChildVisitResult Parser::staticParseCursor(CXCursor c, CXCursor parent, CXClientData clientData) noexcept
 {
 	Parser*	parser = reinterpret_cast<Parser*>(clientData);
@@ -42,11 +34,11 @@ CXChildVisitResult Parser::staticParseCursor(CXCursor c, CXCursor parent, CXClie
 
 void Parser::updateParsingState(CXCursor parent) noexcept
 {
-	if (_classParser.isCurrentlyParsing())
+	if (_classParser.getParsingLevel())
 	{
 		_classParser.updateParsingState(parent, _parsingInfo);
 	}
-	else if (_enumParser.isCurrentlyParsing())
+	else if (_enumParser.getParsingLevel())
 	{
 		_enumParser.updateParsingState(parent, _parsingInfo);
 	}
@@ -54,15 +46,15 @@ void Parser::updateParsingState(CXCursor parent) noexcept
 
 CXChildVisitResult Parser::parseCursor(CXCursor currentCursor) noexcept
 {
-	if (_classParser.isCurrentlyParsing())	//Currently parsing a class of struct
+	if (_classParser.getParsingLevel())			//Currently parsing a class of struct
 	{
 		return _classParser.parse(currentCursor, _parsingInfo);
 	}
-	else if (_enumParser.isCurrentlyParsing())	//Currently parsing an enum
+	else if (_enumParser.getParsingLevel())		//Currently parsing an enum
 	{	
 		return _enumParser.parse(currentCursor, _parsingInfo);
 	}
-	else									//Looking for something to parse
+	else										//Looking for something to parse
 	{
 		return parseDefault(currentCursor);
 	}
@@ -102,7 +94,7 @@ bool Parser::parse(fs::path const& parseFile, ParsingResult& out_result) noexcep
 {
 	bool isSuccess = false;
 
-	setupForParsing();
+	reset();
 
 	preParse(parseFile);
 
@@ -161,9 +153,15 @@ void Parser::postParse(fs::path const& parseFile, ParsingResult const& result) n
 	*/
 }
 
-void Parser::clear() noexcept
+void Parser::reset() noexcept
 {
-	_parsingInfo.parsingResult.classes.clear();
-	_parsingInfo.parsingResult.enums.clear();
-	_parsingInfo.parsingResult.parsingErrors.clear();
+	_classParser.reset();
+	_enumParser.reset();
+
+	_parsingInfo.reset();
+}
+
+ParsingSettings& Parser::getParsingSettings() noexcept
+{
+	return _parsingInfo.parsingSettings;
 }

@@ -5,26 +5,26 @@
 #include "Misc/FundamentalTypes.h"
 #include "Misc/EAccessSpecifier.h"
 #include "InfoStructures/ParsingInfo.h"
+#include "Parsing/EntityParser.h"
 #include "Parsing/FieldParser.h"
 #include "Parsing/MethodParser.h"
 
 namespace refureku
 {
-	class ClassParser
+	class ClassParser final : public EntityParser
 	{
 		private:
-			bool					_shouldCheckValidity	= false;
-			uint8					_classLevel				= 0u;
-			CXCursor				_currentCursor			= clang_getNullCursor();
 			EntityInfo::EType		_structOrClass			= EntityInfo::EType::Count;
 
 			FieldParser				_fieldParser;
 			MethodParser			_methodParser;
 
-			opt::optional<PropertyGroup>	isStructOrClassValid(CXCursor currentCursor, ParsingInfo& parsingInfo)						noexcept;
-			CXChildVisitResult				setAsCurrentStructOrClassIfValid(CXCursor classAnnotationCursor, ParsingInfo& parsingInfo)	noexcept;
-			void							endParsing(ParsingInfo& parsingInfo)														noexcept;
-			void							updateAccessSpecifier(CXCursor cursor, ParsingInfo& parsingInfo)							noexcept;
+		protected:
+			virtual opt::optional<PropertyGroup>	isEntityValid(CXCursor const& currentCursor, ParsingInfo& parsingInfo)						noexcept override final;
+			virtual CXChildVisitResult				setAsCurrentEntityIfValid(CXCursor const& classAnnotationCursor, ParsingInfo& parsingInfo)	noexcept override final;
+			virtual void							endParsing(ParsingInfo& parsingInfo)														noexcept override final;
+			
+			void									updateAccessSpecifier(CXCursor const& cursor, ParsingInfo& parsingInfo)							noexcept;
 
 		public:
 			ClassParser()					= default;
@@ -32,12 +32,11 @@ namespace refureku
 			ClassParser(ClassParser&&)		= default;
 			~ClassParser()					= default;
 
-			CXChildVisitResult	parse(CXCursor currentCursor, ParsingInfo& parsingInfo)						noexcept;
-			void				startClassParsing(CXCursor currentCursor, ParsingInfo& parsingInfo)			noexcept;
-			void				startStructParsing(CXCursor currentCursor, ParsingInfo& parsingInfo)		noexcept;
+			virtual CXChildVisitResult	parse(CXCursor const& currentCursor, ParsingInfo& parsingInfo)							noexcept override final;
+			virtual void				updateParsingState(CXCursor const& parent, ParsingInfo& parsingInfo)					noexcept override final;
+			virtual void				reset()																					noexcept override final;
 
-			void				updateParsingState(CXCursor parent, ParsingInfo& parsingInfo)				noexcept;
-
-			bool				isCurrentlyParsing()												const	noexcept;
+			void						startClassParsing(CXCursor const& currentCursor, ParsingInfo& parsingInfo)				noexcept;
+			void						startStructParsing(CXCursor const& currentCursor, ParsingInfo& parsingInfo)				noexcept;
 	};
 }

@@ -6,12 +6,12 @@
 
 using namespace refureku;
 
-CXChildVisitResult MethodParser::parse(CXCursor cursor, ParsingInfo& parsingInfo) noexcept
+CXChildVisitResult MethodParser::parse(CXCursor const& cursor, ParsingInfo& parsingInfo) noexcept
 {
 	//Check for any annotation attribute if the flag is raised
 	if (_shouldCheckValidity)
 	{
-		return addToCurrentClassIfValid(cursor, parsingInfo);
+		return setAsCurrentEntityIfValid(cursor, parsingInfo);
 	}
 
 	if (!parsingInfo.currentStructOrClass.has_value())
@@ -41,14 +41,14 @@ CXChildVisitResult MethodParser::parse(CXCursor cursor, ParsingInfo& parsingInfo
 	return CXChildVisitResult::CXChildVisit_Recurse;
 }
 
-CXChildVisitResult MethodParser::addToCurrentClassIfValid(CXCursor const& methodAnnotationCursor, ParsingInfo& parsingInfo) noexcept
+CXChildVisitResult MethodParser::setAsCurrentEntityIfValid(CXCursor const& methodAnnotationCursor, ParsingInfo& parsingInfo) noexcept
 {
-	if (opt::optional<PropertyGroup> propertyGroup = isMethodValid(methodAnnotationCursor, parsingInfo))
+	if (opt::optional<PropertyGroup> propertyGroup = isEntityValid(methodAnnotationCursor, parsingInfo))
 	{
 		if (parsingInfo.currentStructOrClass.has_value())
 		{
-			MethodInfo& methodInfo = parsingInfo.currentStructOrClass->methods.at(parsingInfo.accessSpecifier).emplace_back(MethodInfo(Helpers::getString(clang_getCursorDisplayName(_currentCursor)), std::move(*propertyGroup)));
-			setupMethod(_currentCursor, methodInfo);
+			MethodInfo& methodInfo = parsingInfo.currentStructOrClass->methods.at(parsingInfo.accessSpecifier).emplace_back(MethodInfo(Helpers::getString(clang_getCursorDisplayName(getCurrentCursor())), std::move(*propertyGroup)));
+			setupMethod(getCurrentCursor(), methodInfo);
 
 			return CXChildVisitResult::CXChildVisit_Recurse;
 		}
@@ -67,7 +67,7 @@ CXChildVisitResult MethodParser::addToCurrentClassIfValid(CXCursor const& method
 		{
 			parsingInfo.parsingResult.parsingErrors.emplace_back(ParsingError(parsingInfo.propertyParser.getParsingError(), clang_getCursorLocation(methodAnnotationCursor)));
 
-			return parsingInfo.parsingSettings->shouldAbortParsingOnFirstError ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
+			return parsingInfo.parsingSettings.shouldAbortParsingOnFirstError ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
 		}
 	}
 }
@@ -108,7 +108,7 @@ void MethodParser::setupMethod(CXCursor const& methodCursor, MethodInfo& methodI
 	}
 }
 
-opt::optional<PropertyGroup> MethodParser::isMethodValid(CXCursor currentCursor, ParsingInfo& parsingInfo) noexcept
+opt::optional<PropertyGroup> MethodParser::isEntityValid(CXCursor const& currentCursor, ParsingInfo& parsingInfo) noexcept
 {
 	_shouldCheckValidity = false;
 	parsingInfo.propertyParser.clean();
@@ -121,29 +121,10 @@ opt::optional<PropertyGroup> MethodParser::isMethodValid(CXCursor currentCursor,
 	return opt::nullopt;
 }
 
-void MethodParser::startParsing(CXCursor cursor) noexcept
+void MethodParser::updateParsingState(CXCursor const& parent, ParsingInfo& parsingInfo) noexcept
 {
-	_isCurrentlyParsing		= true;
-	_currentCursor			= cursor;
-	_shouldCheckValidity	= true;
-}
-
-void MethodParser::endParsing() noexcept
-{
-	_isCurrentlyParsing		= false;
-	_currentCursor			= clang_getNullCursor();
-	_shouldCheckValidity	= false;
-}
-
-void MethodParser::updateParsingState(CXCursor parent) noexcept
-{
-	if (!clang_equalCursors(_currentCursor, parent))
+	if (!clang_equalCursors(getCurrentCursor(), parent))
 	{
-		endParsing();
+		endParsing(parsingInfo);
 	}
-}
-
-bool MethodParser::isCurrentlyParsing() const noexcept
-{
-	return _isCurrentlyParsing;
 }

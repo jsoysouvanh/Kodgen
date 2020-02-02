@@ -30,8 +30,12 @@ namespace refureku
 
 			void						updateParsingState(CXCursor parent)											noexcept;
 			CXChildVisitResult			parseCursor(CXCursor currentCursor)											noexcept;
-
 			CXChildVisitResult			parseDefault(CXCursor currentCursor)										noexcept;
+
+			/**
+			*	Remove all previously parsed information from the class
+			*/
+			void	reset()																							noexcept;
 
 		protected:
 			/**
@@ -51,18 +55,24 @@ namespace refureku
 			virtual void postParse(fs::path const& parseFile, ParsingResult const& result)	noexcept;
 
 		public:
-			ParsingSettings	parsingSettings;
-
-			Parser()				noexcept;
-			Parser(Parser const&)	= default;
-			Parser(Parser&&)		= default;
-			~Parser()				noexcept;
-
-			bool	parse(fs::path const& parseFile, ParsingResult& out_result)		noexcept;
+			Parser()					noexcept;
+			Parser(Parser const&)		= default;
+			Parser(Parser&&)			= default;
+			virtual ~Parser()			noexcept;
 
 			/**
-			*	Remove all previously parsed information from the class
+			*	Get the parsing settings of the parser to setup it
 			*/
-			void	clear()															noexcept;
+			ParsingSettings&	getParsingSettings()								noexcept;
+
+			/**
+			*	Parse a file
+			*
+			*	@param parseFile Path to the file to parse
+			*	@param out_result Result filled with the collected information
+			*
+			*	@return true if the parsing process finished without error, else false
+			*/
+			bool	parse(fs::path const& parseFile, ParsingResult& out_result)		noexcept;
 	};
 }

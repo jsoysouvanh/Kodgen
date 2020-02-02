@@ -16,9 +16,9 @@ namespace refureku
 	{
 		public:
 			/**
-			*
+			*	Settings used to parse
 			*/
-			ParsingSettings const*			parsingSettings = nullptr;
+			ParsingSettings					parsingSettings;
 
 			/**
 			*	PropertyParser.
@@ -68,6 +68,9 @@ namespace refureku
 			*/
 			bool	flushCurrentEnum()											noexcept;
 
-			void	setParsingSettings(ParsingSettings const* parsingSettings)	noexcept;
+			/**
+			*	Reset this parsingInfo fields
+			*/
+			void	reset()														noexcept;
 	};
 }

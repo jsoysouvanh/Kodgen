@@ -5,32 +5,25 @@
 #include "Misc/Optional.h"
 #include "InfoStructures/ParsingInfo.h"
 #include "Properties/PropertyGroup.h"
+#include "Parsing/EntityParser.h"
 
 namespace refureku
 {
-	class FieldParser
+	class FieldParser : public refureku::EntityParser
 	{
 		private:
-			bool		_shouldCheckValidity	= false;
-			bool		_isCurrentlyParsing		= false;
-			
-			CXCursor	_currentCursor			= clang_getNullCursor();
-
-			CXChildVisitResult				addToCurrentClassIfValid(CXCursor fieldAnnotationCursor, ParsingInfo& parsingInfo)	noexcept;
-			opt::optional<PropertyGroup>	isFieldValid(CXCursor currentCursor, ParsingInfo& parsingInfo)						noexcept;
-			void							endParsing()																		noexcept;
+			virtual CXChildVisitResult				setAsCurrentEntityIfValid(CXCursor const& fieldAnnotationCursor, ParsingInfo& parsingInfo)	noexcept override final;
+			virtual	opt::optional<PropertyGroup>	isEntityValid(CXCursor const& currentCursor, ParsingInfo& parsingInfo)						noexcept override final;
 
 		public:
 			FieldParser()					= default;
 			FieldParser(FieldParser const&) = default;
 			FieldParser(FieldParser&&)		= default;
-			~FieldParser()					= default;
+			virtual ~FieldParser()			= default;
 
-			CXChildVisitResult	parse(CXCursor cursor, ParsingInfo& parsingInfo)		noexcept;
+			virtual CXChildVisitResult	parse(CXCursor const& cursor, ParsingInfo& parsingInfo)					noexcept override final;
+			virtual void				updateParsingState(CXCursor const& parent, ParsingInfo& parsingInfo)	noexcept override final;
 
-			void				startParsing(CXCursor cursor)							noexcept;
-			void				updateParsingState(CXCursor parent)						noexcept;
-
-			bool				isCurrentlyParsing()							const	noexcept;
+			using EntityParser::startParsing;
 	};
 }

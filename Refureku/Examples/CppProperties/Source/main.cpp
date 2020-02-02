@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "SomeClass.h"
+#include "SomeOtherClass.h"
 
 int main()
 {

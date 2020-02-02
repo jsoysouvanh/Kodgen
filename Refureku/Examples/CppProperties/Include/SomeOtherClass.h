@@ -16,7 +16,7 @@ namespace SomeNamespace
 			std::vector<SomeClass*>		_someClasses;
 
 			RfrkField(Get[const, &], Get[&])
-			int							_intArray[5];
+			int							_int;
 
 		public:
 			SomeOtherClass() = default;

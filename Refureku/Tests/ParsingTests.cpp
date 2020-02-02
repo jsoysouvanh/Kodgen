@@ -5,14 +5,16 @@
 
 void setupParser(refureku::Parser& parser)
 {
-	//Setup parser settings
-	parser.parsingSettings.shouldAbortParsingOnFirstError = false;
+	refureku::ParsingSettings& parsingSettings = parser.getParsingSettings();
 
-	parser.parsingSettings.propertyParsingSettings.ignoredCharacters.insert(' ');	//Ignore white space
-	parser.parsingSettings.propertyParsingSettings.subPropertySeparator = ',';
+	//Setup parser settings
+	parsingSettings.shouldAbortParsingOnFirstError = false;
+
+	parsingSettings.propertyParsingSettings.ignoredCharacters.insert(' ');	//Ignore white space
+	parsingSettings.propertyParsingSettings.subPropertySeparator = ',';
 
 	//ClassProp1, ClassProp2[ClassSubProp21, ClassSubProp22], ClassProp3
-	refureku::PropertyRules& classPropertyRules = parser.parsingSettings.propertyParsingSettings.classPropertyRules;
+	refureku::PropertyRules& classPropertyRules = parsingSettings.propertyParsingSettings.classPropertyRules;
 
 	classPropertyRules.addSimplePropertyRule("ClassProp1");
 	classPropertyRules.addSimplePropertyRule("ClassProp2");
@@ -20,7 +22,7 @@ void setupParser(refureku::Parser& parser)
 	classPropertyRules.addSimplePropertyRule("ClassProp3");
 
 	//MethodProp1, MethodProp2[MethodSubProp21, MethodSubProp22], MethodProp3
-	refureku::PropertyRules& methodPropertyRules = parser.parsingSettings.propertyParsingSettings.methodPropertyRules;
+	refureku::PropertyRules& methodPropertyRules = parsingSettings.propertyParsingSettings.methodPropertyRules;
 
 	methodPropertyRules.addSimplePropertyRule("MethodProp1");
 	methodPropertyRules.addSimplePropertyRule("MethodProp2");
@@ -28,7 +30,7 @@ void setupParser(refureku::Parser& parser)
 	methodPropertyRules.addSimplePropertyRule("MethodProp3");
 
 	//FieldProp1, FieldProp2[FieldSubProp21, FieldSubProp22], FieldProp3
-	refureku::PropertyRules& fieldPropertyRules = parser.parsingSettings.propertyParsingSettings.fieldPropertyRules;
+	refureku::PropertyRules& fieldPropertyRules = parsingSettings.propertyParsingSettings.fieldPropertyRules;
 
 	fieldPropertyRules.addSimplePropertyRule("FieldProp1");
 	fieldPropertyRules.addSimplePropertyRule("FieldProp2");
@@ -36,7 +38,7 @@ void setupParser(refureku::Parser& parser)
 	fieldPropertyRules.addSimplePropertyRule("FieldProp3");
 
 	//EnumProp1, EnumProp2[EnumSubProp21, EnumSubProp22], EnumProp3
-	refureku::PropertyRules& enumPropertyRules = parser.parsingSettings.propertyParsingSettings.enumPropertyRules;
+	refureku::PropertyRules& enumPropertyRules = parsingSettings.propertyParsingSettings.enumPropertyRules;
 
 	enumPropertyRules.addSimplePropertyRule("EnumProp1");
 	enumPropertyRules.addSimplePropertyRule("EnumProp2");
@@ -44,7 +46,7 @@ void setupParser(refureku::Parser& parser)
 	enumPropertyRules.addSimplePropertyRule("EnumProp3");
 
 	//EnumValueProp1, EnumValueProp2[EnumValueSubProp21, EnumValueSubProp22], EnumValueProp3
-	refureku::PropertyRules& enumValuePropertyRules = parser.parsingSettings.propertyParsingSettings.enumValuePropertyRules;
+	refureku::PropertyRules& enumValuePropertyRules = parsingSettings.propertyParsingSettings.enumValuePropertyRules;
 
 	enumValuePropertyRules.addSimplePropertyRule("EnumValueProp1");
 	enumValuePropertyRules.addSimplePropertyRule("EnumValueProp2");

@@ -3,6 +3,8 @@
 CppPropsParser::CppPropsParser() noexcept:
 	Parser()
 {
+	refureku::ParsingSettings& parsingSettings = getParsingSettings();
+
 	//We abort parsing if we encounter a single error while parsing
 	parsingSettings.shouldAbortParsingOnFirstError = true;
 

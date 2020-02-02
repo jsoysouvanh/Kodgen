@@ -47,3 +47,17 @@ bool ParsingInfo::flushCurrentEnum() noexcept
 
 	return false;
 }
+
+void ParsingInfo::reset() noexcept
+{
+	propertyParser.setup(&parsingSettings.propertyParsingSettings);
+
+	accessSpecifier			= EAccessSpecifier::Private;
+
+	currentStructOrClass	= std::nullopt;
+	currentEnum				= std::nullopt;
+
+	parsingResult.classes.clear();
+	parsingResult.enums.clear();
+	parsingResult.parsingErrors.clear();
+}

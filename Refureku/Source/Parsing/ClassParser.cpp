@@ -6,20 +6,30 @@
 
 using namespace refureku;
 
-CXChildVisitResult ClassParser::parse(CXCursor currentCursor, ParsingInfo& parsingInfo) noexcept
+void ClassParser::reset() noexcept
 {
-	if (_fieldParser.isCurrentlyParsing())
+	EntityParser::reset();
+
+	_fieldParser.reset();
+	_methodParser.reset();
+
+	_structOrClass = EntityInfo::EType::Count;
+}
+
+CXChildVisitResult ClassParser::parse(CXCursor const& currentCursor, ParsingInfo& parsingInfo) noexcept
+{
+	if (_fieldParser.getParsingLevel())
 	{
 		return _fieldParser.parse(currentCursor, parsingInfo);
 	}
-	else if (_methodParser.isCurrentlyParsing())
+	else if (_methodParser.getParsingLevel())
 	{
 		return _methodParser.parse(currentCursor, parsingInfo);
 	}
 	else if (_shouldCheckValidity)	//Check for any annotation attribute if the flag is raised
 	{
 		_shouldCheckValidity = false;
-		return setAsCurrentStructOrClassIfValid(currentCursor, parsingInfo);
+		return setAsCurrentEntityIfValid(currentCursor, parsingInfo);
 	}
 
 	//Check for class field or method
@@ -29,7 +39,7 @@ CXChildVisitResult ClassParser::parse(CXCursor currentCursor, ParsingInfo& parsi
 			updateAccessSpecifier(currentCursor, parsingInfo);
 			break;
 
-		case CXCursorKind::CXCursor_VarDecl:
+		case CXCursorKind::CXCursor_VarDecl:	//For static fields
 			[[fallthrough]];
 		case CXCursorKind::CXCursor_FieldDecl:
 			_fieldParser.startParsing(currentCursor);
@@ -46,11 +56,11 @@ CXChildVisitResult ClassParser::parse(CXCursor currentCursor, ParsingInfo& parsi
 	return CXChildVisitResult::CXChildVisit_Recurse;
 }
 
-CXChildVisitResult ClassParser::setAsCurrentStructOrClassIfValid(CXCursor classAnnotationCursor, ParsingInfo& parsingInfo) noexcept
+CXChildVisitResult ClassParser::setAsCurrentEntityIfValid(CXCursor const& classAnnotationCursor, ParsingInfo& parsingInfo) noexcept
 {
-	if (opt::optional<PropertyGroup> propertyGroup = isStructOrClassValid(classAnnotationCursor, parsingInfo))
+	if (opt::optional<PropertyGroup> propertyGroup = isEntityValid(classAnnotationCursor, parsingInfo))
 	{
-		parsingInfo.currentStructOrClass.emplace(StructClassInfo(Helpers::getString(clang_getCursorDisplayName(_currentCursor)), std::move(*propertyGroup), std::move(_structOrClass)));
+		parsingInfo.currentStructOrClass.emplace(StructClassInfo(Helpers::getString(clang_getCursorDisplayName(getCurrentCursor())), std::move(*propertyGroup), std::move(_structOrClass)));
 
 		return CXChildVisitResult::CXChildVisit_Recurse;
 	}
@@ -65,12 +75,12 @@ CXChildVisitResult ClassParser::setAsCurrentStructOrClassIfValid(CXCursor classA
 		{
 			parsingInfo.parsingResult.parsingErrors.emplace_back(ParsingError(parsingInfo.propertyParser.getParsingError(), clang_getCursorLocation(classAnnotationCursor)));
 
-			return parsingInfo.parsingSettings->shouldAbortParsingOnFirstError ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
+			return parsingInfo.parsingSettings.shouldAbortParsingOnFirstError ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
 		}
 	}
 }
 
-opt::optional<PropertyGroup> ClassParser::isStructOrClassValid(CXCursor currentCursor, ParsingInfo& parsingInfo) noexcept
+opt::optional<PropertyGroup> ClassParser::isEntityValid(CXCursor const& currentCursor, ParsingInfo& parsingInfo) noexcept
 {
 	parsingInfo.propertyParser.clean();
 
@@ -94,63 +104,55 @@ opt::optional<PropertyGroup> ClassParser::isStructOrClassValid(CXCursor currentC
 	return opt::nullopt;
 }
 
-void ClassParser::startClassParsing(CXCursor currentCursor, ParsingInfo& parsingInfo)	noexcept
+void ClassParser::startClassParsing(CXCursor const& currentCursor, ParsingInfo& parsingInfo)	noexcept
 {
-	_classLevel++;
-	_currentCursor					= currentCursor;
-	_shouldCheckValidity			= true;
+	EntityParser::startParsing(currentCursor);
+
 	parsingInfo.accessSpecifier		= EAccessSpecifier::Private;
 	_structOrClass					= EntityInfo::EType::Class;
 }
 
-void ClassParser::startStructParsing(CXCursor currentCursor, ParsingInfo& parsingInfo)	noexcept
+void ClassParser::startStructParsing(CXCursor const& currentCursor, ParsingInfo& parsingInfo)	noexcept
 {
-	_classLevel++;
-	_currentCursor					= currentCursor;
-	_shouldCheckValidity			= true;
+	EntityParser::startParsing(currentCursor);
+
 	parsingInfo.accessSpecifier		= EAccessSpecifier::Public;
 	_structOrClass					= EntityInfo::EType::Struct;
 }
 
 void ClassParser::endParsing(ParsingInfo& parsingInfo)	noexcept
 {
-	_classLevel--;
-	_currentCursor					= clang_getNullCursor();
-	_shouldCheckValidity			= false;
+	EntityParser::endParsing(parsingInfo);
+
 	parsingInfo.accessSpecifier		= EAccessSpecifier::Invalid;
 	_structOrClass					= EntityInfo::EType::Count;
 
 	parsingInfo.flushCurrentStructOrClass();
 }
 
-void ClassParser::updateParsingState(CXCursor parent, ParsingInfo& parsingInfo) noexcept
+void ClassParser::updateParsingState(CXCursor const& parent, ParsingInfo& parsingInfo) noexcept
 {
 	//Check if we're not parsing a field anymore
-	if (_fieldParser.isCurrentlyParsing())
+	if (_fieldParser.getParsingLevel())
 	{
-		_fieldParser.updateParsingState(parent);
+		_fieldParser.updateParsingState(parent, parsingInfo);
 	}
 	//Check if we're not parsing a method anymore
-	else if (_methodParser.isCurrentlyParsing())
+	else if (_methodParser.getParsingLevel())
 	{
-		_methodParser.updateParsingState(parent);
+		_methodParser.updateParsingState(parent, parsingInfo);
 	}
 
 	/**
 	*	Check if we're finishing parsing a class
 	*/
-	if (clang_equalCursors(clang_getCursorSemanticParent(_currentCursor), parent))
+	if (clang_equalCursors(clang_getCursorSemanticParent(getCurrentCursor()), parent))
 	{
 		endParsing(parsingInfo);
 	}
 }
 
-void ClassParser::updateAccessSpecifier(CXCursor cursor, ParsingInfo& parsingInfo) noexcept
+void ClassParser::updateAccessSpecifier(CXCursor const& cursor, ParsingInfo& parsingInfo) noexcept
 {
 	parsingInfo.accessSpecifier = static_cast<EAccessSpecifier>(1 << clang_getCXXAccessSpecifier(cursor));
-}
-
-bool ClassParser::isCurrentlyParsing() const noexcept
-{
-	return _classLevel;
 }

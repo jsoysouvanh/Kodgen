@@ -3,22 +3,16 @@
 #include <clang-c/Index.h>
 
 #include "InfoStructures/ParsingInfo.h"
+#include "Parsing/EntityParser.h"
 
 namespace refureku
 {
-	class MethodParser
+	class MethodParser : public EntityParser
 	{
 		private:
-			bool		_shouldCheckValidity	= false;
-			bool		_isCurrentlyParsing		= false;
-
-			CXCursor	_currentCursor			= clang_getNullCursor();
-
-			CXChildVisitResult				addToCurrentClassIfValid(CXCursor const& methodAnnotationCursor, ParsingInfo& parsingInfo)	noexcept;
-			opt::optional<PropertyGroup>	isMethodValid(CXCursor currentCursor, ParsingInfo& parsingInfo)								noexcept;
-			void							setupMethod(CXCursor const& methodCursor, MethodInfo& methodInfo)							noexcept;
-
-			void	endParsing()	noexcept;
+			virtual CXChildVisitResult				setAsCurrentEntityIfValid(CXCursor const& methodAnnotationCursor, ParsingInfo& parsingInfo)	noexcept override final;
+			virtual opt::optional<PropertyGroup>	isEntityValid(CXCursor const& currentCursor, ParsingInfo& parsingInfo)						noexcept override final;
+			void									setupMethod(CXCursor const& methodCursor, MethodInfo& methodInfo)							noexcept;
 
 		public:
 			MethodParser()						= default;
@@ -26,11 +20,9 @@ namespace refureku
 			MethodParser(MethodParser&&)		= default;
 			~MethodParser()						= default;
 
-			CXChildVisitResult	parse(CXCursor cursor, ParsingInfo& parsingInfo)		noexcept;
+			virtual CXChildVisitResult	parse(CXCursor const& cursor, ParsingInfo& parsingInfo)					noexcept override final;
+			virtual void				updateParsingState(CXCursor const& parent, ParsingInfo& parsingInfo)	noexcept override final;
 
-			void				startParsing(CXCursor cursor)							noexcept;
-			void				updateParsingState(CXCursor parent)						noexcept;
-
-			bool				isCurrentlyParsing()							const	noexcept;
+			using EntityParser::startParsing;
 	};
 }

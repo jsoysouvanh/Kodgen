@@ -6,29 +6,29 @@
 
 using namespace refureku;
 
-CXChildVisitResult FieldParser::parse(CXCursor cursor, ParsingInfo& parsingInfo) noexcept
+CXChildVisitResult FieldParser::parse(CXCursor const& cursor, ParsingInfo& parsingInfo) noexcept
 {
 	//Check for any annotation attribute if the flag is raised
 	if (_shouldCheckValidity)
 	{
-		return addToCurrentClassIfValid(cursor, parsingInfo);
+		return setAsCurrentEntityIfValid(cursor, parsingInfo);
 	}
 
 	return CXChildVisitResult::CXChildVisit_Recurse;
 }
 
-CXChildVisitResult FieldParser::addToCurrentClassIfValid(CXCursor fieldAnnotationCursor, ParsingInfo& parsingInfo) noexcept
+CXChildVisitResult FieldParser::setAsCurrentEntityIfValid(CXCursor const& fieldAnnotationCursor, ParsingInfo& parsingInfo) noexcept
 {
-	if (opt::optional<PropertyGroup> propertyGroup = isFieldValid(fieldAnnotationCursor, parsingInfo))
+	if (opt::optional<PropertyGroup> propertyGroup = isEntityValid(fieldAnnotationCursor, parsingInfo))
 	{
 		if (parsingInfo.currentStructOrClass.has_value())
 		{
-			FieldInfo& field = parsingInfo.currentStructOrClass->fields.at(parsingInfo.accessSpecifier).emplace_back(FieldInfo(Helpers::getString(clang_getCursorDisplayName(_currentCursor)), std::move(*propertyGroup)));
-			field.type = TypeInfo(clang_getCursorType(_currentCursor));
-			field.qualifiers.isStatic = (clang_getCursorKind(_currentCursor) == CXCursorKind::CXCursor_VarDecl);
+			FieldInfo& field = parsingInfo.currentStructOrClass->fields.at(parsingInfo.accessSpecifier).emplace_back(FieldInfo(Helpers::getString(clang_getCursorDisplayName(getCurrentCursor())), std::move(*propertyGroup)));
+			field.type = TypeInfo(clang_getCursorType(getCurrentCursor()));
+			field.qualifiers.isStatic = (clang_getCursorKind(getCurrentCursor()) == CXCursorKind::CXCursor_VarDecl);
 
 			if (!field.qualifiers.isStatic)
-				field.qualifiers.isMutable = clang_CXXField_isMutable(_currentCursor);
+				field.qualifiers.isMutable = clang_CXXField_isMutable(getCurrentCursor());
 
 			assert(!(field.type.qualifiers.isConst && field.qualifiers.isStatic));	//Field can't be const and static
 
@@ -49,12 +49,12 @@ CXChildVisitResult FieldParser::addToCurrentClassIfValid(CXCursor fieldAnnotatio
 		{
 			parsingInfo.parsingResult.parsingErrors.emplace_back(ParsingError(parsingInfo.propertyParser.getParsingError(), clang_getCursorLocation(fieldAnnotationCursor)));
 
-			return parsingInfo.parsingSettings->shouldAbortParsingOnFirstError ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
+			return parsingInfo.parsingSettings.shouldAbortParsingOnFirstError ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
 		}
 	}
 }
 
-opt::optional<PropertyGroup> FieldParser::isFieldValid(CXCursor currentCursor, ParsingInfo& parsingInfo) noexcept
+opt::optional<PropertyGroup> FieldParser::isEntityValid(CXCursor const& currentCursor, ParsingInfo& parsingInfo) noexcept
 {
 	_shouldCheckValidity = false;
 	parsingInfo.propertyParser.clean();
@@ -67,29 +67,10 @@ opt::optional<PropertyGroup> FieldParser::isFieldValid(CXCursor currentCursor, P
 	return opt::nullopt;
 }
 
-void FieldParser::startParsing(CXCursor cursor) noexcept
+void FieldParser::updateParsingState(CXCursor const& parent, ParsingInfo& parsingInfo) noexcept
 {
-	_isCurrentlyParsing		= true;
-	_currentCursor			= cursor;
-	_shouldCheckValidity	= true;
-}
-
-void FieldParser::endParsing() noexcept
-{
-	_isCurrentlyParsing		= false;
-	_currentCursor			= clang_getNullCursor();
-	_shouldCheckValidity	= false;
-}
-
-void FieldParser::updateParsingState(CXCursor parent) noexcept
-{
-	if (!clang_equalCursors(_currentCursor, parent))
+	if (!clang_equalCursors(getCurrentCursor(), parent))
 	{
-		endParsing();
+		endParsing(parsingInfo);
 	}
-}
-
-bool FieldParser::isCurrentlyParsing() const noexcept
-{
-	return _isCurrentlyParsing;
 }
