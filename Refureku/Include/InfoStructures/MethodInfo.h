@@ -13,16 +13,16 @@ namespace refureku
 	class MethodInfo : public EntityInfo
 	{
 		public:
-			struct MethodQualifier
+			struct MethodQualifiers
 			{
-				bool Default		: 1;
-				bool Static			: 1;
-				bool Virtual		: 1;
-				bool PureVirtual	: 1;
-				bool Inline			: 1;
-				bool Override		: 1;
-				bool Final			: 1;
-				bool Const			: 1;
+				bool isDefault		: 1;
+				bool isStatic		: 1;
+				bool isVirtual		: 1;
+				bool isPureVirtual	: 1;
+				bool isInline		: 1;
+				bool isOverride		: 1;
+				bool isFinal		: 1;
+				bool isConst		: 1;
 
 			}						qualifiers;
 

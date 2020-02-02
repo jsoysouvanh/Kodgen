@@ -6,7 +6,7 @@ namespace refureku
 {
 	class TestGeneratedCodeTemplate : public GeneratedCodeTemplate
 	{
-		virtual void generateCode(GeneratedFile& generatedFile, EntityInfo const& entityInfo) noexcept override
+		virtual void generateCode(GeneratedFile& generatedFile, EntityInfo const& entityInfo) const noexcept override
 		{
 			switch (entityInfo.entityType)
 			{
@@ -22,7 +22,7 @@ namespace refureku
 
 						for (FieldInfo const& field : fieldIt.second)
 						{
-							generatedFile.writeLine(field.type.pureName + " -> " + field.type.canonicalPureName + " " + field.name);
+							generatedFile.writeLine(field.type.getName(true, true) + " -> " + field.type.getCanonicalName(true, true) + " " + field.name);
 						}
 					}
 
@@ -39,7 +39,7 @@ namespace refureku
 
 							for (TypeInfo typeInfo : method.parameters)
 							{
-								methodAsString += typeInfo.pureName + " -> " + typeInfo.canonicalPureName + ", ";
+								methodAsString += typeInfo.getName(true, true) + " -> " + typeInfo.getCanonicalName(true, true) + ", ";
 							}
 
 							methodAsString += ")";
@@ -57,15 +57,12 @@ namespace refureku
 					break;
 
 				case EntityInfo::EType::Enum:
-					
-					EnumInfo const& enumInfo = static_cast<EnumInfo const&>(entityInfo);
-
 					generatedFile.writeLines(	"#define _RFRK_GENERATED_ENUM_" + entityInfo.name + " //TODO something",
 												"/*",
-												"enum class " + enumInfo.name + "Reflect : " + enumInfo.underlyingType,
+												"enum class " + static_cast<EnumInfo const&>(entityInfo).name + "Reflect : " + static_cast<EnumInfo const&>(entityInfo).underlyingType,
 												"{");
 
-					for (EnumValueInfo const& evi : enumInfo.enumValues)
+					for (EnumValueInfo const& evi : static_cast<EnumInfo const&>(entityInfo).enumValues)
 					{
 						generatedFile.writeLine("\t" + evi.name + " = " + std::to_string(evi.defaultValue) + ",");
 					}
@@ -83,6 +80,9 @@ namespace refureku
 												"a",
 												"test");
 
+					break;
+
+				default:
 					break;
 			}
 		}

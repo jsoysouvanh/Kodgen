@@ -1,5 +1,7 @@
 #include "Parsing/FieldParser.h"
 
+#include <cassert>
+
 #include "Misc/Helpers.h"
 
 using namespace refureku;
@@ -23,7 +25,12 @@ CXChildVisitResult FieldParser::addToCurrentClassIfValid(CXCursor fieldAnnotatio
 		{
 			FieldInfo& field = parsingInfo.currentStructOrClass->fields.at(parsingInfo.accessSpecifier).emplace_back(FieldInfo(Helpers::getString(clang_getCursorDisplayName(_currentCursor)), std::move(*propertyGroup)));
 			field.type = TypeInfo(clang_getCursorType(_currentCursor));
-			field.qualifiers.Static = (clang_getCursorKind(_currentCursor) == CXCursorKind::CXCursor_VarDecl);
+			field.qualifiers.isStatic = (clang_getCursorKind(_currentCursor) == CXCursorKind::CXCursor_VarDecl);
+
+			if (!field.qualifiers.isStatic)
+				field.qualifiers.isMutable = clang_CXXField_isMutable(_currentCursor);
+
+			assert(!(field.type.qualifiers.isConst && field.qualifiers.isStatic));	//Field can't be const and static
 
 			return CXChildVisitResult::CXChildVisit_Recurse;
 		}

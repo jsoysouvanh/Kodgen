@@ -55,6 +55,9 @@ static std::string const TestFile =
 "		RfrkField(FieldProp1)																																\n"
 "		static int var2 : 1;																																\n"
 "																																							\n"
+"		RfrkField(FieldProp1)																																\n"
+"		unsigned long long	_someUnsignedLongLong;																											\n"
+"																																							\n"
 "		#pragma region Methods																																\n"
 "																																							\n"
 "		RfrkMethod(MethodProp1, MethodProp2[MethodSubProp21, MethodSubProp22], MethodProp3)																	\n"
@@ -180,7 +183,7 @@ int main()
 	fs::path includeDirPath	= fs::current_path();
 	fs::path pathToFile		= includeDirPath / "TestClass.h";
 
-	fg.pathToGeneratedFilesFolder = includeDirPath / "Generated";
+	fg.outputDirectory = includeDirPath / "Generated";
 
 	fg.addGeneratedCodeTemplate("TestTemplate", new refureku::TestGeneratedCodeTemplate());
 	fg.setDefaultClassTemplate("TestTemplate");

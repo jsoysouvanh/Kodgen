@@ -8,6 +8,9 @@ project(CppPropertiesExample)
 
 set(CppPropertiesDemoProjectGeneratorTarget CppPropertiesDemoProjectGenerator)
 add_executable(${CppPropertiesDemoProjectGeneratorTarget}
+					Generator/Source/CppPropsParser.cpp
+					Generator/Source/CppPropsCodeTemplate.cpp
+					
 					Generator/Source/main.cpp)
 
 target_include_directories(${CppPropertiesDemoProjectGeneratorTarget} PRIVATE
@@ -22,7 +25,10 @@ target_link_libraries(${CppPropertiesDemoProjectGeneratorTarget} PRIVATE ${Refur
 ###########################################
 
 set(CppPropertiesDemoProjectTarget CppPropertiesDemoProject)
-add_executable(${CppPropertiesDemoProjectTarget} Source/main.cpp)
+add_executable(${CppPropertiesDemoProjectTarget}
+					Source/SomeClass.cpp
+
+					Source/main.cpp)
 
 set(RunGeneratorTarget RunCppPropertiesGenerator)
 add_custom_target(${RunGeneratorTarget}

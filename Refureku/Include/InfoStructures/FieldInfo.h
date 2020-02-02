@@ -8,9 +8,10 @@ namespace refureku
 	class FieldInfo : public EntityInfo
 	{
 		public:
-			struct FieldQualifier
+			struct FieldQualifiers
 			{
-				bool Static			: 1;
+				bool isStatic	: 1;
+				bool isMutable	: 1;
 
 			}			qualifiers;
 

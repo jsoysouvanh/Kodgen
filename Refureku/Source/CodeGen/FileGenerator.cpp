@@ -136,7 +136,7 @@ bool FileGenerator::shouldRegenerateFile(fs::path const& filePath) const noexcep
 
 fs::path FileGenerator::makePathToGeneratedFile(fs::path const& sourceFilePath) const noexcept
 {
-	return (pathToGeneratedFilesFolder / sourceFilePath.filename()).replace_extension(generatedFilesExtension);
+	return (outputDirectory / sourceFilePath.filename()).replace_extension(generatedFilesExtension);
 }
 
 void FileGenerator::writeHeader(GeneratedFile& file, ParsingResult const& parsingResult) const noexcept
@@ -210,10 +210,10 @@ FileGenerationResult FileGenerator::generateFiles(Parser& parser, bool forceRege
 	bool					parsingSuccess;
 
 	//Before doing anything, make sure destination folder exists
-	if (!fs::exists(pathToGeneratedFilesFolder))
-		genResult.completed = fs::create_directories(pathToGeneratedFilesFolder);
+	if (!fs::exists(outputDirectory))
+		genResult.completed = fs::create_directories(outputDirectory);
 
-	if (fs::is_directory(pathToGeneratedFilesFolder))
+	if (fs::is_directory(outputDirectory))
 	{
 		//Make sure the CodeTemplate property is setup in class, struct and enum
 		parser.parsingSettings.propertyParsingSettings.classPropertyRules.removeComplexPropertyRule(std::string(codeTemplateMainComplexPropertyName));
@@ -225,7 +225,7 @@ FileGenerationResult FileGenerator::generateFiles(Parser& parser, bool forceRege
 		parser.parsingSettings.propertyParsingSettings.enumPropertyRules.removeComplexPropertyRule(std::string(codeTemplateMainComplexPropertyName));
 		parser.parsingSettings.propertyParsingSettings.enumPropertyRules.addComplexPropertyRule(std::string(codeTemplateMainComplexPropertyName), std::string(_supportedCodeTemplateRegex));
 
-		for (fs::path path : _includedFiles)
+		for (fs::path const& path : _includedFiles)
 		{
 			if (forceRegenerateAll || shouldRegenerateFile(path))
 			{

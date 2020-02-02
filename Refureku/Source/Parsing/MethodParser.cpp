@@ -22,11 +22,11 @@ CXChildVisitResult MethodParser::parse(CXCursor cursor, ParsingInfo& parsingInfo
 	switch (clang_getCursorKind(cursor))
 	{
 		case CXCursorKind::CXCursor_CXXFinalAttr:
-			parsingInfo.currentStructOrClass->methods.at(parsingInfo.accessSpecifier).back().qualifiers.Final = true;
+			parsingInfo.currentStructOrClass->methods.at(parsingInfo.accessSpecifier).back().qualifiers.isFinal = true;
 			break;
 
 		case CXCursorKind::CXCursor_CXXOverrideAttr:
-			parsingInfo.currentStructOrClass->methods.at(parsingInfo.accessSpecifier).back().qualifiers.Override = true;
+			parsingInfo.currentStructOrClass->methods.at(parsingInfo.accessSpecifier).back().qualifiers.isOverride = true;
 			break;
 
 		case CXCursorKind::CXCursor_ParmDecl:
@@ -84,27 +84,27 @@ void MethodParser::setupMethod(CXCursor const& methodCursor, MethodInfo& methodI
 	//Define method qualifiers
 	if (clang_CXXMethod_isDefaulted(methodCursor))
 	{
-		methodInfo.qualifiers.Default = true;
+		methodInfo.qualifiers.isDefault = true;
 	}
 	if (clang_CXXMethod_isStatic(methodCursor))
 	{
-		methodInfo.qualifiers.Static = true;
+		methodInfo.qualifiers.isStatic = true;
 	}
 	if (clang_CXXMethod_isVirtual(methodCursor))
 	{
-		methodInfo.qualifiers.Virtual = true;
+		methodInfo.qualifiers.isVirtual = true;
 	}
 	if (clang_CXXMethod_isPureVirtual(methodCursor))
 	{
-		methodInfo.qualifiers.PureVirtual = true;
+		methodInfo.qualifiers.isPureVirtual = true;
 	}
 	if (clang_CXXMethod_isConst(methodCursor))
 	{
-		methodInfo.qualifiers.Const = true;
+		methodInfo.qualifiers.isConst = true;
 	}
 	if (clang_Cursor_isFunctionInlined(methodCursor))
 	{
-		methodInfo.qualifiers.Inline = true;
+		methodInfo.qualifiers.isInline = true;
 	}
 }
 

@@ -59,9 +59,10 @@ namespace refureku
 			std::string generatedFilesExtension = ".refureku.h";
 
 			/**
-			*	@brief Path to the folder all files should be generated (and where existing ones are)
+			*	@brief Path to the directory all files should be generated (and where existing ones are)
+			*	If the existed directory doesn't exist, it will be created if possible
 			*/
-			fs::path pathToGeneratedFilesFolder;
+			fs::path outputDirectory;
 
 			FileGenerator()		noexcept;
 			~FileGenerator()	noexcept;

@@ -11,52 +11,10 @@ namespace refureku
 	class TypeInfo
 	{
 		private:
-			using EParsingStepUnderlyingType = uint16;
-
 			static constexpr char const*	_classQualifier		= "class ";
 			static constexpr char const*	_structQualifier	= "struct ";
-			static constexpr char const*	_constQualifier		= "const ";
-			static constexpr char const*	_volatileQualifier	= "volatile ";
-
-			enum class EParsingStep : EParsingStepUnderlyingType
-			{
-				ConstQualifier = 0,
-				VolatileQualifier,
-				NamespaceAndNestedClass,
-				Pointer,
-				Reference,
-
-				Count
-			};
-
-			/**
-			*	Init all internal flags according to the provided type
-			*/
-			void initialize(CXType cursorType)																				noexcept;
-			void removeForwardDeclaredClassQualifier(std::string& parsingStr)										const	noexcept;
-
-			void updateConst(std::string& parsingCanonicalStr, std::string& parsingStr, bool shouldConsider2ndArg)			noexcept;
-			void updateVolatile(std::string& parsingCanonicalStr, std::string& parsingStr, bool shouldConsider2ndArg)		noexcept;
-			void updatePureName(std::string& parsingCanonicalStr, std::string& parsingStr, bool shouldConsider2ndArg)		noexcept;
-			void updatePointer(std::string& parsingCanonicalStr)															noexcept;
-			void updateReference(std::string& parsingCanonicalStr)															noexcept;
-
-			void incrementParsingStep(EParsingStep& ps)																		noexcept;
-
-		public:
-			enum class EPointerType : uint8
-			{
-				Pointer,
-				ConstPointer
-			};
-			
-			/**
-			*	This array contains info about the "pointer depth" of the canonical type
-			*
-			*	If the type is SomeType *const**const*, the pointers array would be
-			*	{ Pointer, ConstPointer, Pointer, ConstPointer }	(left to right)
-			*/
-			std::vector<EPointerType>	pointers;
+			static constexpr char const*	_constQualifier		= "const";
+			static constexpr char const*	_volatileQualifier	= "volatile";
 
 			/**
 			*	The full name represents the type name, containing all its qualifiers
@@ -73,30 +31,36 @@ namespace refureku
 			std::string					canonicalFullName	= "";
 
 			/**
-			*	In contrast with the full name, the pure name represents the type name
-			*	without all its pre-qualifiers
+			*	Init all internal flags according to the provided type
+			*/
+			void initialize(CXType cursorType)											noexcept;
+
+			void removeForwardDeclaredClassQualifier(std::string& parsingStr)	const	noexcept;
+			void removeNamespacesAndNestedClasses(std::string& typeString)		const	noexcept;
+			bool removeConstQualifier(std::string& typeString)					const	noexcept;
+			bool removeVolatileQualifier(std::string& typeString)				const	noexcept;
+
+		public:
+			enum class EPointerType : uint8
+			{
+				Pointer,
+				ConstPointer
+			};
+
+			struct TypeQualifiers
+			{
+				bool isConst		: 1;
+				bool isRestricted	: 1;
+				bool isVolatile		: 1;
+			}							qualifiers;
+			
+			/**
+			*	This array contains info about the "pointer depth" of the canonical type
 			*
-			*	If the fullName is
-			*		const volatile ExampleNamespace::ExampleClass *const*&
-			*	the pureName would be ExampleClass *const*&
+			*	If the type is SomeType *const**const*, the pointers array would be
+			*	{ Pointer, ConstPointer, Pointer, ConstPointer }	(right to left)
 			*/
-			std::string					pureName			= "";
-
-			/**
-			*	The canonical pure name is the pure name simplified by unwinding
-			*	all aliases / typedefs
-			*/
-			std::string					canonicalPureName	= "";
-
-			/**
-			*	Is the type const qualified
-			*/
-			bool						isConst				= false;
-
-			/**
-			*	Is the type volatile qualified
-			*/
-			bool						isVolatile			= false;
+			std::vector<EPointerType>	pointers;
 
 			/**
 			*	Is this type a pointer ?
@@ -109,11 +73,37 @@ namespace refureku
 			*/
 			bool						isReference			= false;
 
+			/**
+			*	Size of this type in bytes
+			*/
+			size_t						sizeInBytes			= 0u;
+
 			TypeInfo()						= default;
 			TypeInfo(CXType cursorType)		noexcept;
 			TypeInfo(TypeInfo const&)		= default;
 			TypeInfo(TypeInfo&&)			= default;
 			~TypeInfo()						= default;
+
+			/**
+			*	@brief Get this type name by removing specified qualifiers / namespaces / nested classes
+			*
+			*	@param removeQualifiers Should the const and volatile qualifiers be removed from the type name
+			*	@param removeNamespacesAndNestedClasses Should the namespaces and nested classes be removed from the type name
+			*
+			*	@return The cleaned type name
+			*/
+			std::string getName(bool removeQualifiers = false, bool shouldRemoveNamespacesAndNestedClasses = false)				const noexcept;
+
+			/**
+			*	@brief Get this type canonical name by removing specified qualifiers / namespaces / nested classes
+			*	@brief The canonical name is the name simplified by unwinding all aliases and/or typedefs
+			*
+			*	@param removeQualifiers Should the const and volatile qualifiers be removed from the type name
+			*	@param removeNamespacesAndNestedClasses Should the namespaces and nested classes be removed from the type name
+			*
+			*	@return The cleaned type name
+			*/
+			std::string getCanonicalName(bool removeQualifiers = false, bool shouldRemoveNamespacesAndNestedClasses = false)	const noexcept;
 
 			TypeInfo& operator=(TypeInfo const&)	= default;
 			TypeInfo& operator=(TypeInfo&&)			= default;
