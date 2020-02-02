@@ -1,6 +1,6 @@
 #pragma once
 
-#include <set>
+#include <vector>
 #include <iostream>
 
 #include "Properties/SimpleProperty.h"
@@ -10,8 +10,8 @@ namespace refureku
 {
 	struct PropertyGroup
 	{
-		std::set<SimpleProperty>	simpleProperties;
-		std::set<ComplexProperty>	complexProperties;
+		std::vector<SimpleProperty>		simpleProperties;
+		std::vector<ComplexProperty>	complexProperties;
 	};
 
 	std::ostream& operator<<(std::ostream& out_stream, PropertyGroup const&) noexcept;

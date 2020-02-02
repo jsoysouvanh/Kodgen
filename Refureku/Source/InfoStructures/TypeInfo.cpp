@@ -12,8 +12,6 @@ TypeInfo::TypeInfo(CXType cursorType) noexcept:
 {
 	assert(cursorType.kind != CXTypeKind::CXType_Invalid);
 
-	std::cout << "TypeInfo: " << cursorType.kind << std::endl;
-
 	initialize(cursorType);
 }
 
@@ -25,9 +23,6 @@ void TypeInfo::initialize(CXType cursorType) noexcept
 
 	fullName			= Helpers::getString(clang_getTypeSpelling(cursorType));
 	canonicalFullName	= Helpers::getString(clang_getTypeSpelling(canonicalType));
-
-	std::cout << "TypeInfo::initialize(): fullName: " << fullName << std::endl;
-	std::cout << "TypeInfo::initialize(): canonicalFullName: " << canonicalFullName << std::endl;
 
 	long long size		= clang_Type_getSizeOf(cursorType);
 

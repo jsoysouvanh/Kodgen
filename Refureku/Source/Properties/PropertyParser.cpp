@@ -196,7 +196,7 @@ bool PropertyParser::addSimpleProperty(std::vector<std::string>& propertyAsVecto
 
 	if (rules.getSimplePropertyRule(propName) != nullptr)
 	{
-		out_propertyGroup.simpleProperties.emplace(SimpleProperty(std::move(propName)));
+		out_propertyGroup.simpleProperties.emplace_back(SimpleProperty(std::move(propName)));
 		return true;
 	}
 	else
@@ -235,7 +235,7 @@ bool PropertyParser::addComplexProperty(std::vector<std::string>& propertyAsVect
 			}
 		}
 
-		out_propertyGroup.complexProperties.emplace(std::move(complexProp));
+		out_propertyGroup.complexProperties.emplace_back(std::move(complexProp));
 	}
 	else
 	{

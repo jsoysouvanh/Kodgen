@@ -55,8 +55,8 @@ GeneratedCodeTemplate* FileGenerator::getEntityGeneratedCodeTemplate(EntityInfo&
 	GeneratedCodeTemplate* result = nullptr;
 
 	//Find the specified code template
-	std::set<ComplexProperty>::const_iterator it = std::find_if(entityInfo.properties.complexProperties.cbegin(), entityInfo.properties.complexProperties.cend(),
-																[this](ComplexProperty const& prop) { return prop.name == codeTemplateMainComplexPropertyName; });
+	decltype(entityInfo.properties.complexProperties)::const_iterator it = std::find_if(entityInfo.properties.complexProperties.cbegin(), entityInfo.properties.complexProperties.cend(),
+																			[this](ComplexProperty const& prop) { return prop.name == codeTemplateMainComplexPropertyName; });
 
 	if (it == entityInfo.properties.complexProperties.cend())	//No main property corresponding to codeTemplateMainComplexPropertyName found
 	{

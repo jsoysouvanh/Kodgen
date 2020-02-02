@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include <string>
 
 #include "RefurekuConfig.h"
 #include "SomeClass.h"
@@ -13,19 +13,10 @@ namespace SomeNamespace
 	{
 		private:
 			RfrkField(Get[const, &], Get[&])
-			float						_someFloat;
-
-			RfrkField(Get[const, &])
-			std::vector<SomeClass*>		_someVectorOfSomeClasses;
-
-			RfrkField(Get[const, &])
-			std::vector<std::string>	_someVectorOfStrings;
+			float		_someFloat	= 42.42f;
 
 			RfrkField(Get[const])
-			SomeClass*					_someClass;
-
-			RfrkField(Get[const, &])
-			std::vector<int>			_someVectorOfInt;
+			SomeClass*	_someClass	= nullptr;
 
 		public:
 			SomeOtherClass() = default;
