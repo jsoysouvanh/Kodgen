@@ -17,10 +17,6 @@ jobs:
    - env: CC=clang-9 CXX=clang++-9
      addons: { apt: { packages: ["clang-9", "libc++-9-dev", "libc++abi-9-dev"] } }
 
-   # GCC 7
-   - env: CC=gcc-7 CXX=g++-7
-     addons: { apt: { packages: ["g++-7"] } }
-
    # GCC 8
    - env: CC=gcc-8 CXX=g++-8
      addons: { apt: { packages: ["g++-8"] } }
