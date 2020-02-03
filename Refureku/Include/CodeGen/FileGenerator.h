@@ -20,13 +20,14 @@ namespace refureku
 			std::set<fs::path>										_includedDirectories;
 			std::unordered_map<std::string,	GeneratedCodeTemplate*>	_generatedCodeTemplates;
 			GeneratedCodeTemplate*									_defaultClassTemplate		= nullptr;
+			GeneratedCodeTemplate*									_defaultStructTemplate		= nullptr;
 			GeneratedCodeTemplate*									_defaultEnumTemplate		= nullptr;
 			std::string												_supportedCodeTemplateRegex = "";
 
 			void					updateSupportedCodeTemplateRegex()																								noexcept;
 			void					generateEntityFile(FileGenerationResult& genResult, fs::path const& filePath, ParsingResult const& parsingResult)				noexcept;
-			GeneratedCodeTemplate*	getEntityGeneratedCodeTemplate(EntityInfo& entityInfo, bool isClass, EFileGenerationError& out_error)					const	noexcept;
-			void					writeEntityToFile(GeneratedFile& generatedFile, EntityInfo& entityInfo, FileGenerationResult& genResult, bool isClass)			noexcept;
+			GeneratedCodeTemplate*	getEntityGeneratedCodeTemplate(EntityInfo& entityInfo, EFileGenerationError& out_error)									const	noexcept;
+			void					writeEntityToFile(GeneratedFile& generatedFile, EntityInfo& entityInfo, FileGenerationResult& genResult)						noexcept;
 			bool					shouldRegenerateFile(fs::path const& filePath)																			const	noexcept;
 			fs::path				makePathToGeneratedFile(fs::path const& sourceFilePath)																	const	noexcept;
 
@@ -91,18 +92,30 @@ namespace refureku
 			*	@param templateName Name of the code template which will be specified in the source code
 			*	@param codeTemplate Pointer to a GeneratedCodeTemplate instance (must be newed).
 			*			The instance will be deleted by the FileGenerator when destroyed
+			*	@param setAsDefaultClassTemplate Should this CodeTemplate be used as the default one when none is
+			*			explicitly specified in source code
 			*/
-			void addGeneratedCodeTemplate(std::string templateName, GeneratedCodeTemplate* codeTemplate)	noexcept;
+			void addGeneratedCodeTemplate(std::string const& templateName, GeneratedCodeTemplate* codeTemplate, bool setAsDefaultClassTemplate = false)	noexcept;
 
 			/**
 			*	@brief Setup the generated code template to use when no template is specified in a parsed source code class
 			*
-			*	@param codeTemplate The name of the default generated code template.
+			*	@param templateName The name of the default generated code template.
 			*						It must have been setup using the addGeneratedCodeTemplate(...) method before
 			*
 			*	@return true if the new default class template was setup successfully, else false
 			*/
-			bool setDefaultClassTemplate(std::string templateName)											noexcept;
+			bool setDefaultClassTemplate(std::string const& templateName)									noexcept;
+
+			/**
+			*	@brief Setup the generated code template to use when no template is specified in a parsed source code struct
+			*
+			*	@param templateName The name of the default generated code template.
+			*						It must have been setup using the addGeneratedCodeTemplate(...) method before call
+			*
+			*	@return true if the new default struct template was setup successfully, else false
+			*/
+			bool setDefaultStructTemplate(std::string const& templateName)									noexcept;
 
 			/**
 			*	@brief Setup the generated code template to use when no template is specified in a parsed source code enum
@@ -112,7 +125,7 @@ namespace refureku
 			*
 			*	@return true if the new default enum template was setup successfully, else false
 			*/
-			bool setDefaultEnumTemplate(std::string templateName)											noexcept;
+			bool setDefaultEnumTemplate(std::string const& templateName)									noexcept;
 
 			/**
 			*	@brief Parse registered files if they were changes since last generation

@@ -38,21 +38,28 @@ void FileGenerator::generateEntityFile(FileGenerationResult& genResult, fs::path
 	//Actual file content (per entity)
 	for (StructClassInfo structOrClassInfo : parsingResult.classes)
 	{
-		writeEntityToFile(generatedFile, structOrClassInfo, genResult, true);
+		writeEntityToFile(generatedFile, structOrClassInfo, genResult);
+	}
+
+	for (StructClassInfo structOrClassInfo : parsingResult.structs)
+	{
+		writeEntityToFile(generatedFile, structOrClassInfo, genResult);
 	}
 
 	for (EnumInfo enumInfo : parsingResult.enums)
 	{
-		writeEntityToFile(generatedFile, enumInfo, genResult, false);
+		writeEntityToFile(generatedFile, enumInfo, genResult);
 	}
 
 	//Footer
 	writeFooter(generatedFile, parsingResult);
 }
 
-GeneratedCodeTemplate* FileGenerator::getEntityGeneratedCodeTemplate(EntityInfo& entityInfo, bool isClass, EFileGenerationError& out_error) const noexcept
+GeneratedCodeTemplate* FileGenerator::getEntityGeneratedCodeTemplate(EntityInfo& entityInfo, EFileGenerationError& out_error) const noexcept
 {
 	GeneratedCodeTemplate* result = nullptr;
+
+	//entityInfo.type
 
 	//Find the specified code template
 	decltype(entityInfo.properties.complexProperties)::const_iterator it = std::find_if(entityInfo.properties.complexProperties.cbegin(), entityInfo.properties.complexProperties.cend(),
@@ -60,11 +67,22 @@ GeneratedCodeTemplate* FileGenerator::getEntityGeneratedCodeTemplate(EntityInfo&
 
 	if (it == entityInfo.properties.complexProperties.cend())	//No main property corresponding to codeTemplateMainComplexPropertyName found
 	{
-		if (isClass)
+		if (entityInfo.entityType == EntityInfo::EType::Class)
 		{
 			if (_defaultClassTemplate != nullptr)
 			{
 				result = _defaultClassTemplate;
+			}
+			else
+			{
+				out_error = EFileGenerationError::MissingGeneratedCodeTemplateComplexProperty;
+			}
+		}
+		else if (entityInfo.entityType == EntityInfo::EType::Struct)
+		{
+			if (_defaultStructTemplate != nullptr)
+			{
+				result = _defaultStructTemplate;
 			}
 			else
 			{
@@ -111,10 +129,10 @@ GeneratedCodeTemplate* FileGenerator::getEntityGeneratedCodeTemplate(EntityInfo&
 	return result;
 }
 
-void FileGenerator::writeEntityToFile(GeneratedFile& generatedFile, EntityInfo& entityInfo, FileGenerationResult& genResult, bool isClass) noexcept
+void FileGenerator::writeEntityToFile(GeneratedFile& generatedFile, EntityInfo& entityInfo, FileGenerationResult& genResult) noexcept
 {
 	EFileGenerationError error = EFileGenerationError::Count;
-	GeneratedCodeTemplate* codeTemplate = getEntityGeneratedCodeTemplate(entityInfo, isClass, error);
+	GeneratedCodeTemplate* codeTemplate = getEntityGeneratedCodeTemplate(entityInfo, error);
 
 	if (codeTemplate != nullptr)
 	{
@@ -177,14 +195,20 @@ bool FileGenerator::addDirectory(fs::path dirPath) noexcept
 	return false;
 }
 
-void FileGenerator::addGeneratedCodeTemplate(std::string templateName, GeneratedCodeTemplate* codeTemplate) noexcept
+void FileGenerator::addGeneratedCodeTemplate(std::string const& templateName, GeneratedCodeTemplate* codeTemplate, bool setAsDefaultClassTemplate) noexcept
 {
-	_generatedCodeTemplates[templateName] = codeTemplate;
+	if (codeTemplate != nullptr)
+	{
+		_generatedCodeTemplates[templateName] = codeTemplate;
 
-	updateSupportedCodeTemplateRegex();
+		updateSupportedCodeTemplateRegex();
+
+		if (setAsDefaultClassTemplate)
+			_defaultClassTemplate = codeTemplate;
+	}
 }
 
-bool FileGenerator::setDefaultClassTemplate(std::string templateName) noexcept
+bool FileGenerator::setDefaultClassTemplate(std::string const& templateName) noexcept
 {
 	decltype(_generatedCodeTemplates)::const_iterator it = _generatedCodeTemplates.find(templateName);
 
@@ -198,7 +222,21 @@ bool FileGenerator::setDefaultClassTemplate(std::string templateName) noexcept
 	return false;
 }
 
-bool FileGenerator::setDefaultEnumTemplate(std::string templateName) noexcept
+bool FileGenerator::setDefaultStructTemplate(std::string const& templateName) noexcept
+{
+	decltype(_generatedCodeTemplates)::const_iterator it = _generatedCodeTemplates.find(templateName);
+
+	if (it != _generatedCodeTemplates.cend())
+	{
+		_defaultStructTemplate = it->second;
+
+		return true;
+	}
+
+	return false;
+}
+
+bool FileGenerator::setDefaultEnumTemplate(std::string const& templateName) noexcept
 {
 	decltype(_generatedCodeTemplates)::const_iterator it = _generatedCodeTemplates.find(templateName);
 
