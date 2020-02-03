@@ -297,7 +297,7 @@ int main()
 	fg.setDefaultClassTemplate("TestTemplate");
 
 	//Add files/directories to parse
-	fg.addFile(pathToFile);
+	fg.includedFiles.emplace(pathToFile.string());
 
 	refureku::FileGenerationResult fgr = fg.generateFiles(parser, true);
 

@@ -15,7 +15,7 @@ namespace SomeNamespace
 
 		private:
 			RfrkField(Get[explicit], Set[])
-			int													_someInt				= 1;
+			int													_someInt				= 2;
 
 			RfrkField(Get[const, *], Set[])
 			float												_someFloat				= 3.14f;

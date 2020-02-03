@@ -23,9 +23,14 @@ int main(int argc, char** argv)
 			CppPropsParser parser;
 			refureku::FileGenerator fileGenerator;
 
-			//Parse WorkingDir/Include/SomeClass.h
-			fileGenerator.addFile(includeDirectory / "SomeClass.h");
-			fileGenerator.addFile(includeDirectory / "SomeOtherClass.h");
+			//Parse WorkingDir/...
+			fileGenerator.includedDirectories.emplace(workingDirectory.string());
+
+			//Ignore generated files...
+			fileGenerator.ignoredDirectories.emplace((includeDirectory / "Generated").string());
+			
+			//Only parse .h files
+			fileGenerator.supportedExtensions.emplace(".h");
 
 			//All generated files will be located in WorkingDir/Include/Generated
 			fileGenerator.outputDirectory = includeDirectory / "Generated";
@@ -54,7 +59,7 @@ int main(int argc, char** argv)
 			*/
 			fileGenerator.setDefaultClassTemplate("PropertyCodeTemplate");
 
-			refureku::FileGenerationResult genResult = fileGenerator.generateFiles(parser, true);
+			refureku::FileGenerationResult genResult = fileGenerator.generateFiles(parser, false);
 
 			if (genResult.completed)
 			{

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <set>
 #include <unordered_map>
+#include <unordered_set>
 #include <string>
 #include <type_traits>
 
@@ -16,8 +16,6 @@ namespace refureku
 	class FileGenerator
 	{
 		private:
-			std::set<fs::path>										_includedFiles;
-			std::set<fs::path>										_includedDirectories;
 			std::unordered_map<std::string,	GeneratedCodeTemplate*>	_generatedCodeTemplates;
 			GeneratedCodeTemplate*									_defaultClassTemplate		= nullptr;
 			GeneratedCodeTemplate*									_defaultStructTemplate		= nullptr;
@@ -30,6 +28,10 @@ namespace refureku
 			void					writeEntityToFile(GeneratedFile& generatedFile, EntityInfo& entityInfo, FileGenerationResult& genResult)						noexcept;
 			bool					shouldRegenerateFile(fs::path const& filePath)																			const	noexcept;
 			fs::path				makePathToGeneratedFile(fs::path const& sourceFilePath)																	const	noexcept;
+			void					processFile(Parser& parser, FileGenerationResult& genResult, fs::path const& pathToFile)										noexcept;
+			void					processIncludedFiles(Parser& parser, FileGenerationResult& genResult, bool forceRegenerateAll)									noexcept;
+			void					processIncludedDirectories(Parser& parser, FileGenerationResult& genResult, bool forceRegenerateAll)							noexcept;
+			void					refreshPropertyRules(ParsingSettings& parsingSettings)																	const	noexcept;
 
 		protected:
 			/**
@@ -69,21 +71,35 @@ namespace refureku
 			~FileGenerator()	noexcept;
 
 			/**
-			*	@brief Add a file to the list of files to parse.
-			*
-			*	@return true on success (the path exists and is a file), else false
+			*	Collection of files to parse.
+			*	These files will be parse without further check if they exist.
 			*/
-
-			bool addFile(fs::path filePath)																	noexcept;
+			std::unordered_set<std::string>							includedFiles;
 
 			/**
-			*	@brief Add a directory to the list of directories to parse.
-			*	@brief All directories contained in the given directory will be recursively inspected.
-			*	@brief All files contained in any included directory will be parsed.
-			*
-			*	@return true on success (the path exists and is a directory), else false
+			*	Collection of included directories.
+			*	All directories contained in the given directories will be recursively inspected, except if they are ignored
+			*	All files contained in any included directory will be parsed, except if they are ignored
 			*/
-			bool addDirectory(fs::path dirPath)																noexcept;
+			std::unordered_set<std::string>							includedDirectories;
+
+			/**
+			*	Collection of ignored files.
+			*	These files will never be parsed (except if they are also part of the includedFiles collection)
+			*/
+			std::unordered_set<std::string>							ignoredFiles;
+
+			/**
+			*	Collection of ignored directories.
+			*	All directories contained in the given directories will be ignored, except if they are included
+			*	All files contained in any ignored directory will be ignored, except if they are included
+			*/
+			std::unordered_set<std::string>							ignoredDirectories;
+
+			/**
+			*	Extensions of files which should be considered for parsing.
+			*/
+			std::unordered_set<std::string>							supportedExtensions;
 
 			/**
 			*	@brief Add a new template to the list of generated code templates

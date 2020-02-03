@@ -156,43 +156,16 @@ fs::path FileGenerator::makePathToGeneratedFile(fs::path const& sourceFilePath) 
 	return (outputDirectory / sourceFilePath.filename()).replace_extension(generatedFilesExtension);
 }
 
-void FileGenerator::writeHeader(GeneratedFile& file, ParsingResult const& parsingResult) const noexcept
+void FileGenerator::writeHeader(GeneratedFile& file, ParsingResult const&) const noexcept
 {
 	file.writeLine("#pragma once\n");
 
 	file.writeLines("/**", "*	Source file: " + file.getSourceFile().string(), "*/\n");
-
-	//Fake use to remove warnings
-	static_cast<void>(parsingResult);
 }
 
-void FileGenerator::writeFooter(GeneratedFile& file, ParsingResult const& parsingResult) const noexcept
+void FileGenerator::writeFooter(GeneratedFile&, ParsingResult const&) const noexcept
 {
 	//Default implementation has no footer
-
-	//Fake use to remove warnings
-	static_cast<void>(file);
-	static_cast<void>(parsingResult);
-}
-
-bool FileGenerator::addFile(fs::path filePath) noexcept
-{
-	if (fs::exists(filePath) && !fs::is_directory(filePath))
-	{
-		return _includedFiles.insert(std::move(filePath)).second;
-	}
-
-	return false;
-}
-
-bool FileGenerator::addDirectory(fs::path dirPath) noexcept
-{
-	if (fs::exists(dirPath) && fs::is_directory(dirPath))
-	{
-		return _includedDirectories.insert(std::move(dirPath)).second;
-	}
-
-	return false;
 }
 
 void FileGenerator::addGeneratedCodeTemplate(std::string const& templateName, GeneratedCodeTemplate* codeTemplate, bool setAsDefaultClassTemplate) noexcept
@@ -250,10 +223,86 @@ bool FileGenerator::setDefaultEnumTemplate(std::string const& templateName) noex
 	return false;
 }
 
+void FileGenerator::processFile(Parser& parser, FileGenerationResult& genResult, fs::path const& pathToFile) noexcept
+{
+	//Parse file
+	ParsingResult parsingResult;
+
+	if (parser.parse(pathToFile, parsingResult))
+	{
+		generateEntityFile(genResult, pathToFile, parsingResult);
+	}
+	else
+	{
+		//Transfer parsing errors into the file generation result
+		genResult.parsingErrors.insert(genResult.parsingErrors.end(), std::make_move_iterator(parsingResult.parsingErrors.begin()), std::make_move_iterator(parsingResult.parsingErrors.end()));
+	}
+}
+
+void FileGenerator::processIncludedFiles(Parser& parser, FileGenerationResult& genResult, bool forceRegenerateAll) noexcept
+{
+	for (fs::path path : includedFiles)
+	{
+		if (fs::exists(path) &&
+			!fs::is_directory(path) &&
+			(forceRegenerateAll || shouldRegenerateFile(path)))
+		{
+			processFile(parser, genResult, path);
+		}
+	}
+}
+
+void FileGenerator::processIncludedDirectories(Parser& parser, FileGenerationResult& genResult, bool forceRegenerateAll) noexcept
+{
+	for (fs::path pathToIncludedDir : includedDirectories)
+	{
+		if (fs::exists(pathToIncludedDir) && fs::is_directory(pathToIncludedDir))
+		{
+			for (fs::recursive_directory_iterator directoryIt = fs::recursive_directory_iterator(pathToIncludedDir, fs::directory_options::follow_directory_symlink); directoryIt != fs::recursive_directory_iterator(); directoryIt++)
+			{
+				fs::directory_entry entry = *directoryIt;
+
+				//Just to make sure the entry hasn't been deleted since beginning of directory iteration
+				if (entry.exists())
+				{
+					fs::path entryPath = entry.path();
+
+					if (entry.is_regular_file())
+					{
+						if (supportedExtensions.find(entryPath.extension().string()) != supportedExtensions.cend() &&
+							ignoredFiles.find(entryPath.string()) == ignoredFiles.cend() &&
+							(forceRegenerateAll || shouldRegenerateFile(entryPath)))
+						{
+							processFile(parser, genResult, entryPath);
+						}
+					}
+					else if (entry.is_directory() && ignoredDirectories.find(entryPath.string()) != ignoredDirectories.cend())
+					{
+						//Don't iterate on ignored directory content
+						directoryIt.disable_recursion_pending();
+					}
+				}
+			}
+		}
+	}
+}
+
+void FileGenerator::refreshPropertyRules(ParsingSettings& parsingSettings) const noexcept
+{
+	//Make sure the CodeTemplate property is setup in class, struct and enum
+	parsingSettings.propertyParsingSettings.classPropertyRules.removeComplexPropertyRule(std::string(codeTemplateMainComplexPropertyName));
+	parsingSettings.propertyParsingSettings.classPropertyRules.addComplexPropertyRule(std::string(codeTemplateMainComplexPropertyName), std::string(_supportedCodeTemplateRegex));
+
+	parsingSettings.propertyParsingSettings.structPropertyRules.removeComplexPropertyRule(std::string(codeTemplateMainComplexPropertyName));
+	parsingSettings.propertyParsingSettings.structPropertyRules.addComplexPropertyRule(std::string(codeTemplateMainComplexPropertyName), std::string(_supportedCodeTemplateRegex));
+
+	parsingSettings.propertyParsingSettings.enumPropertyRules.removeComplexPropertyRule(std::string(codeTemplateMainComplexPropertyName));
+	parsingSettings.propertyParsingSettings.enumPropertyRules.addComplexPropertyRule(std::string(codeTemplateMainComplexPropertyName), std::string(_supportedCodeTemplateRegex));
+}
+
 FileGenerationResult FileGenerator::generateFiles(Parser& parser, bool forceRegenerateAll) noexcept
 {
-	FileGenerationResult	genResult;
-	bool					parsingSuccess;
+	FileGenerationResult genResult;
 
 	//Before doing anything, make sure destination folder exists
 	if (!fs::exists(outputDirectory))
@@ -261,37 +310,10 @@ FileGenerationResult FileGenerator::generateFiles(Parser& parser, bool forceRege
 
 	if (fs::is_directory(outputDirectory))
 	{
-		ParsingSettings& parsingSettings = parser.getParsingSettings();
+		refreshPropertyRules(parser.getParsingSettings());
 
-		//Make sure the CodeTemplate property is setup in class, struct and enum
-		parsingSettings.propertyParsingSettings.classPropertyRules.removeComplexPropertyRule(std::string(codeTemplateMainComplexPropertyName));
-		parsingSettings.propertyParsingSettings.classPropertyRules.addComplexPropertyRule(std::string(codeTemplateMainComplexPropertyName), std::string(_supportedCodeTemplateRegex));
-
-		parsingSettings.propertyParsingSettings.structPropertyRules.removeComplexPropertyRule(std::string(codeTemplateMainComplexPropertyName));
-		parsingSettings.propertyParsingSettings.structPropertyRules.addComplexPropertyRule(std::string(codeTemplateMainComplexPropertyName), std::string(_supportedCodeTemplateRegex));
-
-		parsingSettings.propertyParsingSettings.enumPropertyRules.removeComplexPropertyRule(std::string(codeTemplateMainComplexPropertyName));
-		parsingSettings.propertyParsingSettings.enumPropertyRules.addComplexPropertyRule(std::string(codeTemplateMainComplexPropertyName), std::string(_supportedCodeTemplateRegex));
-
-		for (fs::path const& path : _includedFiles)
-		{
-			if (forceRegenerateAll || shouldRegenerateFile(path))
-			{
-				//Parse file
-				ParsingResult parsingResult;
-				parsingSuccess = parser.parse(path, parsingResult);
-
-				if (parsingSuccess)
-				{
-					generateEntityFile(genResult, path, parsingResult);
-				}
-				else
-				{
-					//Transfer parsing errors into the file generation result
-					genResult.parsingErrors.insert(genResult.parsingErrors.end(), std::make_move_iterator(parsingResult.parsingErrors.begin()), std::make_move_iterator(parsingResult.parsingErrors.end()));
-				}
-			}
-		}
+		processIncludedFiles(parser, genResult, forceRegenerateAll);
+		processIncludedDirectories(parser, genResult, forceRegenerateAll);
 
 		genResult.completed = true;
 	}
