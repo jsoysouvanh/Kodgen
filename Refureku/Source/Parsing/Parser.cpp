@@ -101,7 +101,7 @@ bool Parser::parse(fs::path const& parseFile, ParsingResult& out_result) noexcep
 	if (fs::exists(parseFile) && !fs::is_directory(parseFile))
 	{
 		//Parse the given file
-		CXTranslationUnit translationUnit = clang_parseTranslationUnit(_clangIndex, parseFile.string().c_str(), _parseArguments, sizeof(_parseArguments) / sizeof(char const*), nullptr, 0, CXTranslationUnit_SkipFunctionBodies);
+		CXTranslationUnit translationUnit = clang_parseTranslationUnit(_clangIndex, parseFile.string().c_str(), _parseArguments, sizeof(_parseArguments) / sizeof(char const*), nullptr, 0, CXTranslationUnit_SkipFunctionBodies | CXTranslationUnit_Incomplete);
 
 		if (translationUnit != nullptr)
 		{
@@ -119,6 +119,23 @@ bool Parser::parse(fs::path const& parseFile, ParsingResult& out_result) noexcep
 
 				isSuccess = true;
 			}
+
+			#ifndef NDEBUG
+			
+			CXDiagnosticSet diagnostics = clang_getDiagnosticSetFromTU(translationUnit);
+
+			std::cout << "DIAGNOSTICS START..." << std::endl;
+			for (unsigned i = 0u; i < clang_getNumDiagnosticsInSet(diagnostics); i++)
+			{
+				CXDiagnostic diagnostic(clang_getDiagnosticInSet(diagnostics, i));
+				std::cout << Helpers::getString(clang_formatDiagnostic(diagnostic, clang_defaultDiagnosticDisplayOptions())) << std::endl;
+				clang_disposeDiagnostic(diagnostic);
+			}
+			std::cout << "DIAGNOSTICS END..." << std::endl;
+
+			clang_disposeDiagnosticSet(diagnostics);
+
+			#endif
 
 			clang_disposeTranslationUnit(translationUnit);
 		}

@@ -16,7 +16,7 @@ namespace refureku
 	class Parser
 	{
 		private:
-			static constexpr char const*	_parseArguments[] = { "-x", "c++", "-D", "REFUREKU_PARSING" };
+			static constexpr char const*	_parseArguments[] = { "-xc++", "-DREFUREKU_PARSING" /*, "-IC:/Program Files/LLVM/lib/clang/9.0.0/include/" */ };
 			
 			CXIndex							_clangIndex;
 			

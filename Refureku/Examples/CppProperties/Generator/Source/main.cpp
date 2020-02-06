@@ -57,7 +57,7 @@ int main(int argc, char** argv)
 			*		RkrfField()
 			*		int i;
 			*/
-			fileGenerator.setDefaultClassTemplate("PropertyCodeTemplate");
+			fileGenerator.setDefaultClassTemplate("PropertyCodeTemplate"); 
 
 			refureku::FileGenerationResult genResult = fileGenerator.generateFiles(parser, false);
 
