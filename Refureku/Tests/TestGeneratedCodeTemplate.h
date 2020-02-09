@@ -37,9 +37,9 @@ namespace refureku
 
 							methodAsString += method.name + "(";
 
-							for (TypeInfo typeInfo : method.parameters)
+							for (MethodParamInfo parameter : method.parameters)
 							{
-								methodAsString += typeInfo.getName(true, true) + " -> " + typeInfo.getCanonicalName(true, true) + ", ";
+								methodAsString += parameter.type.getName(true, true) + " -> " + parameter.type.getCanonicalName(true, true) + " " + parameter.name + ", ";
 							}
 
 							methodAsString += ")";

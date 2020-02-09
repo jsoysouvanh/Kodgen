@@ -3,6 +3,7 @@
 #include <assert.h>
 
 #include "Misc/Helpers.h"
+#include "InfoStructures/MethodParamInfo.h"
 
 using namespace refureku;
 
@@ -30,7 +31,7 @@ CXChildVisitResult MethodParser::parse(CXCursor const& cursor, ParsingInfo& pars
 			break;
 
 		case CXCursorKind::CXCursor_ParmDecl:
-			parsingInfo.currentStructOrClass->methods.at(parsingInfo.accessSpecifier).back().parameters.emplace_back(TypeInfo(clang_getCursorType(cursor)));
+			parsingInfo.currentStructOrClass->methods.at(parsingInfo.accessSpecifier).back().parameters.emplace_back(MethodParamInfo{ TypeInfo(clang_getCursorType(cursor)), Helpers::getString(clang_getCursorDisplayName(cursor)) });
 			break;
 
 		default:

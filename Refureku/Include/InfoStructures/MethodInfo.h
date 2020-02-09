@@ -6,7 +6,8 @@
 #include "Misc/FundamentalTypes.h"
 
 #include "InfoStructures/EntityInfo.h"
-#include "TypeInfo.h"
+#include "InfoStructures/TypeInfo.h"
+#include "InfoStructures/MethodParamInfo.h"
 
 namespace refureku
 {
@@ -24,10 +25,10 @@ namespace refureku
 				bool isFinal		: 1;
 				bool isConst		: 1;
 
-			}						qualifiers;
+			}								qualifiers;
 
-			TypeInfo				returnType;
-			std::vector<TypeInfo>	parameters;
+			TypeInfo						returnType;
+			std::vector<MethodParamInfo>	parameters;
 
 			MethodInfo()														= default;
 			MethodInfo(std::string&& entityName, PropertyGroup&& propertyGroup)	noexcept;

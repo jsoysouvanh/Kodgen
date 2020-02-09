@@ -59,7 +59,7 @@ static std::string const TestFile =
 "		#pragma region Methods																																\n"
 "																																							\n"
 "		RfrkMethod(MethodProp1, MethodProp2[MethodSubProp21, MethodSubProp22], MethodProp3)																	\n"
-"		virtual const volatile int* const& someMethod(int param1, Class1Typename& param2) const final;														\n"
+"		virtual const volatile int* const& someMethod(int someMethodParam1, Class1Typename&) const final;													\n"
 "																																							\n"
 "		RfrkMethod(MethodProp1, MethodProp2[MethodSubProp21, MethodSubProp22], MethodProp3)																	\n"
 "		virtual int someMethod2(int param1, class Hey* param2) final																						\n"
