@@ -15,6 +15,19 @@ namespace refureku
 												"",
 												"/**");
 
+					generatedFile.writeLine("is Final: " + std::to_string(static_cast<StructClassInfo const&>(entityInfo).qualifiers.isFinal));
+
+					generatedFile.writeLine("Base classes");
+					for (std::pair<EAccessSpecifier, std::vector<TypeInfo>> const baseClassIt : static_cast<StructClassInfo const&>(entityInfo).parents)
+					{
+						generatedFile.writeLine(toString(baseClassIt.first));
+
+						for (TypeInfo const& baseClass : baseClassIt.second)
+						{
+							generatedFile.writeLine(baseClass.getName(true, true) + " -> " + baseClass.getCanonicalName(true, true));
+						}
+					}
+
 					generatedFile.writeLine("Fields");
 					for (std::pair<EAccessSpecifier, std::vector<FieldInfo>> const fieldIt : static_cast<StructClassInfo const&>(entityInfo).fields)
 					{

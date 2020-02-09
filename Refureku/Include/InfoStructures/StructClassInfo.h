@@ -21,9 +21,12 @@ namespace refureku
 			void initContainers() noexcept;
 
 		public:
-			bool															isFinal;
+			struct ClassQualifiers
+			{
+				bool isFinal		: 1;
+			}																qualifiers;
 
-			std::vector<std::string>										parents;
+			std::unordered_map<EAccessSpecifier, std::vector<TypeInfo>>		parents;
 			std::unordered_map<EAccessSpecifier, std::vector<FieldInfo>>	fields;
 			std::unordered_map<EAccessSpecifier, std::vector<MethodInfo>>	methods;
 

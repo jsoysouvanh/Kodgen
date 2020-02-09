@@ -20,11 +20,12 @@ namespace refureku
 			MethodParser			_methodParser;
 
 		protected:
-			virtual opt::optional<PropertyGroup>	isEntityValid(CXCursor const& currentCursor, ParsingInfo& parsingInfo)						noexcept override final;
-			virtual CXChildVisitResult				setAsCurrentEntityIfValid(CXCursor const& classAnnotationCursor, ParsingInfo& parsingInfo)	noexcept override final;
-			virtual void							endParsing(ParsingInfo& parsingInfo)														noexcept override final;
+			virtual opt::optional<PropertyGroup>	isEntityValid(CXCursor const& currentCursor, ParsingInfo& parsingInfo)								noexcept override final;
+			virtual CXChildVisitResult				setAsCurrentEntityIfValid(CXCursor const& classAnnotationCursor, ParsingInfo& parsingInfo)			noexcept override final;
+			virtual void							endParsing(ParsingInfo& parsingInfo)																noexcept override final;
 			
-			void									updateAccessSpecifier(CXCursor const& cursor, ParsingInfo& parsingInfo)							noexcept;
+			void									addToParents(CXCursor cursor, ParsingInfo& parsingInfo)										const	noexcept;	
+			void									updateAccessSpecifier(CXCursor const& cursor, ParsingInfo& parsingInfo)						const	noexcept;
 
 		public:
 			ClassParser()					= default;
