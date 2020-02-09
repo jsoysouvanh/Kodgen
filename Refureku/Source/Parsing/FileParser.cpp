@@ -1,4 +1,4 @@
-#include "Parsing/Parser.h"
+#include "Parsing/FileParser.h"
 
 #include <iostream>
 
@@ -7,19 +7,19 @@
 
 using namespace refureku;
 
-Parser::Parser() noexcept:
+FileParser::FileParser() noexcept:
 	_clangIndex{clang_createIndex(0, 0)}
 {
 }
 
-Parser::~Parser() noexcept
+FileParser::~FileParser() noexcept
 {
 	clang_disposeIndex(_clangIndex);
 }
 
-CXChildVisitResult Parser::staticParseCursor(CXCursor c, CXCursor parent, CXClientData clientData) noexcept
+CXChildVisitResult FileParser::staticParseCursor(CXCursor c, CXCursor parent, CXClientData clientData) noexcept
 {
-	Parser*	parser = reinterpret_cast<Parser*>(clientData);
+	FileParser*	parser = reinterpret_cast<FileParser*>(clientData);
 
 	//Parse the given file ONLY, ignore headers
 	if (clang_Location_isFromMainFile(clang_getCursorLocation (c)) || clang_getCursorKind(c) == CXCursorKind::CXCursor_AnnotateAttr)
@@ -32,7 +32,7 @@ CXChildVisitResult Parser::staticParseCursor(CXCursor c, CXCursor parent, CXClie
 	return CXChildVisitResult::CXChildVisit_Continue;
 }
 
-void Parser::updateParsingState(CXCursor parent) noexcept
+void FileParser::updateParsingState(CXCursor parent) noexcept
 {
 	if (_classParser.getParsingLevel())
 	{
@@ -44,7 +44,7 @@ void Parser::updateParsingState(CXCursor parent) noexcept
 	}
 }
 
-CXChildVisitResult Parser::parseCursor(CXCursor currentCursor) noexcept
+CXChildVisitResult FileParser::parseCursor(CXCursor currentCursor) noexcept
 {
 	if (_classParser.getParsingLevel())			//Currently parsing a class of struct
 	{
@@ -60,7 +60,7 @@ CXChildVisitResult Parser::parseCursor(CXCursor currentCursor) noexcept
 	}
 }
 
-CXChildVisitResult Parser::parseDefault(CXCursor currentCursor) noexcept
+CXChildVisitResult FileParser::parseDefault(CXCursor currentCursor) noexcept
 {
 	CXCursorKind cursorKind	= clang_getCursorKind(currentCursor);
 
@@ -90,7 +90,7 @@ CXChildVisitResult Parser::parseDefault(CXCursor currentCursor) noexcept
 	return CXChildVisitResult::CXChildVisit_Recurse;
 }
 
-bool Parser::parse(fs::path const& parseFile, ParsingResult& out_result) noexcept
+bool FileParser::parse(fs::path const& parseFile, ParsingResult& out_result) noexcept
 {
 	bool isSuccess = false;
 
@@ -108,7 +108,7 @@ bool Parser::parse(fs::path const& parseFile, ParsingResult& out_result) noexcep
 			//Get the root cursor for this translation unit
 			CXCursor cursor = clang_getTranslationUnitCursor(translationUnit);
 			
-			if (clang_visitChildren(cursor, &Parser::staticParseCursor, this) || _parsingInfo.hasErrorOccured())
+			if (clang_visitChildren(cursor, &FileParser::staticParseCursor, this) || _parsingInfo.hasErrorOccured())
 			{
 				//ERROR
 			}
@@ -156,7 +156,7 @@ bool Parser::parse(fs::path const& parseFile, ParsingResult& out_result) noexcep
 	return isSuccess;
 }
 
-void Parser::preParse(fs::path const& parseFile) noexcept
+void FileParser::preParse(fs::path const& parseFile) noexcept
 {
 	/**
 	*	Default implementation does nothing special
@@ -166,7 +166,7 @@ void Parser::preParse(fs::path const& parseFile) noexcept
 	static_cast<void>(parseFile);
 }
 
-void Parser::postParse(fs::path const& parseFile, ParsingResult const& result) noexcept
+void FileParser::postParse(fs::path const& parseFile, ParsingResult const& result) noexcept
 {
 	/**
 	*	Default implementation does nothing special
@@ -177,7 +177,7 @@ void Parser::postParse(fs::path const& parseFile, ParsingResult const& result) n
 	static_cast<void>(result);
 }
 
-void Parser::reset() noexcept
+void FileParser::reset() noexcept
 {
 	_classParser.reset();
 	_enumParser.reset();
@@ -185,7 +185,7 @@ void Parser::reset() noexcept
 	_parsingInfo.reset();
 }
 
-ParsingSettings& Parser::getParsingSettings() noexcept
+ParsingSettings& FileParser::getParsingSettings() noexcept
 {
 	return _parsingInfo.parsingSettings;
 }

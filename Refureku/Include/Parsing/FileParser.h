@@ -13,10 +13,10 @@
 
 namespace refureku
 {
-	class Parser
+	class FileParser
 	{
 		private:
-			static constexpr char const*	_parseArguments[] = { "-xc++", "-DREFUREKU_PARSING" /*, "-IC:/Program Files/LLVM/lib/clang/9.0.0/include/" */ };
+			static constexpr char const*	_parseArguments[] = { "-xc++", "-DREFUREKU_PARSING" /*, "-IC:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.24.28314/include/" */};
 			
 			CXIndex							_clangIndex;
 			
@@ -55,10 +55,10 @@ namespace refureku
 			virtual void postParse(fs::path const& parseFile, ParsingResult const& result)	noexcept;
 
 		public:
-			Parser()					noexcept;
-			Parser(Parser const&)		= default;
-			Parser(Parser&&)			= default;
-			virtual ~Parser()			noexcept;
+			FileParser()					noexcept;
+			FileParser(FileParser const&)	= default;
+			FileParser(FileParser&&)		= default;
+			virtual ~FileParser()			noexcept;
 
 			/**
 			*	Get the parsing settings of the parser to setup it

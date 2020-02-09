@@ -42,7 +42,7 @@ add_library(${RefurekuTargetLibrary}
 					Source/Parsing/MethodParser.cpp
 					Source/Parsing/EnumParser.cpp
 					Source/Parsing/EnumValueParser.cpp
-					Source/Parsing/Parser.cpp
+					Source/Parsing/FileParser.cpp
 	
 					Source/Misc/EAccessSpecifier.cpp
 					Source/Misc/Helpers.cpp

@@ -223,7 +223,7 @@ bool FileGenerator::setDefaultEnumTemplate(std::string const& templateName) noex
 	return false;
 }
 
-void FileGenerator::processFile(Parser& parser, FileGenerationResult& genResult, fs::path const& pathToFile) noexcept
+void FileGenerator::processFile(FileParser& parser, FileGenerationResult& genResult, fs::path const& pathToFile) noexcept
 {
 	//Parse file
 	ParsingResult parsingResult;
@@ -239,7 +239,7 @@ void FileGenerator::processFile(Parser& parser, FileGenerationResult& genResult,
 	}
 }
 
-void FileGenerator::processIncludedFiles(Parser& parser, FileGenerationResult& genResult, bool forceRegenerateAll) noexcept
+void FileGenerator::processIncludedFiles(FileParser& parser, FileGenerationResult& genResult, bool forceRegenerateAll) noexcept
 {
 	for (fs::path path : includedFiles)
 	{
@@ -252,7 +252,7 @@ void FileGenerator::processIncludedFiles(Parser& parser, FileGenerationResult& g
 	}
 }
 
-void FileGenerator::processIncludedDirectories(Parser& parser, FileGenerationResult& genResult, bool forceRegenerateAll) noexcept
+void FileGenerator::processIncludedDirectories(FileParser& parser, FileGenerationResult& genResult, bool forceRegenerateAll) noexcept
 {
 	for (fs::path pathToIncludedDir : includedDirectories)
 	{
@@ -300,7 +300,7 @@ void FileGenerator::refreshPropertyRules(ParsingSettings& parsingSettings) const
 	parsingSettings.propertyParsingSettings.enumPropertyRules.addComplexPropertyRule(std::string(codeTemplateMainComplexPropertyName), std::string(_supportedCodeTemplateRegex));
 }
 
-FileGenerationResult FileGenerator::generateFiles(Parser& parser, bool forceRegenerateAll) noexcept
+FileGenerationResult FileGenerator::generateFiles(FileParser& parser, bool forceRegenerateAll) noexcept
 {
 	FileGenerationResult genResult;
 

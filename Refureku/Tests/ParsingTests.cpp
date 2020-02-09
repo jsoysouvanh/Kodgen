@@ -1,9 +1,9 @@
 #include <iostream>
 #include <cassert>
 
-#include "Parsing/Parser.h"
+#include "Parsing/FileParser.h"
 
-void setupParser(refureku::Parser& parser)
+void setupParser(refureku::FileParser& parser)
 {
 	refureku::ParsingSettings& parsingSettings = parser.getParsingSettings();
 

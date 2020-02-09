@@ -1,7 +1,7 @@
 #include "CppPropsParser.h"
 
 CppPropsParser::CppPropsParser() noexcept:
-	Parser()
+	FileParser()
 {
 	refureku::ParsingSettings& parsingSettings = getParsingSettings();
 

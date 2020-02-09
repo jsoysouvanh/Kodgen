@@ -1,8 +1,8 @@
 #pragma once
 
-#include <Parsing/Parser.h>
+#include <Parsing/FileParser.h>
 
-class CppPropsParser : public refureku::Parser
+class CppPropsParser : public refureku::FileParser
 {
 	protected:
 	virtual void preParse(fs::path const& parseFile)											noexcept override;

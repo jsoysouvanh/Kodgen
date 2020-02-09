@@ -20,7 +20,7 @@ namespace SomeNamespace
 	{
 		private:
 			RfrkField(Get[const, &], Get[&])
-			float							_someFloat	= 42.42f;
+			float							_someFloat	= 42.42f; 
 
 			RfrkField(Get[const, &])
 			SomeClass						_someClass;
@@ -28,14 +28,14 @@ namespace SomeNamespace
 			RfrkField(Get[const, &])
 			SomeTemplateClass<SomeClass>	_someTemplateClass;
 
-			RfrkField(Get[const, &])
-			std::vector<int>				_someVectorOfInt;
+			//RfrkField(Get[const, &])
+			//std::vector<int>				_someVectorOfInt;
 		
-			RfrkField(Get[const, &])
-			std::vector<SomeClass*>			_someVectorOfSomeClass;
+			//RfrkField(Get[const, &])
+			//std::vector<SomeClass*>			_someVectorOfSomeClass;
 
-			RfrkField(Get[const, &])
-			std::pmr::vector<SomeClass*>	_someVectorOfSomeClass2; 
+			//RfrkField(Get[const, &])
+			//std::unordered_map<int, SomeClass*>	_someVectorOfSomeClass2; 
 
 		public:
 			SomeOtherClass() = default;

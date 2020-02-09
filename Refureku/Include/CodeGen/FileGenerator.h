@@ -9,7 +9,7 @@
 #include "CodeGen/GeneratedCodeTemplate.h"
 #include "CodeGen/FileGenerationResult.h"
 #include "CodeGen/GeneratedFile.h"
-#include "Parsing/Parser.h"
+#include "Parsing/FileParser.h"
 
 namespace refureku
 {
@@ -28,9 +28,9 @@ namespace refureku
 			void					writeEntityToFile(GeneratedFile& generatedFile, EntityInfo& entityInfo, FileGenerationResult& genResult)						noexcept;
 			bool					shouldRegenerateFile(fs::path const& filePath)																			const	noexcept;
 			fs::path				makePathToGeneratedFile(fs::path const& sourceFilePath)																	const	noexcept;
-			void					processFile(Parser& parser, FileGenerationResult& genResult, fs::path const& pathToFile)										noexcept;
-			void					processIncludedFiles(Parser& parser, FileGenerationResult& genResult, bool forceRegenerateAll)									noexcept;
-			void					processIncludedDirectories(Parser& parser, FileGenerationResult& genResult, bool forceRegenerateAll)							noexcept;
+			void					processFile(FileParser& parser, FileGenerationResult& genResult, fs::path const& pathToFile)									noexcept;
+			void					processIncludedFiles(FileParser& parser, FileGenerationResult& genResult, bool forceRegenerateAll)								noexcept;
+			void					processIncludedDirectories(FileParser& parser, FileGenerationResult& genResult, bool forceRegenerateAll)						noexcept;
 			void					refreshPropertyRules(ParsingSettings& parsingSettings)																	const	noexcept;
 
 		protected:
@@ -152,6 +152,6 @@ namespace refureku
 			*
 			*	@return Structure containing result report
 			*/
-			FileGenerationResult generateFiles(Parser& parser, bool forceRegenerateAll = false)				noexcept;
+			FileGenerationResult generateFiles(FileParser& parser, bool forceRegenerateAll = false)			noexcept;
 	};
 }

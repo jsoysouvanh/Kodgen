@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cassert>
 
-#include "Parsing/Parser.h"
+#include "Parsing/FileParser.h"
 #include "CodeGen/FileGenerator.h"
 
 #include "TestGeneratedCodeTemplate.h"
@@ -218,7 +218,7 @@ static std::string const TestFile2 =
 "	};																																						\n"
 "}																																							\n";
 
-void setupParser(refureku::Parser& parser)
+void setupParser(refureku::FileParser& parser)
 {
 	refureku::ParsingSettings& parsingSettings = parser.getParsingSettings();
 
@@ -281,7 +281,7 @@ int main()
 	testFileStream2.close();
 
 	//Setup parser
-	refureku::Parser parser;
+	refureku::FileParser parser;
 
 	setupParser(parser);
 
