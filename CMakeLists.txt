@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.13.5)
 
-project(Refureku)
+project(Kodgen)
 
 # Handle specific flags for each supported compiler
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
@@ -28,4 +28,4 @@ message("Compiler:	${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
 # Enable tests
 enable_testing()
 
-add_subdirectory(Refureku)
+add_subdirectory(Kodgen)
