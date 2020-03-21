@@ -41,10 +41,3 @@ add_dependencies(${RunGeneratorTarget} ${CppPropertiesDemoProjectGeneratorTarget
 
 target_include_directories(${CppPropertiesDemoProjectTarget} PRIVATE
 							Include)
-
-# Setup language requirements
-set_target_properties(${CppPropertiesDemoProjectTarget} ${CppPropertiesDemoProjectGeneratorTarget}
-						PROPERTIES
-						CXX_STANDARD 17
-						CXX_STANDARD_REQUIRED ON
-						CXX_EXTENSIONS OFF)

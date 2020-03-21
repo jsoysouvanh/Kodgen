@@ -1,6 +1,8 @@
 #pragma once
 
 /**
+*	These macros are the tags to use in your headers to make the Kodgen library take it into consideration.
+*
 *	You can redefine these macro names as you like,
 *	but never change their expansion
 */
