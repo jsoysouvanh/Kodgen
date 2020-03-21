@@ -2,9 +2,10 @@
 
 using namespace kodgen;
 
-GeneratedFile::GeneratedFile(fs::path const& sourceFile, fs::path&& generatedFilePath) noexcept:
-	_streamToFile(generatedFilePath.string(), std::ios::out | std::ios::trunc),
-	_sourceFile{sourceFile}
+GeneratedFile::GeneratedFile(fs::path&& generatedFilePath, fs::path const& sourceFilePath) noexcept:
+	_path{std::forward<fs::path>(generatedFilePath)},
+	_sourceFilePath{sourceFilePath},
+	_streamToFile(_path.string(), std::ios::out | std::ios::trunc)
 {
 }
 
@@ -39,7 +40,12 @@ void GeneratedFile::expandWriteMacroLines(std::string&& line) noexcept
 	writeLine("");
 }
 
-fs::path const& GeneratedFile::getSourceFile() const noexcept
+fs::path const& GeneratedFile::getPath() const noexcept
 {
-	return _sourceFile;
+	return _path;
+}
+
+fs::path const& GeneratedFile::getSourceFilePath() const noexcept
+{
+	return _sourceFilePath;
 }

@@ -4,6 +4,11 @@
 
 using namespace kodgen;
 
+PropertyRules::PropertyRules(std::string defaultMacroName):
+	macroName{std::move(defaultMacroName)}
+{
+}
+
 bool PropertyRules::addSimplePropertyRule(std::string&& propertyName) noexcept
 {
 	return _simplePropertyRules.emplace(SimplePropertyRule(std::forward<std::string>(propertyName))).second;

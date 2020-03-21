@@ -16,7 +16,7 @@ namespace kodgen
 	class FileParser
 	{
 		private:
-			static constexpr char const*	_parseArguments[] = { "-xc++", "-DKODGEN_PARSING" };
+			static inline std::string const	_parsingMacro	= "KODGEN_PARSING";
 			
 			CXIndex							_clangIndex;
 			
@@ -24,18 +24,20 @@ namespace kodgen
 			EnumParser						_enumParser;
 			ParsingInfo						_parsingInfo;
 
-			static CXChildVisitResult	staticParseCursor(CXCursor c, CXCursor parent, CXClientData clientData)		noexcept;
+			static CXChildVisitResult	staticParseCursor(CXCursor c, CXCursor parent, CXClientData clientData)			noexcept;
 			
-			void						setupForParsing()															noexcept;
+			std::vector<char const*>	makeParseArguments()													const	noexcept;
 
-			void						updateParsingState(CXCursor parent)											noexcept;
-			CXChildVisitResult			parseCursor(CXCursor currentCursor)											noexcept;
-			CXChildVisitResult			parseDefault(CXCursor currentCursor)										noexcept;
+			void						setupForParsing()																noexcept;
+
+			void						updateParsingState(CXCursor parent)												noexcept;
+			CXChildVisitResult			parseCursor(CXCursor currentCursor)												noexcept;
+			CXChildVisitResult			parseDefault(CXCursor currentCursor)											noexcept;
 
 			/**
 			*	Remove all previously parsed information from the class
 			*/
-			void	reset()																							noexcept;
+			void	reset()																								noexcept;
 
 		protected:
 			/**
@@ -61,9 +63,14 @@ namespace kodgen
 			virtual ~FileParser()			noexcept;
 
 			/**
+			*	Get the name of the macro which is set when parsing the source code
+			*/
+			static std::string const&	getParsingMacro()												noexcept;
+
+			/**
 			*	Get the parsing settings of the parser to setup it
 			*/
-			ParsingSettings&	getParsingSettings()								noexcept;
+			ParsingSettings&			getParsingSettings()											noexcept;
 
 			/**
 			*	Parse a file
@@ -73,6 +80,6 @@ namespace kodgen
 			*
 			*	@return true if the parsing process finished without error, else false
 			*/
-			bool	parse(fs::path const& parseFile, ParsingResult& out_result)		noexcept;
+			bool						parse(fs::path const& parseFile, ParsingResult& out_result)		noexcept;
 	};
 }

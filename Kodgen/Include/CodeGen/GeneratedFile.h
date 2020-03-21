@@ -10,8 +10,9 @@ namespace kodgen
 	class GeneratedFile
 	{
 		private:
+			fs::path		_path;
+			fs::path		_sourceFilePath;
 			std::ofstream	_streamToFile;
-			fs::path		_sourceFile;
 
 			/**
 			*	@brief Write a single line in the generated file
@@ -39,11 +40,11 @@ namespace kodgen
 			void expandWriteMacroLines(std::string&& line)							noexcept;
 
 		public:
-			GeneratedFile()															= delete;
-			GeneratedFile(fs::path const& sourceFile, fs::path&& generatedFilePath)	noexcept;
-			GeneratedFile(GeneratedFile const&)										= delete;
-			GeneratedFile(GeneratedFile&&)											= delete;
-			~GeneratedFile()														noexcept;
+			GeneratedFile()																				= delete;
+			GeneratedFile(fs::path&& generatedFilePath, fs::path const& sourceFilePath = fs::path())	noexcept;
+			GeneratedFile(GeneratedFile const&)															= delete;
+			GeneratedFile(GeneratedFile&&)																= delete;
+			~GeneratedFile()																			noexcept;
 
 			/**
 			*	@brief Write a line in the generated file
@@ -76,9 +77,14 @@ namespace kodgen
 			void writeMacro(std::string&& macroPrototype, Lines&&... lines)			noexcept;
 
 			/**
-			*	@return The source file for this generated file
+			*	@return The path to this generated file
 			*/
-			fs::path const&	getSourceFile()									const	noexcept;
+			fs::path const& getPath()										const	noexcept;
+
+			/**
+			*	@return The path to the source file for this generated file
+			*/
+			fs::path const&	getSourceFilePath()								const	noexcept;
 	};
 
 	#include "CodeGen/GeneratedFile.inl"

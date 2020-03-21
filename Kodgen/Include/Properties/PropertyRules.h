@@ -14,22 +14,35 @@ namespace kodgen
 			std::set<ComplexPropertyRule>	_complexPropertyRules;
 
 		public:
-			PropertyRules()						= default;
-			PropertyRules(PropertyRules const&)	= default;
-			PropertyRules(PropertyRules&&)		= default;
-			~PropertyRules()					= default;
+			/**
+			*	Name of the macro to use in source code to add properties to an entity
+			*	
+			*	If this PropertyRules object is the classPropertyRules and _macroName = "MyCustomClassMacro", 
+			*	We can add properties to a class like so:
+			*		class MyCustomClassMacro() SomeClass {};
+			*/
+			std::string						macroName;
 
-			bool addSimplePropertyRule(std::string&& propertyName)										noexcept;
-			bool removeSimplePropertyRule(std::string&& propertyName)									noexcept;
-			bool addComplexPropertyRule(std::string&& mainPropertyName, std::string&& subPropPattern)	noexcept;
-			bool removeComplexPropertyRule(std::string&& mainPropertyName, std::string&& subPropPattern)noexcept;
-			bool removeComplexPropertyRule(std::string&& mainPropertyName)								noexcept;
+			PropertyRules()								= default;
+			PropertyRules(std::string defaultMacroName);
+			PropertyRules(PropertyRules const&)			= default;
+			PropertyRules(PropertyRules&&)				= default;
+			~PropertyRules()							= default;
 
-			void clearSimplePropertyRules()																noexcept;
-			void clearComplexPropertyRules()															noexcept;
-			void clearAllPropertyRules()																noexcept;
+			bool addSimplePropertyRule(std::string&& propertyName)											noexcept;
+			bool removeSimplePropertyRule(std::string&& propertyName)										noexcept;
+			bool addComplexPropertyRule(std::string&& mainPropertyName, std::string&& subPropPattern)		noexcept;
+			bool removeComplexPropertyRule(std::string&& mainPropertyName, std::string&& subPropPattern)	noexcept;
+			bool removeComplexPropertyRule(std::string&& mainPropertyName)									noexcept;
 
-			SimplePropertyRule const*	getSimplePropertyRule(std::string const& propertyName)	const	noexcept;
-			ComplexPropertyRule const*	getComplexPropertyRule(std::string const& propertyName)	const	noexcept;
+			void clearSimplePropertyRules()																	noexcept;
+			void clearComplexPropertyRules()																noexcept;
+			void clearAllPropertyRules()																	noexcept;
+
+			SimplePropertyRule const*	getSimplePropertyRule(std::string const& propertyName)		const	noexcept;
+			ComplexPropertyRule const*	getComplexPropertyRule(std::string const& propertyName)		const	noexcept;
+
+			PropertyRules&	operator=(PropertyRules&)	= default;
+			PropertyRules&	operator=(PropertyRules&&)	= default;
 	};
 }

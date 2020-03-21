@@ -2,8 +2,6 @@
 
 #include <string>
 
-#include "KodgenConfig.h"
-
 #include "Generated/SomeClass.myCustomExtension.h"
 
 namespace SomeNamespace

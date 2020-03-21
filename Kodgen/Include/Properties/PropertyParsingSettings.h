@@ -13,11 +13,11 @@ namespace kodgen
 		char						subPropertyEnclosers[2]	= { '[', ']' };
 		std::unordered_set<char>	ignoredCharacters;
 
-		PropertyRules				classPropertyRules;
-		PropertyRules				structPropertyRules;
-		PropertyRules				fieldPropertyRules;
-		PropertyRules				methodPropertyRules;
-		PropertyRules				enumPropertyRules;
-		PropertyRules				enumValuePropertyRules;
+		PropertyRules				classPropertyRules		= PropertyRules("Class");
+		PropertyRules				structPropertyRules		= PropertyRules("Struct");
+		PropertyRules				fieldPropertyRules		= PropertyRules("Field");
+		PropertyRules				methodPropertyRules		= PropertyRules("Method");
+		PropertyRules				enumPropertyRules		= PropertyRules("Enum");
+		PropertyRules				enumValuePropertyRules	= PropertyRules("EnumVal");
 	};
 }

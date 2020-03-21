@@ -90,6 +90,52 @@ CXChildVisitResult FileParser::parseDefault(CXCursor currentCursor) noexcept
 	return CXChildVisitResult::CXChildVisit_Recurse;
 }
 
+std::vector<char const*> FileParser::makeParseArguments() const noexcept
+{
+	static std::string			parsingMacro("-D" + _parsingMacro);
+	static std::string			classPropertyMacro;
+	static std::string			structPropertyMacro;
+	static std::string			fieldPropertyMacro;
+	static std::string			methodPropertyMacro;
+	static std::string			enumPropertyMacro;
+	static std::string			enumValuePropertyMacro;
+
+	std::vector<char const*>	result;
+
+	/**
+	*	2 to include -xc++ & _parsingMacro
+	*
+	*	6 because we make an additional parameter per possible entity
+	*	Class, Struct, Field, Method, Enum, EnumValue
+	*/
+	result.reserve(2u + 6u);
+
+	//Parsing C++
+	result.emplace_back("-xc++");
+
+	//Macro set when we are parsing with Kodgen
+	result.emplace_back(parsingMacro.data());
+
+	//Refresh static entity property macros according to parsing settings
+	ParsingSettings const& parsingSettings = _parsingInfo.parsingSettings;
+
+	classPropertyMacro		= "-D" + parsingSettings.propertyParsingSettings.classPropertyRules.macroName		+ "(...)=__attribute__((annotate(\"KGC:\"#__VA_ARGS__)))";
+	structPropertyMacro		= "-D" + parsingSettings.propertyParsingSettings.structPropertyRules.macroName		+ "(...)=__attribute__((annotate(\"KGS:\"#__VA_ARGS__)))";
+	fieldPropertyMacro		= "-D" + parsingSettings.propertyParsingSettings.fieldPropertyRules.macroName		+ "(...)=__attribute__((annotate(\"KGF:\"#__VA_ARGS__)))";
+	methodPropertyMacro		= "-D" + parsingSettings.propertyParsingSettings.methodPropertyRules.macroName		+ "(...)=__attribute__((annotate(\"KGM:\"#__VA_ARGS__)))";
+	enumPropertyMacro		= "-D" + parsingSettings.propertyParsingSettings.enumPropertyRules.macroName		+ "(...)=__attribute__((annotate(\"KGE:\"#__VA_ARGS__)))";
+	enumValuePropertyMacro	= "-D" + parsingSettings.propertyParsingSettings.enumValuePropertyRules.macroName	+ "(...)=__attribute__((annotate(\"KGEV:\"#__VA_ARGS__)))";
+
+	result.emplace_back(classPropertyMacro.data());
+	result.emplace_back(structPropertyMacro.data());
+	result.emplace_back(fieldPropertyMacro.data());
+	result.emplace_back(methodPropertyMacro.data());
+	result.emplace_back(enumPropertyMacro.data());
+	result.emplace_back(enumValuePropertyMacro.data());
+
+	return result;
+}
+
 bool FileParser::parse(fs::path const& parseFile, ParsingResult& out_result) noexcept
 {
 	bool isSuccess = false;
@@ -100,8 +146,10 @@ bool FileParser::parse(fs::path const& parseFile, ParsingResult& out_result) noe
 
 	if (fs::exists(parseFile) && !fs::is_directory(parseFile))
 	{
+		std::vector<char const*> const parseArguments = makeParseArguments();
+
 		//Parse the given file
-		CXTranslationUnit translationUnit = clang_parseTranslationUnit(_clangIndex, parseFile.string().c_str(), _parseArguments, sizeof(_parseArguments) / sizeof(char const*), nullptr, 0, CXTranslationUnit_SkipFunctionBodies | CXTranslationUnit_Incomplete);
+		CXTranslationUnit translationUnit = clang_parseTranslationUnit(_clangIndex, parseFile.string().c_str(), parseArguments.data(), static_cast<int32>(parseArguments.size()), nullptr, 0, CXTranslationUnit_SkipFunctionBodies | CXTranslationUnit_Incomplete);
 
 		if (translationUnit != nullptr)
 		{
@@ -156,25 +204,18 @@ bool FileParser::parse(fs::path const& parseFile, ParsingResult& out_result) noe
 	return isSuccess;
 }
 
-void FileParser::preParse(fs::path const& parseFile) noexcept
+void FileParser::preParse(fs::path const&) noexcept
 {
 	/**
 	*	Default implementation does nothing special
 	*/
-
-	//Fake use to remove warning
-	static_cast<void>(parseFile);
 }
 
-void FileParser::postParse(fs::path const& parseFile, ParsingResult const& result) noexcept
+void FileParser::postParse(fs::path const&, ParsingResult const&) noexcept
 {
 	/**
 	*	Default implementation does nothing special
 	*/
-
-	//Fake use to remove warning
-	static_cast<void>(parseFile);
-	static_cast<void>(result);
 }
 
 void FileParser::reset() noexcept
@@ -183,6 +224,11 @@ void FileParser::reset() noexcept
 	_enumParser.reset();
 
 	_parsingInfo.reset();
+}
+
+std::string const& FileParser::getParsingMacro() noexcept
+{
+	return _parsingMacro;
 }
 
 ParsingSettings& FileParser::getParsingSettings() noexcept

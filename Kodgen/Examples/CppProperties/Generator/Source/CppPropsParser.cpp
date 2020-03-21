@@ -26,6 +26,14 @@ CppPropsParser::CppPropsParser() noexcept:
 	//Define the Get property, which can take 
 	fieldPropertyRules.addComplexPropertyRule("Get", "&|\\*|const|explicit");
 	fieldPropertyRules.addComplexPropertyRule("Set", "explicit");
+
+	//Define the macros to use for each entity type
+	parsingSettings.propertyParsingSettings.classPropertyRules.macroName		= "KGClass";
+	parsingSettings.propertyParsingSettings.structPropertyRules.macroName		= "KGStruct";
+	fieldPropertyRules.macroName												= "KGField";
+	parsingSettings.propertyParsingSettings.methodPropertyRules.macroName		= "KGMethod";
+	parsingSettings.propertyParsingSettings.enumPropertyRules.macroName			= "KGEnum";
+	parsingSettings.propertyParsingSettings.enumValuePropertyRules.macroName	= "KGEnumVal";
 }
 
 void CppPropsParser::preParse(fs::path const& parseFile) noexcept

@@ -30,7 +30,7 @@ void FileGenerator::updateSupportedCodeTemplateRegex() noexcept
 
 void FileGenerator::generateEntityFile(FileGenerationResult& genResult, fs::path const& filePath, ParsingResult const& parsingResult) noexcept
 {
-	GeneratedFile generatedFile(filePath, makePathToGeneratedFile(filePath));
+	GeneratedFile generatedFile(makePathToGeneratedFile(filePath), filePath);
 
 	//Header
 	writeHeader(generatedFile, parsingResult);
@@ -58,8 +58,6 @@ void FileGenerator::generateEntityFile(FileGenerationResult& genResult, fs::path
 GeneratedCodeTemplate* FileGenerator::getEntityGeneratedCodeTemplate(EntityInfo& entityInfo, EFileGenerationError& out_error) const noexcept
 {
 	GeneratedCodeTemplate* result = nullptr;
-
-	//entityInfo.type
 
 	//Find the specified code template
 	decltype(entityInfo.properties.complexProperties)::const_iterator it = std::find_if(entityInfo.properties.complexProperties.cbegin(), entityInfo.properties.complexProperties.cend(),
@@ -140,7 +138,7 @@ void FileGenerator::writeEntityToFile(GeneratedFile& generatedFile, EntityInfo& 
 	}
 	else
 	{
-		genResult.fileGenerationErrors.emplace_back(FileGenerationError(generatedFile.getSourceFile(), entityInfo.name, error));
+		genResult.fileGenerationErrors.emplace_back(FileGenerationError(generatedFile.getSourceFilePath(), entityInfo.name, error));
 	}
 }
 
@@ -160,7 +158,9 @@ void FileGenerator::writeHeader(GeneratedFile& file, ParsingResult const&) const
 {
 	file.writeLine("#pragma once\n");
 
-	file.writeLines("/**", "*	Source file: " + file.getSourceFile().string(), "*/\n");
+	file.writeLines("/**", "*	Source file: " + file.getSourceFilePath().string(), "*/\n");
+
+	file.writeLine("#include \"" + _entityMacrosDefFilename + "\"\n");
 }
 
 void FileGenerator::writeFooter(GeneratedFile&, ParsingResult const&) const noexcept
@@ -300,6 +300,25 @@ void FileGenerator::refreshPropertyRules(ParsingSettings& parsingSettings) const
 	parsingSettings.propertyParsingSettings.enumPropertyRules.addComplexPropertyRule(std::string(codeTemplateMainComplexPropertyName), std::string(_supportedCodeTemplateRegex));
 }
 
+void FileGenerator::generateMacrosFile(FileParser& parser) const noexcept
+{
+	GeneratedFile macrosDefinitionFile(outputDirectory / _entityMacrosDefFilename);
+
+	PropertyParsingSettings& pps = parser.getParsingSettings().propertyParsingSettings;
+
+	//Define empty entity macros to allow compilation outside of the Kodgen parsing
+	macrosDefinitionFile.writeLines("#pragma once",
+									"",
+									"#ifndef " + parser.getParsingMacro(),
+									"	#define " + pps.classPropertyRules.macroName + "(...)",
+									"	#define " + pps.structPropertyRules.macroName + "(...)",
+									"	#define " + pps.fieldPropertyRules.macroName + "(...)",
+									"	#define " + pps.methodPropertyRules.macroName + "(...)",
+									"	#define " + pps.enumPropertyRules.macroName + "(...)",
+									"	#define " + pps.enumValuePropertyRules.macroName + "(...)",
+									"#endif");
+}
+
 FileGenerationResult FileGenerator::generateFiles(FileParser& parser, bool forceRegenerateAll) noexcept
 {
 	FileGenerationResult genResult;
@@ -310,7 +329,11 @@ FileGenerationResult FileGenerator::generateFiles(FileParser& parser, bool force
 
 	if (fs::is_directory(outputDirectory))
 	{
-		refreshPropertyRules(parser.getParsingSettings());
+		ParsingSettings& parsingSettings = parser.getParsingSettings();
+
+		refreshPropertyRules(parsingSettings);
+
+		generateMacrosFile(parser);
 
 		processIncludedFiles(parser, genResult, forceRegenerateAll);
 		processIncludedDirectories(parser, genResult, forceRegenerateAll);

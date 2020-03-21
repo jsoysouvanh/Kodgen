@@ -3,7 +3,6 @@
 #include <string>
 #include <vector>
 
-#include "KodgenConfig.h"
 #include "SomeClass.h"
 
 #include "Generated/SomeOtherClass.myCustomExtension.h"

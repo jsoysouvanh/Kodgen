@@ -16,6 +16,8 @@ namespace kodgen
 	class FileGenerator
 	{
 		private:
+			static inline std::string								_entityMacrosDefFilename	= "EntityMacros.h";
+
 			std::unordered_map<std::string,	GeneratedCodeTemplate*>	_generatedCodeTemplates;
 			GeneratedCodeTemplate*									_defaultClassTemplate		= nullptr;
 			GeneratedCodeTemplate*									_defaultStructTemplate		= nullptr;
@@ -32,6 +34,7 @@ namespace kodgen
 			void					processIncludedFiles(FileParser& parser, FileGenerationResult& genResult, bool forceRegenerateAll)								noexcept;
 			void					processIncludedDirectories(FileParser& parser, FileGenerationResult& genResult, bool forceRegenerateAll)						noexcept;
 			void					refreshPropertyRules(ParsingSettings& parsingSettings)																	const	noexcept;
+			void					generateMacrosFile(FileParser& parser)																					const	noexcept;
 
 		protected:
 			/**
