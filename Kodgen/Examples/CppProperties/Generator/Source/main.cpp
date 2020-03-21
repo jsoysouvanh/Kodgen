@@ -18,22 +18,23 @@ int main(int argc, char** argv)
 		{
 			std::cout << "WORKING DIRECTORY IS: " << workingDirectory.string() << std::endl;
 
-			fs::path includeDirectory = workingDirectory / "Include";
+			fs::path includeDirectory	= workingDirectory / "Include";
+			fs::path generatedDirectory	= includeDirectory / "Generated";
 
 			CppPropsParser parser;
 			kodgen::FileGenerator fileGenerator;
 
 			//Parse WorkingDir/...
-			fileGenerator.includedDirectories.emplace(workingDirectory.string());
+			fileGenerator.includedDirectories.emplace(includeDirectory.string());
 
 			//Ignore generated files...
-			fileGenerator.ignoredDirectories.emplace((includeDirectory / "Generated").string());
+			fileGenerator.ignoredDirectories.emplace(generatedDirectory.string());
 			
 			//Only parse .h files
 			fileGenerator.supportedExtensions.emplace(".h");
 
 			//All generated files will be located in WorkingDir/Include/Generated
-			fileGenerator.outputDirectory = includeDirectory / "Generated";
+			fileGenerator.outputDirectory = generatedDirectory;
 
 			//Generated files will use .myCustomExtension.h extension
 			fileGenerator.generatedFilesExtension = ".myCustomExtension.h";
@@ -45,8 +46,7 @@ int main(int argc, char** argv)
 			*	Can specify code template to use by using the MyCustomCodeTemplatePropertyName main property
 			*
 			*	For example:
-			*		RkrfField(MyCustomCodeTemplatePropertyName[PropertyCodeTemplate])
-			*		int i;
+			*		class KGClass(MyCustomCodeTemplatePropertyName[PropertyCodeTemplate]) MyClass {};
 			*/
 			fileGenerator.codeTemplateMainComplexPropertyName = "MyCustomCodeTemplatePropertyName";
 
@@ -54,8 +54,7 @@ int main(int argc, char** argv)
 			*	Set a default class template so that we don't have to specify it manually
 			*
 			*	Now we can simply write:
-			*		RkrfField()
-			*		int i;
+			*		class KGClass() MyClass {};
 			*/
 			fileGenerator.setDefaultClassTemplate("PropertyCodeTemplate"); 
 
