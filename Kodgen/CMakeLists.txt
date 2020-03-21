@@ -22,7 +22,6 @@ add_library(${KodgenTargetLibrary}
 					Source/Properties/ComplexPropertyRule.cpp
 					Source/Properties/ComplexProperty.cpp
 					Source/Properties/PropertyRules.cpp
-					Source/Properties/PropertyParser.cpp
 					Source/Properties/PropertyGroup.cpp
 	
 					Source/InfoStructures/EntityInfo.cpp
@@ -36,6 +35,7 @@ add_library(${KodgenTargetLibrary}
 	
 					Source/Parsing/EParsingError.cpp
 					Source/Parsing/ParsingError.cpp
+					Source/Parsing/PropertyParser.cpp
 					Source/Parsing/EntityParser.cpp
 					Source/Parsing/ClassParser.cpp
 					Source/Parsing/FieldParser.cpp

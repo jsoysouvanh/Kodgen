@@ -7,7 +7,7 @@
 #include "Misc/EAccessSpecifier.h"
 #include "Parsing/ParsingSettings.h"
 #include "Parsing/ParsingResult.h"
-#include "Properties/PropertyParser.h"
+#include "Parsing/PropertyParser.h"
 #include "InfoStructures/TypeInfo.h"
 
 namespace kodgen

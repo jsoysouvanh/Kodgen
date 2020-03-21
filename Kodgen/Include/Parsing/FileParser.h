@@ -9,7 +9,7 @@
 #include "Parsing/EnumParser.h"
 #include "Parsing/ParsingResult.h"
 #include "Parsing/ParsingSettings.h"
-#include "Properties/PropertyParser.h"
+#include "Parsing/PropertyParser.h"
 
 namespace kodgen
 {

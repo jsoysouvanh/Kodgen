@@ -1,6 +1,6 @@
-#include "Properties/PropertyParser.h"
+#include "Parsing/PropertyParser.h"
 
-#include <iostream>	//TO DELETE
+#include <iostream>	//TODO DELETE
 #include <cassert>
 
 using namespace kodgen;
