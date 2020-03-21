@@ -57,12 +57,7 @@ add_library(${KodgenTargetLibrary}
 target_compile_options(${KodgenTargetLibrary} PUBLIC $<$<CXX_COMPILER_ID:Clang>:-stdlib=libc++>)
 
 # Setup language requirements
-set_target_properties(${KodgenTargetLibrary}
-						PROPERTIES
-							CXX_STANDARD 17
-							CXX_STANDARD_REQUIRED ON
-							CXX_EXTENSIONS OFF
-						)
+target_compile_features(${KodgenTargetLibrary} PUBLIC cxx_std_17)
 
 # Setup include directories
 target_include_directories(${KodgenTargetLibrary}
