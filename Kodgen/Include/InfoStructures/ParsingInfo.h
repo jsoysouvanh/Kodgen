@@ -16,7 +16,7 @@ namespace kodgen
 	{
 		public:
 			/**
-			*	Settings used to parse
+			*	Settings used to parse headers
 			*/
 			ParsingSettings					parsingSettings;
 
