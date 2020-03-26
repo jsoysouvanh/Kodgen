@@ -1,11 +1,10 @@
 #pragma once
 
-#include "InfoStructures/EntityInfo.h"
-
 #include <vector>
 #include <unordered_map>
 #include <clang-c/Index.h>
 
+#include "InfoStructures/EntityInfo.h"
 #include "Misc/EAccessSpecifier.h"
 #include "InfoStructures/FieldInfo.h"
 #include "InfoStructures/MethodInfo.h"
@@ -21,18 +20,22 @@ namespace kodgen
 			void initContainers() noexcept;
 
 		public:
+			struct ParentInfo
+			{
+				EAccessSpecifier	inheritanceAccess;
+				TypeInfo			parent;
+			};
+
 			struct ClassQualifiers
 			{
 				bool isFinal		: 1;
 			}																qualifiers;
 
-			//std::vector<
+			//std::vector<ParentInfo>										parents;
+			std::unordered_map<EAccessSpecifier, std::vector<TypeInfo>>		parents;	//TODO: change that
 			std::vector<FieldInfo>											fields;
 			std::vector<MethodInfo>											methods;
 
-			std::unordered_map<EAccessSpecifier, std::vector<TypeInfo>>		parents;	//TODO: change that
-			//std::unordered_map<EAccessSpecifier, std::vector<FieldInfo>>	fields;
-			//std::unordered_map<EAccessSpecifier, std::vector<MethodInfo>>	methods;
 
 			StructClassInfo()																				noexcept;
 			StructClassInfo(std::string&& entityName, PropertyGroup&& propertyGroup, EType&& entityType)	noexcept;

@@ -29,36 +29,26 @@ namespace kodgen
 					}
 
 					generatedFile.writeLine("Fields");
-					for (std::pair<EAccessSpecifier, std::vector<FieldInfo>> const fieldIt : static_cast<StructClassInfo const&>(entityInfo).fields)
+					for (FieldInfo const& field : static_cast<StructClassInfo const&>(entityInfo).fields)
 					{
-						generatedFile.writeLine(toString(fieldIt.first));
-
-						for (FieldInfo const& field : fieldIt.second)
-						{
-							generatedFile.writeLine(field.type.getName(true, true) + " -> " + field.type.getCanonicalName(true, true) + " " + field.name);
-						}
+						generatedFile.writeLine(field.type.getName(true, true) + " -> " + field.type.getCanonicalName(true, true) + " " + field.name);
 					}
 
 					generatedFile.writeLine("Methods");
-					for (std::pair<EAccessSpecifier, std::vector<MethodInfo>> const methodIt : static_cast<StructClassInfo const&>(entityInfo).methods)
+					for (MethodInfo const& method : static_cast<StructClassInfo const&>(entityInfo).methods)
 					{
-						generatedFile.writeLine(toString(methodIt.first));
+						std::string methodAsString;
 
-						for (MethodInfo const& method : methodIt.second)
+						methodAsString += method.name + "(";
+
+						for (MethodParamInfo parameter : method.parameters)
 						{
-							std::string methodAsString;
-
-							methodAsString += method.name + "(";
-
-							for (MethodParamInfo parameter : method.parameters)
-							{
-								methodAsString += parameter.type.getName(true, true) + " -> " + parameter.type.getCanonicalName(true, true) + " " + parameter.name + ", ";
-							}
-
-							methodAsString += ")";
-
-							generatedFile.writeLine(methodAsString);
+							methodAsString += parameter.type.getName(true, true) + " -> " + parameter.type.getCanonicalName(true, true) + " " + parameter.name + ", ";
 						}
+
+						methodAsString += ")";
+
+						generatedFile.writeLine(methodAsString);
 					}
 
 					generatedFile.writeLine("*/");
