@@ -22,16 +22,6 @@ void StructClassInfo::initContainers() noexcept
 	parents.emplace(EAccessSpecifier::Public, std::vector<TypeInfo>());
 	parents.emplace(EAccessSpecifier::Protected, std::vector<TypeInfo>());
 	parents.emplace(EAccessSpecifier::Private, std::vector<TypeInfo>());
-
-	fields.reserve(3u);
-	fields.emplace(EAccessSpecifier::Public, std::vector<FieldInfo>());
-	fields.emplace(EAccessSpecifier::Protected, std::vector<FieldInfo>());
-	fields.emplace(EAccessSpecifier::Private, std::vector<FieldInfo>());
-
-	methods.reserve(3u);
-	methods.emplace(EAccessSpecifier::Public, std::vector<MethodInfo>());
-	methods.emplace(EAccessSpecifier::Protected, std::vector<MethodInfo>());
-	methods.emplace(EAccessSpecifier::Private, std::vector<MethodInfo>());
 }
 
 std::ostream& kodgen::operator<<(std::ostream& out_stream, StructClassInfo const& structClassInfo) noexcept
@@ -43,26 +33,18 @@ std::ostream& kodgen::operator<<(std::ostream& out_stream, StructClassInfo const
 
 	//Fields
 	out_stream << " - Fields" << std::endl;
-	for (decltype(structClassInfo.fields)::const_iterator it = structClassInfo.fields.cbegin(); it != structClassInfo.fields.cend(); it++)
-	{
-		out_stream << "   - " << toString(it->first) << std::endl;
 
-		for (FieldInfo const& field : it->second)
-		{
-			out_stream << "       " << field << std::endl;
-		}
+	for (FieldInfo const& field : structClassInfo.fields)
+	{
+		out_stream << "       " << field << std::endl;
 	}
 
 	//Methods
 	out_stream << " - Methods" << std::endl;
-	for (decltype(structClassInfo.methods)::const_iterator it = structClassInfo.methods.cbegin(); it != structClassInfo.methods.cend(); it++)
-	{
-		out_stream << "   - " << toString(it->first) << std::endl;
 
-		for (MethodInfo const& method : it->second)
-		{
-			out_stream << "       " << method << std::endl;
-		}
+	for (MethodInfo const& method : structClassInfo.methods)
+	{
+		out_stream << "       " << method << std::endl;
 	}
 
 	return out_stream;

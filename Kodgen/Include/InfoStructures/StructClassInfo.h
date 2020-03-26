@@ -26,9 +26,13 @@ namespace kodgen
 				bool isFinal		: 1;
 			}																qualifiers;
 
-			std::unordered_map<EAccessSpecifier, std::vector<TypeInfo>>		parents;
-			std::unordered_map<EAccessSpecifier, std::vector<FieldInfo>>	fields;
-			std::unordered_map<EAccessSpecifier, std::vector<MethodInfo>>	methods;
+			//std::vector<
+			std::vector<FieldInfo>											fields;
+			std::vector<MethodInfo>											methods;
+
+			std::unordered_map<EAccessSpecifier, std::vector<TypeInfo>>		parents;	//TODO: change that
+			//std::unordered_map<EAccessSpecifier, std::vector<FieldInfo>>	fields;
+			//std::unordered_map<EAccessSpecifier, std::vector<MethodInfo>>	methods;
 
 			StructClassInfo()																				noexcept;
 			StructClassInfo(std::string&& entityName, PropertyGroup&& propertyGroup, EType&& entityType)	noexcept;
