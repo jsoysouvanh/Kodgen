@@ -25,6 +25,7 @@ CXChildVisitResult FieldParser::setAsCurrentEntityIfValid(CXCursor const& fieldA
 		{
 			FieldInfo& field = parsingInfo.currentStructOrClass->fields.at(parsingInfo.accessSpecifier).emplace_back(FieldInfo(Helpers::getString(clang_getCursorDisplayName(getCurrentCursor())), std::move(*propertyGroup)));
 			
+			field.accessSpecifier = parsingInfo.accessSpecifier;
 			field.type = TypeInfo(clang_getCursorType(getCurrentCursor()));
 			field.qualifiers.isStatic = (clang_getCursorKind(getCurrentCursor()) == CXCursorKind::CXCursor_VarDecl);
 
