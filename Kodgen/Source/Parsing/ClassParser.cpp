@@ -165,7 +165,7 @@ void ClassParser::updateParsingState(CXCursor const& parent, ParsingInfo& parsin
 
 void ClassParser::updateAccessSpecifier(CXCursor const& cursor, ParsingInfo& parsingInfo) const noexcept
 {
-	parsingInfo.accessSpecifier = static_cast<EAccessSpecifier>(1 << clang_getCXXAccessSpecifier(cursor));
+	parsingInfo.accessSpecifier = static_cast<EAccessSpecifier>(clang_getCXXAccessSpecifier(cursor));
 }
 
 void ClassParser::addToParents(CXCursor cursor, ParsingInfo& parsingInfo) const noexcept
@@ -175,7 +175,5 @@ void ClassParser::addToParents(CXCursor cursor, ParsingInfo& parsingInfo) const 
 	if (parsingInfo.currentStructOrClass.has_value())
 	{
 		parsingInfo.currentStructOrClass->parents.emplace_back(StructClassInfo::ParentInfo{ static_cast<EAccessSpecifier>(1 << clang_getCXXAccessSpecifier(cursor)), TypeInfo(clang_getCursorType(cursor)) });
-
-		//parsingInfo.currentStructOrClass->parents.at().emplace_back();
 	}
 }
