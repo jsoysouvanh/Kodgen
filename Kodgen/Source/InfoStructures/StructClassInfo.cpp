@@ -6,22 +6,12 @@ StructClassInfo::StructClassInfo() noexcept:
 	EntityInfo(),
 	qualifiers{ false }
 {
-	initContainers();
 }
 
 StructClassInfo::StructClassInfo(std::string&& entityName, PropertyGroup&& propertyGroup, EType&& entityType) noexcept:
 	EntityInfo(std::forward<std::string>(entityName), std::forward<PropertyGroup>(propertyGroup), std::forward<EType>(entityType)),
 	qualifiers{ false }
 {
-	initContainers();
-}
-
-void StructClassInfo::initContainers() noexcept
-{
-	parents.reserve(3u);
-	parents.emplace(EAccessSpecifier::Public, std::vector<TypeInfo>());
-	parents.emplace(EAccessSpecifier::Protected, std::vector<TypeInfo>());
-	parents.emplace(EAccessSpecifier::Private, std::vector<TypeInfo>());
 }
 
 std::ostream& kodgen::operator<<(std::ostream& out_stream, StructClassInfo const& structClassInfo) noexcept

@@ -16,25 +16,21 @@ namespace kodgen
 	*/
 	class StructClassInfo : public EntityInfo
 	{
-		private:
-			void initContainers() noexcept;
-
 		public:
 			struct ParentInfo
 			{
 				EAccessSpecifier	inheritanceAccess;
-				TypeInfo			parent;
+				TypeInfo			type;
 			};
 
 			struct ClassQualifiers
 			{
 				bool isFinal		: 1;
-			}																qualifiers;
+			}								qualifiers;
 
-			//std::vector<ParentInfo>										parents;
-			std::unordered_map<EAccessSpecifier, std::vector<TypeInfo>>		parents;	//TODO: change that
-			std::vector<FieldInfo>											fields;
-			std::vector<MethodInfo>											methods;
+			std::vector<ParentInfo>			parents;
+			std::vector<FieldInfo>			fields;
+			std::vector<MethodInfo>			methods;
 
 
 			StructClassInfo()																				noexcept;
