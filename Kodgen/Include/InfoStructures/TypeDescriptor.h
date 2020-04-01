@@ -40,9 +40,13 @@ namespace kodgen
 
 	struct TypePart
 	{
+		uint16			padding;
+
 		ETypeDescriptor	descriptor;
 
 		/** If descriptor is a CArray, additionalData is size. Might contain other information in other cases. */
-		uint32_t	additionalData;
+		uint32			additionalData;
 	};
+
+	static_assert(sizeof(TypePart) == sizeof(uint64));
 }

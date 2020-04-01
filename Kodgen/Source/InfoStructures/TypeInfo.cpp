@@ -50,35 +50,35 @@ void TypeInfo::initialize(CXType cursorType) noexcept
 	{
 		if (currType.kind == CXTypeKind::CXType_Pointer)
 		{
-			currTypePart = &typeParts.emplace_back(TypePart{ ETypeDescriptor::Ptr, 0u });
+			currTypePart = &typeParts.emplace_back(TypePart{ 0u, ETypeDescriptor::Ptr, 0u });
 
 			prevType = currType;
 			currType = clang_getPointeeType(prevType);
 		}
 		else if (currType.kind == CXTypeKind::CXType_LValueReference)
 		{
-			currTypePart = &typeParts.emplace_back(TypePart{ ETypeDescriptor::LRef, 0u });
+			currTypePart = &typeParts.emplace_back(TypePart{ 0u, ETypeDescriptor::LRef, 0u });
 
 			prevType = currType;
 			currType = clang_getPointeeType(prevType);
 		}
 		else if (currType.kind == CXTypeKind::CXType_RValueReference)
 		{
-			currTypePart = &typeParts.emplace_back(TypePart{ ETypeDescriptor::RRef, 0u });
+			currTypePart = &typeParts.emplace_back(TypePart{ 0u, ETypeDescriptor::RRef, 0u });
 
 			prevType = currType;
 			currType = clang_getPointeeType(prevType);
 		}
 		else if (currType.kind == CXTypeKind::CXType_ConstantArray)
 		{
-			currTypePart = &typeParts.emplace_back(TypePart{ ETypeDescriptor::CArray, static_cast<uint32>(clang_getArraySize(currType)) });
+			currTypePart = &typeParts.emplace_back(TypePart{ 0u, ETypeDescriptor::CArray, static_cast<uint32>(clang_getArraySize(currType)) });
 
 			prevType = currType;
 			currType = clang_getArrayElementType(prevType);
 		}
 		else	//Should be fundamental / record / enum
 		{
-			currTypePart	= &typeParts.emplace_back(TypePart{ ETypeDescriptor::Value, 0u });
+			currTypePart	= &typeParts.emplace_back(TypePart{ 0u, ETypeDescriptor::Value, 0u });
 			reachedValue	= true;
 		}
 
