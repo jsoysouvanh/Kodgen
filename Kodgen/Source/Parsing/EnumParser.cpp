@@ -29,10 +29,13 @@ CXChildVisitResult EnumParser::parse(CXCursor const& currentCursor) noexcept
 		return setAsCurrentEntityIfValid(currentCursor);
 	}
 
-	switch (clang_getCursorKind(currentCursor))
+	switch (currentCursor.kind)
 	{
 		case CXCursorKind::CXCursor_EnumConstantDecl:
 			return parseEnumValue(currentCursor);
+
+		default:
+			break;
 	}
 
 	return CXChildVisitResult::CXChildVisit_Continue;

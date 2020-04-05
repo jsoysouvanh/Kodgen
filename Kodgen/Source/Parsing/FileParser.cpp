@@ -50,6 +50,9 @@ CXChildVisitResult FileParser::parseCursor(CXCursor currentCursor) noexcept
 
 		case CXCursorKind::CXCursor_EnumDecl:
 			return parseEnum(currentCursor);
+
+		default:
+			break;
 	}
 
 	return CXChildVisitResult::CXChildVisit_Continue;

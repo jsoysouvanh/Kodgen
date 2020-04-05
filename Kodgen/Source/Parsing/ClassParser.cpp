@@ -33,7 +33,7 @@ CXChildVisitResult ClassParser::parse(CXCursor const& cursor) noexcept
 	}
 
 	//Check for class field or method
-	switch (clang_getCursorKind(cursor))
+	switch (cursor.kind)
 	{
 		case CXCursorKind::CXCursor_CXXFinalAttr:
 			if (_parsingInfo->currentStructOrClass.has_value())
@@ -61,6 +61,9 @@ CXChildVisitResult ClassParser::parse(CXCursor const& cursor) noexcept
 
 		case CXCursorKind::CXCursor_CXXMethod:
 			return parseMethod(cursor);
+
+		default:
+			break;
 	}
 
 	return CXChildVisitResult::CXChildVisit_Continue;
