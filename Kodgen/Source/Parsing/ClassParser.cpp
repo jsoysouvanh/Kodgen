@@ -75,11 +75,9 @@ CXChildVisitResult ClassParser::parseField(CXCursor fieldCursor) noexcept
 
 	_fieldParser.startParsing(fieldCursor);
 
-	clang_visitChildren(fieldCursor, [](CXCursor c, CXCursor parent, CXClientData clientData)
+	clang_visitChildren(fieldCursor, [](CXCursor c, CXCursor, CXClientData clientData)
 						{
-							FieldParser* fieldParser = reinterpret_cast<FieldParser*>(clientData);
-
-							return fieldParser->parse(c);
+							return reinterpret_cast<FieldParser*>(clientData)->parse(c);
 
 						}, &_fieldParser);
 
@@ -92,11 +90,9 @@ CXChildVisitResult ClassParser::parseMethod(CXCursor methodCursor) noexcept
 
 	_methodParser.startParsing(methodCursor);
 
-	clang_visitChildren(methodCursor, [](CXCursor c, CXCursor parent, CXClientData clientData)
+	clang_visitChildren(methodCursor, [](CXCursor c, CXCursor, CXClientData clientData)
 						{
-							MethodParser* fieldParser = reinterpret_cast<MethodParser*>(clientData);
-
-							return fieldParser->parse(c);
+							return reinterpret_cast<MethodParser*>(clientData)->parse(c);
 
 						}, &_methodParser);
 

@@ -47,9 +47,10 @@ CXChildVisitResult EnumParser::parseEnumValue(CXCursor enumCursor) noexcept
 
 	_enumValueParser.startParsing(enumCursor);
 
-	clang_visitChildren(enumCursor, [](CXCursor c, CXCursor parent, CXClientData clientData)
+	clang_visitChildren(enumCursor, [](CXCursor c, CXCursor, CXClientData clientData)
 						{
 							return reinterpret_cast<EnumValueParser*>(clientData)->parse(c);
+
 						}, &_enumValueParser);
 
 	return _enumValueParser.endParsing();
