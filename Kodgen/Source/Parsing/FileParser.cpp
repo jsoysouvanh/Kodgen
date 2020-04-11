@@ -129,10 +129,13 @@ std::vector<char const*> FileParser::makeParseArguments() noexcept
 	*	6 because we make an additional parameter per possible entity
 	*	Class, Struct, Field, Method, Enum, EnumValue
 	*/
-	result.reserve(2u + 6u + _projectIncludeDirs.size());
+	result.reserve(3u + 6u + _projectIncludeDirs.size());
 
 	//Parsing C++
 	result.emplace_back("-xc++");
+
+	//Use C++17
+	result.emplace_back("-std=c++1z"); 
 
 	//Macro set when we are parsing with Kodgen
 	result.emplace_back(_kodgenParsingMacro.data());
@@ -181,22 +184,22 @@ bool FileParser::parse(fs::path const& parseFile, ParsingResult& out_result) noe
 				isSuccess = true;
 			}
 
-			#ifndef NDEBUG
-			
-			CXDiagnosticSet diagnostics = clang_getDiagnosticSetFromTU(translationUnit);
+			//#ifndef NDEBUG
+			//
+			//CXDiagnosticSet diagnostics = clang_getDiagnosticSetFromTU(translationUnit);
 
-			std::cout << "DIAGNOSTICS START..." << std::endl;
-			for (unsigned i = 0u; i < clang_getNumDiagnosticsInSet(diagnostics); i++)
-			{
-				CXDiagnostic diagnostic(clang_getDiagnosticInSet(diagnostics, i));
-				std::cout << Helpers::getString(clang_formatDiagnostic(diagnostic, clang_defaultDiagnosticDisplayOptions())) << std::endl;
-				clang_disposeDiagnostic(diagnostic);
-			}
-			std::cout << "DIAGNOSTICS END..." << std::endl;
+			//std::cout << "DIAGNOSTICS START..." << std::endl;
+			//for (unsigned i = 0u; i < clang_getNumDiagnosticsInSet(diagnostics); i++)
+			//{
+			//	CXDiagnostic diagnostic(clang_getDiagnosticInSet(diagnostics, i));
+			//	std::cout << Helpers::getString(clang_formatDiagnostic(diagnostic, clang_defaultDiagnosticDisplayOptions())) << std::endl;
+			//	clang_disposeDiagnostic(diagnostic);
+			//}
+			//std::cout << "DIAGNOSTICS END..." << std::endl;
 
-			clang_disposeDiagnosticSet(diagnostics);
+			//clang_disposeDiagnosticSet(diagnostics);
 
-			#endif
+			//#endif
 
 			clang_disposeTranslationUnit(translationUnit);
 		}
