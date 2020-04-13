@@ -72,11 +72,15 @@ target_include_directories(${KodgenTargetLibrary}
 								Libraries/Include)
 
 # Setup link directories
-target_link_directories(${KodgenTargetLibrary} PUBLIC Libraries/x64/Static)
+target_link_directories(${KodgenTargetLibrary} PUBLIC
+							Libraries/x64/Static
+							Libraries/x64/Shared)
 
 # Link to required libraries (mostly libclang dependencies)
 target_link_libraries(${KodgenTargetLibrary}
 						INTERFACE
+							$<$<CXX_COMPILER_ID:Clang>:c++>
+							$<$<CXX_COMPILER_ID:Clang>:c++abi>
 							$<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_LESS:${CMAKE_CXX_COMPILER_VERSION},9.0>>:stdc++fs>	#filesystem	pre GCC-9
 							clang
 )
