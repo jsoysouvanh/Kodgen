@@ -74,6 +74,7 @@ branches:
   only:
   - master
   - dev
+  - libclang_rework
 
 
 notifications:
