@@ -161,7 +161,9 @@ namespace kodgen
 			*	@brief Setup this object's parameters with the provided toml file. Unset settings remain unchanged.
 			*
 			*	@param pathToSettingsFile Path to the toml file.
+			*
+			*	@return true if a file could be loaded, else false.
 			*/
-			void				loadSettings(fs::path const& pathToSettingsFile)							noexcept;
+			bool				loadSettings(fs::path const& pathToSettingsFile)							noexcept;
 	};
 }

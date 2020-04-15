@@ -5,6 +5,7 @@
 
 #include "Misc/Helpers.h"
 #include "Misc/DisableWarningMacros.h"
+#include "Misc/TomlUtility.h"
 #include "InfoStructures/ParsingInfo.h"
 
 using namespace kodgen;
@@ -256,4 +257,41 @@ std::string const& FileParser::getParsingMacro() noexcept
 ParsingSettings& FileParser::getParsingSettings() noexcept
 {
 	return _parsingInfo.parsingSettings;
+}
+
+bool FileParser::loadSettings(fs::path const& pathToSettingsFile) noexcept
+{
+	try
+	{
+		toml::value settings = toml::parse(pathToSettingsFile.string());
+
+		if (!settings.contains("FileParserSettings"))
+			return true;
+
+		//Get the FileParserSettings table
+		toml::value const& parserSettings = toml::find(settings, "FileParserSettings");
+
+		//Update Parsing settings
+		TomlUtility::updateSetting(parserSettings, "shouldAbortParsingOnFirstError", _parsingInfo.parsingSettings.shouldAbortParsingOnFirstError);
+		TomlUtility::updateSetting(parserSettings, "projectIncludeDirectories", _parsingInfo.parsingSettings.projectIncludeDirectories);
+
+		//Update Property settings
+		if (parserSettings.contains("Properties"))
+		{
+			_parsingInfo.parsingSettings.propertyParsingSettings.loadSettings(toml::find(parserSettings, "Properties"));
+		}
+
+		return true;
+	}
+	catch (std::runtime_error const& e)
+	{
+		return false;
+	}
+	catch (toml::syntax_error const& e)
+	{
+		std::cerr << "Syntax error in settings file." << std::endl <<
+			e.what() << std::endl;
+
+		return false;
+	}
 }

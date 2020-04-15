@@ -1,7 +1,8 @@
 #include "CodeGen/FileGenerator.h"
 
 #include <assert.h>
-#include <toml11/toml.hpp>
+
+#include "Misc/TomlUtility.h"
 
 using namespace kodgen;
 
@@ -330,8 +331,6 @@ FileGenerationResult FileGenerator::generateFiles(FileParser& parser, bool force
 
 	if (fs::is_directory(outputDirectory))
 	{
-		std::cout << "Using CINDEX version: " << CINDEX_VERSION_STRING << std::endl;
-
 		ParsingSettings& parsingSettings = parser.getParsingSettings();
 
 		refreshPropertyRules(parsingSettings);
@@ -347,80 +346,37 @@ FileGenerationResult FileGenerator::generateFiles(FileParser& parser, bool force
 	return genResult;
 }
 
-/* These methods are declared in the .cpp file to avoid propagation of Toml11 headers down the hierarchy */
-//Retrieve value from the table and handle exceptions internally
-template <typename T>
-bool getValueFromTable(toml::value const& table, std::string const& entryName, T& out_value) noexcept
+bool FileGenerator::loadSettings(fs::path const& pathToSettingsFile) noexcept
 {
-	if (table.contains(entryName))
+	try
 	{
-		try
-		{
-			out_value = toml::find<T>(table, entryName);
+		toml::value settings = toml::parse(pathToSettingsFile.string());
+
+		if (!settings.contains("FileGeneratorSettings"))
 			return true;
-		}
-		catch (toml::type_error const& e)
-		{
-			std::cerr << entryName << " value is of incorrect type." << std::endl
-				<< e.what() << std::endl;
-		}
+
+		toml::value const& generatorSettings = toml::find(settings, "FileGeneratorSettings");
+
+		TomlUtility::updateSetting<std::string>(generatorSettings, "codeTemplateMainComplexPropertyName", codeTemplateMainComplexPropertyName);
+		TomlUtility::updateSetting<std::string>(generatorSettings, "generatedFilesExtension", generatedFilesExtension);
+		TomlUtility::updateSetting<fs::path>(generatorSettings, "outputDirectory", outputDirectory);
+		TomlUtility::updateSetting(generatorSettings, "toParseFiles", toParseFiles);
+		TomlUtility::updateSetting(generatorSettings, "toParseDirectories", toParseDirectories);
+		TomlUtility::updateSetting(generatorSettings, "ignoredFiles", ignoredFiles);
+		TomlUtility::updateSetting(generatorSettings, "ignoredDirectories", ignoredDirectories);
+		TomlUtility::updateSetting(generatorSettings, "supportedExtensions", supportedExtensions);
+
+		return true;
 	}
-
-	return false;
-}
-
-void updateStringSetting(toml::value const& table, std::string const& entryName, std::string& toUpdateValue)
-{
-	std::string foundString;
-
-	if (getValueFromTable<std::string>(table, entryName, foundString))
+	catch (std::runtime_error const& e)
 	{
-		toUpdateValue = foundString;
+		return false;
 	}
-}
-
-void updatePathSetting(toml::value const& table, std::string const& entryName, fs::path& toUpdateValue)
-{
-	std::string foundString;
-
-	if (getValueFromTable<std::string>(table, entryName, foundString))
+	catch (toml::syntax_error const& e)
 	{
-		toUpdateValue = foundString;
+		std::cerr << "Syntax error in settings file." << std::endl <<
+			e.what() << std::endl;
+
+		return false;
 	}
-}
-
-void updateStringUnorderedSetSetting(toml::value const& table, std::string const& entryName, std::unordered_set<std::string>& toUpdateUS)
-{
-	std::vector<std::string>	foundStringVector;
-
-	if (getValueFromTable<std::vector<std::string>>(table, entryName, foundStringVector))
-	{
-		//Override
-		toUpdateUS.clear();
-		toUpdateUS.reserve(foundStringVector.size());
-
-		for (std::string value : foundStringVector)
-		{
-			toUpdateUS.emplace(std::move(value));
-		}
-	}
-}
-
-void FileGenerator::loadSettings(fs::path const& pathToSettingsFile) noexcept
-{
-	toml::value settings = toml::parse(pathToSettingsFile.string());
-
-	if (!settings.contains("FileGenerator"))
-		return;
-
-	toml::value const& generatorSettings = toml::find(settings, "FileGenerator");
-
-	updateStringSetting(generatorSettings, "codeTemplateMainComplexPropertyName", codeTemplateMainComplexPropertyName);
-	updateStringSetting(generatorSettings, "generatedFilesExtension", generatedFilesExtension);
-	updatePathSetting(generatorSettings, "outputDirectory", outputDirectory);
-	updateStringUnorderedSetSetting(generatorSettings, "toParseFiles", toParseFiles);
-	updateStringUnorderedSetSetting(generatorSettings, "toParseDirectories", toParseDirectories);
-	updateStringUnorderedSetSetting(generatorSettings, "ignoredFiles", ignoredFiles);
-	updateStringUnorderedSetSetting(generatorSettings, "ignoredDirectories", ignoredDirectories);
-	updateStringUnorderedSetSetting(generatorSettings, "supportedExtensions", supportedExtensions);
 }
