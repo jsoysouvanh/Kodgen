@@ -352,31 +352,30 @@ bool FileGenerator::loadSettings(fs::path const& pathToSettingsFile) noexcept
 	{
 		toml::value settings = toml::parse(pathToSettingsFile.string());
 
-		if (!settings.contains("FileGeneratorSettings"))
-			return true;
+		if (settings.contains("FileGeneratorSettings"))
+		{
+			toml::value const& generatorSettings = toml::find(settings, "FileGeneratorSettings");
 
-		toml::value const& generatorSettings = toml::find(settings, "FileGeneratorSettings");
-
-		TomlUtility::updateSetting<std::string>(generatorSettings, "codeTemplateMainComplexPropertyName", codeTemplateMainComplexPropertyName);
-		TomlUtility::updateSetting<std::string>(generatorSettings, "generatedFilesExtension", generatedFilesExtension);
-		TomlUtility::updateSetting<fs::path>(generatorSettings, "outputDirectory", outputDirectory);
-		TomlUtility::updateSetting(generatorSettings, "toParseFiles", toParseFiles);
-		TomlUtility::updateSetting(generatorSettings, "toParseDirectories", toParseDirectories);
-		TomlUtility::updateSetting(generatorSettings, "ignoredFiles", ignoredFiles);
-		TomlUtility::updateSetting(generatorSettings, "ignoredDirectories", ignoredDirectories);
-		TomlUtility::updateSetting(generatorSettings, "supportedExtensions", supportedExtensions);
+			TomlUtility::updateSetting<std::string>(generatorSettings, "codeTemplateMainComplexPropertyName", codeTemplateMainComplexPropertyName);
+			TomlUtility::updateSetting<std::string>(generatorSettings, "generatedFilesExtension", generatedFilesExtension);
+			TomlUtility::updateSetting<fs::path>(generatorSettings, "outputDirectory", outputDirectory);
+			TomlUtility::updateSetting(generatorSettings, "toParseFiles", toParseFiles);
+			TomlUtility::updateSetting(generatorSettings, "toParseDirectories", toParseDirectories);
+			TomlUtility::updateSetting(generatorSettings, "ignoredFiles", ignoredFiles);
+			TomlUtility::updateSetting(generatorSettings, "ignoredDirectories", ignoredDirectories);
+			TomlUtility::updateSetting(generatorSettings, "supportedExtensions", supportedExtensions);
+		}
 
 		return true;
 	}
-	catch (std::runtime_error const& e)
+	catch (std::runtime_error const&)
 	{
-		return false;
 	}
 	catch (toml::syntax_error const& e)
 	{
 		std::cerr << "Syntax error in settings file." << std::endl <<
 			e.what() << std::endl;
-
-		return false;
 	}
+	
+	return false;
 }

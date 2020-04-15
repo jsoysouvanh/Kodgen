@@ -37,7 +37,7 @@ inline void TomlUtility::updateSetting<fs::path>(toml::value const& table, std::
 
 	if (TomlUtility::getValueFromTable<std::string>(table, entryName, foundSetting))
 	{
-		toUpdateSetting = foundSetting;
+		toUpdateSetting = fs::path(foundSetting).make_preferred().string();
 	}
 }
 
@@ -66,13 +66,23 @@ inline void TomlUtility::updateSetting<std::unordered_set<std::string>>(toml::va
 
 	if (TomlUtility::getValueFromTable<std::vector<std::string>>(table, entryName, foundStringVector))
 	{
-		//Override
-		//toUpdateUS.clear();
-		//toUpdateUS.reserve(foundStringVector.size());
-
 		for (std::string value : foundStringVector)
 		{
 			toUpdateUS.emplace(std::move(value));
+		}
+	}
+}
+
+template <>
+inline void TomlUtility::updateSetting<std::unordered_set<fs::path, PathHash>>(toml::value const& table, std::string const& entryName, std::unordered_set<fs::path, PathHash>& toUpdateUS) noexcept
+{
+	std::vector<std::string> foundStringVector;
+
+	if (TomlUtility::getValueFromTable<std::vector<std::string>>(table, entryName, foundStringVector))
+	{
+		for (std::string value : foundStringVector)
+		{
+			toUpdateUS.emplace(fs::path(value).make_preferred());
 		}
 	}
 }
