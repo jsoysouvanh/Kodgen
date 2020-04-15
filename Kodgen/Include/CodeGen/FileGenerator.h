@@ -156,5 +156,12 @@ namespace kodgen
 			*	@return Structure containing result report
 			*/
 			FileGenerationResult generateFiles(FileParser& parser, bool forceRegenerateAll = false)			noexcept;
+
+			/**
+			*	@brief Setup this object's parameters with the provided toml file. Unset settings remain unchanged.
+			*
+			*	@param pathToSettingsFile Path to the toml file.
+			*/
+			void				loadSettings(fs::path const& pathToSettingsFile)							noexcept;
 	};
 }

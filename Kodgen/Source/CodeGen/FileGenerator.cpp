@@ -1,6 +1,7 @@
 #include "CodeGen/FileGenerator.h"
 
 #include <assert.h>
+#include <toml11/toml.hpp>
 
 using namespace kodgen;
 
@@ -344,4 +345,82 @@ FileGenerationResult FileGenerator::generateFiles(FileParser& parser, bool force
 	}
 
 	return genResult;
+}
+
+/* These methods are declared in the .cpp file to avoid propagation of Toml11 headers down the hierarchy */
+//Retrieve value from the table and handle exceptions internally
+template <typename T>
+bool getValueFromTable(toml::value const& table, std::string const& entryName, T& out_value) noexcept
+{
+	if (table.contains(entryName))
+	{
+		try
+		{
+			out_value = toml::find<T>(table, entryName);
+			return true;
+		}
+		catch (toml::type_error const& e)
+		{
+			std::cerr << entryName << " value is of incorrect type." << std::endl
+				<< e.what() << std::endl;
+		}
+	}
+
+	return false;
+}
+
+void updateStringSetting(toml::value const& table, std::string const& entryName, std::string& toUpdateValue)
+{
+	std::string foundString;
+
+	if (getValueFromTable<std::string>(table, entryName, foundString))
+	{
+		toUpdateValue = foundString;
+	}
+}
+
+void updatePathSetting(toml::value const& table, std::string const& entryName, fs::path& toUpdateValue)
+{
+	std::string foundString;
+
+	if (getValueFromTable<std::string>(table, entryName, foundString))
+	{
+		toUpdateValue = foundString;
+	}
+}
+
+void updateStringUnorderedSetSetting(toml::value const& table, std::string const& entryName, std::unordered_set<std::string>& toUpdateUS)
+{
+	std::vector<std::string>	foundStringVector;
+
+	if (getValueFromTable<std::vector<std::string>>(table, entryName, foundStringVector))
+	{
+		//Override
+		toUpdateUS.clear();
+		toUpdateUS.reserve(foundStringVector.size());
+
+		for (std::string value : foundStringVector)
+		{
+			toUpdateUS.emplace(std::move(value));
+		}
+	}
+}
+
+void FileGenerator::loadSettings(fs::path const& pathToSettingsFile) noexcept
+{
+	toml::value settings = toml::parse(pathToSettingsFile.string());
+
+	if (!settings.contains("FileGenerator"))
+		return;
+
+	toml::value const& generatorSettings = toml::find(settings, "FileGenerator");
+
+	updateStringSetting(generatorSettings, "codeTemplateMainComplexPropertyName", codeTemplateMainComplexPropertyName);
+	updateStringSetting(generatorSettings, "generatedFilesExtension", generatedFilesExtension);
+	updatePathSetting(generatorSettings, "outputDirectory", outputDirectory);
+	updateStringUnorderedSetSetting(generatorSettings, "toParseFiles", toParseFiles);
+	updateStringUnorderedSetSetting(generatorSettings, "toParseDirectories", toParseDirectories);
+	updateStringUnorderedSetSetting(generatorSettings, "ignoredFiles", ignoredFiles);
+	updateStringUnorderedSetSetting(generatorSettings, "ignoredDirectories", ignoredDirectories);
+	updateStringUnorderedSetSetting(generatorSettings, "supportedExtensions", supportedExtensions);
 }
