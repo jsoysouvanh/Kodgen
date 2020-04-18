@@ -7,16 +7,17 @@ jobs:
   include:
    # clang 7
    - env: CC=clang-7 CXX=clang++-7
-     addons: { apt: { packages: ["clang-7", "g++-8", "libstdc++-8-dev", "libc++abi-7-dev", "ninja-build"] } }
+     addons: { apt: { packages: ["clang-7", "g++-8", "libstdc++-8-dev", "ninja-build"] } }
 
    # clang 8
    - env: CC=clang-8 CXX=clang++-8
-     addons: { apt: { packages: ["clang-8", "g++-8", "libstdc++-8-dev", "libc++abi-8-dev", "ninja-build"] } }
+     addons: { apt: { packages: ["clang-8", "g++-8", "libstdc++-8-dev", "ninja-build"] } }
 
    # clang 9
    - env: CC=clang-9 CXX=clang++-9
-     addons: { apt: { packages: ["clang-9", "g++-8", "libstdc++-9-dev", "libc++abi-9-dev", "ninja-build"], sources: [sourceline: "ppa:ubuntu-toolchain-r/test"] } }
-
+     addons: { apt: { packages: ["clang-9", "g++-8", "libstdc++-9-dev", "ninja-build"], sources: [sourceline: "ppa:ubuntu-toolchain-r/test"] } }
+   
+   # clang 10
    - env: CC=clang-10 CXX=clang++-10
      addons:
         apt:
