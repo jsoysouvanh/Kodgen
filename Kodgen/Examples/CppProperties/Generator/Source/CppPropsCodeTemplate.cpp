@@ -58,8 +58,6 @@ std::string CppPropsCodeTemplate::generateGetter(kodgen::FieldInfo const& fieldI
 	bool		isPtr				= false;
 	bool		isExplicit			= false;
 
-	std::cout << "Generate getter: " << fieldInfo.type.getName() << "	" << fieldInfo.name << std::endl;
-
 	for (std::string const& subprop : complexProp.subProperties)
 	{
 		if (!isConst && subprop.at(0) == 'c')			//const
@@ -135,7 +133,6 @@ std::string CppPropsCodeTemplate::generateSetter(kodgen::FieldInfo const& fieldI
 		return "";
 	}
 
-	std::string rawReturnType	= fieldInfo.type.getName() + " ";
 	std::string paramName		= "_kodgen" + fieldInfo.name;
 	bool		isExplicit		= false;
 
@@ -149,8 +146,6 @@ std::string CppPropsCodeTemplate::generateSetter(kodgen::FieldInfo const& fieldI
 	methodName.replace(0, 1, 1, static_cast<char>(std::toupper(methodName.at(0)))); 
 	methodName.insert(0, "set");
 	methodName += "(";
-
-	
 
 	methodName += fieldInfo.type.getName();
 	methodName += ((fieldInfo.type.sizeInBytes == 0u || fieldInfo.type.sizeInBytes > 4u) &&
