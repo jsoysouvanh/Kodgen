@@ -52,7 +52,7 @@ add_library(${KodgenTargetLibrary}
 if (MSVC)
 	string(REGEX REPLACE " /W[0-4]" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")	# Remove the default flag /W3
 	target_compile_options(${KodgenTargetLibrary} PUBLIC /W4)
-else()	# Clang or GCC
+else ()	# Clang or GCC
 	target_compile_options(${KodgenTargetLibrary} PUBLIC -Wall -Wextra -Wpedantic)
 endif()
 
@@ -79,8 +79,8 @@ target_link_directories(${KodgenTargetLibrary}
 # Link to required libraries
 target_link_libraries(${KodgenTargetLibrary}
 						INTERFACE
-							$<$<AND:$<CXX_COMPILER_ID:Clang>,$<VERSION_LESS:${CMAKE_CXX_COMPILER_VERSION},9.0>>:stdc++fs>	#filesystem	pre Clang-9
-							$<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_LESS:${CMAKE_CXX_COMPILER_VERSION},9.0>>:stdc++fs>	#filesystem	pre GCC-9
+							$<$<AND:$<CXX_COMPILER_ID:Clang,AppleClang>,$<VERSION_LESS:${CMAKE_CXX_COMPILER_VERSION},9.0>>:stdc++fs>	#filesystem	pre Clang-9
+							$<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_LESS:${CMAKE_CXX_COMPILER_VERSION},9.0>>:stdc++fs>					#filesystem	pre GCC-9
 							clang
 )
 
@@ -89,7 +89,7 @@ if (WIN32)
 	add_custom_command(	TARGET ${KodgenTargetLibrary} POST_BUILD
 						COMMAND ${CMAKE_COMMAND} -E copy
 						${PROJECT_SOURCE_DIR}/Libraries/x64/Shared/libclang.dll
-						${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/libclang.dll)
+						${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}/libclang.dll)
 endif()
 
 add_subdirectory(Tests)
