@@ -31,12 +31,14 @@ add_library(${KodgenTargetLibrary}
 					Source/Parsing/ParsingError.cpp
 					Source/Parsing/PropertyParser.cpp
 					Source/Parsing/EntityParser.cpp
+					Source/Parsing/NamespaceParser.cpp
 					Source/Parsing/ClassParser.cpp
 					Source/Parsing/FieldParser.cpp
 					Source/Parsing/MethodParser.cpp
 					Source/Parsing/EnumParser.cpp
 					Source/Parsing/EnumValueParser.cpp
 					Source/Parsing/FileParser.cpp
+					Source/Parsing/ParsingContext.cpp
 	
 					Source/Misc/EAccessSpecifier.cpp
 					Source/Misc/Helpers.cpp
@@ -46,7 +48,7 @@ add_library(${KodgenTargetLibrary}
 					Source/CodeGen/EFileGenerationError.cpp
 					Source/CodeGen/FileGenerationError.cpp
 					Source/CodeGen/GeneratedFile.cpp
-			)
+				)
 
 # Setup warning level
 if (MSVC)

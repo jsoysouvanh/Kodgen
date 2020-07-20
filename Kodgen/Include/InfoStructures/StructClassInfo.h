@@ -28,7 +28,6 @@ namespace kodgen
 				bool isFinal		: 1;
 			}								qualifiers;
 
-			std::string						nameSpace;
 			std::vector<ParentInfo>			parents;
 			std::vector<FieldInfo>			fields;
 			std::vector<MethodInfo>			methods;

@@ -6,9 +6,10 @@
 #include "Misc/FundamentalTypes.h"
 #include "Misc/EAccessSpecifier.h"
 #include "Parsing/ParsingSettings.h"
-#include "Parsing/ParsingResult.h"
+#include "Parsing/ParsingResults/ParsingResult.h"
 #include "Parsing/PropertyParser.h"
 #include "InfoStructures/TypeInfo.h"
+#include "InfoStructures/NamespaceInfo.h"
 
 namespace kodgen
 {
@@ -27,7 +28,7 @@ namespace kodgen
 			PropertyParser					propertyParser;
 
 			/**
-			*	Current class modifier
+			*	Current access modifier
 			*/
 			EAccessSpecifier				accessSpecifier	= EAccessSpecifier::Private;
 
@@ -40,6 +41,11 @@ namespace kodgen
 			*	Current parsing enum (if valid)
 			*/
 			opt::optional<EnumInfo>			currentEnum;
+
+			/**
+			*	Stack of namespaces
+			*/
+			std::vector<NamespaceInfo>		currentNamespaces;
 
 			/**
 			*	Final collected data
@@ -67,6 +73,13 @@ namespace kodgen
 			*	@return true if an enum was flushed (currentEnum had a value), else false
 			*/
 			bool	flushCurrentEnum()											noexcept;
+
+			/**
+			*	@brief Tries to flush the current namespace into the ParsingResult
+			*
+			*	@return true if a namespace was flushed, else false
+			*/
+			bool	flushCurrentNamespace()										noexcept;
 
 			/**
 			*	Reset this parsingInfo fields

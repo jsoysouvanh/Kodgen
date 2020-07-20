@@ -24,7 +24,7 @@ bool ParsingInfo::flushCurrentStructOrClass() noexcept
 				break;
 
 			default:
-				assert(false);	//Should never pass here
+				assert(false);	//Should never reach this line
 		}
 
 		currentStructOrClass.reset();
@@ -48,6 +48,13 @@ bool ParsingInfo::flushCurrentEnum() noexcept
 	return false;
 }
 
+bool ParsingInfo::flushCurrentNamespace() noexcept
+{
+	//TODO
+	
+	return true;
+}
+
 void ParsingInfo::reset() noexcept
 {
 	propertyParser.setup(&parsingSettings.propertyParsingSettings);
@@ -56,7 +63,9 @@ void ParsingInfo::reset() noexcept
 
 	currentStructOrClass	= std::nullopt;
 	currentEnum				= std::nullopt;
+	currentNamespaces.clear();
 
+	parsingResult.namespaces.clear();
 	parsingResult.classes.clear();
 	parsingResult.enums.clear();
 	parsingResult.parsingErrors.clear();

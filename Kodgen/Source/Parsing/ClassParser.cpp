@@ -29,7 +29,8 @@ DISABLE_WARNING_UNSCOPED_ENUM
 
 CXChildVisitResult ClassParser::parse(CXCursor const& cursor) noexcept
 {
-	if (_shouldCheckValidity)	//Check for any annotation attribute if the flag is raised
+	//Check for any annotation attribute if the flag is raised
+	if (_shouldCheckValidity)
 	{
 		_shouldCheckValidity = false;
 		return setAsCurrentEntityIfValid(cursor);
@@ -131,8 +132,8 @@ void ClassParser::initClassInfos(StructClassInfo& toInit) const noexcept
 
 	size_t namespacePos = fullName.find_last_of("::");
 
-	if (namespacePos != std::string::npos)
-		toInit.nameSpace = std::string(fullName.cbegin(), fullName.cbegin() + namespacePos - 1);
+	//if (namespacePos != std::string::npos)
+	//	toInit.nameSpace = std::string(fullName.cbegin(), fullName.cbegin() + namespacePos - 1);
 }
 
 opt::optional<PropertyGroup> ClassParser::isEntityValid(CXCursor const& currentCursor) noexcept
@@ -197,5 +198,164 @@ void ClassParser::addToParents(CXCursor cursor, ParsingInfo& parsingInfo) const 
 	if (parsingInfo.currentStructOrClass.has_value())
 	{
 		parsingInfo.currentStructOrClass->parents.emplace_back(StructClassInfo::ParentInfo{ static_cast<EAccessSpecifier>(clang_getCXXAccessSpecifier(cursor)), TypeInfo(clang_getCursorType(cursor)) });
+	}
+}
+
+
+//=========================================================================================
+
+CXChildVisitResult ClassParser2::parseField(CXCursor const& fieldCursor) noexcept
+{
+	FieldParsingResult fieldResult;
+
+	//CXChildVisitResult childVisitResult = _fieldParser.parse(fieldCursor, parsingSettings, propertyParser, out_result);
+
+	//TODO append result to the current class
+
+	return CXChildVisitResult::CXChildVisit_Recurse;
+}
+
+CXChildVisitResult ClassParser2::parse(CXCursor const& classCursor, ParsingSettings const& parsingSettings, PropertyParser& propertyParser, ClassParsingResult& out_result) noexcept
+{
+	//Make sure the cursor is compatible for the class parser
+	assert(classCursor.kind == CXCursorKind::CXCursor_ClassDecl || classCursor.kind == CXCursorKind::CXCursor_StructDecl);
+
+	//Init context
+	initContext(classCursor, parsingSettings, propertyParser, out_result);
+
+	clang_visitChildren(classCursor, &ClassParser2::parseEntity, this);
+
+	return (parsingSettings.shouldAbortParsingOnFirstError && !out_result.errors.empty()) ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
+}
+
+CXChildVisitResult ClassParser2::parseEntity(CXCursor cursor, CXCursor /* parentCursor */, CXClientData clientData) noexcept
+{
+	ClassParser2* parser = reinterpret_cast<ClassParser2*>(clientData);
+
+	if (parser->parsingContext.shouldCheckEntityValidity)
+	{
+		parser->parsingContext.shouldCheckEntityValidity = false;
+
+		//Set parsed struct/class in result if it is valid
+		return parser->setParsedEntity(cursor);
+	}
+	else
+	{
+		switch (cursor.kind)
+		{
+			case CXCursorKind::CXCursor_CXXFinalAttr:
+				if (reinterpret_cast<ClassParsingResult*>(parser->parsingContext.parsingResult)->parsedClass.has_value())
+				{
+					reinterpret_cast<ClassParsingResult*>(parser->parsingContext.parsingResult)->parsedClass->qualifiers.isFinal = true;
+				}
+				break;
+
+			case CXCursorKind::CXCursor_CXXAccessSpecifier:
+				parser->updateAccessSpecifier(cursor);
+				break;
+
+			case CXCursorKind::CXCursor_CXXBaseSpecifier:
+				parser->addBaseClass(cursor);
+				break;
+
+			case CXCursorKind::CXCursor_Constructor:
+				//TODO
+				break;
+
+			case CXCursorKind::CXCursor_ClassDecl:
+				//TODO handle nested class
+				break;
+
+			case CXCursorKind::CXCursor_StructDecl:
+				//TODO handle nested struct
+				break;
+
+			case CXCursorKind::CXCursor_EnumDecl:
+				//TODO handle nested enum
+				break;
+
+			case CXCursorKind::CXCursor_VarDecl:	//For static fields
+				[[fallthrough]];
+			case CXCursorKind::CXCursor_FieldDecl:
+				return parser->parseField(cursor);
+
+			//case CXCursorKind::CXCursor_CXXMethod:
+			//	return parseMethod(cursor);
+
+			default:
+				break;
+		}
+
+		return CXChildVisitResult::CXChildVisit_Continue;
+	}
+}
+
+void ClassParser2::initContext(CXCursor const& classCursor, ParsingSettings const& parsingSettings, PropertyParser& propertyParser, ClassParsingResult& out_result) noexcept
+{
+	parsingContext.rootCursor					= classCursor;
+	parsingContext.shouldCheckEntityValidity	= true;
+	parsingContext.propertyParser				= &propertyParser;
+	parsingContext.parsingSettings				= &parsingSettings;
+	parsingContext.parsingResult				= &out_result;
+	parsingContext.currentAccessSpecifier		= (classCursor.kind == CXCursorKind::CXCursor_ClassDecl) ? EAccessSpecifier::Private : EAccessSpecifier::Public;
+}
+
+CXChildVisitResult ClassParser2::setParsedEntity(CXCursor const& annotationCursor) noexcept
+{
+	if (opt::optional<PropertyGroup> propertyGroup = getProperties(annotationCursor))
+	{
+		reinterpret_cast<ClassParsingResult*>(parsingContext.parsingResult)->parsedClass.emplace(StructClassInfo(parsingContext.rootCursor, std::move(*propertyGroup), (parsingContext.rootCursor.kind == CXCursorKind::CXCursor_ClassDecl) ? EntityInfo::EType::Class : EntityInfo::EType::Struct));
+		
+		return CXChildVisitResult::CXChildVisit_Recurse;
+	}
+	else
+	{
+		if (parsingContext.propertyParser->getParsingError() != EParsingError::Count)
+		{
+			parsingContext.parsingResult->errors.emplace_back(ParsingError(parsingContext.propertyParser->getParsingError(), clang_getCursorLocation(annotationCursor)));
+		}
+
+		return CXChildVisitResult::CXChildVisit_Break;
+	}
+}
+
+opt::optional<PropertyGroup> ClassParser2::getProperties(CXCursor const& cursor) noexcept
+{
+	parsingContext.propertyParser->clean();
+
+	if (clang_getCursorKind(cursor) == CXCursorKind::CXCursor_AnnotateAttr)
+	{
+		switch (parsingContext.rootCursor.kind)
+		{
+			case CXCursorKind::CXCursor_ClassDecl:
+				return parsingContext.propertyParser->getClassProperties(Helpers::getString(clang_getCursorSpelling(cursor)));
+				break;
+
+			case CXCursorKind::CXCursor_StructDecl:
+				return parsingContext.propertyParser->getStructProperties(Helpers::getString(clang_getCursorSpelling(cursor)));
+				break;
+
+			default:
+				break;
+		}
+	}
+
+	return opt::nullopt;
+}
+
+void ClassParser2::updateAccessSpecifier(CXCursor const& cursor) noexcept
+{
+	assert(cursor.kind == CXCursorKind::CXCursor_CXXAccessSpecifier);
+
+	parsingContext.currentAccessSpecifier = static_cast<EAccessSpecifier>(clang_getCXXAccessSpecifier(cursor));
+}
+
+void ClassParser2::addBaseClass(CXCursor cursor) noexcept
+{
+	assert(clang_getCursorKind(cursor) == CXCursorKind::CXCursor_CXXBaseSpecifier);
+
+	if (getParsingResult()->parsedClass.has_value())
+	{
+		getParsingResult()->parsedClass->parents.emplace_back(StructClassInfo::ParentInfo{ static_cast<EAccessSpecifier>(clang_getCXXAccessSpecifier(cursor)), TypeInfo(clang_getCursorType(cursor)) });
 	}
 }

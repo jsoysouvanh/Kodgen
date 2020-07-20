@@ -25,6 +25,7 @@ namespace kodgen
 				Field,
 				Method,
 				EnumValue,
+				Namespace,
 
 				/**
 				*	Unset

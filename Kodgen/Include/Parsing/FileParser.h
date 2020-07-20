@@ -6,9 +6,10 @@
 #include "Misc/Optional.h"
 #include "Misc/ILogger.h"
 #include "InfoStructures/ParsingInfo.h"
+#include "Parsing/NamespaceParser.h"
 #include "Parsing/ClassParser.h"
 #include "Parsing/EnumParser.h"
-#include "Parsing/ParsingResult.h"
+#include "Parsing/ParsingResults/ParsingResult.h"
 #include "Parsing/ParsingSettings.h"
 #include "Parsing/PropertyParser.h"
 
@@ -21,6 +22,7 @@ namespace kodgen
 			
 			CXIndex						_clangIndex;
 			
+			NamespaceParser				_namespaceParser;
 			ClassParser					_classParser;
 			EnumParser					_enumParser;
 			ParsingInfo					_parsingInfo;
@@ -43,6 +45,7 @@ namespace kodgen
 			void						setupForParsing()																noexcept;
 
 			CXChildVisitResult			parseCursor(CXCursor currentCursor)												noexcept;
+			CXChildVisitResult			parseNamespace(CXCursor namespaceCursor)										noexcept;
 			CXChildVisitResult			parseClass(CXCursor classCursor, bool isStruct)									noexcept;
 			CXChildVisitResult			parseEnum(CXCursor enumCursor)													noexcept;
 
@@ -114,5 +117,15 @@ namespace kodgen
 			*	\param logger Instance of the logger to use.
 			*/
 			void						provideLogger(ILogger& logger)									noexcept;
+	};
+}
+
+#include "Parsing/NamespaceParser.h"
+
+namespace kodgen
+{
+	class FileParser2 : public NamespaceParser2
+	{
+		//TODO
 	};
 }

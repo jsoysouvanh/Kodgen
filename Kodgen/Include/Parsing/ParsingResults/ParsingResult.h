@@ -5,6 +5,7 @@
 #include "Parsing/ParsingError.h"
 #include "Parsing/ParsingSettings.h"
 
+#include "InfoStructures/NamespaceInfo.h"
 #include "InfoStructures/StructClassInfo.h"
 #include "InfoStructures/EnumInfo.h"
 
@@ -15,6 +16,7 @@ namespace kodgen
 		/**
 		*	All parsed entities
 		*/
+		std::vector<NamespaceInfo>		namespaces;
 		std::vector<StructClassInfo>	classes;
 		std::vector<StructClassInfo>	structs;
 		std::vector<EnumInfo>			enums;

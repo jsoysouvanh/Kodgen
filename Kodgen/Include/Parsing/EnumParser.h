@@ -33,3 +33,13 @@ namespace kodgen
 			using EntityParser::startParsing;
 	};
 }
+
+#include "Parsing/EntityParser.h"
+
+namespace kodgen
+{
+	class EnumParser2 : public EntityParser2
+	{
+		//TODO
+	};
+}

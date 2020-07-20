@@ -39,3 +39,30 @@ namespace kodgen
 			uint8						getParsingLevel()					const	noexcept;
 	};
 }
+
+
+#include <clang-c/Index.h>
+
+#include "Misc/FundamentalTypes.h"
+#include "Parsing/ParsingContext.h"
+
+namespace kodgen
+{
+	class EntityParser2
+	{
+		protected:
+			/** Parsing context of this parser */
+			ParsingContext	parsingContext;
+
+		public:
+			EntityParser2()						= default;
+			EntityParser2(EntityParser2 const&)	= default;
+			EntityParser2(EntityParser2&&)		= default;
+			~EntityParser2()					= default;
+
+			void				reset()	noexcept {}
+
+			void				startParsing(CXCursor const& currentCursor)	noexcept {}
+			CXChildVisitResult	endParsing()								noexcept {}
+	};
+}

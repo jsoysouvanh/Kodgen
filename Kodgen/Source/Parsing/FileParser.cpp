@@ -48,6 +48,7 @@ CXChildVisitResult FileParser::parseCursor(CXCursor currentCursor) noexcept
 	{
 		case CXCursorKind::CXCursor_Namespace:
 			return CXChildVisitResult::CXChildVisit_Recurse;
+			//return parseNamespace(currentCursor);
 
 		case CXCursorKind::CXCursor_ClassDecl:
 			return parseClass(currentCursor, false);
@@ -63,6 +64,21 @@ CXChildVisitResult FileParser::parseCursor(CXCursor currentCursor) noexcept
 	}
 
 	return CXChildVisitResult::CXChildVisit_Continue;
+}
+
+CXChildVisitResult FileParser::parseNamespace(CXCursor namespaceCursor) noexcept
+{
+	assert(namespaceCursor.kind == CXCursorKind::CXCursor_Namespace);
+
+	_namespaceParser.startParsing(namespaceCursor);
+
+	clang_visitChildren(namespaceCursor, [](CXCursor c, CXCursor, CXClientData clientData)
+						{
+							return reinterpret_cast<NamespaceParser*>(clientData)->parse(c);
+
+						}, &_namespaceParser);
+
+	return _namespaceParser.endParsing();
 }
 
 CXChildVisitResult FileParser::parseClass(CXCursor classCursor, bool isStruct) noexcept

@@ -25,3 +25,17 @@ namespace kodgen
 			using EntityParser::startParsing;
 	};
 }
+
+
+#include "Parsing/EntityParser.h"
+
+namespace kodgen
+{
+	class FieldParser2 : public EntityParser2
+	{
+		CXChildVisitResult	parse(CXCursor const& currentCursor, ParsingResultBase& out_result)	noexcept
+		{
+			return CXChildVisitResult::CXChildVisit_Recurse;
+		}
+	};
+}
