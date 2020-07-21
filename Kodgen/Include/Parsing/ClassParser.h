@@ -16,8 +16,8 @@ namespace kodgen
 		private:
 			EntityInfo::EType		_structOrClass	= EntityInfo::EType::Count;
 
-			FieldParser				_fieldParser;
-			MethodParser			_methodParser;
+			FieldParser				fieldParser;
+			MethodParser			methodParser;
 
 			void				initClassInfos(StructClassInfo& toInit)	const	noexcept;
 			CXChildVisitResult	parseField(CXCursor fieldCursor)				noexcept;
@@ -55,6 +55,7 @@ namespace kodgen
 #include "Parsing/PropertyParser.h"
 #include "Parsing/ParsingResults/ClassParsingResult.h"
 #include "Parsing/ParsingResults/FieldParsingResult.h"
+#include "Parsing/ParsingResults/MethodParsingResult.h"
 #include "InfoStructures/FieldInfo.h"
 #include "InfoStructures/MethodInfo.h"
 #include "InfoStructures/StructClassInfo.h"
@@ -68,10 +69,6 @@ namespace kodgen
 	class ClassParser2 : public EntityParser2
 	{
 		private:
-			/** Internal parsers */
-			FieldParser2	_fieldParser;
-			MethodParser2	_methodParser;
-
 			/**
 			*	@brief This method is called at each node (cursor) of the parsing.
 			*
@@ -91,7 +88,7 @@ namespace kodgen
 			*	@param classCursor		Root cursor of the class/struct to parse.
 			*	@param parsingSettings	ParsingSettings to use to parse this class/struct.
 			*	@param propertyParser	PropertyParser to use to parse properties.
-			*	@param out_result		Result to fill during the parsing.
+			*	@param out_result		Result to fill during parsing.
 			*/
 			void							initContext(CXCursor const&			classCursor,
 														ParsingSettings const&	parsingSettings,
@@ -135,7 +132,51 @@ namespace kodgen
 			*
 			*	@param result FieldParsingResult to add.
 			*/
-			void							addFieldResult(FieldParsingResult& result)					noexcept;
+			void							addFieldResult(FieldParsingResult&& result)					noexcept;
+
+			/**
+			*	@brief Add the provided method result to the current class context result.
+			*
+			*	@param result MethodParsingResult to add.
+			*/
+			void							addMethodResult(MethodParsingResult&& result)				noexcept;
+
+			/**
+			*	@brief Add the provided struct/class result to the current class context result.
+			*
+			*	@param result ClassParsingResult to add.
+			*/
+			void							addClassResult(ClassParsingResult&& result)					noexcept;
+
+			/**
+			*	@brief Parse the struct/class starting at the provided AST cursor.
+			*
+			*	@param classCursor AST cursor to the struct/class to parse.
+			*
+			*	@return An enum which indicates how to choose the next cursor to parse in the AST.
+			*/
+			CXChildVisitResult				parseNestedStructOrClass(CXCursor const& classCursor)		noexcept;
+
+			/**
+			*	@brief Parse the field starting at the provided AST cursor.
+			*
+			*	@param fieldCursor AST cursor to the field to parse.
+			*
+			*	@return An enum which indicates how to choose the next cursor to parse in the AST.
+			*/
+			CXChildVisitResult				parseField(CXCursor const& fieldCursor)						noexcept;
+
+			/**
+			*	@brief Parse the method starting at the provided AST cursor.
+			*
+			*	@param methodCursor AST cursor to the method to parse.
+			*
+			*	@return An enum which indicates how to choose the next cursor to parse in the AST.
+			*/
+			CXChildVisitResult				parseMethod(CXCursor const& methodCursor)					noexcept;
+
+			/** Parse the enum starting at the provided AST cursor */
+			CXChildVisitResult				parseNestedEnum(CXChildVisitResult cursor)					noexcept { /* TODO */ return CXChildVisitResult::CXChildVisit_Recurse; }
 
 			/**
 			*	@brief Helper to get the ParsingResult contained in the context as a ClassParsingResult.
@@ -145,26 +186,11 @@ namespace kodgen
 			inline ClassParsingResult*		getParsingResult()											noexcept;
 
 		protected:
-			/**
-			*	@brief Parse the field starting at the provided AST cursor.
-			*
-			*	@param fieldCursor	AST cursor to the field to parse.
-			*
-			*	@return An enum which indicates how to choose the next cursor to parse in the AST.
-			*/
-			CXChildVisitResult	parseField(CXCursor const& fieldCursor)	noexcept;
+			/** Parser used to parse fields contained in the parsed class. */
+			FieldParser2	fieldParser;
 
-			/** Parse the method starting at the provided AST cursor */
-			CXChildVisitResult	parseMethod(CXChildVisitResult cursor)	noexcept { return CXChildVisitResult::CXChildVisit_Recurse; }
-
-			/** Parse the enum starting at the provided AST cursor */
-			CXChildVisitResult	parseEnum(CXChildVisitResult cursor)	noexcept { return CXChildVisitResult::CXChildVisit_Recurse; }
-
-			/** Parse the struct starting at the provided AST cursor */
-			CXChildVisitResult	parseStruct(CXChildVisitResult cursor)	noexcept { return CXChildVisitResult::CXChildVisit_Recurse; }
-
-			/** Parse the class starting at the provided AST cursor */
-			CXChildVisitResult	parseClass(CXChildVisitResult cursor)	noexcept { return CXChildVisitResult::CXChildVisit_Recurse; }
+			/** Parser used to parse methods contained in the parsed class. */
+			MethodParser2	methodParser;
 
 		public:
 			ClassParser2()						= default;
@@ -185,7 +211,7 @@ namespace kodgen
 			CXChildVisitResult	parse(CXCursor const&			classCursor,
 									  ParsingSettings const&	parsingSettings,
 									  PropertyParser&			propertyParser,
-									  ClassParsingResult&		out_result) noexcept;
+									  ClassParsingResult&		out_result)		noexcept;
 	};
 
 	#include "Parsing/ClassParser.inl"

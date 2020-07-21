@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string>
 #include <vector>
 
 #include "InfoStructures/StructClassInfo.h"
@@ -18,5 +17,8 @@ namespace kodgen
 			std::vector<StructClassInfo>	classes;
 			std::vector<StructClassInfo>	structs;
 			std::vector<EnumInfo>			enums;
+
+			//TODO: Global functions
+			//TODO: Global fields
 	};
 }

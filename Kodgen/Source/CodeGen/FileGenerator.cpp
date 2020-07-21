@@ -30,7 +30,7 @@ void FileGenerator::updateSupportedCodeTemplateRegex() noexcept
 	_supportedCodeTemplateRegex.pop_back();
 }
 
-void FileGenerator::generateEntityFile(FileGenerationResult& genResult, fs::path const& filePath, ParsingResult const& parsingResult) noexcept
+void FileGenerator::generateEntityFile(FileGenerationResult& genResult, fs::path const& filePath, FileParsingResult const& parsingResult) noexcept
 {
 	/**
 	*	This constructor actually create the file in the filesystem.
@@ -161,7 +161,7 @@ fs::path FileGenerator::makePathToGeneratedFile(fs::path const& sourceFilePath) 
 	return (outputDirectory / sourceFilePath.filename()).replace_extension(generatedFilesExtension);
 }
 
-void FileGenerator::writeHeader(GeneratedFile& file, ParsingResult const&) const noexcept
+void FileGenerator::writeHeader(GeneratedFile& file, FileParsingResult const&) const noexcept
 {
 	file.writeLine("#pragma once\n");
 
@@ -170,7 +170,7 @@ void FileGenerator::writeHeader(GeneratedFile& file, ParsingResult const&) const
 	file.writeLine("#include \"" + _entityMacrosDefFilename + "\"\n");
 }
 
-void FileGenerator::writeFooter(GeneratedFile&, ParsingResult const&) const noexcept
+void FileGenerator::writeFooter(GeneratedFile&, FileParsingResult const&) const noexcept
 {
 	//Default implementation has no footer
 }
@@ -233,7 +233,7 @@ bool FileGenerator::setDefaultEnumTemplate(std::string const& templateName) noex
 void FileGenerator::processFile(FileParser& parser, FileGenerationResult& genResult, fs::path const& pathToFile) noexcept
 {
 	//Parse file
-	ParsingResult parsingResult;
+	FileParsingResult parsingResult;
 
 	genResult.parsedFiles.push_back(pathToFile);
 
@@ -244,7 +244,7 @@ void FileGenerator::processFile(FileParser& parser, FileGenerationResult& genRes
 	else
 	{
 		//Transfer parsing errors into the file generation result
-		genResult.parsingErrors.insert(genResult.parsingErrors.end(), std::make_move_iterator(parsingResult.parsingErrors.begin()), std::make_move_iterator(parsingResult.parsingErrors.end()));
+		genResult.parsingErrors.insert(genResult.parsingErrors.end(), std::make_move_iterator(parsingResult.errors.begin()), std::make_move_iterator(parsingResult.errors.end()));
 	}
 }
 

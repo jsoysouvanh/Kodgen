@@ -47,7 +47,7 @@ CXChildVisitResult EnumValueParser::setAsCurrentEntityIfValid(CXCursor const& an
 	else if (_parsingInfo->propertyParser.getParsingError() != EParsingError::Count)
 	{
 		//Fatal parsing error occured
-		_parsingInfo->parsingResult.parsingErrors.emplace_back(ParsingError(_parsingInfo->propertyParser.getParsingError(), clang_getCursorLocation(annotationCursor)));
+		_parsingInfo->parsingResult.errors.emplace_back(ParsingError(_parsingInfo->propertyParser.getParsingError(), clang_getCursorLocation(annotationCursor)));
 	}
 
 	return CXChildVisitResult::CXChildVisit_Break;

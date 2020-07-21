@@ -99,7 +99,7 @@ CXChildVisitResult EnumParser::setAsCurrentEntityIfValid(CXCursor const& classAn
 		if (_parsingInfo->propertyParser.getParsingError() != EParsingError::Count)
 		{
 			//Fatal parsing error occured
-			_parsingInfo->parsingResult.parsingErrors.emplace_back(ParsingError(_parsingInfo->propertyParser.getParsingError(), clang_getCursorLocation(classAnnotationCursor)));
+			_parsingInfo->parsingResult.errors.emplace_back(ParsingError(_parsingInfo->propertyParser.getParsingError(), clang_getCursorLocation(classAnnotationCursor)));
 		}
 
 		return CXChildVisitResult::CXChildVisit_Break;

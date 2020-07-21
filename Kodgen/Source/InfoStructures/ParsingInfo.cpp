@@ -6,7 +6,7 @@ using namespace kodgen;
 
 bool ParsingInfo::hasErrorOccured() const noexcept
 {
-	return !parsingResult.parsingErrors.empty();
+	return !parsingResult.errors.empty();
 }
 
 bool ParsingInfo::flushCurrentStructOrClass() noexcept
@@ -68,5 +68,5 @@ void ParsingInfo::reset() noexcept
 	parsingResult.namespaces.clear();
 	parsingResult.classes.clear();
 	parsingResult.enums.clear();
-	parsingResult.parsingErrors.clear();
+	parsingResult.errors.clear();
 }

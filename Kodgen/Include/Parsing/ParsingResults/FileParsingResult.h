@@ -4,6 +4,7 @@
 
 #include "Parsing/ParsingError.h"
 #include "Parsing/ParsingSettings.h"
+#include "Parsing/ParsingResults/ParsingResultBase.h"
 
 #include "InfoStructures/NamespaceInfo.h"
 #include "InfoStructures/StructClassInfo.h"
@@ -11,19 +12,17 @@
 
 namespace kodgen
 {
-	struct ParsingResult
+	struct FileParsingResult : public ParsingResultBase
 	{
 		/**
-		*	All parsed entities
+		*	All parsed entities contained in this file.
 		*/
 		std::vector<NamespaceInfo>		namespaces;
 		std::vector<StructClassInfo>	classes;
 		std::vector<StructClassInfo>	structs;
 		std::vector<EnumInfo>			enums;
-		
-		/**
-		*	Errors encountered during parsing
-		*/
-		std::vector<ParsingError>		parsingErrors;
+
+		//TODO: Global functions
+		//TODO: Global fields
 	};
 }

@@ -6,7 +6,7 @@
 #include "Misc/FundamentalTypes.h"
 #include "Misc/EAccessSpecifier.h"
 #include "Parsing/ParsingSettings.h"
-#include "Parsing/ParsingResults/ParsingResult.h"
+#include "Parsing/ParsingResults/FileParsingResult.h"
 #include "Parsing/PropertyParser.h"
 #include "InfoStructures/TypeInfo.h"
 #include "InfoStructures/NamespaceInfo.h"
@@ -50,7 +50,7 @@ namespace kodgen
 			/**
 			*	Final collected data
 			*/
-			ParsingResult					parsingResult;
+			FileParsingResult				parsingResult;
 
 			ParsingInfo()	= default;
 			~ParsingInfo()	= default;

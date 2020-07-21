@@ -26,7 +26,7 @@ namespace kodgen
 			std::string												_supportedCodeTemplateRegex = "";
 
 			void					updateSupportedCodeTemplateRegex()																								noexcept;
-			void					generateEntityFile(FileGenerationResult& genResult, fs::path const& filePath, ParsingResult const& parsingResult)				noexcept;
+			void					generateEntityFile(FileGenerationResult& genResult, fs::path const& filePath, FileParsingResult const& parsingResult)			noexcept;
 			GeneratedCodeTemplate*	getEntityGeneratedCodeTemplate(EntityInfo& entityInfo, EFileGenerationError& out_error)									const	noexcept;
 			void					writeEntityToFile(GeneratedFile& generatedFile, EntityInfo& entityInfo, FileGenerationResult& genResult)						noexcept;
 			bool					shouldRegenerateFile(fs::path const& filePath)																			const	noexcept;
@@ -49,7 +49,7 @@ namespace kodgen
 			*	\param file Object which allows to write into the generated file
 			*	\param parsingResult Structure containing info about the parsed file
 			*/
-			virtual void	writeHeader(GeneratedFile& file, ParsingResult const& parsingResult)	const	noexcept;
+			virtual void	writeHeader(GeneratedFile& file, FileParsingResult const& parsingResult)	const	noexcept;
 
 			/**
 			*	\brief Write a footer for any generated file
@@ -57,7 +57,7 @@ namespace kodgen
 			*	\param file Object which allows to write into the generated file
 			*	\param parsingResult Structure containing info about the parsed file
 			*/
-			virtual void	writeFooter(GeneratedFile& file, ParsingResult const& parsingResult)	const	noexcept;
+			virtual void	writeFooter(GeneratedFile& file, FileParsingResult const& parsingResult)	const	noexcept;
 
 		public:
 			/**

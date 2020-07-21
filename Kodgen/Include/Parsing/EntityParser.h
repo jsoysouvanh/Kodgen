@@ -59,10 +59,5 @@ namespace kodgen
 			EntityParser2(EntityParser2 const&)	= default;
 			EntityParser2(EntityParser2&&)		= default;
 			~EntityParser2()					= default;
-
-			void				reset()	noexcept {}
-
-			void				startParsing(CXCursor const& currentCursor)	noexcept {}
-			CXChildVisitResult	endParsing()								noexcept {}
 	};
 }

@@ -27,8 +27,12 @@ namespace kodgen
 }
 
 
+#include <clang-c/Index.h>
+
 #include "Parsing/EntityParser.h"
 #include "Parsing/ParsingResults/FieldParsingResult.h"
+#include "Properties/PropertyGroup.h"
+#include "Misc/Optional.h"
 
 namespace kodgen
 {
@@ -72,7 +76,7 @@ namespace kodgen
 			*	@param fieldCursor		Root cursor of the field to parse.
 			*	@param parsingSettings	ParsingSettings to use to parse this field.
 			*	@param propertyParser	PropertyParser to use to parse properties.
-			*	@param out_result		Result filled while parsing the field.
+			*	@param out_result		Result to fill during parsing.
 			*/
 			void							initContext(CXCursor const&			fieldCursor,
 														ParsingSettings const&	parsingSettings,
@@ -87,7 +91,6 @@ namespace kodgen
 			inline FieldParsingResult*		getParsingResult()										noexcept;
 
 		public:
-
 			/**
 			*	@brief Parse the field starting at the provided AST cursor.
 			*
@@ -101,7 +104,7 @@ namespace kodgen
 			CXChildVisitResult	parse(CXCursor const&			fieldCursor,
 									  ParsingSettings const&	parsingSettings,
 									  PropertyParser&			propertyParser,
-									  FieldParsingResult&		out_result) noexcept;
+									  FieldParsingResult&		out_result)			noexcept;
 	};
 
 	#include "Parsing/FieldParser.inl"

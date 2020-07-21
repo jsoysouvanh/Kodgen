@@ -22,6 +22,7 @@ add_library(${KodgenTargetLibrary}
 					Source/InfoStructures/FieldInfo.cpp
 					Source/InfoStructures/MethodInfo.cpp
 					Source/InfoStructures/StructClassInfo.cpp
+					Source/InfoStructures/NestedStructClassInfo.cpp
 					Source/InfoStructures/EnumInfo.cpp
 					Source/InfoStructures/EnumValueInfo.cpp
 					Source/InfoStructures/ParsingInfo.cpp
@@ -38,7 +39,7 @@ add_library(${KodgenTargetLibrary}
 					Source/Parsing/EnumParser.cpp
 					Source/Parsing/EnumValueParser.cpp
 					Source/Parsing/FileParser.cpp
-					Source/Parsing/ParsingContext.cpp
+					
 	
 					Source/Misc/EAccessSpecifier.cpp
 					Source/Misc/Helpers.cpp
@@ -48,7 +49,7 @@ add_library(${KodgenTargetLibrary}
 					Source/CodeGen/EFileGenerationError.cpp
 					Source/CodeGen/FileGenerationError.cpp
 					Source/CodeGen/GeneratedFile.cpp
-				)
+			)
 
 # Setup warning level
 if (MSVC)

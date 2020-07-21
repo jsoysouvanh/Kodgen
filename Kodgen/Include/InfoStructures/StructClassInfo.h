@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include <unordered_map>
+#include <memory>
 #include <clang-c/Index.h>
 
 #include "InfoStructures/EntityInfo.h"
@@ -11,26 +11,44 @@
 
 namespace kodgen
 {
+	//Forward declaration
+	class NestedStructClassInfo;
+
 	/**
-	*	This class defines common data / behaviors shared by class and structs
+	*	This class defines common data / behaviors shared by class and structs.
 	*/
 	class StructClassInfo : public EntityInfo
 	{
 		public:
 			struct ParentInfo
 			{
+				/** Inheritance access of this parent. */
 				EAccessSpecifier	inheritanceAccess;
+
+				/** Type of the parent. */
 				TypeInfo			type;
 			};
 
 			struct ClassQualifiers
 			{
+				/** Is the class final qualified of not. */
 				bool isFinal		: 1;
-			}								qualifiers;
+			}													qualifiers;
 
-			std::vector<ParentInfo>			parents;
-			std::vector<FieldInfo>			fields;
-			std::vector<MethodInfo>			methods;
+			/** List of all parent classes of this class. */
+			std::vector<ParentInfo>								parents;
+
+			/** List of all fields contained in this class. */
+			std::vector<FieldInfo>								fields;
+
+			/** List of all methods contained in this class. */
+			std::vector<MethodInfo>								methods;
+
+			/** List of all nested classes contained in this class. */
+			std::vector<std::shared_ptr<NestedStructClassInfo>>	nestedClasses;
+
+			/** List of all nested structs contained in this class. */
+			std::vector<std::shared_ptr<NestedStructClassInfo>>	nestedStructs;
 
 			StructClassInfo()																			noexcept;
 			StructClassInfo(CXCursor const& cursor, PropertyGroup&& propertyGroup, EType&& entityType)	noexcept;

@@ -47,7 +47,7 @@ CXChildVisitResult FieldParser::setAsCurrentEntityIfValid(CXCursor const& fieldA
 	else if (_parsingInfo->propertyParser.getParsingError() != EParsingError::Count)
 	{
 		//Fatal parsing error occured
-		_parsingInfo->parsingResult.parsingErrors.emplace_back(ParsingError(_parsingInfo->propertyParser.getParsingError(), clang_getCursorLocation(fieldAnnotationCursor)));
+		_parsingInfo->parsingResult.errors.emplace_back(ParsingError(_parsingInfo->propertyParser.getParsingError(), clang_getCursorLocation(fieldAnnotationCursor)));
 	}
 
 	return CXChildVisitResult::CXChildVisit_Break;
@@ -98,7 +98,7 @@ CXChildVisitResult FieldParser2::parseEntity(CXCursor cursor, CXCursor /* parent
 	{
 		parser->parsingContext.shouldCheckEntityValidity = false;
 
-		//Set parsed struct/class in result if it is valid
+		//Set parsed field in result if it is valid
 		return parser->setParsedEntity(cursor);
 	}
 	else

@@ -44,11 +44,11 @@ void CppPropsParser::preParse(fs::path const& parseFile) noexcept
 	}
 }
 
-void CppPropsParser::postParse(fs::path const&, kodgen::ParsingResult const& result) noexcept
+void CppPropsParser::postParse(fs::path const&, kodgen::FileParsingResult const& result) noexcept
 {
 	if (_logger != nullptr)
 	{
-		for (kodgen::ParsingError const& parsingError : result.parsingErrors)
+		for (kodgen::ParsingError const& parsingError : result.errors)
 		{
 			_logger->log(parsingError.toString(), kodgen::ILogger::ELogSeverity::Error);
 		}
