@@ -77,7 +77,7 @@ namespace kodgen
 			*
 			*	@param cursor		Current cursor to parse.
 			*	@param parentCursor	Parent of the current cursor.
-			*	@param clientData	Pointer to a data provided by the client. Must be a ClassParser*.
+			*	@param clientData	Pointer to a data provided by the client. Must contain a ClassParser*.
 			*
 			*	@return An enum which indicates how to choose the next cursor to parse in the AST.
 			*/
@@ -99,7 +99,7 @@ namespace kodgen
 														ClassParsingResult&		out_result)				noexcept;
 
 			/**
-			*	@brief Retrieve the properties from provided cursor if possible.
+			*	@brief Retrieve the properties from the provided cursor if possible.
 			*
 			*	@param cursor Property cursor we retrieve information from.
 			*
@@ -129,6 +129,13 @@ namespace kodgen
 			*	@param cursor AST cursor to the base class.
 			*/
 			void							addBaseClass(CXCursor cursor)								noexcept;
+
+			/**
+			*	@brief Add the provided field result to the current class context result.
+			*
+			*	@param result FieldParsingResult to add.
+			*/
+			void							addFieldResult(FieldParsingResult& result)					noexcept;
 
 			/**
 			*	@brief Helper to get the ParsingResult contained in the context as a ClassParsingResult.

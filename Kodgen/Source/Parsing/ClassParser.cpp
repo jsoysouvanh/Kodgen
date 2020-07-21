@@ -208,11 +208,11 @@ CXChildVisitResult ClassParser2::parseField(CXCursor const& fieldCursor) noexcep
 {
 	FieldParsingResult fieldResult;
 
-	//CXChildVisitResult childVisitResult = _fieldParser.parse(fieldCursor, parsingSettings, propertyParser, out_result);
+	CXChildVisitResult childVisitResult = _fieldParser.parse(fieldCursor, *parsingContext.parsingSettings, *parsingContext.propertyParser, fieldResult);
 
-	//TODO append result to the current class
+	addFieldResult(fieldResult);
 
-	return CXChildVisitResult::CXChildVisit_Recurse;
+	return childVisitResult;
 }
 
 CXChildVisitResult ClassParser2::parse(CXCursor const& classCursor, ParsingSettings const& parsingSettings, PropertyParser& propertyParser, ClassParsingResult& out_result) noexcept
@@ -244,9 +244,9 @@ CXChildVisitResult ClassParser2::parseEntity(CXCursor cursor, CXCursor /* parent
 		switch (cursor.kind)
 		{
 			case CXCursorKind::CXCursor_CXXFinalAttr:
-				if (reinterpret_cast<ClassParsingResult*>(parser->parsingContext.parsingResult)->parsedClass.has_value())
+				if (parser->getParsingResult()->parsedClass.has_value())
 				{
-					reinterpret_cast<ClassParsingResult*>(parser->parsingContext.parsingResult)->parsedClass->qualifiers.isFinal = true;
+					parser->getParsingResult()->parsedClass->qualifiers.isFinal = true;
 				}
 				break;
 
@@ -304,7 +304,7 @@ CXChildVisitResult ClassParser2::setParsedEntity(CXCursor const& annotationCurso
 {
 	if (opt::optional<PropertyGroup> propertyGroup = getProperties(annotationCursor))
 	{
-		reinterpret_cast<ClassParsingResult*>(parsingContext.parsingResult)->parsedClass.emplace(StructClassInfo(parsingContext.rootCursor, std::move(*propertyGroup), (parsingContext.rootCursor.kind == CXCursorKind::CXCursor_ClassDecl) ? EntityInfo::EType::Class : EntityInfo::EType::Struct));
+		getParsingResult()->parsedClass.emplace(StructClassInfo(parsingContext.rootCursor, std::move(*propertyGroup), (parsingContext.rootCursor.kind == CXCursorKind::CXCursor_ClassDecl) ? EntityInfo::EType::Class : EntityInfo::EType::Struct));
 		
 		return CXChildVisitResult::CXChildVisit_Recurse;
 	}
@@ -357,5 +357,25 @@ void ClassParser2::addBaseClass(CXCursor cursor) noexcept
 	if (getParsingResult()->parsedClass.has_value())
 	{
 		getParsingResult()->parsedClass->parents.emplace_back(StructClassInfo::ParentInfo{ static_cast<EAccessSpecifier>(clang_getCXXAccessSpecifier(cursor)), TypeInfo(clang_getCursorType(cursor)) });
+	}
+}
+
+void ClassParser2::addFieldResult(FieldParsingResult& result) noexcept
+{
+	if (result.parsedField.has_value())
+	{
+		//Update field access specifier
+		result.parsedField->accessSpecifier = parsingContext.currentAccessSpecifier;
+
+		if (getParsingResult()->parsedClass.has_value())
+		{
+			getParsingResult()->parsedClass->fields.emplace_back(result.parsedField.value());
+		}
+	}
+
+	//Append errors if any
+	if (!result.errors.empty())
+	{
+		getParsingResult()->errors.insert(getParsingResult()->errors.cend(), result.errors.cbegin(), result.errors.cend());
 	}
 }

@@ -9,6 +9,7 @@ namespace kodgen
 	struct FieldParsingResult : public ParsingResultBase
 	{
 		public:
+			/** Information on the parsed field. */
 			opt::optional<FieldInfo>	parsedField	= opt::nullopt;
 	};
 }
