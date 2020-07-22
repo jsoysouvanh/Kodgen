@@ -169,23 +169,21 @@ CXChildVisitResult NamespaceParser2::parseEntity(CXCursor cursor, CXCursor /* pa
 	}
 	else
 	{
-		//At this point, the result must contain a valid namespace
-		assert(parser->getParsingResult()->parsedNamespace.has_value());
-
-		//TODO: Log what's here
+		CXChildVisitResult visitResult = CXChildVisitResult::CXChildVisit_Continue;
 
 		switch (cursor.kind)
 		{
-			case CXCursorKind::CXCursor_ClassDecl:
-				//TODO: Handle nested class
+			case CXCursorKind::CXCursor_Namespace:
+				parser->addNamespaceResult(parser->parseNamespace(cursor, visitResult));
 				break;
 
 			case CXCursorKind::CXCursor_StructDecl:
-				//TODO: Handle nested struct
-				break;
+				[[fallthrough]];
+			case CXCursorKind::CXCursor_ClassDecl:
+				parser->addClassResult(parser->parseClass(cursor, visitResult));
 
 			case CXCursorKind::CXCursor_EnumDecl:
-				//TODO: Handle nested enum
+				parser->addEnumResult(parser->parseEnum(cursor, visitResult));
 				break;
 
 			case CXCursorKind::CXCursor_VarDecl:	//For static fields
@@ -202,6 +200,72 @@ CXChildVisitResult NamespaceParser2::parseEntity(CXCursor cursor, CXCursor /* pa
 				break;
 		}
 
-		return CXChildVisitResult::CXChildVisit_Continue;
+		return visitResult;
+	}
+}
+
+NamespaceParsingResult NamespaceParser2::parseNamespace(CXCursor const& namespaceCursor, CXChildVisitResult& out_visitResult) noexcept
+{
+	NamespaceParsingResult namespaceResult;
+	
+	out_visitResult	= NamespaceParser2::parse(namespaceCursor, getContext(), namespaceResult);
+
+	return namespaceResult;
+}
+
+void NamespaceParser2::addNamespaceResult(NamespaceParsingResult&& result) noexcept
+{
+	ParsingContext& context = getContext();
+
+	if (result.parsedNamespace.has_value() && getParsingResult()->parsedNamespace.has_value())
+	{
+		getParsingResult()->parsedNamespace->namespaces.emplace_back(std::move(result.parsedNamespace).value());
+	}
+
+	//Append errors if any
+	if (!result.errors.empty())
+	{
+		getContext().parsingResult->errors.insert(getParsingResult()->errors.cend(), std::make_move_iterator(result.errors.cbegin()), std::make_move_iterator(result.errors.cend()));
+	}
+}
+
+void NamespaceParser2::addClassResult(ClassParsingResult&& result) noexcept
+{
+	if (result.parsedClass.has_value() && getParsingResult()->parsedNamespace.has_value())
+	{
+		switch (result.parsedClass->entityType)
+		{
+			case EntityInfo::EType::Struct:
+				getParsingResult()->parsedNamespace->structs.emplace_back(std::move(result.parsedClass).value());
+				break;
+
+			case EntityInfo::EType::Class:
+				getParsingResult()->parsedNamespace->classes.emplace_back(std::move(result.parsedClass).value());
+				break;
+
+			default:
+				assert(false);	//Should never reach this line
+				break;
+		}
+	}
+
+	//Append errors if any
+	if (!result.errors.empty())
+	{
+		getContext().parsingResult->errors.insert(getParsingResult()->errors.cend(), std::make_move_iterator(result.errors.cbegin()), std::make_move_iterator(result.errors.cend()));
+	}
+}
+
+void NamespaceParser2::addEnumResult(EnumParsingResult&& result) noexcept
+{
+	if (result.parsedEnum.has_value() && getParsingResult()->parsedNamespace.has_value())
+	{
+		getParsingResult()->parsedNamespace->enums.emplace_back(std::move(result.parsedEnum).value());
+	}
+
+	//Append errors if any
+	if (!result.errors.empty())
+	{
+		getContext().parsingResult->errors.insert(getParsingResult()->errors.cend(), std::make_move_iterator(result.errors.cbegin()), std::make_move_iterator(result.errors.cend()));
 	}
 }

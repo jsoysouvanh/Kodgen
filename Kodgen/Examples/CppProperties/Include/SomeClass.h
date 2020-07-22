@@ -6,7 +6,7 @@
 
 namespace SomeNamespace
 {
-	namespace np1
+	namespace KGNamespace() np1
 	{
 		class KGClass() SomeClass
 		{

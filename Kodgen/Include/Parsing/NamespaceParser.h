@@ -47,6 +47,7 @@ namespace kodgen
 
 #include "Parsing/ClassParser.h"
 #include "Parsing/ParsingResults/NamespaceParsingResult.h"
+#include "Parsing/ParsingResults/EnumParsingResult.h"
 
 namespace kodgen
 {
@@ -96,11 +97,43 @@ namespace kodgen
 														NamespaceParsingResult&		out_result)		noexcept;
 
 			/**
+			*	@brief Add the provided namespace result to the namespace result.
+			*
+			*	@param result NamespaceParsingResult to add.
+			*/
+			void							addNamespaceResult(NamespaceParsingResult&& result)		noexcept;
+
+			/**
+			*	@brief Add the provided struct/class result to the namespace result.
+			*
+			*	@param result ClassParsingResult to add.
+			*/
+			void							addClassResult(ClassParsingResult&& result)				noexcept;
+
+			/**
+			*	@brief Add the provided enum result to the namespace result.
+			*
+			*	@param result EnumParsingResult to add.
+			*/
+			void							addEnumResult(EnumParsingResult&& result)				noexcept;
+
+			/**
 			*	@brief Helper to get the ParsingResult contained in the context as a NamespaceParsingResult.
 			*
 			*	@return The cast NamespaceParsingResult.
 			*/
 			inline NamespaceParsingResult*	getParsingResult()										noexcept;
+
+		protected:
+			/**
+			*	@brief Parse a namespace.
+			*
+			*	@param namespaceCursor	AST cursor to the namespace to parse.
+			*	@param out_visitResult	An enum which indicates how to choose the next cursor to parse in the AST.
+			*
+			*	@return A structure containing information about the parsed namespace.
+			*/
+			NamespaceParsingResult 	parseNamespace(CXCursor const& namespaceCursor, CXChildVisitResult& out_visitResult)	noexcept;
 
 		public:
 			NamespaceParser2()							= default;

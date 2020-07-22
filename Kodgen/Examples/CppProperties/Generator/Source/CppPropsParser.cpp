@@ -26,6 +26,7 @@ CppPropsParser::CppPropsParser() noexcept:
 	fieldPropertyRules.addComplexPropertyRule("Set", "explicit");
 
 	//Define the macros to use for each entity type
+	parsingSettings.propertyParsingSettings.namespacePropertyRules.macroName	= "KGNamespace";
 	parsingSettings.propertyParsingSettings.classPropertyRules.macroName		= "KGClass";
 	parsingSettings.propertyParsingSettings.structPropertyRules.macroName		= "KGStruct";
 	fieldPropertyRules.macroName												= "KGField";

@@ -17,13 +17,17 @@ namespace kodgen
 	class FileGenerator
 	{
 		private:
-			static inline std::string								_entityMacrosDefFilename	= "EntityMacros.h";
+			/** Name of the internally generated header containing empty definitions for entity macros. */
+			static inline std::string										_entityMacrosDefFilename		= "EntityMacros.h";
 
-			std::unordered_map<std::string,	GeneratedCodeTemplate*>	_generatedCodeTemplates;
-			GeneratedCodeTemplate*									_defaultClassTemplate		= nullptr;
-			GeneratedCodeTemplate*									_defaultStructTemplate		= nullptr;
-			GeneratedCodeTemplate*									_defaultEnumTemplate		= nullptr;
-			std::string												_supportedCodeTemplateRegex = "";
+			/** All generated code templates usable by this generator. */
+			std::unordered_map<std::string,	GeneratedCodeTemplate*>			_generatedCodeTemplates;
+			
+			/** Default generated code templates to use when none is specified in property parameters. */
+			std::unordered_map<EntityInfo::EType, GeneratedCodeTemplate*>	_defaultGeneratedCodeTemplates;
+			
+			/** Regex used internally to determine either a generated code template name is valid or not. */
+			std::string														_supportedCodeTemplateRegex		= "";
 
 			void					updateSupportedCodeTemplateRegex()																								noexcept;
 			void					generateEntityFile(FileGenerationResult& genResult, fs::path const& filePath, FileParsingResult const& parsingResult)			noexcept;
@@ -38,11 +42,6 @@ namespace kodgen
 			void					generateMacrosFile(FileParser2& parser)																					const	noexcept;
 
 		protected:
-			/**
-			*	Logger used to issue logs from the FileGenerator
-			*/
-			ILogger*	_logger	= nullptr;
-
 			/**
 			*	@brief Write a header for any generated file
 			*
@@ -60,26 +59,25 @@ namespace kodgen
 			virtual void	writeFooter(GeneratedFile& file, FileParsingResult const& parsingResult)	const	noexcept;
 
 		public:
-			/**
-			*	Main (complex) property name used to specify code generator in source code
-			*/
+			/** Logger used to issue logs from the FileGenerator. */
+			ILogger*								logger								= nullptr;
+
+			/** Main (complex) property name used to specify code generator in source code. */
 			std::string								codeTemplateMainComplexPropertyName	= "GenTemplate";
 
-			/**
-			*	Extension used for generated files
-			*/
+			/** Extension used for generated files */
 			std::string								generatedFilesExtension				= ".kodgen.h";
 
 			/**
-			*	Path to the directory all files should be generated (and where existing ones are)
-			*	If the existed directory doesn't exist, it will be created if possible
+			*	Path to the directory all files should be generated (and where existing ones are).
+			*	If the existed directory doesn't exist, it will be created if possible.
 			*/
 			fs::path								outputDirectory;
 
 			/**
 			*	Collection of files to parse.
 			*	These files will be parsed without any further check if they exist.
-			*	/!\ Make sure all added paths use the os preferred syntax (you should call path.make_preferred() before)
+			*	/!\ Make sure all added paths use the os preferred syntax (you should call path.make_preferred() before).
 			*/
 			std::unordered_set<fs::path, PathHash>	toParseFiles;
 
@@ -106,9 +104,7 @@ namespace kodgen
 			*/
 			std::unordered_set<fs::path, PathHash>	ignoredDirectories;
 
-			/**
-			*	Extensions of files which should be considered for parsing.
-			*/
+			/** Extensions of files which should be considered for parsing. */
 			std::unordered_set<std::string>			supportedExtensions;
 
 			FileGenerator()		noexcept;
@@ -121,40 +117,21 @@ namespace kodgen
 			*	@param templateName Name of the code template which will be specified in the source code
 			*	@param codeTemplate Pointer to a GeneratedCodeTemplate instance (must be newed).
 			*			The instance will be deleted by the FileGenerator when destroyed
-			*	@param setAsDefaultClassTemplate Should this CodeTemplate be used as the default one when none is
-			*			explicitly specified in source code
 			*/
-			void addGeneratedCodeTemplate(std::string const& templateName, GeneratedCodeTemplate* codeTemplate, bool setAsDefaultClassTemplate = false)	noexcept;
+			void addGeneratedCodeTemplate(std::string const& templateName, GeneratedCodeTemplate* codeTemplate)	noexcept;
 
 			/**
-			*	@brief Setup the generated code template to use when no template is specified in a parsed source code class
+			*	@brief Set the default generated code template to use with the specified entity type when no template is specified in the entity properties.
 			*
-			*	@param templateName The name of the default generated code template.
-			*						It must have been setup using the addGeneratedCodeTemplate(...) method before
+			*	@brief entityType	Type of the entity we set the default generated code template for.
+			*						It can only be one of the following: Namespace, Class, Struct, Enum.
+			*	@brief template		Name of the default generated code template.
+			*						It must have been setup using the addGeneratedCodeTemplate(...) method before.
 			*
-			*	@return true if the new default class template was setup successfully, else false
+			*	@return true if the new default generated code template was setup successfully, else false.
 			*/
-			bool setDefaultClassTemplate(std::string const& templateName)									noexcept;
-
-			/**
-			*	@brief Setup the generated code template to use when no template is specified in a parsed source code struct
-			*
-			*	@param templateName The name of the default generated code template.
-			*						It must have been setup using the addGeneratedCodeTemplate(...) method before call
-			*
-			*	@return true if the new default struct template was setup successfully, else false
-			*/
-			bool setDefaultStructTemplate(std::string const& templateName)									noexcept;
-
-			/**
-			*	@brief Setup the generated code template to use when no template is specified in a parsed source code enum
-			*
-			*	@param codeTemplate The name of the default generated code template.
-			*						It must have been setup using the addGeneratedCodeTemplate(...) method before
-			*
-			*	@return true if the new default enum template was setup successfully, else false
-			*/
-			bool setDefaultEnumTemplate(std::string const& templateName)									noexcept;
+			bool setDefaultGeneratedCodeTemplate(EntityInfo::EType	entityType,
+												 std::string const& templateName)							noexcept;
 
 			/**
 			*	@brief Parse registered files if they were changes since last generation
@@ -175,12 +152,5 @@ namespace kodgen
 			*	@return true if a file could be loaded, else false.
 			*/
 			bool				loadSettings(fs::path const& pathToSettingsFile)							noexcept;
-
-			/**
-			*	@brief Setup the logger used by this generator.
-			*
-			*	@param logger Instance of the logger to use.
-			*/
-			void				provideLogger(ILogger& logger)												noexcept;
 	};
 }

@@ -163,21 +163,27 @@ CXChildVisitResult MethodParser2::parseEntity(CXCursor cursor, CXCursor /* paren
 	}
 	else
 	{
-		//At this point, the result must contain a valid method
-		assert(parser->getParsingResult()->parsedMethod.has_value());
-
 		switch (clang_getCursorKind(cursor))
 		{
 			case CXCursorKind::CXCursor_CXXFinalAttr:
-				parser->getParsingResult()->parsedMethod->qualifiers.isFinal = true;
+				if (parser->getParsingResult()->parsedMethod.has_value())
+				{
+					parser->getParsingResult()->parsedMethod->qualifiers.isFinal = true;
+				}
 				break;
 
 			case CXCursorKind::CXCursor_CXXOverrideAttr:
-				parser->getParsingResult()->parsedMethod->qualifiers.isOverride = true;
+				if (parser->getParsingResult()->parsedMethod.has_value())
+				{
+					parser->getParsingResult()->parsedMethod->qualifiers.isOverride = true;
+				}
 				break;
 
 			case CXCursorKind::CXCursor_ParmDecl:
-				parser->getParsingResult()->parsedMethod->parameters.emplace_back(MethodParamInfo{ TypeInfo(clang_getCursorType(cursor)), Helpers::getString(clang_getCursorDisplayName(cursor)) });
+				if (parser->getParsingResult()->parsedMethod.has_value())
+				{
+					parser->getParsingResult()->parsedMethod->parameters.emplace_back(MethodParamInfo{TypeInfo(clang_getCursorType(cursor)), Helpers::getString(clang_getCursorDisplayName(cursor))});
+				}
 				break;
 
 			default:

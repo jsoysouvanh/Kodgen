@@ -3,6 +3,7 @@
 #include <cassert>
 
 #include "InfoStructures/NestedStructClassInfo.h"
+#include "InfoStructures/NestedEnumInfo.h"
 #include "Misc/Helpers.h"
 
 using namespace kodgen;
@@ -205,39 +206,6 @@ void ClassParser::addToParents(CXCursor cursor, ParsingInfo& parsingInfo) const 
 
 //=========================================================================================
 
-CXChildVisitResult ClassParser2::parseField(CXCursor const& fieldCursor) noexcept
-{
-	FieldParsingResult fieldResult;
-
-	CXChildVisitResult childVisitResult = fieldParser.parse(fieldCursor, getContext(), fieldResult);
-
-	addFieldResult(std::move(fieldResult));
-
-	return childVisitResult;
-}
-
-CXChildVisitResult ClassParser2::parseMethod(CXCursor const& methodCursor) noexcept
-{
-	MethodParsingResult methodResult;
-
-	CXChildVisitResult childVisitResult = methodParser.parse(methodCursor, getContext(), methodResult);
-
-	addMethodResult(std::move(methodResult));
-
-	return childVisitResult;
-}
-
-CXChildVisitResult ClassParser2::parseNestedStructOrClass(CXCursor const& classCursor) noexcept
-{
-	ClassParsingResult classResult;
-
-	CXChildVisitResult childVisitResult = parse(classCursor, getContext(), classResult);
-
-	addClassResult(std::move(classResult));
-
-	return childVisitResult;
-}
-
 CXChildVisitResult ClassParser2::parse(CXCursor const& classCursor, ParsingContext const& parentContext, ClassParsingResult& out_result) noexcept
 {
 	//Make sure the cursor is compatible for the class parser
@@ -251,6 +219,24 @@ CXChildVisitResult ClassParser2::parse(CXCursor const& classCursor, ParsingConte
 	popContext();
 
 	return (parentContext.parsingSettings->shouldAbortParsingOnFirstError && !out_result.errors.empty()) ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
+}
+
+FieldParsingResult ClassParser2::parseField(CXCursor const& fieldCursor, CXChildVisitResult& out_visitResult) noexcept
+{
+	FieldParsingResult fieldResult;
+
+	out_visitResult = fieldParser.parse(fieldCursor, getContext(), fieldResult);
+
+	return fieldResult;
+}
+
+MethodParsingResult	ClassParser2::parseMethod(CXCursor const& methodCursor, CXChildVisitResult& out_visitResult) noexcept
+{
+	MethodParsingResult methodResult;
+
+	out_visitResult = methodParser.parse(methodCursor, getContext(), methodResult);
+
+	return methodResult;
 }
 
 CXChildVisitResult ClassParser2::parseEntity(CXCursor cursor, CXCursor /* parentCursor */, CXClientData clientData) noexcept
@@ -267,8 +253,7 @@ CXChildVisitResult ClassParser2::parseEntity(CXCursor cursor, CXCursor /* parent
 	}
 	else
 	{
-		//At this point, the result must contain a valid class
-		assert(parser->getParsingResult()->parsedClass.has_value());
+		CXChildVisitResult visitResult = CXChildVisitResult::CXChildVisit_Continue;
 
 		switch (cursor.kind)
 		{
@@ -291,32 +276,51 @@ CXChildVisitResult ClassParser2::parseEntity(CXCursor cursor, CXCursor /* parent
 				//TODO: Might handle this someday
 				break;
 
-			case CXCursorKind::CXCursor_ClassDecl:
-				//TODO: Handle nested class
-				break;
-
 			case CXCursorKind::CXCursor_StructDecl:
-				//TODO: Handle nested struct
+				[[fallthrough]];
+			case CXCursorKind::CXCursor_ClassDecl:
+				parser->addClassResult(parser->parseClass(cursor, visitResult));
 				break;
 
 			case CXCursorKind::CXCursor_EnumDecl:
-				//TODO: Handle nested enum
+				parser->addEnumResult(parser->parseEnum(cursor, visitResult));
 				break;
 
 			case CXCursorKind::CXCursor_VarDecl:	//For static fields
 				[[fallthrough]];
 			case CXCursorKind::CXCursor_FieldDecl:
-				return parser->parseField(cursor);
+				parser->addFieldResult(parser->parseField(cursor, visitResult));
+				break;
 
 			case CXCursorKind::CXCursor_CXXMethod:
-				return parser->parseMethod(cursor);
+				parser->addMethodResult(parser->parseMethod(cursor, visitResult));
+				break;
 
 			default:
 				break;
 		}
 
-		return CXChildVisitResult::CXChildVisit_Continue;
+		return visitResult;
 	}
+}
+
+ClassParsingResult ClassParser2::parseClass(CXCursor const& classCursor, CXChildVisitResult& out_visitResult) noexcept
+{
+	ClassParsingResult classResult;
+
+	out_visitResult	= parse(classCursor, getContext(), classResult);
+
+	return classResult;
+}
+
+EnumParsingResult ClassParser2::parseEnum(CXCursor const& enumCursor, CXChildVisitResult& out_visitResult) noexcept
+{
+	EnumParsingResult enumResult;
+
+	//TODO
+	//out_visitResult = parse(enumCursor, getContext(), enumResult);
+
+	return enumResult;
 }
 
 void ClassParser2::pushContext(CXCursor const& classCursor, ParsingContext const& parentContext, ClassParsingResult& out_result) noexcept
@@ -401,15 +405,12 @@ void ClassParser2::addFieldResult(FieldParsingResult&& result) noexcept
 {
 	ParsingContext& context = getContext();
 
-	if (result.parsedField.has_value())
+	if (result.parsedField.has_value() && getParsingResult()->parsedClass.has_value())
 	{
 		//Update field access specifier
 		result.parsedField->accessSpecifier = context.currentAccessSpecifier;
 
-		if (getParsingResult()->parsedClass.has_value())
-		{
-			getParsingResult()->parsedClass->fields.emplace_back(std::move(result.parsedField).value());
-		}
+		getParsingResult()->parsedClass->fields.emplace_back(std::move(result.parsedField).value());
 	}
 
 	//Append errors if any
@@ -423,15 +424,12 @@ void ClassParser2::addMethodResult(MethodParsingResult&& result) noexcept
 {
 	ParsingContext& context = getContext();
 
-	if (result.parsedMethod.has_value())
+	if (result.parsedMethod.has_value() && getParsingResult()->parsedClass.has_value())
 	{
-		//Update field access specifier
+		//Update method access specifier
 		result.parsedMethod->accessSpecifier = context.currentAccessSpecifier;
 
-		if (getParsingResult()->parsedClass.has_value())
-		{
-			getParsingResult()->parsedClass->methods.emplace_back(std::move(result.parsedMethod).value());
-		}
+		getParsingResult()->parsedClass->methods.emplace_back(std::move(result.parsedMethod).value());
 	}
 
 	//Append errors if any
@@ -445,25 +443,38 @@ void ClassParser2::addClassResult(ClassParsingResult&& result) noexcept
 {
 	ParsingContext& context = getContext();
 
-	if (result.parsedClass.has_value())
+	if (result.parsedClass.has_value() && getParsingResult()->parsedClass.has_value())
 	{
-		if (getParsingResult()->parsedClass.has_value())
+		switch (result.parsedClass->entityType)
 		{
-			switch (result.parsedClass->entityType)
-			{
-				case EntityInfo::EType::Struct:
-					getParsingResult()->parsedClass->nestedStructs.emplace_back(std::make_shared<NestedStructClassInfo>(std::move(result.parsedClass).value(), context.currentAccessSpecifier));
-					break;
+			case EntityInfo::EType::Struct:
+				getParsingResult()->parsedClass->nestedStructs.emplace_back(std::make_shared<NestedStructClassInfo>(std::move(result.parsedClass).value(), context.currentAccessSpecifier));
+				break;
 
-				case EntityInfo::EType::Class:
-					getParsingResult()->parsedClass->nestedClasses.emplace_back(std::make_shared<NestedStructClassInfo>(std::move(result.parsedClass).value(), context.currentAccessSpecifier));
-					break;
+			case EntityInfo::EType::Class:
+				getParsingResult()->parsedClass->nestedClasses.emplace_back(std::make_shared<NestedStructClassInfo>(std::move(result.parsedClass).value(), context.currentAccessSpecifier));
+				break;
 
-				default:
-					assert(false);	//Should never reach this point
-					break;
-			}
+			default:
+				assert(false);	//Should never reach this point
+				break;
 		}
+	}
+
+	//Append errors if any
+	if (!result.errors.empty())
+	{
+		context.parsingResult->errors.insert(getParsingResult()->errors.cend(), std::make_move_iterator(result.errors.cbegin()), std::make_move_iterator(result.errors.cend()));
+	}
+}
+
+void ClassParser2::addEnumResult(EnumParsingResult&& result) noexcept
+{
+	ParsingContext& context = getContext();
+
+	if (result.parsedEnum.has_value() && getParsingResult()->parsedClass.has_value())
+	{
+		getParsingResult()->parsedClass->nestedEnums.emplace_back(NestedEnumInfo(std::move(result.parsedEnum).value(), context.currentAccessSpecifier));
 	}
 
 	//Append errors if any
