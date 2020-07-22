@@ -252,9 +252,9 @@ bool PropertyParser::addComplexProperty(std::vector<std::string>& propertyAsVect
 	return true;
 }
 
-void PropertyParser::setup(PropertyParsingSettings const* propertyParsingSettings) noexcept
+void PropertyParser::setup(PropertyParsingSettings const& propertyParsingSettings) noexcept
 {
-	_propertyParsingSettings = propertyParsingSettings;
+	_propertyParsingSettings = &propertyParsingSettings;
 
 	char charsForPropParsing[] =	{
 		_propertyParsingSettings->propertySeparator,

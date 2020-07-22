@@ -83,16 +83,14 @@ namespace kodgen
 														CXClientData	clientData)						noexcept;
 
 			/**
-			*	@brief Init the context object of this parser.
+			*	@brief Push a new clean context to prepare struct/class parsing.
 			*
-			*	@param classCursor		Root cursor of the class/struct to parse.
-			*	@param parsingSettings	ParsingSettings to use to parse this class/struct.
-			*	@param propertyParser	PropertyParser to use to parse properties.
+			*	@param classCursor		Root cursor of the struct/class to parse.
+			*	@param parentContext	Context the new context will inherit from.
 			*	@param out_result		Result to fill during parsing.
 			*/
-			void							initContext(CXCursor const&			classCursor,
-														ParsingSettings const&	parsingSettings,
-														PropertyParser&			propertyParser,
+			void							pushContext(CXCursor const&			classCursor,
+														ParsingContext const&	parentContext,
 														ClassParsingResult&		out_result)				noexcept;
 
 			/**
@@ -202,15 +200,13 @@ namespace kodgen
 			*	@brief Parse the struct/class starting at the provided AST cursor.
 			*
 			*	@param classCursor		AST cursor to the struct/class to parse.
-			*	@param parsingSettings	ParsingSettings used to parse the struct/class.
-			*	@param propertyParser	PropertyParser used to parse the struct/class properties.
+			*	@param parentContext	Context the new context will inherit from.
 			*	@param out_result		Result filled while parsing the struct/class.
 			*
 			*	@return An enum which indicates how to choose the next cursor to parse in the AST.
 			*/
 			CXChildVisitResult	parse(CXCursor const&			classCursor,
-									  ParsingSettings const&	parsingSettings,
-									  PropertyParser&			propertyParser,
+									  ParsingContext const&		parentContext,
 									  ClassParsingResult&		out_result)		noexcept;
 	};
 

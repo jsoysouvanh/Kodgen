@@ -39,3 +39,5 @@ uint8 EntityParser::getParsingLevel() const noexcept
 {
 	return _parsingLevel;
 }
+
+//===================================================

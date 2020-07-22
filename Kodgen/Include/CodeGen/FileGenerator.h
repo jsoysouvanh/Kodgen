@@ -31,11 +31,11 @@ namespace kodgen
 			void					writeEntityToFile(GeneratedFile& generatedFile, EntityInfo& entityInfo, FileGenerationResult& genResult)						noexcept;
 			bool					shouldRegenerateFile(fs::path const& filePath)																			const	noexcept;
 			fs::path				makePathToGeneratedFile(fs::path const& sourceFilePath)																	const	noexcept;
-			void					processFile(FileParser& parser, FileGenerationResult& genResult, fs::path const& pathToFile)									noexcept;
-			void					processIncludedFiles(FileParser& parser, FileGenerationResult& genResult, bool forceRegenerateAll)								noexcept;
-			void					processIncludedDirectories(FileParser& parser, FileGenerationResult& genResult, bool forceRegenerateAll)						noexcept;
+			void					processFile(FileParser2& parser, FileGenerationResult& genResult, fs::path const& pathToFile)									noexcept;
+			void					processIncludedFiles(FileParser2& parser, FileGenerationResult& genResult, bool forceRegenerateAll)								noexcept;
+			void					processIncludedDirectories(FileParser2& parser, FileGenerationResult& genResult, bool forceRegenerateAll)						noexcept;
 			void					refreshPropertyRules(ParsingSettings& parsingSettings)																	const	noexcept;
-			void					generateMacrosFile(FileParser& parser)																					const	noexcept;
+			void					generateMacrosFile(FileParser2& parser)																					const	noexcept;
 
 		protected:
 			/**
@@ -44,18 +44,18 @@ namespace kodgen
 			ILogger*	_logger	= nullptr;
 
 			/**
-			*	\brief Write a header for any generated file
+			*	@brief Write a header for any generated file
 			*
-			*	\param file Object which allows to write into the generated file
-			*	\param parsingResult Structure containing info about the parsed file
+			*	@param file Object which allows to write into the generated file
+			*	@param parsingResult Structure containing info about the parsed file
 			*/
 			virtual void	writeHeader(GeneratedFile& file, FileParsingResult const& parsingResult)	const	noexcept;
 
 			/**
-			*	\brief Write a footer for any generated file
+			*	@brief Write a footer for any generated file
 			*
-			*	\param file Object which allows to write into the generated file
-			*	\param parsingResult Structure containing info about the parsed file
+			*	@param file Object which allows to write into the generated file
+			*	@param parsingResult Structure containing info about the parsed file
 			*/
 			virtual void	writeFooter(GeneratedFile& file, FileParsingResult const& parsingResult)	const	noexcept;
 
@@ -115,71 +115,71 @@ namespace kodgen
 			~FileGenerator()	noexcept;
 
 			/**
-			*	\brief Add a new template to the list of generated code templates
+			*	@brief Add a new template to the list of generated code templates
 			*		   This will override any template having the same templateName
 			*
-			*	\param templateName Name of the code template which will be specified in the source code
-			*	\param codeTemplate Pointer to a GeneratedCodeTemplate instance (must be newed).
+			*	@param templateName Name of the code template which will be specified in the source code
+			*	@param codeTemplate Pointer to a GeneratedCodeTemplate instance (must be newed).
 			*			The instance will be deleted by the FileGenerator when destroyed
-			*	\param setAsDefaultClassTemplate Should this CodeTemplate be used as the default one when none is
+			*	@param setAsDefaultClassTemplate Should this CodeTemplate be used as the default one when none is
 			*			explicitly specified in source code
 			*/
 			void addGeneratedCodeTemplate(std::string const& templateName, GeneratedCodeTemplate* codeTemplate, bool setAsDefaultClassTemplate = false)	noexcept;
 
 			/**
-			*	\brief Setup the generated code template to use when no template is specified in a parsed source code class
+			*	@brief Setup the generated code template to use when no template is specified in a parsed source code class
 			*
-			*	\param templateName The name of the default generated code template.
+			*	@param templateName The name of the default generated code template.
 			*						It must have been setup using the addGeneratedCodeTemplate(...) method before
 			*
-			*	\return true if the new default class template was setup successfully, else false
+			*	@return true if the new default class template was setup successfully, else false
 			*/
 			bool setDefaultClassTemplate(std::string const& templateName)									noexcept;
 
 			/**
-			*	\brief Setup the generated code template to use when no template is specified in a parsed source code struct
+			*	@brief Setup the generated code template to use when no template is specified in a parsed source code struct
 			*
-			*	\param templateName The name of the default generated code template.
+			*	@param templateName The name of the default generated code template.
 			*						It must have been setup using the addGeneratedCodeTemplate(...) method before call
 			*
-			*	\return true if the new default struct template was setup successfully, else false
+			*	@return true if the new default struct template was setup successfully, else false
 			*/
 			bool setDefaultStructTemplate(std::string const& templateName)									noexcept;
 
 			/**
-			*	\brief Setup the generated code template to use when no template is specified in a parsed source code enum
+			*	@brief Setup the generated code template to use when no template is specified in a parsed source code enum
 			*
-			*	\param codeTemplate The name of the default generated code template.
+			*	@param codeTemplate The name of the default generated code template.
 			*						It must have been setup using the addGeneratedCodeTemplate(...) method before
 			*
-			*	\return true if the new default enum template was setup successfully, else false
+			*	@return true if the new default enum template was setup successfully, else false
 			*/
 			bool setDefaultEnumTemplate(std::string const& templateName)									noexcept;
 
 			/**
-			*	\brief Parse registered files if they were changes since last generation
+			*	@brief Parse registered files if they were changes since last generation
 			*			and try to generate corresponding files using code templates
 			*
-			*	\param parser The parser to use for the parsing
-			*	\param forceRegenerateAll Ignore the last write time check and reparse / regenerate all files
+			*	@param parser The parser to use for the parsing
+			*	@param forceRegenerateAll Ignore the last write time check and reparse / regenerate all files
 			*
-			*	\return Structure containing result report
+			*	@return Structure containing result report
 			*/
-			FileGenerationResult generateFiles(FileParser& parser, bool forceRegenerateAll = false)			noexcept;
+			FileGenerationResult generateFiles(FileParser2& parser, bool forceRegenerateAll = false)		noexcept;
 
 			/**
-			*	\brief Setup this object's parameters with the provided toml file. Unset settings remain unchanged.
+			*	@brief Setup this object's parameters with the provided toml file. Unset settings remain unchanged.
 			*
-			*	\param pathToSettingsFile Path to the toml file.
+			*	@param pathToSettingsFile Path to the toml file.
 			*
-			*	\return true if a file could be loaded, else false.
+			*	@return true if a file could be loaded, else false.
 			*/
 			bool				loadSettings(fs::path const& pathToSettingsFile)							noexcept;
 
 			/**
-			*	\brief Setup the logger used by this generator.
+			*	@brief Setup the logger used by this generator.
 			*
-			*	\param logger Instance of the logger to use.
+			*	@param logger Instance of the logger to use.
 			*/
 			void				provideLogger(ILogger& logger)												noexcept;
 	};

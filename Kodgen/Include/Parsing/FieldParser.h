@@ -71,17 +71,15 @@ namespace kodgen
 			CXChildVisitResult				setParsedEntity(CXCursor const& annotationCursor)		noexcept;
 
 			/**
-			*	@brief Init the context object of this parser.
+			*	@brief Push a new clean context to prepare field parsing.
 			*
 			*	@param fieldCursor		Root cursor of the field to parse.
-			*	@param parsingSettings	ParsingSettings to use to parse this field.
-			*	@param propertyParser	PropertyParser to use to parse properties.
+			*	@param parentContext	Context the new context will inherit from.
 			*	@param out_result		Result to fill during parsing.
 			*/
-			void							initContext(CXCursor const&			fieldCursor,
-														ParsingSettings const&	parsingSettings,
-														PropertyParser&			propertyParser,
-														FieldParsingResult&		out_result)			noexcept;
+			void							pushContext(CXCursor const&				fieldCursor,
+														ParsingContext const&		parentContext,
+														FieldParsingResult&			out_result)		noexcept;
 
 			/**
 			*	@brief Helper to get the ParsingResult contained in the context as a FieldParsingResult.
@@ -95,15 +93,13 @@ namespace kodgen
 			*	@brief Parse the field starting at the provided AST cursor.
 			*
 			*	@param fieldCursor		AST cursor to the field to parse.
-			*	@param parsingSettings	ParsingSettings used to parse the field.
-			*	@param propertyParser	PropertyParser used to parse the field properties.
+			*	@param parentContext	Context the new context will inherit from.
 			*	@param out_result		Result filled while parsing the field.
 			*
 			*	@return An enum which indicates how to choose the next cursor to parse in the AST.
 			*/
 			CXChildVisitResult	parse(CXCursor const&			fieldCursor,
-									  ParsingSettings const&	parsingSettings,
-									  PropertyParser&			propertyParser,
+									  ParsingContext const&		parentContext,
 									  FieldParsingResult&		out_result)			noexcept;
 	};
 

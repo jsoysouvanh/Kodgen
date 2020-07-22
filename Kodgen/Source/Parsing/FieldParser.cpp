@@ -68,35 +68,42 @@ opt::optional<PropertyGroup> FieldParser::isEntityValid(CXCursor const& currentC
 
 //=========================================================================================
 
-CXChildVisitResult FieldParser2::parse(CXCursor const& fieldCursor, ParsingSettings const& parsingSettings, PropertyParser& propertyParser, FieldParsingResult& out_result) noexcept
+CXChildVisitResult FieldParser2::parse(CXCursor const& fieldCursor, ParsingContext const& parentContext, FieldParsingResult& out_result) noexcept
 {
 	//Make sure the cursor is compatible for the field parser
 	assert(fieldCursor.kind == CXCursorKind::CXCursor_VarDecl || fieldCursor.kind == CXCursorKind::CXCursor_FieldDecl);
 
 	//Init context
-	initContext(fieldCursor, parsingSettings, propertyParser, out_result);
+	pushContext(fieldCursor, parentContext, out_result);
 
 	clang_visitChildren(fieldCursor, &FieldParser2::parseEntity, this);
 
-	return (parsingSettings.shouldAbortParsingOnFirstError && !out_result.errors.empty()) ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
+	popContext();
+
+	return (parentContext.parsingSettings->shouldAbortParsingOnFirstError && !out_result.errors.empty()) ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
 }
 
-void FieldParser2::initContext(CXCursor const& fieldCursor, ParsingSettings const& parsingSettings, PropertyParser& propertyParser, FieldParsingResult& out_result) noexcept
+void FieldParser2::pushContext(CXCursor const& fieldCursor, ParsingContext const& parentContext, FieldParsingResult& out_result) noexcept
 {
-	parsingContext.rootCursor					= fieldCursor;
-	parsingContext.shouldCheckEntityValidity	= true;
-	parsingContext.propertyParser				= &propertyParser;
-	parsingContext.parsingSettings				= &parsingSettings;
-	parsingContext.parsingResult				= &out_result;
+	ParsingContext newContext;
+
+	newContext.rootCursor					= fieldCursor;
+	newContext.shouldCheckEntityValidity	= true;
+	newContext.propertyParser				= parentContext.propertyParser;
+	newContext.parsingSettings				= parentContext.parsingSettings;
+	newContext.parsingResult				= &out_result;
+
+	contextsStack.push(std::move(newContext));
 }
 
 CXChildVisitResult FieldParser2::parseEntity(CXCursor cursor, CXCursor /* parentCursor */, CXClientData clientData) noexcept
 {
-	FieldParser2* parser = reinterpret_cast<FieldParser2*>(clientData);
+	FieldParser2*	parser	= reinterpret_cast<FieldParser2*>(clientData);
+	ParsingContext&	context	= parser->getContext();
 
-	if (parser->parsingContext.shouldCheckEntityValidity)
+	if (context.shouldCheckEntityValidity)
 	{
-		parser->parsingContext.shouldCheckEntityValidity = false;
+		context.shouldCheckEntityValidity = false;
 
 		//Set parsed field in result if it is valid
 		return parser->setParsedEntity(cursor);
@@ -111,19 +118,21 @@ CXChildVisitResult FieldParser2::setParsedEntity(CXCursor const& annotationCurso
 {
 	FieldParsingResult* result = getParsingResult();
 
+	ParsingContext& context = getContext();
+
 	if (opt::optional<PropertyGroup> propertyGroup = getProperties(annotationCursor))
 	{
-		FieldInfo& field = result->parsedField.emplace(FieldInfo(parsingContext.rootCursor, std::move(*propertyGroup)));
+		FieldInfo& field = result->parsedField.emplace(FieldInfo(context.rootCursor, std::move(*propertyGroup)));
 
 		//field.accessSpecifier = _parsingInfo->accessSpecifier;
-		field.type = TypeInfo(clang_getCursorType(parsingContext.rootCursor));
-		field.qualifiers.isStatic = (clang_getCursorKind(parsingContext.rootCursor) == CXCursorKind::CXCursor_VarDecl);
+		field.type = TypeInfo(clang_getCursorType(context.rootCursor));
+		field.qualifiers.isStatic = (clang_getCursorKind(context.rootCursor) == CXCursorKind::CXCursor_VarDecl);
 
 		if (!field.qualifiers.isStatic)
 		{
-			field.qualifiers.isMutable = clang_CXXField_isMutable(parsingContext.rootCursor);
+			field.qualifiers.isMutable = clang_CXXField_isMutable(context.rootCursor);
 
-			field.memoryOffset = clang_Cursor_getOffsetOfField(parsingContext.rootCursor);
+			field.memoryOffset = clang_Cursor_getOffsetOfField(context.rootCursor);
 
 			// assert(field.memoryOffset != CXTypeLayoutError::CXTypeLayoutError_Invalid);	<- Assert here on travis for some reasons...
 			assert(field.memoryOffset != CXTypeLayoutError::CXTypeLayoutError_Incomplete);
@@ -133,10 +142,10 @@ CXChildVisitResult FieldParser2::setParsedEntity(CXCursor const& annotationCurso
 			field.memoryOffset /= 8;	//From bits to bytes
 		}
 	}
-	else if (parsingContext.propertyParser->getParsingError() != EParsingError::Count)
+	else if (context.propertyParser->getParsingError() != EParsingError::Count)
 	{
 		//Fatal parsing error occured
-		result->errors.emplace_back(ParsingError(parsingContext.propertyParser->getParsingError(), clang_getCursorLocation(annotationCursor)));
+		result->errors.emplace_back(ParsingError(context.propertyParser->getParsingError(), clang_getCursorLocation(annotationCursor)));
 	}
 
 	return CXChildVisitResult::CXChildVisit_Break;
@@ -144,9 +153,11 @@ CXChildVisitResult FieldParser2::setParsedEntity(CXCursor const& annotationCurso
 
 opt::optional<PropertyGroup> FieldParser2::getProperties(CXCursor const& cursor) noexcept
 {
-	parsingContext.propertyParser->clean();
+	ParsingContext& context = getContext();
+
+	context.propertyParser->clean();
 
 	return (clang_getCursorKind(cursor) == CXCursorKind::CXCursor_AnnotateAttr) ?
-				parsingContext.propertyParser->getFieldProperties(Helpers::getString(clang_getCursorSpelling(cursor))) :
+				context.propertyParser->getFieldProperties(Helpers::getString(clang_getCursorSpelling(cursor))) :
 				opt::nullopt;
 }

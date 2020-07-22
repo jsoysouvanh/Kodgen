@@ -85,16 +85,14 @@ namespace kodgen
 			CXChildVisitResult				setParsedEntity(CXCursor const& annotationCursor)		noexcept;
 
 			/**
-			*	@brief Init the context object of this parser.
+			*	@brief Push a new clean context to prepare namespace parsing.
 			*
 			*	@param namespaceCursor	Root cursor of the namespace to parse.
-			*	@param parsingSettings	ParsingSettings to use to parse this namespace.
-			*	@param propertyParser	PropertyParser to use to parse properties.
+			*	@param parentContext	Context the new context will inherit from.
 			*	@param out_result		Result to fill during parsing.
 			*/
-			void							initContext(CXCursor const&				namespaceCursor,
-														ParsingSettings const&		parsingSettings,
-														PropertyParser&				propertyParser,
+			void							pushContext(CXCursor const&				namespaceCursor,
+														ParsingContext const&		parentContext,
 														NamespaceParsingResult&		out_result)		noexcept;
 
 			/**
@@ -114,15 +112,13 @@ namespace kodgen
 			*	@brief Parse the namespace starting at the provided AST cursor.
 			*
 			*	@param namespaceCursor	AST cursor to the namespace to parse.
-			*	@param parsingSettings	ParsingSettings used to parse the namespace.
-			*	@param propertyParser	PropertyParser used to parse the namespace properties.
+			*	@param parentContext	Context the new context will inherit from.
 			*	@param out_result		Result filled while parsing the namespace.
 			*
 			*	@return An enum which indicates how to choose the next cursor to parse in the AST.
 			*/
 			CXChildVisitResult	parse(CXCursor const&			namespaceCursor,
-									  ParsingSettings const&	parsingSettings,
-									  PropertyParser&			propertyParser,
+									  ParsingContext const&		parentContext,
 									  NamespaceParsingResult&	out_result)		noexcept;
 	};
 

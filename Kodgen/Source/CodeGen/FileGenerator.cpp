@@ -230,7 +230,7 @@ bool FileGenerator::setDefaultEnumTemplate(std::string const& templateName) noex
 	return false;
 }
 
-void FileGenerator::processFile(FileParser& parser, FileGenerationResult& genResult, fs::path const& pathToFile) noexcept
+void FileGenerator::processFile(FileParser2& parser, FileGenerationResult& genResult, fs::path const& pathToFile) noexcept
 {
 	//Parse file
 	FileParsingResult parsingResult;
@@ -248,7 +248,7 @@ void FileGenerator::processFile(FileParser& parser, FileGenerationResult& genRes
 	}
 }
 
-void FileGenerator::processIncludedFiles(FileParser& parser, FileGenerationResult& genResult, bool forceRegenerateAll) noexcept
+void FileGenerator::processIncludedFiles(FileParser2& parser, FileGenerationResult& genResult, bool forceRegenerateAll) noexcept
 {
 	for (fs::path path : toParseFiles)
 	{
@@ -270,7 +270,7 @@ void FileGenerator::processIncludedFiles(FileParser& parser, FileGenerationResul
 	}
 }
 
-void FileGenerator::processIncludedDirectories(FileParser& parser, FileGenerationResult& genResult, bool forceRegenerateAll) noexcept
+void FileGenerator::processIncludedDirectories(FileParser2& parser, FileGenerationResult& genResult, bool forceRegenerateAll) noexcept
 {
 	for (fs::path pathToIncludedDir : toParseDirectories)
 	{
@@ -324,16 +324,16 @@ void FileGenerator::refreshPropertyRules(ParsingSettings& parsingSettings) const
 	parsingSettings.propertyParsingSettings.enumPropertyRules.addComplexPropertyRule(std::string(codeTemplateMainComplexPropertyName), std::string(_supportedCodeTemplateRegex));
 }
 
-void FileGenerator::generateMacrosFile(FileParser& parser) const noexcept
+void FileGenerator::generateMacrosFile(FileParser2& parser) const noexcept
 {
 	GeneratedFile macrosDefinitionFile(outputDirectory / _entityMacrosDefFilename);
 
-	PropertyParsingSettings& pps = parser.getParsingSettings().propertyParsingSettings;
+	PropertyParsingSettings& pps = parser.parsingSettings.propertyParsingSettings;
 
 	//Define empty entity macros to allow compilation outside of the Kodgen parsing
 	macrosDefinitionFile.writeLines("#pragma once",
 									"",
-									"#ifndef " + parser.getParsingMacro(),
+									"#ifndef " + parser.parsingMacro,
 									"	#define " + pps.classPropertyRules.macroName + "(...)",
 									"	#define " + pps.structPropertyRules.macroName + "(...)",
 									"	#define " + pps.fieldPropertyRules.macroName + "(...)",
@@ -343,7 +343,7 @@ void FileGenerator::generateMacrosFile(FileParser& parser) const noexcept
 									"#endif");
 }
 
-FileGenerationResult FileGenerator::generateFiles(FileParser& parser, bool forceRegenerateAll) noexcept
+FileGenerationResult FileGenerator::generateFiles(FileParser2& parser, bool forceRegenerateAll) noexcept
 {
 	FileGenerationResult genResult;
 
@@ -369,9 +369,7 @@ FileGenerationResult FileGenerator::generateFiles(FileParser& parser, bool force
 
 		if (fs::is_directory(outputDirectory))
 		{
-			ParsingSettings& parsingSettings = parser.getParsingSettings();
-
-			refreshPropertyRules(parsingSettings);
+			refreshPropertyRules(parser.parsingSettings);
 
 			generateMacrosFile(parser);
 

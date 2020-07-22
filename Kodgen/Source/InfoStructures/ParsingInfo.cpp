@@ -57,7 +57,7 @@ bool ParsingInfo::flushCurrentNamespace() noexcept
 
 void ParsingInfo::reset() noexcept
 {
-	propertyParser.setup(&parsingSettings.propertyParsingSettings);
+	propertyParser.setup(parsingSettings.propertyParsingSettings);
 
 	accessSpecifier			= EAccessSpecifier::Private;
 

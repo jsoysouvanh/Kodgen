@@ -7,7 +7,7 @@
 
 namespace kodgen
 {
-	struct NamespaceInfo : public EntityInfo
+	class NamespaceInfo : public EntityInfo
 	{
 		public:
 			/**
@@ -20,5 +20,11 @@ namespace kodgen
 
 			//TODO: Global functions
 			//TODO: Global fields
+
+			NamespaceInfo()															= default;
+			NamespaceInfo(CXCursor const& cursor, PropertyGroup&& propertyGroup)	noexcept;
+			NamespaceInfo(NamespaceInfo const&)										= default;
+			NamespaceInfo(NamespaceInfo&&)											= default;
+			~NamespaceInfo()														= default;
 	};
 }

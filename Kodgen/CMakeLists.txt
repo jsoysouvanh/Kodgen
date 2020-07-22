@@ -19,6 +19,7 @@ add_library(${KodgenTargetLibrary}
 					Source/Properties/PropertyParsingSettings.cpp
 	
 					Source/InfoStructures/EntityInfo.cpp
+					Source/InfoStructures/NamespaceInfo.cpp
 					Source/InfoStructures/FieldInfo.cpp
 					Source/InfoStructures/MethodInfo.cpp
 					Source/InfoStructures/StructClassInfo.cpp
@@ -40,7 +41,6 @@ add_library(${KodgenTargetLibrary}
 					Source/Parsing/EnumValueParser.cpp
 					Source/Parsing/FileParser.cpp
 					
-	
 					Source/Misc/EAccessSpecifier.cpp
 					Source/Misc/Helpers.cpp
 					Source/Misc/DefaultLogger.cpp

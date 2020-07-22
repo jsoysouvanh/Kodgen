@@ -71,16 +71,14 @@ namespace kodgen
 			CXChildVisitResult				setParsedEntity(CXCursor const& annotationCursor)		noexcept;
 
 			/**
-			*	@brief Init the context object of this parser.
+			*	@brief Push a new clean context to prepare method parsing.
 			*
 			*	@param methodCursor		Root cursor of the method to parse.
-			*	@param parsingSettings	ParsingSettings to use to parse methods.
-			*	@param propertyParser	PropertyParser to use to parse properties.
+			*	@param parentContext	Context the new context will inherit from.
 			*	@param out_result		Result to fill during parsing.
 			*/
-			void							initContext(CXCursor const&			methodCursor,
-														ParsingSettings const&	parsingSettings,
-														PropertyParser&			propertyParser,
+			void							pushContext(CXCursor const&			methodCursor,
+														ParsingContext const&	parentContext,
 														MethodParsingResult&	out_result)			noexcept;
 
 			/**
@@ -102,15 +100,13 @@ namespace kodgen
 			*	@brief Parse the method starting at the provided AST cursor.
 			*
 			*	@param methodCursor		AST cursor to the method to parse.
-			*	@param parsingSettings	ParsingSettings used to parse the method.
-			*	@param propertyParser	PropertyParser used to parse the method properties.
+			*	@param parentContext	Context the new context will inherit from.
 			*	@param out_result		Result filled while parsing the method.
 			*
 			*	@return An enum which indicates how to choose the next cursor to parse in the AST.
 			*/
 			CXChildVisitResult	parse(CXCursor const&			methodCursor,
-									  ParsingSettings const&	parsingSettings,
-									  PropertyParser&			propertyParser,
+									  ParsingContext const&		parentContext,
 									  MethodParsingResult&		out_result)			noexcept;
 	};
 

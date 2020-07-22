@@ -41,6 +41,8 @@ namespace kodgen
 }
 
 
+#include <stack>
+#include <cassert>
 #include <clang-c/Index.h>
 
 #include "Misc/FundamentalTypes.h"
@@ -51,8 +53,20 @@ namespace kodgen
 	class EntityParser2
 	{
 		protected:
-			/** Parsing context of this parser */
-			ParsingContext	parsingContext;
+			/** Stack of contexts of this parser. */
+			std::stack<ParsingContext>	contextsStack;
+
+			/**
+			*	@brief Get the current in-use context.
+			*
+			*	@return The current context.
+			*/
+			inline ParsingContext&	getContext()	noexcept;
+
+			/**
+			*	@brief Pop the most recent context from the contexts stack.
+			*/
+			inline void				popContext()	noexcept;
 
 		public:
 			EntityParser2()						= default;
@@ -60,4 +74,6 @@ namespace kodgen
 			EntityParser2(EntityParser2&&)		= default;
 			~EntityParser2()					= default;
 	};
+
+	#include "Parsing/EntityParser.inl"
 }

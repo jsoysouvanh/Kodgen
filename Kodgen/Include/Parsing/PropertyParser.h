@@ -73,7 +73,7 @@ namespace kodgen
 			/**
 			*	Called by the parser to internally setup some acceleration data
 			*/
-			void setup(PropertyParsingSettings const* propertyParsingSettings) noexcept;
+			void setup(PropertyParsingSettings const& propertyParsingSettings) noexcept;
 
 			/**
 			*	Clear all collected data such as parsingErrors or split props.

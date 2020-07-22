@@ -2,7 +2,7 @@
 
 #include <Parsing/FileParser.h>
 
-class CppPropsParser : public kodgen::FileParser
+class CppPropsParser : public kodgen::FileParser2
 {
 	protected:
 		virtual void preParse(fs::path const& parseFile)											noexcept override;

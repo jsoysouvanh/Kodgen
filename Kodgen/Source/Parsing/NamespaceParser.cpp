@@ -101,37 +101,44 @@ void NamespaceParser::startStructParsing(CXCursor const& currentCursor) noexcept
 
 #include <cassert>
 
-CXChildVisitResult NamespaceParser2::parse(CXCursor const& namespaceCursor, ParsingSettings const& parsingSettings, PropertyParser& propertyParser, NamespaceParsingResult& out_result) noexcept
+CXChildVisitResult NamespaceParser2::parse(CXCursor const& namespaceCursor, ParsingContext const& parentContext, NamespaceParsingResult& out_result) noexcept
 {
 	//Make sure the cursor is compatible for the namespace parser
 	assert(namespaceCursor.kind == CXCursorKind::CXCursor_Namespace);
 
 	//Init context
-	initContext(namespaceCursor, parsingSettings, propertyParser, out_result);
+	pushContext(namespaceCursor, parentContext, out_result);
 
 	clang_visitChildren(namespaceCursor, &NamespaceParser2::parseEntity, this);
 
-	return (parsingSettings.shouldAbortParsingOnFirstError && !out_result.errors.empty()) ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
+	popContext();
+
+	return (parentContext.parsingSettings->shouldAbortParsingOnFirstError && !out_result.errors.empty()) ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
 }
 
-void NamespaceParser2::initContext(CXCursor const& namespaceCursor, ParsingSettings const& parsingSettings, PropertyParser& propertyParser, NamespaceParsingResult& out_result) noexcept
+void NamespaceParser2::pushContext(CXCursor const& namespaceCursor, ParsingContext const& parentContext, NamespaceParsingResult& out_result) noexcept
 {
-	parsingContext.rootCursor					= namespaceCursor;
-	parsingContext.shouldCheckEntityValidity	= true;
-	parsingContext.propertyParser				= &propertyParser;
-	parsingContext.parsingSettings				= &parsingSettings;
-	parsingContext.parsingResult				= &out_result;
+	//Add a new context to the contexts stack
+	ParsingContext newContext;
+
+	newContext.rootCursor					= namespaceCursor;
+	newContext.shouldCheckEntityValidity	= true;
+	newContext.propertyParser				= parentContext.propertyParser;
+	newContext.parsingSettings				= parentContext.parsingSettings;
+	newContext.parsingResult				= &out_result;
+
+	contextsStack.push(std::move(newContext));
 }
 
 CXChildVisitResult NamespaceParser2::setParsedEntity(CXCursor const& annotationCursor) noexcept
 {
 	if (opt::optional<PropertyGroup> propertyGroup = getProperties(annotationCursor))
 	{
-		getParsingResult()->parsedNamespace.emplace(NamespaceInfo());
+		getParsingResult()->parsedNamespace.emplace(NamespaceInfo(getContext().rootCursor, std::move(*propertyGroup)));
 	}
-	else if (parsingContext.propertyParser->getParsingError() != EParsingError::Count)
+	else if (getContext().propertyParser->getParsingError() != EParsingError::Count)
 	{
-		parsingContext.parsingResult->errors.emplace_back(ParsingError(parsingContext.propertyParser->getParsingError(), clang_getCursorLocation(annotationCursor)));
+		getContext().parsingResult->errors.emplace_back(ParsingError(getContext().propertyParser->getParsingError(), clang_getCursorLocation(annotationCursor)));
 
 		return CXChildVisitResult::CXChildVisit_Break;
 	}
@@ -142,20 +149,20 @@ CXChildVisitResult NamespaceParser2::setParsedEntity(CXCursor const& annotationC
 
 opt::optional<PropertyGroup> NamespaceParser2::getProperties(CXCursor const& cursor) noexcept
 {
-	parsingContext.propertyParser->clean();
+	getContext().propertyParser->clean();
 
 	return (clang_getCursorKind(cursor) == CXCursorKind::CXCursor_AnnotateAttr) ?
-				parsingContext.propertyParser->getNamespaceProperties(Helpers::getString(clang_getCursorSpelling(cursor))) :
-				opt::nullopt;
+				getContext().propertyParser->getNamespaceProperties(Helpers::getString(clang_getCursorSpelling(cursor))) :
+				PropertyGroup();
 }
 
 CXChildVisitResult NamespaceParser2::parseEntity(CXCursor cursor, CXCursor /* parentCursor */, CXClientData clientData) noexcept
 {
 	NamespaceParser2* parser = reinterpret_cast<NamespaceParser2*>(clientData);
 
-	if (parser->parsingContext.shouldCheckEntityValidity)
+	if (parser->getContext().shouldCheckEntityValidity)
 	{
-		parser->parsingContext.shouldCheckEntityValidity = false;
+		parser->getContext().shouldCheckEntityValidity = false;
 
 		//Set the parsed namespace in result if it is valid
 		return parser->setParsedEntity(cursor);

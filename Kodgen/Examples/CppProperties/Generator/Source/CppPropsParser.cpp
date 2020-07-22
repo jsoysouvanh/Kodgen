@@ -1,10 +1,8 @@
 #include "CppPropsParser.h"
 
 CppPropsParser::CppPropsParser() noexcept:
-	FileParser()
+	FileParser2()
 {
-	kodgen::ParsingSettings& parsingSettings = getParsingSettings();
-
 	//We abort parsing if we encounter a single error while parsing
 	parsingSettings.shouldAbortParsingOnFirstError = true;
 
@@ -38,21 +36,21 @@ CppPropsParser::CppPropsParser() noexcept:
 
 void CppPropsParser::preParse(fs::path const& parseFile) noexcept
 {
-	if (_logger != nullptr)
+	if (logger != nullptr)
 	{
-		_logger->log("Start parsing: " + parseFile.string(), kodgen::ILogger::ELogSeverity::Info);
+		logger->log("Start parsing: " + parseFile.string(), kodgen::ILogger::ELogSeverity::Info);
 	}
 }
 
 void CppPropsParser::postParse(fs::path const&, kodgen::FileParsingResult const& result) noexcept
 {
-	if (_logger != nullptr)
+	if (logger != nullptr)
 	{
 		for (kodgen::ParsingError const& parsingError : result.errors)
 		{
-			_logger->log(parsingError.toString(), kodgen::ILogger::ELogSeverity::Error);
+			logger->log(parsingError.toString(), kodgen::ILogger::ELogSeverity::Error);
 		}
 
-		_logger->log("Found " + std::to_string(result.classes.size()) + " classes and " + std::to_string(result.enums.size()) + " enums.", kodgen::ILogger::ELogSeverity::Info);
+		logger->log("Found " + std::to_string(result.classes.size()) + " classes and " + std::to_string(result.enums.size()) + " enums.", kodgen::ILogger::ELogSeverity::Info);
 	}
 }
