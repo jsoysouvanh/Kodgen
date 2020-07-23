@@ -8,7 +8,7 @@
 
 namespace kodgen
 {
-	class NamespaceParser2 : public ClassParser2
+	class NamespaceParser : public ClassParser
 	{
 		private:
 			/**
@@ -20,9 +20,9 @@ namespace kodgen
 			*
 			*	@return An enum which indicates how to choose the next cursor to parse in the AST.
 			*/
-			static CXChildVisitResult		parseEntity(CXCursor		cursor,
-														CXCursor		parentCursor,
-														CXClientData	clientData)					noexcept;
+			static CXChildVisitResult		parseNestedEntity(CXCursor		cursor,
+															  CXCursor		parentCursor,
+															  CXClientData	clientData)				noexcept;
 
 			/**
 			*	@brief Retrieve the properties from the provided cursor if possible.
@@ -90,13 +90,14 @@ namespace kodgen
 			*
 			*	@return A structure containing information about the parsed namespace.
 			*/
-			NamespaceParsingResult 	parseNamespace(CXCursor const& namespaceCursor, CXChildVisitResult& out_visitResult)	noexcept;
+			NamespaceParsingResult 	parseNamespace(CXCursor const&		namespaceCursor,
+												   CXChildVisitResult&	out_visitResult)	noexcept;
 
 		public:
-			NamespaceParser2()							= default;
-			NamespaceParser2(NamespaceParser2 const&)	= default;
-			NamespaceParser2(NamespaceParser2&&)		= default;
-			~NamespaceParser2()							= default;
+			NamespaceParser()						= default;
+			NamespaceParser(NamespaceParser const&)	= default;
+			NamespaceParser(NamespaceParser&&)		= default;
+			~NamespaceParser()						= default;
 
 			/**
 			*	@brief Parse the namespace starting at the provided AST cursor.

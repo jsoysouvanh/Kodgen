@@ -14,22 +14,25 @@ namespace kodgen
 	struct ParsingContext
 	{
 		public:
-			/** Root cursor of this parsing context */
-			CXCursor				rootCursor					= clang_getNullCursor();
+			/** Parent context of this context. */
+			ParsingContext const*	parentContext			= nullptr;
+
+			/** Root cursor of this parsing context. */
+			CXCursor				rootCursor				= clang_getNullCursor();
 			
 			/** Current access specifier */
-			EAccessSpecifier		currentAccessSpecifier		= EAccessSpecifier::Invalid;
+			EAccessSpecifier		currentAccessSpecifier	= EAccessSpecifier::Invalid;
 
-			/** Should the validity of this entity be checked at the next parsing step? */
-			bool					shouldCheckEntityValidity	= true;
+			/** Should check for properties (annotate) at the next parsing step? */
+			bool					shouldCheckProperties	= true;
 
-			/** Parser used to parse entity properties */
-			PropertyParser*			propertyParser				= nullptr;
+			/** Parser used to parse entity properties. */
+			PropertyParser*			propertyParser			= nullptr;
 
-			/** ParsingSettings used */
-			ParsingSettings const*	parsingSettings				= nullptr;
+			/** ParsingSettings used. */
+			ParsingSettings const*	parsingSettings			= nullptr;
 
-			/** Result of the parsing */
-			ParsingResultBase*		parsingResult				= nullptr;
+			/** Result of the parsing. */
+			ParsingResultBase*		parsingResult			= nullptr;
 	};
 }

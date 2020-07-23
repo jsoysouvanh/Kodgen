@@ -11,7 +11,7 @@ namespace SomeNamespace KGNamespace()
 		class KGClass() SomeClass
 		{
 			public:
-				class SomeNestedClass{};
+				class KGClass() SomeNestedClass{};
 
 			private:
 				KGField(Get[explicit], Set[])

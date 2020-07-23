@@ -8,17 +8,17 @@
 
 using namespace kodgen;
 
-FileParser2::FileParser2() noexcept:
+FileParser::FileParser() noexcept:
 	_clangIndex{clang_createIndex(0, 0)}
 {
 }
 
-FileParser2::~FileParser2() noexcept
+FileParser::~FileParser() noexcept
 {
 	clang_disposeIndex(_clangIndex);
 }
 
-bool FileParser2::parse(fs::path const& toParseFile, FileParsingResult& out_result) noexcept
+bool FileParser::parse(fs::path const& toParseFile, FileParsingResult& out_result) noexcept
 {
 	bool isSuccess = false;
 
@@ -42,7 +42,7 @@ bool FileParser2::parse(fs::path const& toParseFile, FileParsingResult& out_resu
 		{
 			ParsingContext& context = pushContext(translationUnit, out_result);
 
-			if (clang_visitChildren(context.rootCursor, &FileParser2::parseEntity, this) || !out_result.errors.empty())
+			if (clang_visitChildren(context.rootCursor, &FileParser::parseNestedEntity, this) || !out_result.errors.empty())
 			{
 				//ERROR
 			}
@@ -77,9 +77,9 @@ bool FileParser2::parse(fs::path const& toParseFile, FileParsingResult& out_resu
 	return isSuccess;
 }
 
-CXChildVisitResult FileParser2::parseEntity(CXCursor cursor, CXCursor /* parentCursor */, CXClientData clientData) noexcept
+CXChildVisitResult FileParser::parseNestedEntity(CXCursor cursor, CXCursor /* parentCursor */, CXClientData clientData) noexcept
 {
-	FileParser2*		parser		= reinterpret_cast<FileParser2*>(clientData);
+	FileParser*		parser		= reinterpret_cast<FileParser*>(clientData);
 
 	DISABLE_WARNING_PUSH
 	DISABLE_WARNING_UNSCOPED_ENUM
@@ -120,12 +120,13 @@ CXChildVisitResult FileParser2::parseEntity(CXCursor cursor, CXCursor /* parentC
 	return visitResult;
 }
 
-ParsingContext& FileParser2::pushContext(CXTranslationUnit const& translationUnit, FileParsingResult& out_result) noexcept
+ParsingContext& FileParser::pushContext(CXTranslationUnit const& translationUnit, FileParsingResult& out_result) noexcept
 {
 	_propertyParser.setup(parsingSettings.propertyParsingSettings);
 
 	ParsingContext newContext;
 
+	newContext.parentContext	= nullptr;
 	newContext.rootCursor		= clang_getTranslationUnitCursor(translationUnit);
 	newContext.propertyParser	= &_propertyParser;
 	newContext.parsingSettings	= &parsingSettings;
@@ -136,7 +137,7 @@ ParsingContext& FileParser2::pushContext(CXTranslationUnit const& translationUni
 	return getContext();
 }
 
-void FileParser2::addNamespaceResult(NamespaceParsingResult&& result) noexcept
+void FileParser::addNamespaceResult(NamespaceParsingResult&& result) noexcept
 {
 	if (result.parsedNamespace.has_value())
 	{
@@ -150,7 +151,7 @@ void FileParser2::addNamespaceResult(NamespaceParsingResult&& result) noexcept
 	}
 }
 
-void FileParser2::addClassResult(ClassParsingResult&& result) noexcept
+void FileParser::addClassResult(ClassParsingResult&& result) noexcept
 {
 	if (result.parsedClass.has_value())
 	{
@@ -177,7 +178,7 @@ void FileParser2::addClassResult(ClassParsingResult&& result) noexcept
 	}
 }
 
-void FileParser2::addEnumResult(EnumParsingResult&& result) noexcept
+void FileParser::addEnumResult(EnumParsingResult&& result) noexcept
 {
 	if (result.parsedEnum.has_value())
 	{
@@ -191,21 +192,21 @@ void FileParser2::addEnumResult(EnumParsingResult&& result) noexcept
 	}
 }
 
-void FileParser2::preParse(fs::path const&) noexcept
+void FileParser::preParse(fs::path const&) noexcept
 {
 	/**
 	*	Default implementation does nothing special
 	*/
 }
 
-void FileParser2::postParse(fs::path const&, FileParsingResult const&) noexcept
+void FileParser::postParse(fs::path const&, FileParsingResult const&) noexcept
 {
 	/**
 	*	Default implementation does nothing special
 	*/
 }
 
-void FileParser2::refreshBuildCommandStrings() noexcept
+void FileParser::refreshBuildCommandStrings() noexcept
 {
 	_namespacePropertyMacro	= "-D" + parsingSettings.propertyParsingSettings.namespacePropertyRules.macroName	+ "(...)=__attribute__((annotate(\"KGN:\"#__VA_ARGS__)))";
 	_classPropertyMacro		= "-D" + parsingSettings.propertyParsingSettings.classPropertyRules.macroName		+ "(...)=__attribute__((annotate(\"KGC:\"#__VA_ARGS__)))";
@@ -224,7 +225,7 @@ void FileParser2::refreshBuildCommandStrings() noexcept
 	}
 }
 
-std::vector<char const*> FileParser2::makeCompilationArguments() noexcept
+std::vector<char const*> FileParser::makeCompilationArguments() noexcept
 {
 	std::vector<char const*>	result;
 
@@ -263,7 +264,7 @@ std::vector<char const*> FileParser2::makeCompilationArguments() noexcept
 	return result;
 }
 
-void FileParser2::logDiagnostic(CXTranslationUnit const& translationUnit) const noexcept
+void FileParser::logDiagnostic(CXTranslationUnit const& translationUnit) const noexcept
 {
 	if (logger != nullptr)
 	{
@@ -286,7 +287,7 @@ void FileParser2::logDiagnostic(CXTranslationUnit const& translationUnit) const 
 	}
 }
 
-void FileParser2::logCompilationArguments() noexcept
+void FileParser::logCompilationArguments() noexcept
 {
 	if (logger != nullptr)
 	{
@@ -299,7 +300,7 @@ void FileParser2::logCompilationArguments() noexcept
 	}
 }
 
-bool FileParser2::loadSettings(fs::path const& pathToSettingsFile) noexcept
+bool FileParser::loadSettings(fs::path const& pathToSettingsFile) noexcept
 {
 	try
 	{

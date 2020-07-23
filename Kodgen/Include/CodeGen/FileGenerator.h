@@ -40,7 +40,7 @@ namespace kodgen
 			*	@param genResult	Reference to the generation result to fill during file generation.
 			*	@param pathToFile	Path to the source file to parse.
 			*/
-			void					processFile(FileParser2&			parser,
+			void					processFile(FileParser&				parser,
 												FileGenerationResult&	genResult,
 												fs::path const&			pathToFile)									noexcept;
 
@@ -177,7 +177,7 @@ namespace kodgen
 			*	@param genResult			Reference to the generation result to fill during file generation.
 			*	@param forceRegenerateAll	Should all files be regenerated or not (regardless of FileGenerator::shouldRegenerateFile() returned value).
 			*/
-			void					processIncludedFiles(FileParser2&			parser,
+			void					processIncludedFiles(FileParser&			parser,
 														 FileGenerationResult&	genResult,
 														 bool					forceRegenerateAll)					noexcept;
 			
@@ -188,7 +188,7 @@ namespace kodgen
 			*	@param genResult			Reference to the generation result to fill during file generation.
 			*	@param forceRegenerateAll	Should all files be regenerated or not (regardless of FileGenerator::shouldRegenerateFile() returned value).
 			*/
-			void					processIncludedDirectories(FileParser2&				parser,
+			void					processIncludedDirectories(FileParser&				parser,
 															   FileGenerationResult&	genResult,
 															   bool						forceRegenerateAll)			noexcept;
 			
@@ -204,7 +204,7 @@ namespace kodgen
 			*	
 			*	@param parser The file parser.
 			*/
-			void					generateMacrosFile(FileParser2& parser)									const	noexcept;
+			void					generateMacrosFile(FileParser& parser)									const	noexcept;
 
 		protected:
 			/**
@@ -312,7 +312,7 @@ namespace kodgen
 			*
 			*	@return Structure containing file generation report.
 			*/
-			FileGenerationResult generateFiles(FileParser2&	parser,
+			FileGenerationResult generateFiles(FileParser&	parser,
 											   bool			forceRegenerateAll = false)	noexcept;
 
 			/**

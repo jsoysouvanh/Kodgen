@@ -1,5 +1,5 @@
 
-inline ClassParsingResult* ClassParser2::getParsingResult() noexcept
+inline ClassParsingResult* ClassParser::getParsingResult() noexcept
 {
 	return reinterpret_cast<ClassParsingResult*>(getContext().parsingResult);
 }

@@ -1,14 +1,15 @@
 #include "Parsing/NamespaceParser.h"
 
+#include <cassert>
+
+#include "Parsing/ParsingSettings.h"
+#include "Parsing/PropertyParser.h"
 #include "Misc/Helpers.h"
+#include "Misc/DisableWarningMacros.h"
 
 using namespace kodgen;
 
-#include "Parsing/NamespaceParser.h"
-
-#include <cassert>
-
-CXChildVisitResult NamespaceParser2::parse(CXCursor const& namespaceCursor, ParsingContext const& parentContext, NamespaceParsingResult& out_result) noexcept
+CXChildVisitResult NamespaceParser::parse(CXCursor const& namespaceCursor, ParsingContext const& parentContext, NamespaceParsingResult& out_result) noexcept
 {
 	//Make sure the cursor is compatible for the namespace parser
 	assert(namespaceCursor.kind == CXCursorKind::CXCursor_Namespace);
@@ -16,28 +17,34 @@ CXChildVisitResult NamespaceParser2::parse(CXCursor const& namespaceCursor, Pars
 	//Init context
 	pushContext(namespaceCursor, parentContext, out_result);
 
-	clang_visitChildren(namespaceCursor, &NamespaceParser2::parseEntity, this);
+	clang_visitChildren(namespaceCursor, &NamespaceParser::parseNestedEntity, this);
 
 	popContext();
 
+	DISABLE_WARNING_PUSH
+	DISABLE_WARNING_UNSCOPED_ENUM
+
 	return (parentContext.parsingSettings->shouldAbortParsingOnFirstError && !out_result.errors.empty()) ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
+
+	DISABLE_WARNING_POP
 }
 
-void NamespaceParser2::pushContext(CXCursor const& namespaceCursor, ParsingContext const& parentContext, NamespaceParsingResult& out_result) noexcept
+void NamespaceParser::pushContext(CXCursor const& namespaceCursor, ParsingContext const& parentContext, NamespaceParsingResult& out_result) noexcept
 {
 	//Add a new context to the contexts stack
 	ParsingContext newContext;
 
-	newContext.rootCursor					= namespaceCursor;
-	newContext.shouldCheckEntityValidity	= true;
-	newContext.propertyParser				= parentContext.propertyParser;
-	newContext.parsingSettings				= parentContext.parsingSettings;
-	newContext.parsingResult				= &out_result;
+	newContext.parentContext			= &parentContext;
+	newContext.rootCursor				= namespaceCursor;
+	newContext.shouldCheckProperties	= true;
+	newContext.propertyParser			= parentContext.propertyParser;
+	newContext.parsingSettings			= parentContext.parsingSettings;
+	newContext.parsingResult			= &out_result;
 
 	contextsStack.push(std::move(newContext));
 }
 
-CXChildVisitResult NamespaceParser2::setParsedEntity(CXCursor const& annotationCursor) noexcept
+CXChildVisitResult NamespaceParser::setParsedEntity(CXCursor const& annotationCursor) noexcept
 {
 	if (opt::optional<PropertyGroup> propertyGroup = getProperties(annotationCursor))
 	{
@@ -56,7 +63,7 @@ CXChildVisitResult NamespaceParser2::setParsedEntity(CXCursor const& annotationC
 	}
 }
 
-opt::optional<PropertyGroup> NamespaceParser2::getProperties(CXCursor const& cursor) noexcept
+opt::optional<PropertyGroup> NamespaceParser::getProperties(CXCursor const& cursor) noexcept
 {
 	ParsingContext& context = getContext();
 
@@ -67,16 +74,16 @@ opt::optional<PropertyGroup> NamespaceParser2::getProperties(CXCursor const& cur
 				opt::nullopt;
 }
 
-CXChildVisitResult NamespaceParser2::parseEntity(CXCursor cursor, CXCursor /* parentCursor */, CXClientData clientData) noexcept
+CXChildVisitResult NamespaceParser::parseNestedEntity(CXCursor cursor, CXCursor /* parentCursor */, CXClientData clientData) noexcept
 {
-	NamespaceParser2*	parser	= reinterpret_cast<NamespaceParser2*>(clientData);
+	NamespaceParser*	parser	= reinterpret_cast<NamespaceParser*>(clientData);
 	ParsingContext&		context = parser->getContext();
 
 	//std::cout << "NAMESPACE => " << Helpers::getString(clang_getCursorKindSpelling(cursor.kind)) << " " << Helpers::getString(clang_getCursorDisplayName(cursor)) << std::endl;
 
-	if (context.shouldCheckEntityValidity)
+	if (context.shouldCheckProperties)
 	{
-		context.shouldCheckEntityValidity = false;
+		context.shouldCheckProperties = false;
 
 		return parser->setParsedEntity(cursor);
 	}
@@ -94,6 +101,7 @@ CXChildVisitResult NamespaceParser2::parseEntity(CXCursor cursor, CXCursor /* pa
 				[[fallthrough]];
 			case CXCursorKind::CXCursor_ClassDecl:
 				parser->addClassResult(parser->parseClass(cursor, visitResult));
+				break;
 
 			case CXCursorKind::CXCursor_EnumDecl:
 				parser->addEnumResult(parser->parseEnum(cursor, visitResult));
@@ -117,19 +125,17 @@ CXChildVisitResult NamespaceParser2::parseEntity(CXCursor cursor, CXCursor /* pa
 	}
 }
 
-NamespaceParsingResult NamespaceParser2::parseNamespace(CXCursor const& namespaceCursor, CXChildVisitResult& out_visitResult) noexcept
+NamespaceParsingResult NamespaceParser::parseNamespace(CXCursor const& namespaceCursor, CXChildVisitResult& out_visitResult) noexcept
 {
 	NamespaceParsingResult namespaceResult;
 	
-	out_visitResult	= NamespaceParser2::parse(namespaceCursor, getContext(), namespaceResult);
+	out_visitResult	= NamespaceParser::parse(namespaceCursor, getContext(), namespaceResult);
 
 	return namespaceResult;
 }
 
-void NamespaceParser2::addNamespaceResult(NamespaceParsingResult&& result) noexcept
+void NamespaceParser::addNamespaceResult(NamespaceParsingResult&& result) noexcept
 {
-	ParsingContext& context = getContext();
-
 	if (result.parsedNamespace.has_value() && getParsingResult()->parsedNamespace.has_value())
 	{
 		getParsingResult()->parsedNamespace->namespaces.emplace_back(std::move(result.parsedNamespace).value());
@@ -142,7 +148,7 @@ void NamespaceParser2::addNamespaceResult(NamespaceParsingResult&& result) noexc
 	}
 }
 
-void NamespaceParser2::addClassResult(ClassParsingResult&& result) noexcept
+void NamespaceParser::addClassResult(ClassParsingResult&& result) noexcept
 {
 	if (result.parsedClass.has_value() && getParsingResult()->parsedNamespace.has_value())
 	{
@@ -169,7 +175,7 @@ void NamespaceParser2::addClassResult(ClassParsingResult&& result) noexcept
 	}
 }
 
-void NamespaceParser2::addEnumResult(EnumParsingResult&& result) noexcept
+void NamespaceParser::addEnumResult(EnumParsingResult&& result) noexcept
 {
 	if (result.parsedEnum.has_value() && getParsingResult()->parsedNamespace.has_value())
 	{

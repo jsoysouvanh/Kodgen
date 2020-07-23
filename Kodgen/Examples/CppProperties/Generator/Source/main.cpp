@@ -12,10 +12,9 @@ int main(int argc, char** argv)
 	kodgen::DefaultLogger	logger;
 	int						result = EXIT_SUCCESS;
 
-	if (true/*argc > 1*/)
+	if (argc > 1)
 	{
-		//fs::path workingDirectory = argv[1];
-		fs::path workingDirectory = "D:/Prog/GP3/PLA/Refureku/Refureku/Generator/Submodules/Kodgen/Examples/CppProperties";
+		fs::path workingDirectory = argv[1];
 
 		if (fs::is_directory(workingDirectory))
 		{

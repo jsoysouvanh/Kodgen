@@ -12,7 +12,7 @@
 
 namespace kodgen
 {
-	class FileParser2 : public NamespaceParser2
+	class FileParser : public NamespaceParser
 	{
 		private:
 			/** Index used internally by libclang to process a translation unit. */
@@ -42,9 +42,9 @@ namespace kodgen
 			*
 			*	@return An enum which indicates how to choose the next cursor to parse in the AST.
 			*/
-			static CXChildVisitResult	parseEntity(CXCursor		cursor,
-													CXCursor		parentCursor,
-													CXClientData	clientData)							noexcept;
+			static CXChildVisitResult	parseNestedEntity(CXCursor		cursor,
+														  CXCursor		parentCursor,
+														  CXClientData	clientData)						noexcept;
 
 			/**
 			*	@brief Refresh all internal compilation macros to pass to the compiler.
@@ -136,10 +136,10 @@ namespace kodgen
 			/** Logger used to issue logs from the FileParser. */
 			ILogger*						logger			= nullptr;
 
-			FileParser2()					noexcept;
-			FileParser2(FileParser2 const&)	= default;
-			FileParser2(FileParser2&&)		= default;
-			virtual ~FileParser2()			noexcept;
+			FileParser()					noexcept;
+			FileParser(FileParser const&)	= default;
+			FileParser(FileParser&&)		= default;
+			virtual ~FileParser()			noexcept;
 
 			/**
 			*	@brief Parse the file and fill the FileParsingResult.

@@ -339,7 +339,7 @@ bool FileGenerator::setDefaultGeneratedCodeTemplate(EntityInfo::EType entityType
 	return false;
 }
 
-void FileGenerator::processFile(FileParser2& parser, FileGenerationResult& genResult, fs::path const& pathToFile) noexcept
+void FileGenerator::processFile(FileParser& parser, FileGenerationResult& genResult, fs::path const& pathToFile) noexcept
 {
 	FileParsingResult parsingResult;
 
@@ -358,7 +358,7 @@ void FileGenerator::processFile(FileParser2& parser, FileGenerationResult& genRe
 	}
 }
 
-void FileGenerator::processIncludedFiles(FileParser2& parser, FileGenerationResult& genResult, bool forceRegenerateAll) noexcept
+void FileGenerator::processIncludedFiles(FileParser& parser, FileGenerationResult& genResult, bool forceRegenerateAll) noexcept
 {
 	for (fs::path path : toParseFiles)
 	{
@@ -380,7 +380,7 @@ void FileGenerator::processIncludedFiles(FileParser2& parser, FileGenerationResu
 	}
 }
 
-void FileGenerator::processIncludedDirectories(FileParser2& parser, FileGenerationResult& genResult, bool forceRegenerateAll) noexcept
+void FileGenerator::processIncludedDirectories(FileParser& parser, FileGenerationResult& genResult, bool forceRegenerateAll) noexcept
 {
 	for (fs::path pathToIncludedDir : toParseDirectories)
 	{
@@ -434,7 +434,7 @@ void FileGenerator::refreshPropertyRules(ParsingSettings& parsingSettings) const
 	parsingSettings.propertyParsingSettings.enumPropertyRules.addComplexPropertyRule(std::string(codeTemplateMainComplexPropertyName), std::string(_supportedCodeTemplateRegex));
 }
 
-void FileGenerator::generateMacrosFile(FileParser2& parser) const noexcept
+void FileGenerator::generateMacrosFile(FileParser& parser) const noexcept
 {
 	GeneratedFile macrosDefinitionFile(outputDirectory / _entityMacrosDefFilename);
 
@@ -454,7 +454,7 @@ void FileGenerator::generateMacrosFile(FileParser2& parser) const noexcept
 									"#endif");
 }
 
-FileGenerationResult FileGenerator::generateFiles(FileParser2& parser, bool forceRegenerateAll) noexcept
+FileGenerationResult FileGenerator::generateFiles(FileParser& parser, bool forceRegenerateAll) noexcept
 {
 	FileGenerationResult genResult;
 

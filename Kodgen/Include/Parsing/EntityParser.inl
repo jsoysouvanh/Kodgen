@@ -1,5 +1,5 @@
 
-inline ParsingContext& EntityParser2::getContext() noexcept
+inline ParsingContext& EntityParser::getContext() noexcept
 {
 	//Can't retrieve the context if there is none.
 	assert(!contextsStack.empty());
@@ -7,7 +7,7 @@ inline ParsingContext& EntityParser2::getContext() noexcept
 	return contextsStack.top();
 }
 
-inline void EntityParser2::popContext() noexcept
+inline void EntityParser::popContext() noexcept
 {
 	assert(!contextsStack.empty());
 

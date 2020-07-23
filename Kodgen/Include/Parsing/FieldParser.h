@@ -2,41 +2,13 @@
 
 #include <clang-c/Index.h>
 
-#include "Misc/Optional.h"
-#include "Properties/PropertyGroup.h"
-#include "Parsing/EntityParser.h"
-
-namespace kodgen
-{
-	class FieldParser : public kodgen::EntityParser
-	{
-		private:
-			virtual CXChildVisitResult				setAsCurrentEntityIfValid(CXCursor const& fieldAnnotationCursor)	noexcept override final;
-			virtual	opt::optional<PropertyGroup>	isEntityValid(CXCursor const& currentCursor)						noexcept override final;
-
-		public:
-			FieldParser()					= default;
-			FieldParser(FieldParser const&) = default;
-			FieldParser(FieldParser&&)		= default;
-			virtual ~FieldParser()			= default;
-
-			virtual CXChildVisitResult	parse(CXCursor const& cursor)	noexcept override final;
-
-			using EntityParser::startParsing;
-	};
-}
-
-
-#include <clang-c/Index.h>
-
 #include "Parsing/EntityParser.h"
 #include "Parsing/ParsingResults/FieldParsingResult.h"
-#include "Properties/PropertyGroup.h"
 #include "Misc/Optional.h"
 
 namespace kodgen
 {
-	class FieldParser2 : public EntityParser2
+	class FieldParser : public EntityParser
 	{
 		private:
 			/**
@@ -48,9 +20,9 @@ namespace kodgen
 			*
 			*	@return An enum which indicates how to choose the next cursor to parse in the AST.
 			*/
-			static CXChildVisitResult		parseEntity(CXCursor		cursor,
-														CXCursor		parentCursor,
-														CXClientData	clientData)					noexcept;
+			static CXChildVisitResult		parseNestedEntity(CXCursor		cursor,
+															  CXCursor		parentCursor,
+															  CXClientData	clientData)				noexcept;
 
 			/**
 			*	@brief Retrieve the properties from the provided cursor if possible.
@@ -89,6 +61,11 @@ namespace kodgen
 			inline FieldParsingResult*		getParsingResult()										noexcept;
 
 		public:
+			FieldParser()					= default;
+			FieldParser(FieldParser const&)	= default;
+			FieldParser(FieldParser&&)		= default;
+			~FieldParser()					= default;
+
 			/**
 			*	@brief Parse the field starting at the provided AST cursor.
 			*

@@ -1,7 +1,7 @@
 #include "CppPropsParser.h"
 
 CppPropsParser::CppPropsParser() noexcept:
-	FileParser2()
+	FileParser()
 {
 	//We abort parsing if we encounter a single error while parsing
 	parsingSettings.shouldAbortParsingOnFirstError = true;

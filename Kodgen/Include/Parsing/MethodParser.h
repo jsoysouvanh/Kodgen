@@ -2,41 +2,13 @@
 
 #include <clang-c/Index.h>
 
-#include "InfoStructures/ParsingInfo.h"
-#include "Parsing/EntityParser.h"
-
-namespace kodgen
-{
-	class MethodParser : public EntityParser
-	{
-		private:
-			virtual CXChildVisitResult				setAsCurrentEntityIfValid(CXCursor const& methodAnnotationCursor)	noexcept override final;
-			virtual opt::optional<PropertyGroup>	isEntityValid(CXCursor const& currentCursor)						noexcept override final;
-			void									setupMethod(CXCursor const& methodCursor, MethodInfo& methodInfo)	noexcept;
-
-		public:
-			MethodParser()						= default;
-			MethodParser(MethodParser const&)	= default;
-			MethodParser(MethodParser&&)		= default;
-			~MethodParser()						= default;
-
-			virtual CXChildVisitResult	parse(CXCursor const& cursor)											noexcept override final;
-
-			using EntityParser::startParsing;
-	};
-}
-
-
-#include <clang-c/Index.h>
-
 #include "Parsing/EntityParser.h"
 #include "Parsing/ParsingResults/MethodParsingResult.h"
-#include "Properties/PropertyGroup.h"
 #include "Misc/Optional.h"
 
 namespace kodgen
 {
-	class MethodParser2 : public EntityParser2
+	class MethodParser : public EntityParser
 	{
 		private:
 			/**
@@ -48,9 +20,9 @@ namespace kodgen
 			*
 			*	@return An enum which indicates how to choose the next cursor to parse in the AST.
 			*/
-			static CXChildVisitResult		parseEntity(CXCursor		cursor,
-														CXCursor		parentCursor,
-														CXClientData	clientData)					noexcept;
+			static CXChildVisitResult		parseNestedEntity(CXCursor		cursor,
+															  CXCursor		parentCursor,
+															  CXClientData	clientData)				noexcept;
 
 			/**
 			*	@brief Retrieve the properties from the provided cursor if possible.
@@ -96,6 +68,11 @@ namespace kodgen
 			inline MethodParsingResult*		getParsingResult()										noexcept;
 
 		public:
+			MethodParser()						= default;
+			MethodParser(MethodParser const&)	= default;
+			MethodParser(MethodParser&&)		= default;
+			~MethodParser()						= default;
+
 			/**
 			*	@brief Parse the method starting at the provided AST cursor.
 			*
