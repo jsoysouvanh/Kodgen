@@ -52,6 +52,6 @@ void CppPropsParser::postParse(fs::path const&, kodgen::FileParsingResult const&
 			logger->log(parsingError.toString(), kodgen::ILogger::ELogSeverity::Error);
 		}
 
-		logger->log("Found " + std::to_string(result.classes.size()) + " classes and " + std::to_string(result.enums.size()) + " enums.", kodgen::ILogger::ELogSeverity::Info);
+		logger->log("Found " + std::to_string(result.namespaces.size()) + "namespaces, " + std::to_string(result.classes.size()) + " classes and " + std::to_string(result.enums.size()) + " enums.", kodgen::ILogger::ELogSeverity::Info);
 	}
 }

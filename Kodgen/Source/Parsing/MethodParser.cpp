@@ -6,6 +6,7 @@
 #include "Parsing/PropertyParser.h"
 #include "InfoStructures/MethodParamInfo.h"
 #include "Misc/Helpers.h"
+#include "Misc/DisableWarningMacros.h"
 
 using namespace kodgen;
 
@@ -21,7 +22,12 @@ CXChildVisitResult MethodParser::parse(CXCursor const& methodCursor, ParsingCont
 
 	popContext();
 
+	DISABLE_WARNING_PUSH
+	DISABLE_WARNING_UNSCOPED_ENUM
+
 	return (parentContext.parsingSettings->shouldAbortParsingOnFirstError && !out_result.errors.empty()) ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
+
+	DISABLE_WARNING_POP
 }
 
 CXChildVisitResult MethodParser::parseNestedEntity(CXCursor cursor, CXCursor /* parentCursor */, CXClientData clientData) noexcept

@@ -277,7 +277,7 @@ namespace kodgen
 			FileGenerator()						noexcept;
 			FileGenerator(FileGenerator const&)	= delete;
 			FileGenerator(FileGenerator&&)		= delete;
-			~FileGenerator()					noexcept;
+			virtual ~FileGenerator()			noexcept;
 
 			/**
 			*	@brief Add a new template to the list of generated code templates.
