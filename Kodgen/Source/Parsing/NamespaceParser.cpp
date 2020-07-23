@@ -4,99 +4,6 @@
 
 using namespace kodgen;
 
-opt::optional<PropertyGroup> NamespaceParser::isEntityValid(CXCursor const& currentCursor) noexcept
-{
-	return opt::nullopt;
-}
-
-CXChildVisitResult NamespaceParser::setAsCurrentEntityIfValid(CXCursor const& classAnnotationCursor) noexcept
-{
-	return CXChildVisitResult::CXChildVisit_Recurse;
-}
-
-void NamespaceParser::addToParents(CXCursor cursor, ParsingInfo& parsingInfo) const noexcept
-{
-
-}
-
-void NamespaceParser::updateAccessSpecifier(CXCursor const& cursor) const noexcept
-{
-
-}
-
-CXChildVisitResult NamespaceParser::endParsing() noexcept
-{
-	return CXChildVisitResult::CXChildVisit_Recurse;
-}
-
-CXChildVisitResult NamespaceParser::parse(CXCursor const& cursor) noexcept
-{
-	std::cout << Helpers::getString(clang_getCursorKindSpelling(clang_getCursorKind(cursor))) << " --> " << Helpers::getString(clang_getCursorDisplayName(cursor)) << std::endl;
-
-	if (_shouldCheckValidity)	//Check for any annotation attribute if the flag is raised
-	{
-		_shouldCheckValidity = false;
-		return setAsCurrentEntityIfValid(cursor);
-	}
-
-	//Check for class field or method
-	//switch (cursor.kind)
-	//{
-	//	case CXCursorKind::CXCursor_CXXFinalAttr:
-	//		if (_parsingInfo->currentStructOrClass.has_value())
-	//		{
-	//			_parsingInfo->currentStructOrClass->qualifiers.isFinal = true;
-	//		}
-	//		break;
-
-	//	case CXCursorKind::CXCursor_CXXAccessSpecifier:
-	//		updateAccessSpecifier(cursor);
-	//		break;
-
-	//	case CXCursorKind::CXCursor_CXXBaseSpecifier:
-	//		addToParents(cursor, *_parsingInfo);
-	//		break;
-
-	//	case CXCursorKind::CXCursor_Constructor:
-	//		//TODO
-	//		break;
-
-	//	case CXCursorKind::CXCursor_VarDecl:	//For static fields
-	//		[[fallthrough]];
-	//	case CXCursorKind::CXCursor_FieldDecl:
-	//		return parseField(cursor);
-
-	//	case CXCursorKind::CXCursor_CXXMethod:
-	//		return parseMethod(cursor);
-
-	//	default:
-	//		break;
-	//}
-
-	return CXChildVisitResult::CXChildVisit_Continue;
-}
-
-void NamespaceParser::reset() noexcept
-{
-	
-}
-
-void NamespaceParser::setParsingInfo(ParsingInfo* info) noexcept
-{
-}
-
-void NamespaceParser::startClassParsing(CXCursor const& currentCursor) noexcept
-{
-
-}
-
-void NamespaceParser::startStructParsing(CXCursor const& currentCursor) noexcept
-{
-
-}
-
-//=========================================================================================
-
 #include "Parsing/NamespaceParser.h"
 
 #include <cassert>
@@ -135,36 +42,42 @@ CXChildVisitResult NamespaceParser2::setParsedEntity(CXCursor const& annotationC
 	if (opt::optional<PropertyGroup> propertyGroup = getProperties(annotationCursor))
 	{
 		getParsingResult()->parsedNamespace.emplace(NamespaceInfo(getContext().rootCursor, std::move(*propertyGroup)));
+
+		return CXChildVisitResult::CXChildVisit_Recurse;
 	}
-	else if (getContext().propertyParser->getParsingError() != EParsingError::Count)
+	else
 	{
-		getContext().parsingResult->errors.emplace_back(ParsingError(getContext().propertyParser->getParsingError(), clang_getCursorLocation(annotationCursor)));
+		if (getContext().propertyParser->getParsingError() != EParsingError::Count)
+		{
+			getContext().parsingResult->errors.emplace_back(ParsingError(getContext().propertyParser->getParsingError(), clang_getCursorLocation(annotationCursor)));
+		}
 
 		return CXChildVisitResult::CXChildVisit_Break;
 	}
-
-	//A namespace without properties is still inspected
-	return CXChildVisitResult::CXChildVisit_Recurse;
 }
 
 opt::optional<PropertyGroup> NamespaceParser2::getProperties(CXCursor const& cursor) noexcept
 {
-	getContext().propertyParser->clean();
+	ParsingContext& context = getContext();
+
+	context.propertyParser->clean();
 
 	return (clang_getCursorKind(cursor) == CXCursorKind::CXCursor_AnnotateAttr) ?
-				getContext().propertyParser->getNamespaceProperties(Helpers::getString(clang_getCursorSpelling(cursor))) :
-				PropertyGroup();
+				context.propertyParser->getNamespaceProperties(Helpers::getString(clang_getCursorSpelling(cursor))) :
+				opt::nullopt;
 }
 
 CXChildVisitResult NamespaceParser2::parseEntity(CXCursor cursor, CXCursor /* parentCursor */, CXClientData clientData) noexcept
 {
-	NamespaceParser2* parser = reinterpret_cast<NamespaceParser2*>(clientData);
+	NamespaceParser2*	parser	= reinterpret_cast<NamespaceParser2*>(clientData);
+	ParsingContext&		context = parser->getContext();
 
-	if (parser->getContext().shouldCheckEntityValidity)
+	//std::cout << "NAMESPACE => " << Helpers::getString(clang_getCursorKindSpelling(cursor.kind)) << " " << Helpers::getString(clang_getCursorDisplayName(cursor)) << std::endl;
+
+	if (context.shouldCheckEntityValidity)
 	{
-		parser->getContext().shouldCheckEntityValidity = false;
+		context.shouldCheckEntityValidity = false;
 
-		//Set the parsed namespace in result if it is valid
 		return parser->setParsedEntity(cursor);
 	}
 	else

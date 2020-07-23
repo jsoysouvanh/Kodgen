@@ -1,7 +1,15 @@
 #include "CodeGen/FileGenerator.h"
 
-#include <assert.h>
+#include <cassert>
 
+#include "InfoStructures/NamespaceInfo.h"
+#include "InfoStructures/StructClassInfo.h"
+#include "InfoStructures/NestedStructClassInfo.h"
+#include "InfoStructures/EnumInfo.h"
+#include "InfoStructures/NestedEnumInfo.h"
+#include "InfoStructures/EnumValueInfo.h"
+#include "InfoStructures/FieldInfo.h"
+#include "InfoStructures/MethodInfo.h"
 #include "Misc/TomlUtility.h"
 
 using namespace kodgen;
@@ -30,14 +38,14 @@ void FileGenerator::updateSupportedCodeTemplateRegex() noexcept
 	_supportedCodeTemplateRegex.pop_back();
 }
 
-void FileGenerator::generateEntityFile(FileGenerationResult& genResult, fs::path const& filePath, FileParsingResult const& parsingResult) noexcept
+void FileGenerator::generateFile(FileGenerationResult& genResult, FileParsingResult const& parsingResult) noexcept
 {
 	/**
 	*	This constructor actually create the file in the filesystem.
 	*	We create a file even if no entity was found so that we have the file generation timestamp to avoid
 	*	parsing this file again if it hasn't changed.
 	*/
-	GeneratedFile generatedFile(makePathToGeneratedFile(filePath), filePath);
+	GeneratedFile generatedFile(makePathToGeneratedFile(parsingResult.parsedFile), parsingResult.parsedFile);
 
 	//Header
 	writeHeader(generatedFile, parsingResult);
@@ -45,29 +53,43 @@ void FileGenerator::generateEntityFile(FileGenerationResult& genResult, fs::path
 	//Actual file content (per entity)
 	for (NamespaceInfo namespaceInfo : parsingResult.namespaces)
 	{
-		writeEntityToFile(generatedFile, namespaceInfo, genResult);
+		writeNamespaceToFile(generatedFile, namespaceInfo, genResult);
 	}
 
-	for (StructClassInfo structOrClassInfo : parsingResult.classes)
+	for (StructClassInfo structInfo : parsingResult.structs)
 	{
-		writeEntityToFile(generatedFile, structOrClassInfo, genResult);
+		writeStructOrClassToFile(generatedFile, structInfo, genResult);
 	}
 
-	for (StructClassInfo structOrClassInfo : parsingResult.structs)
+	for (StructClassInfo classInfo : parsingResult.classes)
 	{
-		writeEntityToFile(generatedFile, structOrClassInfo, genResult);
+		writeStructOrClassToFile(generatedFile, classInfo, genResult);
 	}
 
 	for (EnumInfo enumInfo : parsingResult.enums)
 	{
-		writeEntityToFile(generatedFile, enumInfo, genResult);
+		writeEnumToFile(generatedFile, enumInfo, genResult);
 	}
+
+	/**
+	*	TODO
+	*
+	*	for (FieldInfo const& fieldInfo : parsingResult.fields)
+	*	{
+	*		writeFieldToFile(generatedFile, fieldInfo, genResult);
+	*	}
+	*
+	*	for (MethodInfo const& methodInfo : parsingResult.functions)
+	*	{
+	*		writeMethodToFile(generatedFile, methodInfo, genResult);
+	*	}
+	*/
 
 	//Footer
 	writeFooter(generatedFile, parsingResult);
 }
 
-GeneratedCodeTemplate* FileGenerator::getEntityGeneratedCodeTemplate(EntityInfo& entityInfo, EFileGenerationError& out_error) const noexcept
+GeneratedCodeTemplate* FileGenerator::getEntityGeneratedCodeTemplate(EntityInfo const& entityInfo, EFileGenerationError& out_error) const noexcept
 {
 	GeneratedCodeTemplate* result = nullptr;
 
@@ -87,8 +109,8 @@ GeneratedCodeTemplate* FileGenerator::getEntityGeneratedCodeTemplate(EntityInfo&
 		}
 		else
 		{
-			//Didn't find a default generated code template
-			out_error = EFileGenerationError::MissingGeneratedCodeTemplateComplexProperty;
+			//Didn't find a default generated code template, generate no code for this entity
+			return nullptr;
 		}
 	}
 	else if (it->subProperties.empty())	//No sub prop provided to the codeTemplateMainComplexPropertyName main prop
@@ -119,7 +141,7 @@ GeneratedCodeTemplate* FileGenerator::getEntityGeneratedCodeTemplate(EntityInfo&
 	return result;
 }
 
-void FileGenerator::writeEntityToFile(GeneratedFile& generatedFile, EntityInfo& entityInfo, FileGenerationResult& genResult) noexcept
+void FileGenerator::writeEntityToFile(GeneratedFile& generatedFile, EntityInfo const& entityInfo, FileGenerationResult& genResult) noexcept
 {
 	EFileGenerationError	error			= EFileGenerationError::Count;
 	GeneratedCodeTemplate*	codeTemplate	= getEntityGeneratedCodeTemplate(entityInfo, error);
@@ -128,10 +150,141 @@ void FileGenerator::writeEntityToFile(GeneratedFile& generatedFile, EntityInfo& 
 	{
 		codeTemplate->generateCode(generatedFile, entityInfo);
 	}
-	else
+	else if (error != EFileGenerationError::Count)
 	{
 		genResult.fileGenerationErrors.emplace_back(FileGenerationError(generatedFile.getSourceFilePath(), entityInfo.name, error));
 	}
+}
+
+void FileGenerator::writeNamespaceToFile(GeneratedFile& generatedFile, EntityInfo const& namespaceInfo, FileGenerationResult& genResult) noexcept
+{
+	assert(namespaceInfo.entityType == EntityInfo::EType::Namespace);
+
+	//Write namespace
+	writeEntityToFile(generatedFile, namespaceInfo, genResult);
+
+	NamespaceInfo const& castNamespaceInfo = static_cast<NamespaceInfo const&>(namespaceInfo);
+	
+	//Write recursive namespaces
+	for (NamespaceInfo const& nestedNamespaceInfo : castNamespaceInfo.namespaces)
+	{
+		writeNamespaceToFile(generatedFile, nestedNamespaceInfo, genResult);
+	}
+
+	//Write namespace structs
+	for (StructClassInfo const& structInfo : castNamespaceInfo.structs)
+	{
+		writeStructOrClassToFile(generatedFile, structInfo, genResult);
+	}
+
+	//Write namespace classes
+	for (StructClassInfo const& classInfo : castNamespaceInfo.classes)
+	{
+		writeStructOrClassToFile(generatedFile, classInfo, genResult);
+	}
+
+	//Write namespace enums
+	for (EnumInfo const& enumInfo : castNamespaceInfo.enums)
+	{
+		writeEnumToFile(generatedFile, enumInfo, genResult);
+	}
+
+	/**
+	*	TODO
+	*
+	*	for (FieldInfo const& fieldInfo : castNamespaceInfo.fields)
+	*	{
+	*		writeFieldToFile(generatedFile, fieldInfo, genResult);
+	*	}
+	*
+	*	for (MethodInfo const& methodInfo : castNamespaceInfo.functions)
+	*	{
+	*		writeMethodToFile(generatedFile, methodInfo, genResult);
+	*	}
+	*/
+}
+
+void FileGenerator::writeStructOrClassToFile(GeneratedFile& generatedFile, EntityInfo const& structClassInfo, FileGenerationResult& genResult) noexcept
+{
+	assert(structClassInfo.entityType == EntityInfo::EType::Struct || structClassInfo.entityType == EntityInfo::EType::Class);
+
+	//Write struct/class
+	writeEntityToFile(generatedFile, structClassInfo, genResult);
+
+	StructClassInfo const& castStructClassInfo = static_cast<StructClassInfo const&>(structClassInfo);
+
+	//Write struct/class nested structs
+	for (std::shared_ptr<NestedStructClassInfo> const& nestedStructInfo : castStructClassInfo.nestedStructs)
+	{
+		writeNestedStructOrClassToFile(generatedFile, *nestedStructInfo, genResult);
+	}
+
+	//Write struct/class nested classes
+	for (std::shared_ptr<NestedStructClassInfo> const& nestedClassInfo : castStructClassInfo.nestedClasses)
+	{
+		writeNestedStructOrClassToFile(generatedFile, *nestedClassInfo, genResult);
+	}
+
+	//Write class nested enums
+	for (EnumInfo const& enumInfo : castStructClassInfo.nestedEnums)
+	{
+		writeEnumToFile(generatedFile, enumInfo, genResult);
+	}
+
+	//Write class fields
+	for (FieldInfo const& fieldInfo : castStructClassInfo.fields)
+	{
+		writeFieldToFile(generatedFile, fieldInfo, genResult);
+	}
+	
+	//Write class methods
+	for (MethodInfo const& methodInfo : castStructClassInfo.methods)
+	{
+		writeMethodToFile(generatedFile, methodInfo, genResult);
+	}
+}
+
+void FileGenerator::writeNestedStructOrClassToFile(GeneratedFile& generatedFile, EntityInfo const& nestedStructClassInfo, FileGenerationResult& genResult) noexcept
+{
+	//Might do something else special for nested structs/classes in the future
+	writeStructOrClassToFile(generatedFile, nestedStructClassInfo, genResult);
+}
+
+void FileGenerator::writeEnumToFile(GeneratedFile& generatedFile, EntityInfo const& enumInfo, FileGenerationResult& genResult) noexcept
+{
+	assert(enumInfo.entityType == EntityInfo::EType::Enum);
+
+	//Write enum
+	writeEntityToFile(generatedFile, enumInfo, genResult);
+
+	EnumInfo const& castEnumInfo = static_cast<EnumInfo const&>(enumInfo);
+
+	//Write enum values
+	for (EnumValueInfo const& enumValueInfo : castEnumInfo.enumValues)
+	{
+		writeEnumValueToFile(generatedFile, enumValueInfo, genResult);
+	}
+}
+
+void FileGenerator::writeEnumValueToFile(GeneratedFile& generatedFile, EntityInfo const& enumValueInfo, FileGenerationResult& genResult) noexcept
+{
+	assert(enumValueInfo.entityType == EntityInfo::EType::EnumValue);
+
+	writeEntityToFile(generatedFile, enumValueInfo, genResult);
+}
+
+void FileGenerator::writeFieldToFile(GeneratedFile& generatedFile, EntityInfo const& fieldInfo, FileGenerationResult& genResult) noexcept
+{
+	assert(fieldInfo.entityType == EntityInfo::EType::Field);
+
+	writeEntityToFile(generatedFile, fieldInfo, genResult);
+}
+
+void FileGenerator::writeMethodToFile(GeneratedFile& generatedFile, EntityInfo const& methodInfo, FileGenerationResult& genResult) noexcept
+{
+	assert(methodInfo.entityType == EntityInfo::EType::Method);
+
+	writeEntityToFile(generatedFile, methodInfo, genResult);
 }
 
 bool FileGenerator::shouldRegenerateFile(fs::path const& filePath) const noexcept
@@ -143,6 +296,8 @@ bool FileGenerator::shouldRegenerateFile(fs::path const& filePath) const noexcep
 
 fs::path FileGenerator::makePathToGeneratedFile(fs::path const& sourceFilePath) const noexcept
 {
+	assert(fs::exists(sourceFilePath) && fs::is_regular_file(sourceFilePath));
+
 	return (outputDirectory / sourceFilePath.filename()).replace_extension(generatedFilesExtension);
 }
 
@@ -186,14 +341,15 @@ bool FileGenerator::setDefaultGeneratedCodeTemplate(EntityInfo::EType entityType
 
 void FileGenerator::processFile(FileParser2& parser, FileGenerationResult& genResult, fs::path const& pathToFile) noexcept
 {
-	//Parse file
 	FileParsingResult parsingResult;
 
 	genResult.parsedFiles.push_back(pathToFile);
 
+	//Parse file
 	if (parser.parse(pathToFile, parsingResult))
 	{
-		generateEntityFile(genResult, pathToFile, parsingResult);
+		//Generate file according to parsing result
+		generateFile(genResult, parsingResult);
 	}
 	else
 	{
@@ -306,6 +462,8 @@ FileGenerationResult FileGenerator::generateFiles(FileParser2& parser, bool forc
 	{
 		if (logger != nullptr)
 		{
+			genResult.fileGenerationErrors.emplace_back(FileGenerationError("", "", EFileGenerationError::UnspecifiedOutputDirectory));
+
 			logger->log("Output directory is empty, it must be specified for the files to be generated.", ILogger::ELogSeverity::Error);
 		}
 	}
@@ -323,6 +481,8 @@ FileGenerationResult FileGenerator::generateFiles(FileParser2& parser, bool forc
 			{
 				if (logger != nullptr)
 				{
+					genResult.fileGenerationErrors.emplace_back(FileGenerationError("", "", EFileGenerationError::InvalidOutputDirectory));
+
 					logger->log("Output directory is invalid: " + std::string(exception.what()), ILogger::ELogSeverity::Error);
 				}
 			}

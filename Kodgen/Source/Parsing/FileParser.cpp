@@ -18,22 +18,6 @@ FileParser2::~FileParser2() noexcept
 	clang_disposeIndex(_clangIndex);
 }
 
-ParsingContext& FileParser2::pushContext(CXTranslationUnit const& translationUnit, FileParsingResult& out_result) noexcept
-{
-	_propertyParser.setup(parsingSettings.propertyParsingSettings);
-
-	ParsingContext newContext;
-
-	newContext.rootCursor		= clang_getTranslationUnitCursor(translationUnit);
-	newContext.propertyParser	= &_propertyParser;
-	newContext.parsingSettings	= &parsingSettings;
-	newContext.parsingResult	= &out_result;
-
-	contextsStack.push(std::move(newContext));
-
-	return getContext();
-}
-
 bool FileParser2::parse(fs::path const& toParseFile, FileParsingResult& out_result) noexcept
 {
 	bool isSuccess = false;
@@ -42,6 +26,9 @@ bool FileParser2::parse(fs::path const& toParseFile, FileParsingResult& out_resu
 
 	if (fs::exists(toParseFile) && !fs::is_directory(toParseFile))
 	{
+		//Fill the parsed file info
+		out_result.parsedFile = toParseFile;
+
 		std::vector<char const*> const compilationArguments = makeCompilationArguments();
 
 #if KODGEN_DEV
@@ -104,6 +91,8 @@ CXChildVisitResult FileParser2::parseEntity(CXCursor cursor, CXCursor /* parentC
 	//Parse the given file ONLY, ignore headers
 	if (clang_Location_isFromMainFile(clang_getCursorLocation(cursor)))
 	{
+		//std::cout << "FILE => " << Helpers::getString(clang_getCursorKindSpelling(cursor.kind)) << " " << Helpers::getString(clang_getCursorDisplayName(cursor)) << std::endl;
+
 		switch (cursor.kind)
 		{
 			case CXCursorKind::CXCursor_Namespace:
@@ -129,6 +118,22 @@ CXChildVisitResult FileParser2::parseEntity(CXCursor cursor, CXCursor /* parentC
 	}
 
 	return visitResult;
+}
+
+ParsingContext& FileParser2::pushContext(CXTranslationUnit const& translationUnit, FileParsingResult& out_result) noexcept
+{
+	_propertyParser.setup(parsingSettings.propertyParsingSettings);
+
+	ParsingContext newContext;
+
+	newContext.rootCursor		= clang_getTranslationUnitCursor(translationUnit);
+	newContext.propertyParser	= &_propertyParser;
+	newContext.parsingSettings	= &parsingSettings;
+	newContext.parsingResult	= &out_result;
+
+	contextsStack.push(std::move(newContext));
+
+	return getContext();
 }
 
 void FileParser2::addNamespaceResult(NamespaceParsingResult&& result) noexcept
@@ -242,6 +247,7 @@ std::vector<char const*> FileParser2::makeCompilationArguments() noexcept
 	//Macro set when we are parsing with Kodgen
 	result.emplace_back(_kodgenParsingMacro.data());
 
+	result.emplace_back(_namespacePropertyMacro.data());
 	result.emplace_back(_classPropertyMacro.data());
 	result.emplace_back(_structPropertyMacro.data());
 	result.emplace_back(_fieldPropertyMacro.data());
