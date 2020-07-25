@@ -5,7 +5,6 @@
 #include "Parsing/EntityParser.h"
 #include "Parsing/EnumValueParser.h"
 #include "Parsing/ParsingResults/EnumParsingResult.h"
-#include "Parsing/ParsingResults/EnumValueParsingResult.h"
 
 namespace kodgen
 {
@@ -13,7 +12,7 @@ namespace kodgen
 	{
 		private:
 			/** Parser used to parse enum values. */
-			EnumValueParser	enumValueParser;
+			EnumValueParser	_enumValueParser;
 
 			/**
 			*	@brief This method is called at each node (cursor) of the parsing.

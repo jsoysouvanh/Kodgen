@@ -4,7 +4,6 @@
 
 #include "Parsing/ClassParser.h"
 #include "Parsing/ParsingResults/NamespaceParsingResult.h"
-#include "Parsing/ParsingResults/EnumParsingResult.h"
 
 namespace kodgen
 {

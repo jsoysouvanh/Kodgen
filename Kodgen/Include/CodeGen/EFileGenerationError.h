@@ -6,7 +6,7 @@
 
 namespace kodgen
 {
-	enum class EFileGenerationError : uint16
+	enum class EFileGenerationError : uint8
 	{
 		/**
 		*	FileGenerator::outputDirectory was not specified.

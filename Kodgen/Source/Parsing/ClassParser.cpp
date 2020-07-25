@@ -40,7 +40,7 @@ FieldParsingResult ClassParser::parseField(CXCursor const& fieldCursor, CXChildV
 {
 	FieldParsingResult fieldResult;
 
-	out_visitResult = fieldParser.parse(fieldCursor, getContext(), fieldResult);
+	out_visitResult = _fieldParser.parse(fieldCursor, getContext(), fieldResult);
 
 	return fieldResult;
 }
@@ -49,7 +49,7 @@ MethodParsingResult	ClassParser::parseMethod(CXCursor const& methodCursor, CXChi
 {
 	MethodParsingResult methodResult;
 
-	out_visitResult = methodParser.parse(methodCursor, getContext(), methodResult);
+	out_visitResult = _methodParser.parse(methodCursor, getContext(), methodResult);
 
 	return methodResult;
 }
@@ -132,7 +132,7 @@ EnumParsingResult ClassParser::parseEnum(CXCursor const& enumCursor, CXChildVisi
 {
 	EnumParsingResult enumResult;
 	
-	out_visitResult = enumParser.parse(enumCursor, getContext(), enumResult);
+	out_visitResult = _enumParser.parse(enumCursor, getContext(), enumResult);
 
 	return enumResult;
 }
