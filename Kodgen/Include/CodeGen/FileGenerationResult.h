@@ -1,3 +1,10 @@
+/**
+*	Copyright (c) 2020 Julien SOYSOUVANH - All Rights Reserved
+*
+*	This file is part of the Kodgen library project which is released under the MIT License.
+*	See the README.md file for full license details.
+*/
+
 #pragma once
 
 #include <vector>
@@ -19,18 +26,18 @@ namespace kodgen
 			*	Even if completed is true, errors might have happened during parsing and/or file generation.
 			*	Make sure to check parsingErrors and fileGenerationErrors.
 			*/
-			bool									completed = false;
+			bool								completed = false;
 
 			/** List of errors which occured during files parsing. If a file has parsing error, no code is generated. */
-			std::pmr::vector<ParsingError>			parsingErrors;
+			std::vector<ParsingError>			parsingErrors;
 
 			/** List of errors which occured when attempting to generate code. */
-			std::pmr::vector<FileGenerationError>	fileGenerationErrors;
+			std::vector<FileGenerationError>	fileGenerationErrors;
 
 			/** List of paths to files that have been parsed and got their metadata regenerated. */
-			std::pmr::vector<fs::path>				parsedFiles;
+			std::vector<fs::path>				parsedFiles;
 
 			/** List of paths to files which metadata are up-to-date. */
-			std::pmr::vector<fs::path>				upToDateFiles;
+			std::vector<fs::path>				upToDateFiles;
 	};
 }
