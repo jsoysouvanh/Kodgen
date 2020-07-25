@@ -33,10 +33,20 @@ namespace kodgen
 				Count
 			};
 
-			EType			entityType	= EType::Count;
-			std::string		name		= "";
-			std::string		id			= "";
-			PropertyGroup	properties;
+			/** Type of entity. */
+			EType				entityType	= EType::Count;
+			
+			/** Name of the entity. */
+			std::string			name		= "";
+			
+			/** Unique id of the entity. */
+			std::string			id			= "";
+			
+			/** Entity this entity is contained into, nullptr if none (file level). */
+			EntityInfo const*	outerEntity	= nullptr;
+			
+			/** All properties bound to this entity. */
+			PropertyGroup		properties;
 
 			EntityInfo()																		= default;
 			EntityInfo(CXCursor const& cursor, PropertyGroup&& propertyGroup, EType entityType)	noexcept;
