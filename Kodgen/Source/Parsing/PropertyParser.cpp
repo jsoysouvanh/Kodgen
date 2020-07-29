@@ -23,53 +23,53 @@ opt::optional<PropertyGroup> PropertyParser::getProperties(std::string&& annotat
 	return opt::nullopt;
 }
 
-opt::optional<PropertyGroup> PropertyParser::getNamespaceProperties(std::string&& annotateMessage) noexcept
+opt::optional<PropertyGroup> PropertyParser::getNamespaceProperties(std::string annotateMessage) noexcept
 {
 	static std::string namespaceAnnotation = "KGN:";
 
-	return getProperties(std::forward<std::string>(annotateMessage), namespaceAnnotation, _propertyParsingSettings->namespacePropertyRules);
+	return getProperties(std::move(annotateMessage), namespaceAnnotation, _propertyParsingSettings->namespacePropertyRules);
 }
 
-opt::optional<PropertyGroup> PropertyParser::getClassProperties(std::string&& annotateMessage) noexcept
+opt::optional<PropertyGroup> PropertyParser::getClassProperties(std::string annotateMessage) noexcept
 {
 	static std::string classAnnotation = "KGC:";
 
-	return getProperties(std::forward<std::string>(annotateMessage), classAnnotation, _propertyParsingSettings->classPropertyRules);
+	return getProperties(std::move(annotateMessage), classAnnotation, _propertyParsingSettings->classPropertyRules);
 }
 
-opt::optional<PropertyGroup> PropertyParser::getStructProperties(std::string&& annotateMessage) noexcept
+opt::optional<PropertyGroup> PropertyParser::getStructProperties(std::string annotateMessage) noexcept
 {
 	static std::string structAnnotation = "KGS:";
 
-	return getProperties(std::forward<std::string>(annotateMessage), structAnnotation, _propertyParsingSettings->structPropertyRules);
+	return getProperties(std::move(annotateMessage), structAnnotation, _propertyParsingSettings->structPropertyRules);
 }
 
-opt::optional<PropertyGroup> PropertyParser::getFieldProperties(std::string&& annotateMessage) noexcept
+opt::optional<PropertyGroup> PropertyParser::getFieldProperties(std::string annotateMessage) noexcept
 {
 	static std::string fieldAnnotation = "KGF:";
 
-	return getProperties(std::forward<std::string>(annotateMessage), fieldAnnotation, _propertyParsingSettings->fieldPropertyRules);
+	return getProperties(std::move(annotateMessage), fieldAnnotation, _propertyParsingSettings->fieldPropertyRules);
 }
 
-opt::optional<PropertyGroup> PropertyParser::getMethodProperties(std::string&& annotateMessage) noexcept
+opt::optional<PropertyGroup> PropertyParser::getMethodProperties(std::string annotateMessage) noexcept
 {
 	static std::string methodAnnotation = "KGM:";
 
-	return getProperties(std::forward<std::string>(annotateMessage), methodAnnotation, _propertyParsingSettings->methodPropertyRules);
+	return getProperties(std::move(annotateMessage), methodAnnotation, _propertyParsingSettings->methodPropertyRules);
 }
 
-opt::optional<PropertyGroup> PropertyParser::getEnumProperties(std::string&& annotateMessage) noexcept
+opt::optional<PropertyGroup> PropertyParser::getEnumProperties(std::string annotateMessage) noexcept
 {
 	static std::string enumAnnotation = "KGE:";
 
-	return getProperties(std::forward<std::string>(annotateMessage), enumAnnotation, _propertyParsingSettings->enumPropertyRules);
+	return getProperties(std::move(annotateMessage), enumAnnotation, _propertyParsingSettings->enumPropertyRules);
 }
 
-opt::optional<PropertyGroup> PropertyParser::getEnumValueProperties(std::string&& annotateMessage) noexcept
+opt::optional<PropertyGroup> PropertyParser::getEnumValueProperties(std::string annotateMessage) noexcept
 {
 	static std::string enumValueAnnotation = "KGEV:";
 
-	return getProperties(std::forward<std::string>(annotateMessage), enumValueAnnotation, _propertyParsingSettings->enumValuePropertyRules);
+	return getProperties(std::move(annotateMessage), enumValueAnnotation, _propertyParsingSettings->enumValuePropertyRules);
 }
 
 bool PropertyParser::splitProperties(std::string&& propertiesString) noexcept

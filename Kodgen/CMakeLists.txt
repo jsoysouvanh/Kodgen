@@ -17,6 +17,9 @@ add_library(${KodgenTargetLibrary}
 					Source/Properties/PropertyRules.cpp
 					Source/Properties/PropertyGroup.cpp
 					Source/Properties/PropertyParsingSettings.cpp
+
+					Source/Properties/SimpleProperty2.cpp
+					Source/Properties/ComplexProperty2.cpp
 	
 					Source/InfoStructures/EntityInfo.cpp
 					Source/InfoStructures/NamespaceInfo.cpp
