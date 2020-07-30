@@ -9,7 +9,7 @@
 
 #include <string>
 
-#include "Properties/ComplexPropertyRule2.h"
+#include "Properties/ComplexPropertyRule.h"
 
 class SetPropertyRule : public kodgen::ComplexPropertyRule
 {

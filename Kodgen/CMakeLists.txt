@@ -97,5 +97,4 @@ if (WIN32)
 						$<IF:$<BOOL:${MSVC}>,${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}/libclang.dll,${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/libclang.dll>)
 endif()
 
-add_subdirectory(Tests)
 add_subdirectory(Examples)
