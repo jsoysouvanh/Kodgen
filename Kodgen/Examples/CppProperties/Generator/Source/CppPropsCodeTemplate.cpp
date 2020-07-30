@@ -24,15 +24,15 @@ void CppPropsCodeTemplate::generateCode(kodgen::GeneratedFile& generatedFile, ko
 
 	for (kodgen::FieldInfo const& fieldInfo : classInfo.fields)
 	{
-		for (kodgen::ComplexProperty const& complexProp : fieldInfo.properties.complexProperties)
+		for (kodgen::ComplexProperty2 const& complexProp : fieldInfo.properties.complexProperties)
 		{
 			//Getter
-			if (complexProp.name == GetterPropName)
+			if (complexProp.mainProperty == GetterPropName)
 			{
 				generatedFile.writeLine(generateGetter(fieldInfo, complexProp) + "	\\");
 			}
 			//Setter
-			else if (complexProp.name == SetterPropName)
+			else if (complexProp.mainProperty == SetterPropName)
 			{
 				generatedFile.writeLine(generateSetter(fieldInfo, complexProp) + "	\\");
 			}
@@ -48,7 +48,7 @@ void CppPropsCodeTemplate::undefMacros(kodgen::GeneratedFile& generatedFile, std
 	generatedFile.writeLines("#ifdef DEFINE_GETTERS_AND_SETTERS", "\t#undef DEFINE_GETTERS_AND_SETTERS", "#endif\n");
 }
 
-std::string CppPropsCodeTemplate::generateGetter(kodgen::FieldInfo const& fieldInfo, kodgen::ComplexProperty const& complexProp) const noexcept
+std::string CppPropsCodeTemplate::generateGetter(kodgen::FieldInfo const& fieldInfo, kodgen::ComplexProperty2 const& complexProp) const noexcept
 {
 	std::string postQualifiers;
 	std::string rawReturnType		= fieldInfo.type.getName() + " ";
@@ -124,7 +124,7 @@ std::string CppPropsCodeTemplate::generateGetter(kodgen::FieldInfo const& fieldI
 	}
 }
 
-std::string CppPropsCodeTemplate::generateSetter(kodgen::FieldInfo const& fieldInfo, kodgen::ComplexProperty const& complexProp) const noexcept
+std::string CppPropsCodeTemplate::generateSetter(kodgen::FieldInfo const& fieldInfo, kodgen::ComplexProperty2 const& complexProp) const noexcept
 {
 	//Can't generate any setter if the field is originally const qualified
 	if (fieldInfo.type.typeParts.back().descriptor & kodgen::ETypeDescriptor::Const)

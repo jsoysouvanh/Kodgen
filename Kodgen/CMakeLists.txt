@@ -20,7 +20,11 @@ add_library(${KodgenTargetLibrary}
 
 					Source/Properties/SimpleProperty2.cpp
 					Source/Properties/ComplexProperty2.cpp
-	
+
+					Source/Properties/NativeProperties/ParseAllNestedPropertyRule.cpp
+					Source/Properties/NativeProperties/GenCodeTemplatePropertyRule.cpp
+					Source/Properties/NativeProperties/DefaultSimplePropertyRule.cpp
+
 					Source/InfoStructures/EntityInfo.cpp
 					Source/InfoStructures/NamespaceInfo.cpp
 					Source/InfoStructures/FieldInfo.cpp

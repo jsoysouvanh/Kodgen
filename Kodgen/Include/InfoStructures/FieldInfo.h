@@ -35,11 +35,9 @@ namespace kodgen
 
 			FieldInfo()									= default;
 			FieldInfo(CXCursor const& cursor,
-					  PropertyGroup&& propertyGroup)	noexcept;
+					  PropertyGroup2&& propertyGroup)	noexcept;
 			FieldInfo(FieldInfo const&)					= default;
 			FieldInfo(FieldInfo&&)						= default;
 			~FieldInfo()								= default;
 	};
-
-	std::ostream& operator<<(std::ostream& out_stream, FieldInfo const& fieldInfo) noexcept;
 }

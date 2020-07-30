@@ -19,18 +19,18 @@ namespace kodgen
 			ComplexPropertyRule2()								= default;
 			ComplexPropertyRule2(ComplexPropertyRule2 const&)	= default;
 			ComplexPropertyRule2(ComplexPropertyRule2&&)		= default;
-			~ComplexPropertyRule2()								= default;
+			virtual ~ComplexPropertyRule2()						= default;
 
 			/**
 			*	@brief	Check that a sub property has a valid syntax for a given type of entity.
 			*			This check happens right after the sub property has been parsed.
 			*
 			*	@param subProperty	The property we are checking the syntax of.
-			*	@param entityType	Type of the attached entity.
+			*	@param subPropIndex	Index of the subproperty. First subproperty has index 0.
 			*	
 			*	@return true if the property syntax is valid, else false.
 			*/
 			virtual bool	isSubPropSyntaxValid(std::string const&	subProperty,
-												 EntityInfo::EType	entityType)		const noexcept = 0;
+												 uint8				subPropIndex)	const noexcept = 0;
 	};
 }

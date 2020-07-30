@@ -22,11 +22,17 @@ CXChildVisitResult FieldParser::parse(CXCursor const& fieldCursor, ParsingContex
 		//Check if the parent has the shouldParseAllNested flag set
 		if (shouldParseCurrentEntity())
 		{
-			getParsingResult()->parsedField.emplace(fieldCursor, PropertyGroup());
+			getParsingResult()->parsedField.emplace(fieldCursor, PropertyGroup2());
 		}
 	}
 
 	popContext();
+
+	//Check properties validy one last time
+	if (out_result.parsedField.has_value())
+	{
+		performFinalPropertiesCheck(*out_result.parsedField);
+	}
 
 	DISABLE_WARNING_PUSH
 	DISABLE_WARNING_UNSCOPED_ENUM
@@ -48,7 +54,7 @@ CXChildVisitResult FieldParser::parseNestedEntity(CXCursor cursor, CXCursor /* p
 		if (parser->shouldParseCurrentEntity() && cursor.kind != CXCursorKind::CXCursor_AnnotateAttr)
 		{
 			//Make it valid right away so init the result
-			parser->getParsingResult()->parsedField.emplace(context.rootCursor, PropertyGroup());
+			parser->getParsingResult()->parsedField.emplace(context.rootCursor, PropertyGroup2());
 		}
 		else
 		{
@@ -65,7 +71,7 @@ CXChildVisitResult FieldParser::setParsedEntity(CXCursor const& annotationCursor
 	FieldParsingResult* result	= getParsingResult();
 	ParsingContext&		context	= getContext();
 
-	if (opt::optional<PropertyGroup> propertyGroup = getProperties(annotationCursor))
+	if (opt::optional<PropertyGroup2> propertyGroup = getProperties(annotationCursor))
 	{
 		result->parsedField.emplace(context.rootCursor, std::move(*propertyGroup));
 	}
@@ -78,7 +84,7 @@ CXChildVisitResult FieldParser::setParsedEntity(CXCursor const& annotationCursor
 	return CXChildVisitResult::CXChildVisit_Break;
 }
 
-opt::optional<PropertyGroup> FieldParser::getProperties(CXCursor const& cursor) noexcept
+opt::optional<PropertyGroup2> FieldParser::getProperties(CXCursor const& cursor) noexcept
 {
 	ParsingContext& context = getContext();
 

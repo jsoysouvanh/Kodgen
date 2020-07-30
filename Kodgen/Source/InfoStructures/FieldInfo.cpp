@@ -4,8 +4,8 @@
 
 using namespace kodgen;
 
-FieldInfo::FieldInfo(CXCursor const& cursor, PropertyGroup&& propertyGroup) noexcept:
-	EntityInfo(cursor, std::forward<PropertyGroup>(propertyGroup), EType::Field),
+FieldInfo::FieldInfo(CXCursor const& cursor, PropertyGroup2&& propertyGroup) noexcept:
+	EntityInfo(cursor, std::forward<PropertyGroup2>(propertyGroup), EType::Field),
 	qualifiers{clang_getCursorKind(cursor) == CXCursorKind::CXCursor_VarDecl, false},
 	type(clang_getCursorType(cursor)),
 	accessSpecifier{EAccessSpecifier::Invalid},
@@ -24,11 +24,4 @@ FieldInfo::FieldInfo(CXCursor const& cursor, PropertyGroup&& propertyGroup) noex
 
 		memoryOffset /= 8;	//From bits to bytes
 	}
-}
-
-std::ostream& kodgen::operator<<(std::ostream& out_stream, FieldInfo const& fieldInfo) noexcept
-{
-	out_stream << fieldInfo.type << "   " << fieldInfo.name << "   " << fieldInfo.properties;
-
-	return out_stream;
 }

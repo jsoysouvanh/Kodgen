@@ -19,6 +19,6 @@ namespace kodgen
 			SimplePropertyRule2()							= default;
 			SimplePropertyRule2(SimplePropertyRule2 const&)	= default;
 			SimplePropertyRule2(SimplePropertyRule2&&)		= default;
-			~SimplePropertyRule2()							= default;
+			virtual ~SimplePropertyRule2()					= default;
 	};
 }

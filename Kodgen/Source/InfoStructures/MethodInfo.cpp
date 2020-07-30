@@ -7,8 +7,8 @@
 
 using namespace kodgen;
 
-MethodInfo::MethodInfo(CXCursor const& cursor, PropertyGroup&& propertyGroup) noexcept:
-	EntityInfo(cursor, std::forward<PropertyGroup>(propertyGroup), EType::Method),
+MethodInfo::MethodInfo(CXCursor const& cursor, PropertyGroup2&& propertyGroup) noexcept:
+	EntityInfo(cursor, std::forward<PropertyGroup2>(propertyGroup), EType::Method),
 	qualifiers{	clang_CXXMethod_isDefaulted(cursor) != 0u,
 				clang_CXXMethod_isStatic(cursor) != 0u,
 				clang_CXXMethod_isVirtual(cursor) != 0u,
@@ -55,11 +55,4 @@ std::string MethodInfo::getPrototype(bool removeQualifiers, bool removeSpaces) c
 	}
 
 	return result;
-}
-
-std::ostream& kodgen::operator<<(std::ostream& out_stream, MethodInfo const& methodInfo) noexcept
-{
-	out_stream << methodInfo.returnType << "   " << methodInfo.name << "   " << methodInfo.properties;
-
-	return out_stream;
 }

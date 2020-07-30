@@ -2,15 +2,46 @@
 
 #include <cassert>
 
+#include "Properties/SimpleProperty2.h"
+#include "Properties/ComplexProperty2.h"
+
 using namespace kodgen;
 
-opt::optional<PropertyGroup> PropertyParser::getProperties(std::string&& annotateMessage, std::string const& annotationId, PropertyRules const& rules) noexcept
+opt::optional<PropertyGroup2> PropertyParser::getProperties(std::string&& annotateMessage, std::string const& annotationId, EntityInfo::EType entityType) noexcept
 {
 	if (annotateMessage.substr(0, annotationId.size()) == annotationId)
 	{
 		if (splitProperties(annotateMessage.substr(annotationId.size())))
 		{
-			return checkAndFillPropertyGroup(_splitProps, rules);
+			if (opt::optional<PropertyGroup2> propertyGroup = checkAndFillPropertyGroup(_splitProps, entityType))
+			{
+				//Check whole propertyGroup validity
+				for (uint8 i = 0u; i < propertyGroup->simpleProperties.size(); i++)
+				{
+					if (!propertyGroup->simpleProperties[i].boundPropertyRule->isPropertyGroupValid(*propertyGroup, i))
+					{
+						_parsingError = EParsingError::InvalidSimpleProperty;	//TODO: Replace that by a better way to issue errors
+
+						return opt::nullopt;
+					}
+				}
+
+				for (uint8 i = 0u; i < propertyGroup->complexProperties.size(); i++)
+				{
+					if (!propertyGroup->complexProperties[i].boundPropertyRule->isPropertyGroupValid(*propertyGroup, i))
+					{
+						_parsingError = EParsingError::InvalidComplexMainProperty;	//TODO: Replace that by a better way to issue errors
+
+						return opt::nullopt;
+					}
+				}
+
+				return propertyGroup;
+			}
+			else
+			{
+				return opt::nullopt;
+			}
 		}
 	}
 	else
@@ -23,53 +54,53 @@ opt::optional<PropertyGroup> PropertyParser::getProperties(std::string&& annotat
 	return opt::nullopt;
 }
 
-opt::optional<PropertyGroup> PropertyParser::getNamespaceProperties(std::string annotateMessage) noexcept
+opt::optional<PropertyGroup2> PropertyParser::getNamespaceProperties(std::string annotateMessage) noexcept
 {
 	static std::string namespaceAnnotation = "KGN:";
 
-	return getProperties(std::move(annotateMessage), namespaceAnnotation, _propertyParsingSettings->namespacePropertyRules);
+	return getProperties(std::move(annotateMessage), namespaceAnnotation, EntityInfo::EType::Namespace);
 }
 
-opt::optional<PropertyGroup> PropertyParser::getClassProperties(std::string annotateMessage) noexcept
+opt::optional<PropertyGroup2> PropertyParser::getClassProperties(std::string annotateMessage) noexcept
 {
 	static std::string classAnnotation = "KGC:";
 
-	return getProperties(std::move(annotateMessage), classAnnotation, _propertyParsingSettings->classPropertyRules);
+	return getProperties(std::move(annotateMessage), classAnnotation, EntityInfo::EType::Class);
 }
 
-opt::optional<PropertyGroup> PropertyParser::getStructProperties(std::string annotateMessage) noexcept
+opt::optional<PropertyGroup2> PropertyParser::getStructProperties(std::string annotateMessage) noexcept
 {
 	static std::string structAnnotation = "KGS:";
 
-	return getProperties(std::move(annotateMessage), structAnnotation, _propertyParsingSettings->structPropertyRules);
+	return getProperties(std::move(annotateMessage), structAnnotation, EntityInfo::EType::Struct);
 }
 
-opt::optional<PropertyGroup> PropertyParser::getFieldProperties(std::string annotateMessage) noexcept
+opt::optional<PropertyGroup2> PropertyParser::getFieldProperties(std::string annotateMessage) noexcept
 {
 	static std::string fieldAnnotation = "KGF:";
 
-	return getProperties(std::move(annotateMessage), fieldAnnotation, _propertyParsingSettings->fieldPropertyRules);
+	return getProperties(std::move(annotateMessage), fieldAnnotation, EntityInfo::EType::Field);
 }
 
-opt::optional<PropertyGroup> PropertyParser::getMethodProperties(std::string annotateMessage) noexcept
+opt::optional<PropertyGroup2> PropertyParser::getMethodProperties(std::string annotateMessage) noexcept
 {
 	static std::string methodAnnotation = "KGM:";
 
-	return getProperties(std::move(annotateMessage), methodAnnotation, _propertyParsingSettings->methodPropertyRules);
+	return getProperties(std::move(annotateMessage), methodAnnotation, EntityInfo::EType::Method);
 }
 
-opt::optional<PropertyGroup> PropertyParser::getEnumProperties(std::string annotateMessage) noexcept
+opt::optional<PropertyGroup2> PropertyParser::getEnumProperties(std::string annotateMessage) noexcept
 {
 	static std::string enumAnnotation = "KGE:";
 
-	return getProperties(std::move(annotateMessage), enumAnnotation, _propertyParsingSettings->enumPropertyRules);
+	return getProperties(std::move(annotateMessage), enumAnnotation, EntityInfo::EType::Enum);
 }
 
-opt::optional<PropertyGroup> PropertyParser::getEnumValueProperties(std::string annotateMessage) noexcept
+opt::optional<PropertyGroup2> PropertyParser::getEnumValueProperties(std::string annotateMessage) noexcept
 {
 	static std::string enumValueAnnotation = "KGEV:";
 
-	return getProperties(std::move(annotateMessage), enumValueAnnotation, _propertyParsingSettings->enumValuePropertyRules);
+	return getProperties(std::move(annotateMessage), enumValueAnnotation, EntityInfo::EType::EnumValue);
 }
 
 bool PropertyParser::splitProperties(std::string&& propertiesString) noexcept
@@ -172,22 +203,22 @@ void PropertyParser::cleanString(std::string& toCleanString) const noexcept
 	}
 }
 
-opt::optional<PropertyGroup> PropertyParser::checkAndFillPropertyGroup(std::vector<std::vector<std::string>>& splitProps, PropertyRules const& rules) noexcept
+opt::optional<PropertyGroup2> PropertyParser::checkAndFillPropertyGroup(std::vector<std::vector<std::string>>& splitProps, EntityInfo::EType entityType) noexcept
 {
-	PropertyGroup propertyGroup;
+	PropertyGroup2 propertyGroup;
 
 	for (std::vector<std::string>& props : splitProps)
 	{
 		//Expect a simple prop
-		if (props.size() == 1)
+		if (props.size() == 1u)
 		{
-			if (!addSimpleProperty(props, rules, propertyGroup))
+			if (!addSimpleProperty(props, entityType, propertyGroup))
 			{
 				return opt::nullopt;
 			}
 		}
 		//Expect a complex prop
-		else if (!addComplexProperty(props, rules, propertyGroup))
+		else if (!addComplexProperty(props, entityType, propertyGroup))
 		{
 			return opt::nullopt;
 		}
@@ -196,60 +227,72 @@ opt::optional<PropertyGroup> PropertyParser::checkAndFillPropertyGroup(std::vect
 	return propertyGroup;
 }
 
-bool PropertyParser::addSimpleProperty(std::vector<std::string>& propertyAsVector, PropertyRules const& rules, PropertyGroup& out_propertyGroup) noexcept
+bool PropertyParser::addSimpleProperty(std::vector<std::string>& propertyAsVector, EntityInfo::EType entityType, PropertyGroup2& out_propertyGroup) noexcept
 {
 	std::string propName = std::move(propertyAsVector[0]);
 
-	if (rules.getSimplePropertyRule(propName) != nullptr)
+	//Search the first simple property rule matching with the given name and entity type
+	//Iterate backwards because native properties are at the end and a user rule should never override a native rule
+	for (decltype(_propertyParsingSettings->simplePropertyRules)::const_reverse_iterator it = _propertyParsingSettings->simplePropertyRules.crbegin(); it != _propertyParsingSettings->simplePropertyRules.crend(); it++)
 	{
-		out_propertyGroup.simpleProperties.emplace_back(SimpleProperty(std::move(propName)));
-		return true;
+		if ((*it)->isMainPropSyntaxValid(propName, entityType))
+		{
+			out_propertyGroup.simpleProperties.emplace_back(std::move(propName), (*it));
+
+			return true;
+		}
 	}
-	else
-	{
-		_parsingError = EParsingError::InvalidSimpleProperty;
-		return false;
-	}
+
+	_parsingError = EParsingError::InvalidSimpleProperty;
+
+	return false;
 }
 
-bool PropertyParser::addComplexProperty(std::vector<std::string>& propertyAsVector, PropertyRules const& rules, PropertyGroup& out_propertyGroup) noexcept
+bool PropertyParser::addComplexProperty(std::vector<std::string>& propertyAsVector, EntityInfo::EType entityType, PropertyGroup2& out_propertyGroup) noexcept
 {
 	std::string mainProp = std::move(propertyAsVector[0]);
 
-	if (ComplexPropertyRule const* propertyRule = rules.getComplexPropertyRule(mainProp))
+	//Search the first complex property rule matching with the given mainProp and entity type
+	//Iterate backwards because native properties are at the end and a user rule should never override a native rule
+	for (decltype(_propertyParsingSettings->complexPropertyRules)::const_reverse_iterator it = _propertyParsingSettings->complexPropertyRules.crbegin(); it != _propertyParsingSettings->complexPropertyRules.crend(); it++)
 	{
-		ComplexProperty complexProp;
-		complexProp.name = std::move(mainProp);
-
-		//Iterate over subproperties
-		for (uint8 i = 1u; i < propertyAsVector.size(); i++)
+		if ((*it)->isMainPropSyntaxValid(mainProp, entityType))
 		{
-			std::string subProp = std::move(propertyAsVector[i]);
+			//Found a matching property rule
 
-			if (propertyRule->isValidSubProperty(subProp))
+			ComplexProperty2	complexProp(std::move(mainProp), (*it));
+			std::string			subProp;
+
+			//Check syntax validity of each subproperty
+			for (uint8 i = 1u; i < propertyAsVector.size(); i++)
 			{
-				complexProp.subProperties.emplace_back(std::move(subProp));
+				subProp = std::move(propertyAsVector[i]);
+
+				if ((*it)->isSubPropSyntaxValid(subProp, i - 1u))	// - 1 so that first subprop has index 0
+				{
+					complexProp.subProperties.emplace_back(std::move(subProp));
+				}
+				else if (subProp.empty() && propertyAsVector.size() == 2)
+				{
+					//If there is a single empty subprop, means there is no subprop at all
+				}
+				else
+				{
+					_parsingError = EParsingError::InvalidComplexSubProperty;
+
+					return false;
+				}
 			}
-			else if (subProp.empty() && propertyAsVector.size() == 2)
-			{
-				//If there is a single empty subprop, means there is no subprop at all
-			}
-			else
-			{
-				_parsingError = EParsingError::InvalidComplexSubProperty;
-				return false;
-			}
+
+			out_propertyGroup.complexProperties.emplace_back(std::move(complexProp));
+
+			return true;
 		}
-
-		out_propertyGroup.complexProperties.emplace_back(std::move(complexProp));
-	}
-	else
-	{
-		_parsingError = EParsingError::InvalidComplexMainProperty;
-		return false;
 	}
 
-	return true;
+	_parsingError = EParsingError::InvalidComplexMainProperty;
+
+	return false;
 }
 
 void PropertyParser::setup(PropertyParsingSettings const& propertyParsingSettings) noexcept

@@ -68,7 +68,7 @@ namespace kodgen
 			*
 			*	@return A filled PropertyGroup if valid, else nullopt.
 			*/
-			opt::optional<PropertyGroup>	getProperties(CXCursor const& cursor)						noexcept;
+			opt::optional<PropertyGroup2>	getProperties(CXCursor const& cursor)						noexcept;
 			
 			/**
 			*	@brief Set the parsed struct/class if it is a valid one.

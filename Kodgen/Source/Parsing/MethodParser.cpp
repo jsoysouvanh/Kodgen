@@ -24,11 +24,17 @@ CXChildVisitResult MethodParser::parse(CXCursor const& methodCursor, ParsingCont
 		//Check if the parent has the shouldParseAllNested flag set
 		if (shouldParseCurrentEntity())
 		{
-			getParsingResult()->parsedMethod.emplace(methodCursor, PropertyGroup());
+			getParsingResult()->parsedMethod.emplace(methodCursor, PropertyGroup2());
 		}
 	}
 
 	popContext();
+
+	//Check properties validy one last time
+	if (out_result.parsedMethod.has_value())
+	{
+		performFinalPropertiesCheck(*out_result.parsedMethod);
+	}
 
 	DISABLE_WARNING_PUSH
 	DISABLE_WARNING_UNSCOPED_ENUM
@@ -50,7 +56,7 @@ CXChildVisitResult MethodParser::parseNestedEntity(CXCursor cursor, CXCursor /* 
 		if (parser->shouldParseCurrentEntity() && cursor.kind != CXCursorKind::CXCursor_AnnotateAttr)
 		{
 			//Make it valid right away so init the result
-			parser->getParsingResult()->parsedMethod.emplace(context.rootCursor, PropertyGroup());
+			parser->getParsingResult()->parsedMethod.emplace(context.rootCursor, PropertyGroup2());
 		}
 		else
 		{
@@ -95,7 +101,7 @@ CXChildVisitResult MethodParser::setParsedEntity(CXCursor const& annotationCurso
 	MethodParsingResult*	result	= getParsingResult();
 	ParsingContext&			context	= getContext();
 
-	if (opt::optional<PropertyGroup> propertyGroup = getProperties(annotationCursor))
+	if (opt::optional<PropertyGroup2> propertyGroup = getProperties(annotationCursor))
 	{
 		//Set the parsed entity in the result & initialize its information from the method cursor
 		result->parsedMethod.emplace(context.rootCursor, std::move(*propertyGroup));
@@ -111,7 +117,7 @@ CXChildVisitResult MethodParser::setParsedEntity(CXCursor const& annotationCurso
 	return CXChildVisitResult::CXChildVisit_Break;
 }
 
-opt::optional<PropertyGroup> MethodParser::getProperties(CXCursor const& cursor) noexcept
+opt::optional<PropertyGroup2> MethodParser::getProperties(CXCursor const& cursor) noexcept
 {
 	ParsingContext& context	= getContext();
 

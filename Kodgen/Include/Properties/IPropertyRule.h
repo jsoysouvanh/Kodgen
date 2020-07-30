@@ -32,7 +32,7 @@ namespace kodgen
 			
 			/**
 			*	@brief	Check that a property is valid inside a given property group.
-			*			You could check for invalid double properties, or properties order for example.
+			*			You could check for invalid double properties, properties order, or incompatible properties for example
 			*			This check happens after the property group has been parsed, but before parsing the attached entity.
 			*	
 			*	@param propertyGroup	PropertyGroup containing the checked property.
@@ -41,7 +41,7 @@ namespace kodgen
 			*	@return true if the property group is valid, else false.
 			*/
 			virtual bool	isPropertyGroupValid(PropertyGroup2 const&	propertyGroup,
-												 uint16					propertyIndex)	const noexcept = 0;
+												 uint8					propertyIndex)	const noexcept = 0;
 
 			/**
 			*	@brief	Check that the attached entity of a given property is valid.
@@ -52,6 +52,6 @@ namespace kodgen
 			*	@param propertyIndex	Index of the property in the relevant propertyGroup array.
 			*/
 			virtual bool	isEntityValid(EntityInfo const& entity,
-										  uint16			propertyIndex)				const noexcept = 0;
+										  uint8				propertyIndex)				const noexcept = 0;
 	};
 }

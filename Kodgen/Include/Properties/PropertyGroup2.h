@@ -23,9 +23,12 @@ namespace kodgen
 			/** Vector containing all complex properties of an entity. */
 			std::vector<ComplexProperty2>	complexProperties;
 
-			PropertyGroup()						= default;
-			PropertyGroup(PropertyGroup const&)	= default;
-			PropertyGroup(PropertyGroup&&)		= default;
-			~PropertyGroup()					= default;
+			PropertyGroup2()						= default;
+			PropertyGroup2(PropertyGroup2 const&)	= default;
+			PropertyGroup2(PropertyGroup2&&)		= default;
+			~PropertyGroup2()						= default;
+
+			PropertyGroup2&	operator=(PropertyGroup2 const&)	= default;
+			PropertyGroup2&	operator=(PropertyGroup2&&)			= default;
 	};
 }

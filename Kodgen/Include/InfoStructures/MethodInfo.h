@@ -46,7 +46,7 @@ namespace kodgen
 			std::vector<MethodParamInfo>	parameters;
 
 			MethodInfo()														= default;
-			MethodInfo(CXCursor const& cursor, PropertyGroup&& propertyGroup)	noexcept;
+			MethodInfo(CXCursor const& cursor, PropertyGroup2&& propertyGroup)	noexcept;
 			MethodInfo(MethodInfo const&)										= default;
 			MethodInfo(MethodInfo&&)											= default;
 			~MethodInfo()														= default;
@@ -54,6 +54,4 @@ namespace kodgen
 			std::string getName()																const noexcept;
 			std::string getPrototype(bool removeQualifiers = false, bool removeSpaces = false)	const noexcept;
 	};
-
-	std::ostream& operator<<(std::ostream& out_stream, MethodInfo const& methodInfo) noexcept;
 }

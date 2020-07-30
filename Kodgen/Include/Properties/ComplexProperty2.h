@@ -27,10 +27,11 @@ namespace kodgen
 			/** Pointer to the rule which validated this property syntax. */
 			ComplexPropertyRule2 const*	boundPropertyRule	= nullptr;
 
-			ComplexProperty2()							= default;
-			ComplexProperty2(std::string mainProperty)	noexcept;
-			ComplexProperty2(ComplexProperty2 const&)	= default;
-			ComplexProperty2(ComplexProperty2&&)		= default;
-			~ComplexProperty2()							= default;
+			ComplexProperty2()														= default;
+			ComplexProperty2(std::string					mainProperty,
+							 ComplexPropertyRule2 const*	matchingPropertyRule)	noexcept;
+			ComplexProperty2(ComplexProperty2 const&)								= default;
+			ComplexProperty2(ComplexProperty2&&)									= default;
+			~ComplexProperty2()														= default;
 	};
 }

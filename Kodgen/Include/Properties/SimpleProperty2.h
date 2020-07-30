@@ -23,11 +23,13 @@ namespace kodgen
 			/** Pointer to the rule which validated this property syntax. */
 			SimplePropertyRule2 const*	boundPropertyRule	= nullptr;
 
-			SimpleProperty2()							= default;
-			SimpleProperty2(std::string mainProperty)	noexcept;
-			SimpleProperty2(SimpleProperty2 const&)		= default;
-			SimpleProperty2(SimpleProperty2&&)			= default;
-			~SimpleProperty2()							= default;
+
+			SimpleProperty2()													= default;
+			SimpleProperty2(std::string					mainProperty,
+							SimplePropertyRule2 const*	matchingPropertyRule)	noexcept;
+			SimpleProperty2(SimpleProperty2 const&)								= default;
+			SimpleProperty2(SimpleProperty2&&)									= default;
+			~SimpleProperty2()													= default;
 
 	};
 }

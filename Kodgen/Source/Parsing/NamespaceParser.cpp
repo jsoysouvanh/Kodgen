@@ -4,7 +4,6 @@
 
 #include "Parsing/ParsingSettings.h"
 #include "Parsing/PropertyParser.h"
-#include "Properties/NativeProperties.h"
 #include "Misc/Helpers.h"
 #include "Misc/DisableWarningMacros.h"
 
@@ -24,11 +23,17 @@ CXChildVisitResult NamespaceParser::parse(CXCursor const& namespaceCursor, Parsi
 		//Check if the parent has the shouldParseAllNested flag set
 		if (shouldParseCurrentEntity())
 		{
-			getParsingResult()->parsedNamespace.emplace(namespaceCursor, PropertyGroup());
+			getParsingResult()->parsedNamespace.emplace(namespaceCursor, PropertyGroup2());
 		}
 	}
 
 	popContext();
+
+	//Check properties validy one last time
+	if (out_result.parsedNamespace.has_value())
+	{
+		performFinalPropertiesCheck(*out_result.parsedNamespace);
+	}
 
 	DISABLE_WARNING_PUSH
 	DISABLE_WARNING_UNSCOPED_ENUM
@@ -50,7 +55,7 @@ CXChildVisitResult NamespaceParser::parseNestedEntity(CXCursor cursor, CXCursor 
 		if (parser->shouldParseCurrentEntity() && cursor.kind != CXCursorKind::CXCursor_AnnotateAttr)
 		{
 			//Make it valid right away so init the result
-			parser->getParsingResult()->parsedNamespace.emplace(context.rootCursor, PropertyGroup());
+			parser->getParsingResult()->parsedNamespace.emplace(context.rootCursor, PropertyGroup2());
 		}
 		else
 		{
@@ -121,7 +126,7 @@ ParsingContext& NamespaceParser::pushContext(CXCursor const& namespaceCursor, Pa
 
 CXChildVisitResult NamespaceParser::setParsedEntity(CXCursor const& annotationCursor) noexcept
 {
-	if (opt::optional<PropertyGroup> propertyGroup = getProperties(annotationCursor))
+	if (opt::optional<PropertyGroup2> propertyGroup = getProperties(annotationCursor))
 	{
 		ParsingContext& context = getContext();
 
@@ -141,7 +146,7 @@ CXChildVisitResult NamespaceParser::setParsedEntity(CXCursor const& annotationCu
 	}
 }
 
-opt::optional<PropertyGroup> NamespaceParser::getProperties(CXCursor const& cursor) noexcept
+opt::optional<PropertyGroup2> NamespaceParser::getProperties(CXCursor const& cursor) noexcept
 {
 	ParsingContext& context = getContext();
 

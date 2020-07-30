@@ -36,7 +36,7 @@ namespace kodgen
 
 			NamespaceInfo()									= default;
 			NamespaceInfo(CXCursor const& cursor,
-						  PropertyGroup&& propertyGroup)	noexcept;
+						  PropertyGroup2&& propertyGroup)	noexcept;
 			NamespaceInfo(NamespaceInfo const&)				= default;
 			NamespaceInfo(NamespaceInfo&&)					= default;
 			~NamespaceInfo()								= default;

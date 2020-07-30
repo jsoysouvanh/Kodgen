@@ -2,7 +2,8 @@
 
 using namespace kodgen;
 
-SimpleProperty2::SimpleProperty2(std::string mainProperty) noexcept:
-	mainProperty{mainProperty}
+SimpleProperty2::SimpleProperty2(std::string mainProperty, SimplePropertyRule2 const* matchingPropertyRule) noexcept:
+	mainProperty{mainProperty},
+	boundPropertyRule{matchingPropertyRule}
 {
 }
