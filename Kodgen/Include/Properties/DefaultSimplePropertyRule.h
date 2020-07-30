@@ -16,6 +16,10 @@ namespace kodgen
 {
 	class DefaultSimplePropertyRule : public SimplePropertyRule
 	{
+		private:
+			/** Description of this property rule. */
+			std::string	_description;
+
 		protected:
 			/** Name the property should have to be considered valid. */
 			std::string								mainPropName;
@@ -23,15 +27,20 @@ namespace kodgen
 			/** Entities for which this property rule is valid. */
 			std::unordered_set<EntityInfo::EType>	validEntityTypes;
 
+			virtual std::string	getMacroDocumentation()	const noexcept override;
+
 		public:
 			DefaultSimplePropertyRule()															= delete;
 			DefaultSimplePropertyRule(std::string							mainPropName,
-									  std::unordered_set<EntityInfo::EType>	validEntityTypes)	noexcept;
+									  std::unordered_set<EntityInfo::EType>	validEntityTypes,
+									  std::string							description = "")	noexcept;
 			DefaultSimplePropertyRule(DefaultSimplePropertyRule const&)							= default;
 			DefaultSimplePropertyRule(DefaultSimplePropertyRule&&)								= default;
 			virtual ~DefaultSimplePropertyRule()												= default;
 
-			virtual bool	isMainPropSyntaxValid(std::string const& mainProperty,
-												  EntityInfo::EType	 entityType)	const noexcept override;
+			virtual bool		isMainPropSyntaxValid(std::string const& mainProperty,
+													  EntityInfo::EType	 entityType)	const noexcept override;
+
+			virtual std::string	getMacroDefinition()									const noexcept override;
 	};
 }

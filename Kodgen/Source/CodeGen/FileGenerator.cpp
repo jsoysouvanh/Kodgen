@@ -434,16 +434,41 @@ void FileGenerator::generateMacrosFile(FileParser& parser) const noexcept
 	macrosDefinitionFile.writeLines("#pragma once",
 									"",
 									"#ifndef " + parser.parsingMacro,
-									"	#define " + pps.namespaceMacroName	+ "(...)",
-									"	#define " + pps.classMacroName		+ "(...)",
-									"	#define " + pps.structMacroName		+ "(...)",
-									"	#define " + pps.fieldMacroName		+ "(...)",
-									"	#define " + pps.methodMacroName		+ "(...)",
-									"	#define " + pps.enumMacroName		+ "(...)",
-									"	#define " + pps.enumValueMacroName	+ "(...)",
-									"#endif");
+									"",
+									"#define " + pps.namespaceMacroName	+ "(...)",
+									"#define " + pps.classMacroName		+ "(...)",
+									"#define " + pps.structMacroName	+ "(...)",
+									"#define " + pps.fieldMacroName		+ "(...)",
+									"#define " + pps.methodMacroName	+ "(...)",
+									"#define " + pps.enumMacroName		+ "(...)",
+									"#define " + pps.enumValueMacroName	+ "(...)");
 
-	//TODO: Generate property rules macros + doc
+	//Generate property rules macros + doc
+	std::string macroDefinition;
+	for (kodgen::SimplePropertyRule const* propertyRule : parser.parsingSettings.propertyParsingSettings.simplePropertyRules)
+	{
+		macroDefinition = propertyRule->getMacroDefinition();
+
+		if (!macroDefinition.empty())
+		{
+			macrosDefinitionFile.writeLines("",
+											propertyRule->getMacroDefinition());
+		}
+	}
+
+	for (kodgen::ComplexPropertyRule const* propertyRule : parser.parsingSettings.propertyParsingSettings.complexPropertyRules)
+	{
+		macroDefinition = propertyRule->getMacroDefinition();
+		
+		if (!macroDefinition.empty())
+		{
+			macrosDefinitionFile.writeLines("",
+											propertyRule->getMacroDefinition());
+		}
+	}
+
+	macrosDefinitionFile.writeLines("",
+									"#endif");
 }
 
 FileGenerationResult FileGenerator::generateFiles(FileParser& parser, bool forceRegenerateAll) noexcept

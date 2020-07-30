@@ -16,3 +16,13 @@ bool SimplePropertyRule::isUsedOnlyOnce(PropertyGroup const& propertyGroup, uint
 
 	return true;
 }
+
+std::string	SimplePropertyRule::getMacroDocumentation() const noexcept
+{
+	return	"";
+}
+
+std::string	SimplePropertyRule::getMacroDefinition() const noexcept
+{
+	return "";
+}
