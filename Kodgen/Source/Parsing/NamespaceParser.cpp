@@ -137,9 +137,9 @@ CXChildVisitResult NamespaceParser::setParsedEntity(CXCursor const& annotationCu
 	}
 	else
 	{
-		if (getContext().propertyParser->getParsingError() != EParsingError::Count)
+		if (!getContext().propertyParser->getParsingErrorDescription().empty())
 		{
-			getContext().parsingResult->errors.emplace_back(ParsingError(getContext().propertyParser->getParsingError(), clang_getCursorLocation(annotationCursor)));
+			getContext().parsingResult->errors.emplace_back(ParsingError(getContext().propertyParser->getParsingErrorDescription(), clang_getCursorLocation(annotationCursor)));
 		}
 
 		return CXChildVisitResult::CXChildVisit_Break;

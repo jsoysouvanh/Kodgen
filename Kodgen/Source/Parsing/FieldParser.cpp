@@ -75,10 +75,10 @@ CXChildVisitResult FieldParser::setParsedEntity(CXCursor const& annotationCursor
 	{
 		result->parsedField.emplace(context.rootCursor, std::move(*propertyGroup));
 	}
-	else if (context.propertyParser->getParsingError() != EParsingError::Count)
+	else if (!context.propertyParser->getParsingErrorDescription().empty())
 	{
 		//Fatal parsing error occured
-		result->errors.emplace_back(ParsingError(context.propertyParser->getParsingError(), clang_getCursorLocation(annotationCursor)));
+		result->errors.emplace_back(ParsingError(context.propertyParser->getParsingErrorDescription(), clang_getCursorLocation(annotationCursor)));
 	}
 
 	return CXChildVisitResult::CXChildVisit_Break;

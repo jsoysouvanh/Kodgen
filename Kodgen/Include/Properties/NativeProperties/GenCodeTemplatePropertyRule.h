@@ -26,15 +26,18 @@ namespace kodgen
 			virtual ~GenCodeTemplatePropertyRule()							= default;
 
 			virtual bool	isMainPropSyntaxValid(std::string const& mainProperty,
-												  EntityInfo::EType	 entityType)		const noexcept override;
+												  EntityInfo::EType	 entityType)				const noexcept override;
 
 			virtual bool	isSubPropSyntaxValid(std::string const& subProperty,
-												 uint8				subPropIndex)		const noexcept override;
+												 uint8				subPropIndex,
+												 std::string&		out_errorDescription)		const noexcept override;
 
 			virtual bool	isPropertyGroupValid(PropertyGroup2 const&	propertyGroup,
-												 uint8					propertyIndex)	const noexcept override;
+												 uint8					propertyIndex,
+												 std::string&			out_errorDescription)	const noexcept override;
 
 			virtual bool	isEntityValid(EntityInfo const& entity,
-										  uint8				propertyIndex)				const noexcept override;
+										  uint8				propertyIndex,
+										  std::string&		out_errorDescription)				const noexcept override;
 	};
 }

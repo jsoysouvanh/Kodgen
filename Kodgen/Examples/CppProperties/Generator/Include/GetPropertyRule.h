@@ -20,14 +20,17 @@ class GetPropertyRule : public kodgen::ComplexPropertyRule2
 		virtual ~GetPropertyRule()				= default;
 
 		virtual bool	isMainPropSyntaxValid(std::string const&			mainProperty,
-											  kodgen::EntityInfo::EType		entityType)		const noexcept override;
+											  kodgen::EntityInfo::EType		entityType)				const noexcept override;
 
 		virtual bool	isSubPropSyntaxValid(std::string const& subProperty,
-											 kodgen::uint8		subPropIndex)				const noexcept override;
+											 kodgen::uint8		subPropIndex,
+											 std::string&		out_errorDescription)				const noexcept override;
 
 		virtual bool	isPropertyGroupValid(kodgen::PropertyGroup2 const&	propertyGroup,
-											 kodgen::uint8					propertyIndex)	const noexcept override;
+											 kodgen::uint8					propertyIndex,
+											 std::string&					out_errorDescription)	const noexcept override;
 
 		virtual bool	isEntityValid(kodgen::EntityInfo const& entity,
-									  kodgen::uint8				propertyIndex)				const noexcept override;
+									  kodgen::uint8				propertyIndex,
+									  std::string&				out_errorDescription)				const noexcept override;
 };

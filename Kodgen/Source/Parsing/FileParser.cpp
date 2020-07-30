@@ -67,12 +67,12 @@ bool FileParser::parse(fs::path const& toParseFile, FileParsingResult& out_resul
 		}
 		else
 		{
-			out_result.errors.emplace_back(ParsingError(EParsingError::TranslationUnitInitFailed));
+			out_result.errors.emplace_back("Failed to initialize translation unit for file: " + toParseFile.string());
 		}
 	}
 	else
 	{
-		out_result.errors.emplace_back(ParsingError(EParsingError::InexistantFile));
+		out_result.errors.emplace_back("File " + toParseFile.string() + " doesn't exist.");
 	}
 
 	postParse(toParseFile, out_result);

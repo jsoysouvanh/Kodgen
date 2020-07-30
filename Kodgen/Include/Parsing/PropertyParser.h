@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include "Parsing/EParsingError.h"
 #include "InfoStructures/EntityInfo.h"
 #include "Properties/PropertyGroup.h"
 #include "Properties/PropertyGroup2.h"
@@ -23,7 +22,7 @@ namespace kodgen
 			PropertyParsingSettings const*			_propertyParsingSettings	= nullptr;
 
 			/** Last parsing error which occured when parsing from this parser. */
-			EParsingError							_parsingError				= EParsingError::Count;
+			std::string								_parsingErrorDescription	= "";
 
 			/** Collection of last parsed split properties. */
 			std::vector<std::vector<std::string>>	_splitProps;
@@ -211,10 +210,10 @@ namespace kodgen
 			opt::optional<PropertyGroup2>	getEnumValueProperties(std::string annotateMessage)		noexcept;
 
 			/**
-			*	@brief Getter for _parsingError field.
+			*	@brief Getter for _parsingErrorDescription field.
 			*	
-			*	@return _parsingError.
+			*	@return _parsingErrorDescription.
 			*/
-			EParsingError					getParsingError() const noexcept;
+			std::string const&				getParsingErrorDescription()					const	noexcept;
 	};
 }

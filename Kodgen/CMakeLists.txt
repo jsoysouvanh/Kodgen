@@ -20,6 +20,8 @@ add_library(${KodgenTargetLibrary}
 
 					Source/Properties/SimpleProperty2.cpp
 					Source/Properties/ComplexProperty2.cpp
+					Source/Properties/SimplePropertyRule2.cpp
+					Source/Properties/ComplexPropertyRule2.cpp
 
 					Source/Properties/NativeProperties/ParseAllNestedPropertyRule.cpp
 					Source/Properties/NativeProperties/GenCodeTemplatePropertyRule.cpp
@@ -36,7 +38,6 @@ add_library(${KodgenTargetLibrary}
 					Source/InfoStructures/EnumValueInfo.cpp
 					Source/InfoStructures/TypeInfo.cpp
 	
-					Source/Parsing/EParsingError.cpp
 					Source/Parsing/ParsingError.cpp
 					Source/Parsing/PropertyParser.cpp
 					Source/Parsing/EntityParser.cpp

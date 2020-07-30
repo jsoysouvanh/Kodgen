@@ -18,20 +18,16 @@ opt::optional<PropertyGroup2> PropertyParser::getProperties(std::string&& annota
 				//Check whole propertyGroup validity
 				for (uint8 i = 0u; i < propertyGroup->simpleProperties.size(); i++)
 				{
-					if (!propertyGroup->simpleProperties[i].boundPropertyRule->isPropertyGroupValid(*propertyGroup, i))
+					if (!propertyGroup->simpleProperties[i].boundPropertyRule->isPropertyGroupValid(*propertyGroup, i, _parsingErrorDescription))
 					{
-						_parsingError = EParsingError::InvalidSimpleProperty;	//TODO: Replace that by a better way to issue errors
-
 						return opt::nullopt;
 					}
 				}
 
 				for (uint8 i = 0u; i < propertyGroup->complexProperties.size(); i++)
 				{
-					if (!propertyGroup->complexProperties[i].boundPropertyRule->isPropertyGroupValid(*propertyGroup, i))
+					if (!propertyGroup->complexProperties[i].boundPropertyRule->isPropertyGroupValid(*propertyGroup, i, _parsingErrorDescription))
 					{
-						_parsingError = EParsingError::InvalidComplexMainProperty;	//TODO: Replace that by a better way to issue errors
-
 						return opt::nullopt;
 					}
 				}
@@ -46,11 +42,10 @@ opt::optional<PropertyGroup2> PropertyParser::getProperties(std::string&& annota
 	}
 	else
 	{
-		//Tried to add properties to a class with the wrong macro
-		_parsingError = EParsingError::WrongPropertyMacroUsed;
+		_parsingErrorDescription = "The wrong macro has been used to attached properties to an entity.";
 	}
 
-	assert(_parsingError != EParsingError::Count);	//If fails, _parsing error must be updated
+	assert(!_parsingErrorDescription.empty());	//If fails, _parsingErrorDescription must be updated
 	return opt::nullopt;
 }
 
@@ -127,7 +122,8 @@ bool PropertyParser::splitProperties(std::string&& propertiesString) noexcept
 	//propertyString has been fully parsed but no end subproperty mark found
 	if (isParsingSubproperty)
 	{
-		_parsingError = EParsingError::SubPropertyEndEncloserMissing;
+		_parsingErrorDescription = "Subproperty end encloser \"" + std::string(1u, _propertyParsingSettings->subPropertyEnclosers[1]) + "\" is missing.";
+		
 		return false;
 	}
 
@@ -169,7 +165,8 @@ bool PropertyParser::lookForNextSubProp(std::string& inout_parsingProps, bool& o
 	//Was last prop
 	if (index == inout_parsingProps.npos)
 	{
-		_parsingError = EParsingError::SubPropertyEndEncloserMissing;
+		_parsingErrorDescription = "Subproperty end encloser \"" + std::string(1u, _propertyParsingSettings->subPropertyEnclosers[1]) + "\" is missing.";
+
 		return false;
 	}
 	else if (inout_parsingProps[index] == _propertyParsingSettings->subPropertySeparator)
@@ -182,7 +179,8 @@ bool PropertyParser::lookForNextSubProp(std::string& inout_parsingProps, bool& o
 		//Make sure there is a property separator after the end encloser if is not the last char of the string
 		if (index != inout_parsingProps.size() - 1 && inout_parsingProps[index + 1] != _propertyParsingSettings->propertySeparator)
 		{
-			_parsingError = EParsingError::PropertySeparatorMissing;
+			_parsingErrorDescription = "Property separator \"" + std::string(1, _propertyParsingSettings->propertySeparator) + "\" is missing between two properties.";
+			
 			return false;
 		}
 
@@ -243,7 +241,7 @@ bool PropertyParser::addSimpleProperty(std::vector<std::string>& propertyAsVecto
 		}
 	}
 
-	_parsingError = EParsingError::InvalidSimpleProperty;
+	_parsingErrorDescription = "Invalid simple property: " + std::move(propName);
 
 	return false;
 }
@@ -268,7 +266,7 @@ bool PropertyParser::addComplexProperty(std::vector<std::string>& propertyAsVect
 			{
 				subProp = std::move(propertyAsVector[i]);
 
-				if ((*it)->isSubPropSyntaxValid(subProp, i - 1u))	// - 1 so that first subprop has index 0
+				if ((*it)->isSubPropSyntaxValid(subProp, i - 1u, _parsingErrorDescription))	// - 1 so that first subprop has index 0
 				{
 					complexProp.subProperties.emplace_back(std::move(subProp));
 				}
@@ -278,8 +276,6 @@ bool PropertyParser::addComplexProperty(std::vector<std::string>& propertyAsVect
 				}
 				else
 				{
-					_parsingError = EParsingError::InvalidComplexSubProperty;
-
 					return false;
 				}
 			}
@@ -290,7 +286,7 @@ bool PropertyParser::addComplexProperty(std::vector<std::string>& propertyAsVect
 		}
 	}
 
-	_parsingError = EParsingError::InvalidComplexMainProperty;
+	_parsingErrorDescription = "Invalid complex main property: " + std::move(mainProp);
 
 	return false;
 }
@@ -316,10 +312,10 @@ void PropertyParser::setup(PropertyParsingSettings const& propertyParsingSetting
 void PropertyParser::clean() noexcept
 {
 	_splitProps.clear();
-	_parsingError = EParsingError::Count;
+	_parsingErrorDescription.clear();
 }
 
-EParsingError PropertyParser::getParsingError() const noexcept
+std::string const& PropertyParser::getParsingErrorDescription() const noexcept
 {
-	return _parsingError;
+	return _parsingErrorDescription;
 }

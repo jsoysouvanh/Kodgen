@@ -26,7 +26,7 @@ namespace kodgen
 			/** Char used to separate two sub properties. */
 			char								subPropertySeparator	= ',';
 
-			/** Chars used to start and close respectively a group of sub properties. */
+			/** Chars used to respectively start and close a group of sub properties. */
 			char								subPropertyEnclosers[2]	= { '[', ']' };
 
 			/** Collection of chars which will be ignored by the property parser. */

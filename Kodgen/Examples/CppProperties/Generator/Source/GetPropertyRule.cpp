@@ -9,34 +9,11 @@ bool GetPropertyRule::isMainPropSyntaxValid(std::string const& mainProperty, Ent
 	return mainProperty == "Get" && entityType == EntityInfo::EType::Field;
 }
 
-bool GetPropertyRule::isSubPropSyntaxValid(std::string const& subProperty, uint8 /* subPropIndex */) const noexcept
+bool GetPropertyRule::isSubPropSyntaxValid(std::string const& subProperty, uint8 /* subPropIndex */, std::string& out_errorDescription) const noexcept
 {
-	return	subProperty == "*"			||
-			subProperty == "&"			||
-			subProperty == "const"		||
-			subProperty == "explicit";
-}
-
-bool GetPropertyRule::isPropertyGroupValid(PropertyGroup2 const& propertyGroup, uint8 propertyIndex) const noexcept
-{
-	//Make sure there is a single Get property
-	for (size_t i = 0u; i < propertyGroup.complexProperties.size(); i++)
+	if (subProperty != "*" && subProperty != "&" && subProperty != "const" && subProperty != "explicit")
 	{
-		if (i != propertyIndex && propertyGroup.complexProperties[i].boundPropertyRule == this)
-		{
-			//TODO: Property appear at least twice
-
-			return false;
-		}
-	}
-
-	ComplexProperty2 const& complexProp = propertyGroup.complexProperties[propertyIndex];
-
-	//Can't have * and & at the same time
-	if (std::find(complexProp.subProperties.cbegin(), complexProp.subProperties.cend(), "*") != complexProp.subProperties.cend() &&
-		std::find(complexProp.subProperties.cbegin(), complexProp.subProperties.cend(), "&") != complexProp.subProperties.cend())
-	{
-		//TODO: Can't have * and & at the same time
+		out_errorDescription = subProperty + " is not a valid subproperty.";
 
 		return false;
 	}
@@ -44,7 +21,23 @@ bool GetPropertyRule::isPropertyGroupValid(PropertyGroup2 const& propertyGroup, 
 	return true;
 }
 
-bool GetPropertyRule::isEntityValid(EntityInfo const& /* entity */, uint8 /* propertyIndex */) const noexcept
+bool GetPropertyRule::isPropertyGroupValid(PropertyGroup2 const& propertyGroup, uint8 propertyIndex, std::string& out_errorDescription) const noexcept
+{
+	ComplexProperty2 const& complexProp = propertyGroup.complexProperties[propertyIndex];
+
+	//Can't have * and & at the same time
+	if (std::find(complexProp.subProperties.cbegin(), complexProp.subProperties.cend(), "*") != complexProp.subProperties.cend() &&
+		std::find(complexProp.subProperties.cbegin(), complexProp.subProperties.cend(), "&") != complexProp.subProperties.cend())
+	{
+		out_errorDescription = "Can't use * and & in the same time.";
+
+		return false;
+	}
+
+	return isUsedOnlyOnce(propertyGroup, propertyIndex, out_errorDescription);
+}
+
+bool GetPropertyRule::isEntityValid(EntityInfo const& /* entity */, uint8 /* propertyIndex */, std::string& /* out_errorDescription */) const noexcept
 {
 	//No specific check to perform here
 	return true;

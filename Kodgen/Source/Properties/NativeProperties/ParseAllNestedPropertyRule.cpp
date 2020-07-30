@@ -10,23 +10,12 @@ bool ParseAllNestedPropertyRule::isMainPropSyntaxValid(std::string const& mainPr
 		(entityType == EntityInfo::EType::Namespace || entityType == EntityInfo::EType::Class || entityType == EntityInfo::EType::Struct);
 }
 
-bool ParseAllNestedPropertyRule::isPropertyGroupValid(PropertyGroup2 const& propertyGroup, uint8 propertyIndex) const noexcept
+bool ParseAllNestedPropertyRule::isPropertyGroupValid(PropertyGroup2 const& propertyGroup, uint8 propertyIndex, std::string& out_errorDescription) const noexcept
 {
-	//Check that this property doesn't appear twice
-	for (uint8 i = 0u; i < propertyGroup.simpleProperties.size(); i++)
-	{
-		if (i != propertyIndex && propertyGroup.simpleProperties[i].boundPropertyRule == this)
-		{
-			//TODO: Issue error: This property appeared twice
-
-			return false;
-		}
-	}
-
-	return true;
+	return isUsedOnlyOnce(propertyGroup, propertyIndex, out_errorDescription);
 }
 
-bool ParseAllNestedPropertyRule::isEntityValid(EntityInfo const& /* entity */, uint8 /* propertyIndex */) const noexcept
+bool ParseAllNestedPropertyRule::isEntityValid(EntityInfo const& /* entity */, uint8 /* propertyIndex */, std::string& /* out_errorDescription */) const noexcept
 {
 	//Nothing special to check
 	return true;

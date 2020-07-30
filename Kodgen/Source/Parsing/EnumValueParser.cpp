@@ -65,10 +65,10 @@ void EnumValueParser::setProperties(CXCursor const& annotationCursor) noexcept
 	{
 		getParsingResult()->parsedEnumValue->properties = std::move(*propertyGroup);
 	}
-	else if (context.propertyParser->getParsingError() != EParsingError::Count)
+	else if (!context.propertyParser->getParsingErrorDescription().empty())
 	{
 		//Fatal parsing error occured
-		context.parsingResult->errors.emplace_back(ParsingError(context.propertyParser->getParsingError(), clang_getCursorLocation(annotationCursor)));
+		context.parsingResult->errors.emplace_back(context.propertyParser->getParsingErrorDescription(), clang_getCursorLocation(annotationCursor));
 	}
 }
 
