@@ -46,7 +46,8 @@ int main(int argc, char** argv)
 			fileGenerator.generatedFilesExtension = ".myCustomExtension.h";
 
 			//Bind the PropertyCodeTemplate name to the CppPropsCodeTemplate class
-			fileGenerator.addGeneratedCodeTemplate("PropertyCodeTemplate", new CppPropsCodeTemplate());
+			CppPropsCodeTemplate	propsCodeTemplate;
+			fileGenerator.addGeneratedCodeTemplate("PropertyCodeTemplate", &propsCodeTemplate);
 
 			/**
 			*	Set a default class template so that we don't have to specify it manually

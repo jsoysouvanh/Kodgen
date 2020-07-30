@@ -15,18 +15,6 @@
 
 using namespace kodgen;
 
-FileGenerator::FileGenerator() noexcept
-{
-}
-
-FileGenerator::~FileGenerator() noexcept
-{
-	for (auto& [key, value] : _generatedCodeTemplates)
-	{
-		delete value;
-	}
-}
-
 void FileGenerator::generateFile(FileGenerationResult& genResult, FileParsingResult const& parsingResult) noexcept
 {
 	/**

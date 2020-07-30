@@ -21,9 +21,9 @@ CppPropsParser::CppPropsParser() noexcept:
 
 	//kodgen::PropertyRules& fieldPropertyRules = parsingSettings.propertyParsingSettings.fieldPropertyRules;
 
-	////Define the Get property, which can take 
-	//fieldPropertyRules.addComplexPropertyRule("Get", "&|\\*|const|explicit");
-	//fieldPropertyRules.addComplexPropertyRule("Set", "explicit");
+	////Define the Get property, which can take
+	parsingSettings.propertyParsingSettings.complexPropertyRules.push_back(&_getPropertyRule);
+	parsingSettings.propertyParsingSettings.complexPropertyRules.push_back(&_setPropertyRule);
 
 	//Define the macros to use for each entity type
 	parsingSettings.propertyParsingSettings.namespaceMacroName	= "KGNamespace";

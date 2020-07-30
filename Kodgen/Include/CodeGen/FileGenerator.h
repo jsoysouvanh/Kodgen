@@ -293,18 +293,18 @@ namespace kodgen
 			/** Extensions of files which should be considered for parsing. */
 			std::unordered_set<std::string>			supportedExtensions;
 
-			FileGenerator()						noexcept;
+			FileGenerator()						= default;
 			FileGenerator(FileGenerator const&)	= default;
 			FileGenerator(FileGenerator&&)		= default;
-			virtual ~FileGenerator()			noexcept;
+			virtual ~FileGenerator()			= default;
 
 			/**
 			*	@brief Add a new template to the list of generated code templates.
 			*		   if @param templateName is already defined in the generator, replace it.
 			*
 			*	@param templateName Name of the code template which will be specified in the source code.
-			*	@param codeTemplate Pointer to a GeneratedCodeTemplate instance (must be newed).
-			*			The instance will be deleted by the FileGenerator when destroyed.
+			*	@param codeTemplate Pointer to a GeneratedCodeTemplate instance.
+			*						The provided instance has be deleted manually by the user if newed.
 			*/
 			void addGeneratedCodeTemplate(std::string const&		templateName,
 										  GeneratedCodeTemplate*	codeTemplate)			noexcept;
