@@ -10,7 +10,7 @@ bool ParseAllNestedPropertyRule::isMainPropSyntaxValid(std::string const& mainPr
 		(entityType == EntityInfo::EType::Namespace || entityType == EntityInfo::EType::Class || entityType == EntityInfo::EType::Struct);
 }
 
-bool ParseAllNestedPropertyRule::isPropertyGroupValid(PropertyGroup2 const& propertyGroup, uint8 propertyIndex, std::string& out_errorDescription) const noexcept
+bool ParseAllNestedPropertyRule::isPropertyGroupValid(PropertyGroup const& propertyGroup, uint8 propertyIndex, std::string& out_errorDescription) const noexcept
 {
 	return isUsedOnlyOnce(propertyGroup, propertyIndex, out_errorDescription);
 }

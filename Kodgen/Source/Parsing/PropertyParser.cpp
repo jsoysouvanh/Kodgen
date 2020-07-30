@@ -2,18 +2,18 @@
 
 #include <cassert>
 
-#include "Properties/SimpleProperty2.h"
-#include "Properties/ComplexProperty2.h"
+#include "Properties/SimpleProperty.h"
+#include "Properties/ComplexProperty.h"
 
 using namespace kodgen;
 
-opt::optional<PropertyGroup2> PropertyParser::getProperties(std::string&& annotateMessage, std::string const& annotationId, EntityInfo::EType entityType) noexcept
+opt::optional<PropertyGroup> PropertyParser::getProperties(std::string&& annotateMessage, std::string const& annotationId, EntityInfo::EType entityType) noexcept
 {
 	if (annotateMessage.substr(0, annotationId.size()) == annotationId)
 	{
 		if (splitProperties(annotateMessage.substr(annotationId.size())))
 		{
-			if (opt::optional<PropertyGroup2> propertyGroup = checkAndFillPropertyGroup(_splitProps, entityType))
+			if (opt::optional<PropertyGroup> propertyGroup = checkAndFillPropertyGroup(_splitProps, entityType))
 			{
 				//Check whole propertyGroup validity
 				for (uint8 i = 0u; i < propertyGroup->simpleProperties.size(); i++)
@@ -49,49 +49,49 @@ opt::optional<PropertyGroup2> PropertyParser::getProperties(std::string&& annota
 	return opt::nullopt;
 }
 
-opt::optional<PropertyGroup2> PropertyParser::getNamespaceProperties(std::string annotateMessage) noexcept
+opt::optional<PropertyGroup> PropertyParser::getNamespaceProperties(std::string annotateMessage) noexcept
 {
 	static std::string namespaceAnnotation = "KGN:";
 
 	return getProperties(std::move(annotateMessage), namespaceAnnotation, EntityInfo::EType::Namespace);
 }
 
-opt::optional<PropertyGroup2> PropertyParser::getClassProperties(std::string annotateMessage) noexcept
+opt::optional<PropertyGroup> PropertyParser::getClassProperties(std::string annotateMessage) noexcept
 {
 	static std::string classAnnotation = "KGC:";
 
 	return getProperties(std::move(annotateMessage), classAnnotation, EntityInfo::EType::Class);
 }
 
-opt::optional<PropertyGroup2> PropertyParser::getStructProperties(std::string annotateMessage) noexcept
+opt::optional<PropertyGroup> PropertyParser::getStructProperties(std::string annotateMessage) noexcept
 {
 	static std::string structAnnotation = "KGS:";
 
 	return getProperties(std::move(annotateMessage), structAnnotation, EntityInfo::EType::Struct);
 }
 
-opt::optional<PropertyGroup2> PropertyParser::getFieldProperties(std::string annotateMessage) noexcept
+opt::optional<PropertyGroup> PropertyParser::getFieldProperties(std::string annotateMessage) noexcept
 {
 	static std::string fieldAnnotation = "KGF:";
 
 	return getProperties(std::move(annotateMessage), fieldAnnotation, EntityInfo::EType::Field);
 }
 
-opt::optional<PropertyGroup2> PropertyParser::getMethodProperties(std::string annotateMessage) noexcept
+opt::optional<PropertyGroup> PropertyParser::getMethodProperties(std::string annotateMessage) noexcept
 {
 	static std::string methodAnnotation = "KGM:";
 
 	return getProperties(std::move(annotateMessage), methodAnnotation, EntityInfo::EType::Method);
 }
 
-opt::optional<PropertyGroup2> PropertyParser::getEnumProperties(std::string annotateMessage) noexcept
+opt::optional<PropertyGroup> PropertyParser::getEnumProperties(std::string annotateMessage) noexcept
 {
 	static std::string enumAnnotation = "KGE:";
 
 	return getProperties(std::move(annotateMessage), enumAnnotation, EntityInfo::EType::Enum);
 }
 
-opt::optional<PropertyGroup2> PropertyParser::getEnumValueProperties(std::string annotateMessage) noexcept
+opt::optional<PropertyGroup> PropertyParser::getEnumValueProperties(std::string annotateMessage) noexcept
 {
 	static std::string enumValueAnnotation = "KGEV:";
 
@@ -201,9 +201,9 @@ void PropertyParser::cleanString(std::string& toCleanString) const noexcept
 	}
 }
 
-opt::optional<PropertyGroup2> PropertyParser::checkAndFillPropertyGroup(std::vector<std::vector<std::string>>& splitProps, EntityInfo::EType entityType) noexcept
+opt::optional<PropertyGroup> PropertyParser::checkAndFillPropertyGroup(std::vector<std::vector<std::string>>& splitProps, EntityInfo::EType entityType) noexcept
 {
-	PropertyGroup2 propertyGroup;
+	PropertyGroup propertyGroup;
 
 	for (std::vector<std::string>& props : splitProps)
 	{
@@ -225,7 +225,7 @@ opt::optional<PropertyGroup2> PropertyParser::checkAndFillPropertyGroup(std::vec
 	return propertyGroup;
 }
 
-bool PropertyParser::addSimpleProperty(std::vector<std::string>& propertyAsVector, EntityInfo::EType entityType, PropertyGroup2& out_propertyGroup) noexcept
+bool PropertyParser::addSimpleProperty(std::vector<std::string>& propertyAsVector, EntityInfo::EType entityType, PropertyGroup& out_propertyGroup) noexcept
 {
 	std::string propName = std::move(propertyAsVector[0]);
 
@@ -246,7 +246,7 @@ bool PropertyParser::addSimpleProperty(std::vector<std::string>& propertyAsVecto
 	return false;
 }
 
-bool PropertyParser::addComplexProperty(std::vector<std::string>& propertyAsVector, EntityInfo::EType entityType, PropertyGroup2& out_propertyGroup) noexcept
+bool PropertyParser::addComplexProperty(std::vector<std::string>& propertyAsVector, EntityInfo::EType entityType, PropertyGroup& out_propertyGroup) noexcept
 {
 	std::string mainProp = std::move(propertyAsVector[0]);
 
@@ -258,8 +258,8 @@ bool PropertyParser::addComplexProperty(std::vector<std::string>& propertyAsVect
 		{
 			//Found a matching property rule
 
-			ComplexProperty2	complexProp(std::move(mainProp), (*it));
-			std::string			subProp;
+			ComplexProperty	complexProp(std::move(mainProp), (*it));
+			std::string		subProp;
 
 			//Check syntax validity of each subproperty
 			for (uint8 i = 1u; i < propertyAsVector.size(); i++)

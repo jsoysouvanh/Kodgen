@@ -10,11 +10,11 @@
 #include <string>
 #include <unordered_set>
 
-#include "Properties/ComplexPropertyRule2.h"
+#include "Properties/ComplexPropertyRule.h"
 
 namespace kodgen
 {
-	class GenCodeTemplatePropertyRule : public ComplexPropertyRule2
+	class GenCodeTemplatePropertyRule : public ComplexPropertyRule
 	{
 		public:
 			/** Names of GeneratedCodeTemplate registered to the FileGenerator. */
@@ -32,7 +32,7 @@ namespace kodgen
 												 uint8				subPropIndex,
 												 std::string&		out_errorDescription)		const noexcept override;
 
-			virtual bool	isPropertyGroupValid(PropertyGroup2 const&	propertyGroup,
+			virtual bool	isPropertyGroupValid(PropertyGroup const&	propertyGroup,
 												 uint8					propertyIndex,
 												 std::string&			out_errorDescription)	const noexcept override;
 

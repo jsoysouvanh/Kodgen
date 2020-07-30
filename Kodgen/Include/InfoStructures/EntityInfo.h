@@ -13,7 +13,7 @@
 #include <clang-c/Index.h>
 
 #include "Misc/FundamentalTypes.h"
-#include "Properties/PropertyGroup2.h"
+#include "Properties/PropertyGroup.h"
 
 namespace kodgen
 {
@@ -53,11 +53,11 @@ namespace kodgen
 			EntityInfo const*	outerEntity	= nullptr;
 			
 			/** All properties bound to this entity. */
-			PropertyGroup2		properties;
+			PropertyGroup		properties;
 
 			EntityInfo()								= default;
 			EntityInfo(CXCursor const&	cursor,
-					   PropertyGroup2&&	propertyGroup,
+					   PropertyGroup&&	propertyGroup,
 					   EType			entityType)		noexcept;
 			EntityInfo(EntityInfo const&)				= default;
 			EntityInfo(EntityInfo&&)					= default;

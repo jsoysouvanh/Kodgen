@@ -8,33 +8,32 @@
 #pragma once
 
 #include <string>
-#include <iostream>
+
+#include "Properties/IPropertyRule.h"
 
 namespace kodgen
 {
-	class SimplePropertyRule
+	class SimplePropertyRule : public IPropertyRule
 	{
-		public:
-			/** Name of this property rule. */
-			std::string name = "";
+		protected:
+			/**
+			*	@brief Check that a property rule is used only once in a given property group.
+			*	
+			*	@param propertyGroup		The property group containing the checked property.
+			*	@param propertyIndex		Index of the property that should appear only once.
+			*	@param out_errorDescription	Error to fill in case the property rule is used more than once.
+			*
+			*	@return true if this property rule is used by a single property in the property group, else false.
+			*			If false is returned, out_errorDescription must be filled with an error description.
+			*/
+			virtual bool	isUsedOnlyOnce(PropertyGroup const&	propertyGroup,
+										   uint8				propertyIndex,
+										   std::string&			out_errorDescription)	const noexcept;
 
+		public:
 			SimplePropertyRule()							= default;
-			SimplePropertyRule(std::string&& name)			noexcept;
 			SimplePropertyRule(SimplePropertyRule const&)	= default;
 			SimplePropertyRule(SimplePropertyRule&&)		= default;
-			~SimplePropertyRule()							= default;
-
-			/**
-			*	@brief Check whether 2 property rules have the same name or not.
-			*	
-			*	@param other The other property rule.
-			*	
-			*	@return true if both property rules have the same name, else false.
-			*/
-			bool hasSameName(SimplePropertyRule const& other)	const noexcept;
-
-			bool operator<(SimplePropertyRule const& other)		const;
+			virtual ~SimplePropertyRule()					= default;
 	};
-
-	std::ostream& operator<<(std::ostream& out_stream, SimplePropertyRule const&) noexcept;
 }

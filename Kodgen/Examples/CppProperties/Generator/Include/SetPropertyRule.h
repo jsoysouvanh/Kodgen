@@ -11,7 +11,7 @@
 
 #include "Properties/ComplexPropertyRule2.h"
 
-class SetPropertyRule : public kodgen::ComplexPropertyRule2
+class SetPropertyRule : public kodgen::ComplexPropertyRule
 {
 	public:
 		SetPropertyRule()						= default;
@@ -26,7 +26,7 @@ class SetPropertyRule : public kodgen::ComplexPropertyRule2
 											 kodgen::uint8		subPropIndex,
 											 std::string&		out_errorDescription)				const noexcept override;
 
-		virtual bool	isPropertyGroupValid(kodgen::PropertyGroup2 const&	propertyGroup,
+		virtual bool	isPropertyGroupValid(kodgen::PropertyGroup const&	propertyGroup,
 											 kodgen::uint8					propertyIndex,
 											 std::string&					out_errorDescription)	const noexcept override;
 

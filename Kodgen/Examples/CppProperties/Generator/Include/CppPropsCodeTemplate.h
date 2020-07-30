@@ -7,9 +7,9 @@ class CppPropsCodeTemplate : public kodgen::GeneratedCodeTemplate
 {
 	private:
 		std::string generateGetter(kodgen::FieldInfo const&			fieldInfo,
-								   kodgen::ComplexProperty2 const&	complexProp)	const	noexcept;
+								   kodgen::ComplexProperty const&	complexProp)	const	noexcept;
 		std::string generateSetter(kodgen::FieldInfo const&			fieldInfo,
-								   kodgen::ComplexProperty2 const&	complexProp)	const	noexcept;
+								   kodgen::ComplexProperty const&	complexProp)	const	noexcept;
 
 		void		undefMacros(kodgen::GeneratedFile&	generatedFile,
 								std::string const&		generatedMacroName)			const	noexcept;

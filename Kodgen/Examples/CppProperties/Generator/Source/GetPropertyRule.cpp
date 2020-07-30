@@ -21,9 +21,9 @@ bool GetPropertyRule::isSubPropSyntaxValid(std::string const& subProperty, uint8
 	return true;
 }
 
-bool GetPropertyRule::isPropertyGroupValid(PropertyGroup2 const& propertyGroup, uint8 propertyIndex, std::string& out_errorDescription) const noexcept
+bool GetPropertyRule::isPropertyGroupValid(PropertyGroup const& propertyGroup, uint8 propertyIndex, std::string& out_errorDescription) const noexcept
 {
-	ComplexProperty2 const& complexProp = propertyGroup.complexProperties[propertyIndex];
+	ComplexProperty const& complexProp = propertyGroup.complexProperties[propertyIndex];
 
 	//Can't have * and & at the same time
 	if (std::find(complexProp.subProperties.cbegin(), complexProp.subProperties.cend(), "*") != complexProp.subProperties.cend() &&

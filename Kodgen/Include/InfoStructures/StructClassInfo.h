@@ -68,7 +68,7 @@ namespace kodgen
 
 			StructClassInfo()									noexcept;
 			StructClassInfo(CXCursor const&		cursor,
-							PropertyGroup2&&	propertyGroup,
+							PropertyGroup&&		propertyGroup,
 							EType&&				entityType)		noexcept;
 			StructClassInfo(StructClassInfo const&)				= default;
 			StructClassInfo(StructClassInfo&&)					= default;

@@ -37,7 +37,7 @@ namespace kodgen
 			*
 			*	@return A filled PropertyGroup if valid, else nullopt.
 			*/
-			opt::optional<PropertyGroup2>	getProperties(CXCursor const& cursor)				noexcept;
+			opt::optional<PropertyGroup>	getProperties(CXCursor const& cursor)				noexcept;
 
 			/**
 			*	@brief Fill the enum value result properties.

@@ -26,7 +26,7 @@ namespace kodgen
 
 			EnumInfo()									= default;
 			EnumInfo(CXCursor const& cursor,
-					 PropertyGroup2&& propertyGroup)	noexcept;
+					 PropertyGroup&& propertyGroup)		noexcept;
 			EnumInfo(EnumInfo const&)					= default;
 			EnumInfo(EnumInfo&&)						= default;
 			~EnumInfo()									= default;

@@ -9,7 +9,7 @@ using namespace kodgen;
 void EntityParser::updateShouldParseAllNested(EntityInfo const& parsingEntity) noexcept
 {
 	getContext().shouldParseAllNested = std::find_if(parsingEntity.properties.simpleProperties.cbegin(), parsingEntity.properties.simpleProperties.cend(),
-													 [](SimpleProperty2 const& prop) { return prop.mainProperty == NativeProperties::parseAllNestedProperty; })
+													 [](SimpleProperty const& prop) { return prop.mainProperty == NativeProperties::parseAllNestedProperty; })
 												!= parsingEntity.properties.simpleProperties.cend();
 }
 

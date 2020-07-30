@@ -19,7 +19,7 @@ bool SetPropertyRule::isSubPropSyntaxValid(std::string const& subProperty, uint8
 	return true;
 }
 
-bool SetPropertyRule::isPropertyGroupValid(PropertyGroup2 const& propertyGroup, uint8 propertyIndex, std::string& out_errorDescription) const noexcept
+bool SetPropertyRule::isPropertyGroupValid(PropertyGroup const& propertyGroup, uint8 propertyIndex, std::string& out_errorDescription) const noexcept
 {
 	return isUsedOnlyOnce(propertyGroup, propertyIndex, out_errorDescription);
 }

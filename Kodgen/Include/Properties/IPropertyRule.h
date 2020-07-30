@@ -10,7 +10,7 @@
 #include <string>
 
 #include "InfoStructures/EntityInfo.h"
-#include "Properties/PropertyGroup2.h"
+#include "Properties/PropertyGroup.h"
 #include "Misc/FundamentalTypes.h"
 
 namespace kodgen
@@ -42,7 +42,7 @@ namespace kodgen
 			*	@return true if the property group is valid, else false.
 			*			If false is returned, out_errorDescription must be filled with an error description.
 			*/
-			virtual bool	isPropertyGroupValid(PropertyGroup2 const&	propertyGroup,
+			virtual bool	isPropertyGroupValid(PropertyGroup const&	propertyGroup,
 												 uint8					propertyIndex,
 												 std::string&			out_errorDescription)	const noexcept = 0;
 

@@ -10,9 +10,8 @@
 #include <vector>
 #include <unordered_set>
 
-#include "Properties/PropertyRules.h"
-#include "Properties/SimplePropertyRule2.h"
-#include "Properties/ComplexPropertyRule2.h"
+#include "Properties/SimplePropertyRule.h"
+#include "Properties/ComplexPropertyRule.h"
 #include "Misc/TomlUtility.h"
 
 namespace kodgen
@@ -33,10 +32,10 @@ namespace kodgen
 			std::unordered_set<char>			ignoredCharacters;
 
 			/** Collection of all simple property rules. */
-			std::vector<SimplePropertyRule2*>	simplePropertyRules;
+			std::vector<SimplePropertyRule*>	simplePropertyRules;
 
 			/** Collection of all complex property rules. */
-			std::vector<ComplexPropertyRule2*>	complexPropertyRules;
+			std::vector<ComplexPropertyRule*>	complexPropertyRules;
 
 			/** Macro to use to attach properties to a namespace. */
 			std::string							namespaceMacroName		= "Namespace";

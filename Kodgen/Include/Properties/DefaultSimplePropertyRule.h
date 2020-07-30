@@ -10,11 +10,11 @@
 #include <string>
 #include <unordered_set>
 
-#include "Properties/SimplePropertyRule2.h"
+#include "Properties/SimplePropertyRule.h"
 
 namespace kodgen
 {
-	class DefaultSimplePropertyRule : public SimplePropertyRule2
+	class DefaultSimplePropertyRule : public SimplePropertyRule
 	{
 		protected:
 			/** Name the property should have to be considered valid. */

@@ -21,7 +21,7 @@ bool GenCodeTemplatePropertyRule::isSubPropSyntaxValid(std::string const& subPro
 	return true;
 }
 
-bool GenCodeTemplatePropertyRule::isPropertyGroupValid(PropertyGroup2 const& propertyGroup, uint8 propertyIndex, std::string& out_errorDescription) const noexcept
+bool GenCodeTemplatePropertyRule::isPropertyGroupValid(PropertyGroup const& propertyGroup, uint8 propertyIndex, std::string& out_errorDescription) const noexcept
 {
 	return	hasValidSubpropCount(propertyGroup, propertyIndex, 1u, out_errorDescription) &&
 			isUsedOnlyOnce(propertyGroup, propertyIndex, out_errorDescription);

@@ -35,7 +35,7 @@ namespace kodgen
 
 			FieldInfo()									= default;
 			FieldInfo(CXCursor const& cursor,
-					  PropertyGroup2&& propertyGroup)	noexcept;
+					  PropertyGroup&& propertyGroup)	noexcept;
 			FieldInfo(FieldInfo const&)					= default;
 			FieldInfo(FieldInfo&&)						= default;
 			~FieldInfo()								= default;

@@ -2,8 +2,8 @@
 
 using namespace kodgen;
 
-NamespaceInfo::NamespaceInfo(CXCursor const& cursor, PropertyGroup2&& propertyGroup) noexcept:
-	EntityInfo(cursor, std::forward<PropertyGroup2>(propertyGroup), EntityInfo::EType::Namespace)
+NamespaceInfo::NamespaceInfo(CXCursor const& cursor, PropertyGroup&& propertyGroup) noexcept:
+	EntityInfo(cursor, std::forward<PropertyGroup>(propertyGroup), EntityInfo::EType::Namespace)
 {
 }
 

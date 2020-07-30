@@ -22,17 +22,17 @@ CXChildVisitResult EnumParser::parse(CXCursor const& enumCursor, ParsingContext 
 		//Check if the parent has the shouldParseAllNested flag set
 		if (shouldParseCurrentEntity())
 		{
-			getParsingResult()->parsedEnum.emplace(enumCursor, PropertyGroup2());
+			getParsingResult()->parsedEnum.emplace(enumCursor, PropertyGroup());
 		}
 	}
-
-	popContext();
 
 	//Check properties validy one last time
 	if (out_result.parsedEnum.has_value())
 	{
 		performFinalPropertiesCheck(*out_result.parsedEnum);
 	}
+
+	popContext();
 
 	DISABLE_WARNING_PUSH
 	DISABLE_WARNING_UNSCOPED_ENUM
@@ -54,7 +54,7 @@ CXChildVisitResult EnumParser::parseNestedEntity(CXCursor cursor, CXCursor /* pa
 		if (parser->shouldParseCurrentEntity() && cursor.kind != CXCursorKind::CXCursor_AnnotateAttr)
 		{
 			//Make it valid right away so init the result
-			parser->getParsingResult()->parsedEnum.emplace(context.rootCursor, PropertyGroup2());
+			parser->getParsingResult()->parsedEnum.emplace(context.rootCursor, PropertyGroup());
 		}
 		else
 		{
@@ -87,7 +87,7 @@ EnumValueParsingResult EnumParser::parseEnumValue(CXCursor const& enumValueCurso
 	return enumValueResult;
 }
 
-opt::optional<PropertyGroup2> EnumParser::getProperties(CXCursor const& cursor) noexcept
+opt::optional<PropertyGroup> EnumParser::getProperties(CXCursor const& cursor) noexcept
 {
 	ParsingContext& context = getContext();
 
@@ -105,7 +105,7 @@ CXChildVisitResult EnumParser::setParsedEntity(CXCursor const& annotationCursor)
 {
 	ParsingContext& context = getContext();
 
-	if (opt::optional<PropertyGroup2> propertyGroup = getProperties(annotationCursor))
+	if (opt::optional<PropertyGroup> propertyGroup = getProperties(annotationCursor))
 	{
 		//Set the parsing entity in the result and update the shouldParseAllNested flag in the context
 		updateShouldParseAllNested(getParsingResult()->parsedEnum.emplace(context.rootCursor, std::move(*propertyGroup)));

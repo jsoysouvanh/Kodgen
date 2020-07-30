@@ -20,13 +20,13 @@ CXChildVisitResult EnumValueParser::parse(CXCursor const& enumValueCursor, Parsi
 
 	clang_visitChildren(enumValueCursor, &EnumValueParser::parseNestedEntity, this);
 
-	popContext();
-
 	//Check properties validy one last time
 	if (out_result.parsedEnumValue.has_value())
 	{
 		performFinalPropertiesCheck(*out_result.parsedEnumValue);
 	}
+
+	popContext();
 
 	DISABLE_WARNING_PUSH
 	DISABLE_WARNING_UNSCOPED_ENUM
@@ -43,7 +43,7 @@ CXChildVisitResult EnumValueParser::parseNestedEntity(CXCursor cursor, CXCursor 
 	return CXChildVisitResult::CXChildVisit_Break;
 }
 
-opt::optional<PropertyGroup2> EnumValueParser::getProperties(CXCursor const& cursor) noexcept
+opt::optional<PropertyGroup> EnumValueParser::getProperties(CXCursor const& cursor) noexcept
 {
 	ParsingContext& context = getContext();
 
@@ -61,7 +61,7 @@ void EnumValueParser::setProperties(CXCursor const& annotationCursor) noexcept
 {
 	ParsingContext& context = getContext();
 
-	if (opt::optional<PropertyGroup2> propertyGroup = getProperties(annotationCursor))
+	if (opt::optional<PropertyGroup> propertyGroup = getProperties(annotationCursor))
 	{
 		getParsingResult()->parsedEnumValue->properties = std::move(*propertyGroup);
 	}

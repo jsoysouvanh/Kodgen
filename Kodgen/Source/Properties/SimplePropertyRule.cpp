@@ -2,23 +2,17 @@
 
 using namespace kodgen;
 
-SimplePropertyRule::SimplePropertyRule(std::string&& name) noexcept:
-	name{std::forward<std::string>(name)}
-{}
-
-bool SimplePropertyRule::hasSameName(SimplePropertyRule const& other) const noexcept
+bool SimplePropertyRule::isUsedOnlyOnce(PropertyGroup const& propertyGroup, uint8 propertyIndex, std::string& out_errorDescription) const noexcept
 {
-	return name == other.name;
-}
+	for (uint8 i = 0u; i < propertyGroup.simpleProperties.size(); i++)
+	{
+		if (i != propertyIndex && propertyGroup.simpleProperties[i].boundPropertyRule == this)
+		{
+			out_errorDescription = "The property \"" + propertyGroup.simpleProperties[i].mainProperty + "\" is used more than once in the property group.";
 
-bool SimplePropertyRule::operator<(SimplePropertyRule const& other) const
-{
-	return name < other.name;
-}
+			return false;
+		}
+	}
 
-std::ostream& kodgen::operator<<(std::ostream& out_stream, SimplePropertyRule const& simpleProp) noexcept
-{
-	out_stream << simpleProp.name;
-
-	return out_stream;
+	return true;
 }
