@@ -17,6 +17,9 @@ add_library(${KodgenTargetLibrary}
 					Source/Properties/SimplePropertyRule.cpp
 					Source/Properties/ComplexPropertyRule.cpp
 					Source/Properties/DefaultSimplePropertyRule.cpp
+					Source/Properties/DefaultComplexPropertyRule.cpp
+					Source/Properties/ComplexPropertySubProperty.cpp
+					Source/Properties/FixedComplexPropertyRule.cpp
 
 					Source/Properties/NativeProperties/ParseAllNestedPropertyRule.cpp
 					Source/Properties/NativeProperties/GenCodeTemplatePropertyRule.cpp
