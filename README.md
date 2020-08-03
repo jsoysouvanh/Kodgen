@@ -118,7 +118,7 @@ else
     -   If you're compiling your project in debug mode, you will also probably need the debug version of Kodgen:
         -   cmake -B Build/Debug -DCMAKE_BUILD_TYPE=Debug -G "\<Generator\>"
         -   cmake --build Build/Debug --config Debug --target Kodgen
-    -   You will find the libclang.dll in Build/[Debug|Release]/Bin/ and the library in Build/[Debug|Release]/Lib/
+    -   You will find libclang.dll in Build/[Debug|Release]/Bin/ and Kodgen.lib in Build/[Debug|Release]/Lib/
         
         > **Note:** On multiple configuration generators such as Visual Studio or XCode, an additional Debug/Release folder is generated.
         
@@ -140,7 +140,6 @@ else
 
 ### Possible issues
 #### Issue 1
-
 -   If you compile your program in debug mode, your compiler might complain about library / debug level mismatchs. In that case, make sure to compile the Kodgen library both in Debug and Release, and link against the debug version of the library when compiling your program in debug mode.
     
     > With CMake:
