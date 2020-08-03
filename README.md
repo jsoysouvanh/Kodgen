@@ -1,3 +1,4 @@
+
 # Kodgen
 
 [![Latest Release](https://badge.fury.io/gh/jsoysouvanh%2FKodgen.svg)](https://github.com/jsoysouvanh/Kodgen/releases/latest)
@@ -104,7 +105,7 @@ else
 1.  Pull the repository
 2.  Compile the library following these steps:
     -   At the root of the Kodgen project, open a terminal
-        -   cmake -B Build/Release -DCMAKE_BUILD_TYPE=Release -G "<Generator>" -A x64
+        -   cmake -B Build/Release -DCMAKE_BUILD_TYPE=Release -G "\<Generator\>"
             
             > Most common generators include:
             > 
@@ -115,28 +116,27 @@ else
             
         -   cmake --build Build/Release --config Release --target Kodgen
     -   If you're compiling your project in debug mode, you will also probably need the debug version of Kodgen:
-        -   cmake -B Build/Debug -DCMAKE_BUILD_TYPE=Debug -G "<Generator>" -A x64
+        -   cmake -B Build/Debug -DCMAKE_BUILD_TYPE=Debug -G "\<Generator\>"
         -   cmake --build Build/Debug --config Debug --target Kodgen
     -   You will find the libclang.dll in Build/[Debug|Release]/Bin/ and the library in Build/[Debug|Release]/Lib/
         
         > **Note:** On multiple configuration generators such as Visual Studio or XCode, an additional Debug/Release folder is generated.
         
-3.  In your project settings, add the Kodgen headers directory to the include directories. If you compiled the library yourself, the headers directory is located at /Kodgen/Include. If you downloaded the binaries, the headers directory is the Include directory.
+3.  Add necessary header directories to your project settings:
+    - Kodgen header directory, located at /Kodgen/Include, or /Include if you downloaded the binaries.
+    - Third party libraries header directory, located at /Kodgen/ThirdParty/Include, or /ThirdParty/Include if you downloaded the binaries.
 
-4.  Link against Kodgen.lib. Make sure to use the Debug version of the library if you compile your project in Debug mode to prevent [this issue](#issue-1).
-    
-    -   With CMake, it would look like this:
-    ```cmake
-    # Add Kodgen Include directory
-    target_include_directories(YourExecutable PRIVATE Path/To/Kodgen/Kodgen/Include)
-    
-    # Link against Kodgen library
-    target_link_directories(YourExecutable PRIVATE Path/To/Kodgen/Library)
-    target_link_libraries(YourExecutable PRIVATE $<IF:$<CONFIG:Debug>,KodgenDebug,KodgenRelease>)
-    ``` 
-5.  Make sure you compile your project in C++17 or later.
-6.  Compile!
-7.  Before running your program, make sure that the libclang.dll library is located next to your executable. If you encounter errors, see the [Possible issues section](#possible-issues). If it doesn't help, don't hesitate to [open a new issue](https://github.com/jsoysouvanh/Kodgen/issues).
+4.  Add library directories to your projet settings:
+    - The directory containing Kodgen.lib, located at /Build/[Debug|Release]/Lib/, or /Lib if you downloaded the binaries.
+    - The directory containing third party libraries, located at /Kodgen/ThirdParty/x64/Static, or /ThirdParty/x64/Static if you downloaded the binaries.
+
+5.  Link against:
+    - Kodgen.lib. Make sure to use the Debug version of the library if you compile your project in Debug mode to prevent [this issue](#issue-1).
+    - clang.lib
+
+7.  Make sure you compile your project in C++17 or later.
+8.  Compile!
+9.  Before running your program, make sure that the libclang dynamic library is located next to your executable. You should find it at /Kodgen/ThirdParty/Libraries/x64/Shared (or /ThirdParty/Libraries/x64/Shared from binaries). If you encounter errors, see the [Possible issues section](#possible-issues). If it doesn't help, don't hesitate to [open a new issue](https://github.com/jsoysouvanh/Kodgen/issues).
 
 ### Possible issues
 #### Issue 1
