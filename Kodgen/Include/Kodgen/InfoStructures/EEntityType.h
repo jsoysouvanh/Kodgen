@@ -22,9 +22,10 @@ namespace kodgen
 		Struct		= 1 << 1,
 		Enum		= 1 << 2,
 		Field		= 1 << 3,
-		Method		= 1 << 4,
-		EnumValue	= 1 << 5,
-		Namespace	= 1 << 6
+		Function	= 1 << 4,
+		Method		= 1 << 5,
+		EnumValue	= 1 << 6,
+		Namespace	= 1 << 7
 	};
 
 	inline EEntityType operator|(EEntityType flags1, EEntityType flags2)

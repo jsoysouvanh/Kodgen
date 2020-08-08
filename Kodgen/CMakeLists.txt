@@ -27,6 +27,7 @@ add_library(${KodgenTargetLibrary}
 					Source/InfoStructures/EntityInfo.cpp
 					Source/InfoStructures/NamespaceInfo.cpp
 					Source/InfoStructures/FieldInfo.cpp
+					Source/InfoStructures/FunctionInfo.cpp
 					Source/InfoStructures/MethodInfo.cpp
 					Source/InfoStructures/StructClassInfo.cpp
 					Source/InfoStructures/NestedStructClassInfo.cpp
@@ -41,6 +42,7 @@ add_library(${KodgenTargetLibrary}
 					Source/Parsing/NamespaceParser.cpp
 					Source/Parsing/ClassParser.cpp
 					Source/Parsing/FieldParser.cpp
+					Source/Parsing/FunctionParser.cpp
 					Source/Parsing/MethodParser.cpp
 					Source/Parsing/EnumParser.cpp
 					Source/Parsing/EnumValueParser.cpp
