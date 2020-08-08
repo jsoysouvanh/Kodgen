@@ -22,21 +22,21 @@ namespace kodgen
 
 		protected:
 			/** Name the property should have to be considered valid. */
-			std::string						mainPropName;
+			std::string	mainPropName;
 
-			/** Entities for which this property rule is valid. */
-			std::unordered_set<EEntityType>	validEntityTypes;
+			/** EEntityType bitmask defining valid entities (bit it set for valid entities). */
+			EEntityType	validEntityTypes;
 
 			virtual std::string	getMacroDocumentation()	const noexcept override;
 
 		public:
-			DefaultComplexPropertyRule()															= delete;
-			DefaultComplexPropertyRule(std::string								mainPropName,
-									   std::unordered_set<EEntityType>	validEntityTypes,
-									   std::string								description = "")	noexcept;
-			DefaultComplexPropertyRule(DefaultComplexPropertyRule const&)							= default;
-			DefaultComplexPropertyRule(DefaultComplexPropertyRule&&)								= default;
-			virtual ~DefaultComplexPropertyRule()													= default;
+			DefaultComplexPropertyRule()									= delete;
+			DefaultComplexPropertyRule(std::string	mainPropName,
+									   EEntityType	validEntityTypes,
+									   std::string	description = "")		noexcept;
+			DefaultComplexPropertyRule(DefaultComplexPropertyRule const&)	= default;
+			DefaultComplexPropertyRule(DefaultComplexPropertyRule&&)		= default;
+			virtual ~DefaultComplexPropertyRule()							= default;
 
 			virtual bool		isMainPropSyntaxValid(std::string const&	mainProperty,
 													  EEntityType			entityType)	const noexcept override;

@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <type_traits>
+
 namespace kodgen
 {
 	/**
@@ -24,4 +26,18 @@ namespace kodgen
 		EnumValue	= 1 << 5,
 		Namespace	= 1 << 6
 	};
+
+	inline EEntityType operator|(EEntityType flags1, EEntityType flags2)
+	{
+		using UnderlyingType = std::underlying_type_t<EEntityType>;
+
+		return static_cast<EEntityType>(static_cast<UnderlyingType>(flags1) | static_cast<UnderlyingType>(flags2));
+	}
+
+	inline EEntityType operator&(EEntityType flags1, EEntityType flags2)
+	{
+		using UnderlyingType = std::underlying_type_t<EEntityType>;
+
+		return static_cast<EEntityType>(static_cast<UnderlyingType>(flags1) & static_cast<UnderlyingType>(flags2));
+	}
 }
