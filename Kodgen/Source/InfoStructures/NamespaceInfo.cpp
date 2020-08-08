@@ -32,4 +32,15 @@ void NamespaceInfo::refreshOuterEntity() noexcept
 		enumInfo.refreshOuterEntity();
 		enumInfo.outerEntity = this;
 	}
+
+	for (FunctionInfo& functionInfo : functions)
+	{
+		functionInfo.outerEntity = this;
+	}
+
+	//TODO
+	/*for (VariableInfo& variableInfo : variables)
+	{
+		variableInfo.outerEntity = this;
+	}*/
 }

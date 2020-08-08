@@ -107,9 +107,8 @@ opt::optional<PropertyGroup> FunctionParser::getProperties(CXCursor const& curso
 
 	context.propertyParser->clean();
 	
-	//TODO: Change this by getFunctionProperties
 	return (clang_getCursorKind(cursor) == CXCursorKind::CXCursor_AnnotateAttr) ?
-		context.propertyParser->getMethodProperties(Helpers::getString(clang_getCursorSpelling(cursor))) :
+		context.propertyParser->getFunctionProperties(Helpers::getString(clang_getCursorSpelling(cursor))) :
 		opt::nullopt;
 }
 

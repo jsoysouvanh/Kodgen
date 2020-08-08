@@ -34,6 +34,7 @@ namespace kodgen
 			std::string						_classPropertyMacro;
 			std::string						_structPropertyMacro;
 			std::string						_fieldPropertyMacro;
+			std::string						_functionPropertyMacro;
 			std::string						_methodPropertyMacro;
 			std::string						_enumPropertyMacro;
 			std::string						_enumValuePropertyMacro;
@@ -97,6 +98,13 @@ namespace kodgen
 			*	@param result EnumParsingResult to add.
 			*/
 			void						addEnumResult(EnumParsingResult&& result)						noexcept;
+
+			/**
+			*	@brief Add the provided function result to the current file context result.
+			*
+			*	@param result FunctionParsingResult to add.
+			*/
+			void						addFunctionResult(FunctionParsingResult&& result)				noexcept;
 
 			/**
 			*	@brief Refresh outer entities of the passed FileParsingResult.

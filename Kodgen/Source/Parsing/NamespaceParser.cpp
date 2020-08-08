@@ -87,8 +87,8 @@ CXChildVisitResult NamespaceParser::parseNestedEntity(CXCursor cursor, CXCursor 
 			//TODO: return parser->parseField(cursor);
 			break;
 
-		case CXCursorKind::CXCursor_CXXMethod:
-			//TODO: return parser->parseMethod(cursor);
+		case CXCursorKind::CXCursor_FunctionDecl:
+			parser->addFunctionResult(parser->parseFunction(cursor, visitResult));
 			break;
 
 		default:
@@ -105,6 +105,15 @@ NamespaceParsingResult NamespaceParser::parseNamespace(CXCursor const& namespace
 	out_visitResult	= NamespaceParser::parse(namespaceCursor, getContext(), namespaceResult);
 
 	return namespaceResult;
+}
+
+FunctionParsingResult NamespaceParser::parseFunction(CXCursor const& functionCursor, CXChildVisitResult& out_visitResult) noexcept
+{
+	FunctionParsingResult functionResult;
+
+	out_visitResult = _functionParser.parse(functionCursor, getContext(), functionResult);
+
+	return functionResult;
 }
 
 ParsingContext& NamespaceParser::pushContext(CXCursor const& namespaceCursor, ParsingContext const& parentContext, NamespaceParsingResult& out_result) noexcept
@@ -203,6 +212,20 @@ void NamespaceParser::addEnumResult(EnumParsingResult&& result) noexcept
 	if (result.parsedEnum.has_value() && getParsingResult()->parsedNamespace.has_value())
 	{
 		getParsingResult()->parsedNamespace->enums.emplace_back(std::move(result.parsedEnum).value());
+	}
+
+	//Append errors if any
+	if (!result.errors.empty())
+	{
+		getContext().parsingResult->errors.insert(getParsingResult()->errors.cend(), std::make_move_iterator(result.errors.cbegin()), std::make_move_iterator(result.errors.cend()));
+	}
+}
+
+void NamespaceParser::addFunctionResult(FunctionParsingResult&& result) noexcept
+{
+	if (result.parsedFunction.has_value() && getParsingResult()->parsedNamespace.has_value())
+	{
+		getParsingResult()->parsedNamespace->functions.emplace_back(std::move(result.parsedFunction).value());
 	}
 
 	//Append errors if any

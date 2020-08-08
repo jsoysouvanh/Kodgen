@@ -30,6 +30,7 @@ CppPropsParser::CppPropsParser() noexcept:
 	parsingSettings.propertyParsingSettings.classMacroName		= "KGClass";
 	parsingSettings.propertyParsingSettings.structMacroName		= "KGStruct";
 	parsingSettings.propertyParsingSettings.fieldMacroName		= "KGField";
+	parsingSettings.propertyParsingSettings.functionMacroName	= "KGFunction";
 	parsingSettings.propertyParsingSettings.methodMacroName		= "KGMethod";
 	parsingSettings.propertyParsingSettings.enumMacroName		= "KGEnum";
 	parsingSettings.propertyParsingSettings.enumValueMacroName	= "KGEnumVal";

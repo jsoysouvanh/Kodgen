@@ -446,7 +446,8 @@ void FileGenerator::generateMacrosFile(FileParser& parser) const noexcept
 									"#define " + pps.fieldMacroName		+ "(...)",
 									"#define " + pps.methodMacroName	+ "(...)",
 									"#define " + pps.enumMacroName		+ "(...)",
-									"#define " + pps.enumValueMacroName	+ "(...)");
+									"#define " + pps.enumValueMacroName	+ "(...)",
+									"#define " + pps.functionMacroName	+ "(...)");
 
 	//Generate property rules macros + doc
 	std::string macroDefinition;

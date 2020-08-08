@@ -110,8 +110,13 @@ CXChildVisitResult FileParser::parseNestedEntity(CXCursor cursor, CXCursor /* pa
 				parser->addEnumResult(parser->parseEnum(cursor, visitResult));
 				break;
 
-			//TODO: Handle global variables
-			//TODO: Handle free functions
+			case CXCursorKind::CXCursor_FunctionDecl:
+				parser->addFunctionResult(parser->parseFunction(cursor, visitResult));
+				break;
+
+			case CXCursorKind::CXCursor_VarDecl:
+				//TODO: Handle variables
+				break;
 
 			default:
 				break;
@@ -193,6 +198,20 @@ void FileParser::addEnumResult(EnumParsingResult&& result) noexcept
 	}
 }
 
+void FileParser::addFunctionResult(FunctionParsingResult&& result) noexcept
+{
+	if (result.parsedFunction.has_value())
+	{
+		getParsingResult()->functions.emplace_back(std::move(result.parsedFunction).value());
+	}
+
+	//Append errors if any
+	if (!result.errors.empty())
+	{
+		getContext().parsingResult->errors.insert(getParsingResult()->errors.cend(), std::make_move_iterator(result.errors.cbegin()), std::make_move_iterator(result.errors.cend()));
+	}
+}
+
 void FileParser::refreshOuterEntity(FileParsingResult& out_result) const noexcept
 {
 	for (NamespaceInfo& namespaceInfo : out_result.namespaces)
@@ -236,6 +255,7 @@ void FileParser::refreshBuildCommandStrings() noexcept
 	_classPropertyMacro		= "-D" + parsingSettings.propertyParsingSettings.classMacroName		+ "(...)=__attribute__((annotate(\"KGC:\"#__VA_ARGS__)))";
 	_structPropertyMacro	= "-D" + parsingSettings.propertyParsingSettings.structMacroName	+ "(...)=__attribute__((annotate(\"KGS:\"#__VA_ARGS__)))";
 	_fieldPropertyMacro		= "-D" + parsingSettings.propertyParsingSettings.fieldMacroName		+ "(...)=__attribute__((annotate(\"KGF:\"#__VA_ARGS__)))";
+	_functionPropertyMacro	= "-D" + parsingSettings.propertyParsingSettings.functionMacroName	+ "(...)=__attribute__((annotate(\"KGFu:\"#__VA_ARGS__)))";
 	_methodPropertyMacro	= "-D" + parsingSettings.propertyParsingSettings.methodMacroName	+ "(...)=__attribute__((annotate(\"KGM:\"#__VA_ARGS__)))";
 	_enumPropertyMacro		= "-D" + parsingSettings.propertyParsingSettings.enumMacroName		+ "(...)=__attribute__((annotate(\"KGE:\"#__VA_ARGS__)))";
 	_enumValuePropertyMacro	= "-D" + parsingSettings.propertyParsingSettings.enumValueMacroName	+ "(...)=__attribute__((annotate(\"KGEV:\"#__VA_ARGS__)))";
@@ -259,9 +279,9 @@ std::vector<char const*> FileParser::makeCompilationArguments() noexcept
 	*	3 to include -xc++, -std=c++1z & _kodgenParsingMacro
 	*
 	*	7 because we make an additional parameter per possible entity
-	*	Namespace, Class, Struct, Field, Method, Enum, EnumValue
+	*	Namespace, Class, Struct, Field, Function, Method, Enum, EnumValue
 	*/
-	result.reserve(3u + 7u + _projectIncludeDirs.size());
+	result.reserve(3u + 8u + _projectIncludeDirs.size());
 
 	//Parsing C++
 	result.emplace_back("-xc++");
@@ -277,6 +297,7 @@ std::vector<char const*> FileParser::makeCompilationArguments() noexcept
 	result.emplace_back(_structPropertyMacro.data());
 	result.emplace_back(_fieldPropertyMacro.data());
 	result.emplace_back(_methodPropertyMacro.data());
+	result.emplace_back(_functionPropertyMacro.data());
 	result.emplace_back(_enumPropertyMacro.data());
 	result.emplace_back(_enumValuePropertyMacro.data());
 
