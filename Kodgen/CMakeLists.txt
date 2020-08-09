@@ -26,6 +26,7 @@ add_library(${KodgenTargetLibrary}
 
 					Source/InfoStructures/EntityInfo.cpp
 					Source/InfoStructures/NamespaceInfo.cpp
+					Source/InfoStructures/VariableInfo.cpp
 					Source/InfoStructures/FieldInfo.cpp
 					Source/InfoStructures/FunctionInfo.cpp
 					Source/InfoStructures/MethodInfo.cpp

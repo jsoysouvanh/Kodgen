@@ -14,7 +14,7 @@
 
 namespace kodgen
 {
-	class MethodInfo : public FunctionInfo
+	class MethodInfo final : public FunctionInfo
 	{
 		public:
 			/** Access of this method in its outer struct/class. */
