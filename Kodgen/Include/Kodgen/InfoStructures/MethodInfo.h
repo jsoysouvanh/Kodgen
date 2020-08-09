@@ -23,9 +23,6 @@ namespace kodgen
 			/** Is this method defaulted or not. */
 			bool				isDefault		: 1;
 
-			/** Is this method static or not. */
-			bool				isStatic		: 1;
-
 			/** Is this method virtual or not. */
 			bool				isVirtual		: 1;
 

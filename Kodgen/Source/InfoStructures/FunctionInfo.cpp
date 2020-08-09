@@ -25,6 +25,9 @@ FunctionInfo::FunctionInfo(CXCursor const& cursor, PropertyGroup&& propertyGroup
 FunctionInfo::FunctionInfo(CXCursor const& cursor, PropertyGroup&& propertyGroup) noexcept:
 	FunctionInfo(cursor, std::forward<PropertyGroup>(propertyGroup), EEntityType::Function)
 {
+	assert(cursor.kind == CXCursorKind::CXCursor_FunctionDecl);
+
+	isStatic = clang_getCursorLinkage(cursor) == CXLinkage_Internal;
 }
 
 std::string FunctionInfo::getName() const noexcept

@@ -38,6 +38,9 @@ namespace kodgen
 			/** Is this function inline or not. */
 			bool isInline	: 1;
 
+			/** Is this function static or not. */
+			bool isStatic	: 1;
+
 			FunctionInfo()									= default;
 			FunctionInfo(CXCursor const&	cursor,
 						 PropertyGroup&&	propertyGroup)	noexcept;
