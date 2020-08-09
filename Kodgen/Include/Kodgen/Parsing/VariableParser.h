@@ -10,12 +10,12 @@
 #include <clang-c/Index.h>
 
 #include "Kodgen/Parsing/EntityParser.h"
-#include "Kodgen/Parsing/ParsingResults/FunctionParsingResult.h"
+#include "Kodgen/Parsing/ParsingResults/VariableParsingResult.h"
 #include "Kodgen/Misc/Optional.h"
 
 namespace kodgen
 {
-	class FunctionParser : public EntityParser
+	class VariableParser final : public EntityParser
 	{
 		private:
 			/**
@@ -41,18 +41,18 @@ namespace kodgen
 			opt::optional<PropertyGroup>	getProperties(CXCursor const& cursor)					noexcept;
 
 			/**
-			*	@brief Set the parsed function if it is a valid one.
+			*	@brief Set the parsed variable if it is a valid one.
 			*
-			*	@param annotationCursor The cursor used to check function validity.
+			*	@param annotationCursor The cursor used to check variable validity.
 			*
 			*	@return An enum which indicates how to choose the next cursor to parse in the AST.
 			*/
 			CXChildVisitResult				setParsedEntity(CXCursor const& annotationCursor)		noexcept;
 
 			/**
-			*	@brief Push a new clean context to prepare function parsing.
+			*	@brief Push a new clean context to prepare variable parsing.
 			*
-			*	@param methodCursor		Root cursor of the function to parse.
+			*	@param methodCursor		Root cursor of the variable to parse.
 			*	@param parentContext	Context the new context will inherit from.
 			*	@param out_result		Result to fill during parsing.
 			*
@@ -60,34 +60,34 @@ namespace kodgen
 			*/
 			ParsingContext&					pushContext(CXCursor const&			methodCursor,
 														ParsingContext const&	parentContext,
-														FunctionParsingResult&	out_result)			noexcept;
+														VariableParsingResult&	out_result)			noexcept;
 
 			/**
-			*	@brief Helper to get the ParsingResult contained in the context as a MethodParsingResult.
+			*	@brief Helper to get the ParsingResult contained in the context as a VariableParsingResult.
 			*
-			*	@return The cast MethodParsingResult.
+			*	@return The cast VariableParsingResult.
 			*/
-			inline FunctionParsingResult*	getParsingResult()										noexcept;
+			inline VariableParsingResult*	getParsingResult()										noexcept;
 
 		public:
-			FunctionParser()						= default;
-			FunctionParser(FunctionParser const&)	= default;
-			FunctionParser(FunctionParser&&)		= default;
-			~FunctionParser()						= default;
+			VariableParser()						= default;
+			VariableParser(VariableParser const&)	= default;
+			VariableParser(VariableParser&&)		= default;
+			~VariableParser()						= default;
 
 			/**
-			*	@brief Parse the function starting at the provided AST cursor.
+			*	@brief Parse the variable starting at the provided AST cursor.
 			*
-			*	@param functionCursor	AST cursor to the function to parse.
+			*	@param variableCursor	AST cursor to the variable to parse.
 			*	@param parentContext	Context the new context will inherit from.
-			*	@param out_result		Result filled while parsing the function.
+			*	@param out_result		Result filled while parsing the variable.
 			*
 			*	@return An enum which indicates how to choose the next cursor to parse in the AST.
 			*/
-			CXChildVisitResult	parse(CXCursor const&			functionCursor,
+			CXChildVisitResult	parse(CXCursor const&			variableCursor,
 									  ParsingContext const&		parentContext,
-									  FunctionParsingResult&	out_result)			noexcept;
+									  VariableParsingResult&	out_result)			noexcept;
 	};
 
-	#include "Kodgen/Parsing/FunctionParser.inl"
+	#include "Kodgen/Parsing/VariableParser.inl"
 }

@@ -169,6 +169,16 @@ namespace kodgen
 			opt::optional<PropertyGroup>	getStructProperties(std::string annotateMessage)		noexcept;
 			
 			/**
+			*	@brief Retrieve the properties from a variable annotate attribute.
+			*
+			*	@param annotateMessage The string we retrieve the properties from.
+			*	
+			*	@return A valid optional object if all properties were valid, else an empty optional.
+			*			On failure, _parsingErrorDescription is updated.
+			*/
+			opt::optional<PropertyGroup>	getVariableProperties(std::string annotateMessage)		noexcept;
+
+			/**
 			*	@brief Retrieve the properties from a field annotate attribute.
 			*
 			*	@param annotateMessage The string we retrieve the properties from.

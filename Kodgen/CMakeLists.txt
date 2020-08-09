@@ -42,6 +42,7 @@ add_library(${KodgenTargetLibrary}
 					Source/Parsing/EntityParser.cpp
 					Source/Parsing/NamespaceParser.cpp
 					Source/Parsing/ClassParser.cpp
+					Source/Parsing/VariableParser.cpp
 					Source/Parsing/FieldParser.cpp
 					Source/Parsing/FunctionParser.cpp
 					Source/Parsing/MethodParser.cpp

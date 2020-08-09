@@ -46,6 +46,9 @@ namespace kodgen
 			/** Macro to use to attach properties to a struct. */
 			std::string							structMacroName			= "Struct";
 
+			/** Macro to use to attach properties to a variable (non-member). */
+			std::string							variableMacroName		= "Variable";
+
 			/** Macro to use to attach properties to a field. */
 			std::string							fieldMacroName			= "Field";
 

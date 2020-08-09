@@ -443,6 +443,7 @@ void FileGenerator::generateMacrosFile(FileParser& parser) const noexcept
 									"#define " + pps.namespaceMacroName	+ "(...)",
 									"#define " + pps.classMacroName		+ "(...)",
 									"#define " + pps.structMacroName	+ "(...)",
+									"#define " + pps.variableMacroName	+ "(...)",
 									"#define " + pps.fieldMacroName		+ "(...)",
 									"#define " + pps.methodMacroName	+ "(...)",
 									"#define " + pps.enumMacroName		+ "(...)",

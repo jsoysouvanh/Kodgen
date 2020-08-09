@@ -254,6 +254,7 @@ void FileParser::refreshBuildCommandStrings() noexcept
 	_namespacePropertyMacro	= "-D" + parsingSettings.propertyParsingSettings.namespaceMacroName	+ "(...)=__attribute__((annotate(\"KGN:\"#__VA_ARGS__)))";
 	_classPropertyMacro		= "-D" + parsingSettings.propertyParsingSettings.classMacroName		+ "(...)=__attribute__((annotate(\"KGC:\"#__VA_ARGS__)))";
 	_structPropertyMacro	= "-D" + parsingSettings.propertyParsingSettings.structMacroName	+ "(...)=__attribute__((annotate(\"KGS:\"#__VA_ARGS__)))";
+	_variablePropertyMacro	= "-D" + parsingSettings.propertyParsingSettings.structMacroName	+ "(...)=__attribute__((annotate(\"KGV:\"#__VA_ARGS__)))";
 	_fieldPropertyMacro		= "-D" + parsingSettings.propertyParsingSettings.fieldMacroName		+ "(...)=__attribute__((annotate(\"KGF:\"#__VA_ARGS__)))";
 	_functionPropertyMacro	= "-D" + parsingSettings.propertyParsingSettings.functionMacroName	+ "(...)=__attribute__((annotate(\"KGFu:\"#__VA_ARGS__)))";
 	_methodPropertyMacro	= "-D" + parsingSettings.propertyParsingSettings.methodMacroName	+ "(...)=__attribute__((annotate(\"KGM:\"#__VA_ARGS__)))";
@@ -278,10 +279,10 @@ std::vector<char const*> FileParser::makeCompilationArguments() noexcept
 	/**
 	*	3 to include -xc++, -std=c++1z & _kodgenParsingMacro
 	*
-	*	7 because we make an additional parameter per possible entity
-	*	Namespace, Class, Struct, Field, Function, Method, Enum, EnumValue
+	*	9 because we make an additional parameter per possible entity
+	*	Namespace, Class, Struct, Variable, Field, Function, Method, Enum, EnumValue
 	*/
-	result.reserve(3u + 8u + _projectIncludeDirs.size());
+	result.reserve(3u + 9u + _projectIncludeDirs.size());
 
 	//Parsing C++
 	result.emplace_back("-xc++");
@@ -295,6 +296,7 @@ std::vector<char const*> FileParser::makeCompilationArguments() noexcept
 	result.emplace_back(_namespacePropertyMacro.data());
 	result.emplace_back(_classPropertyMacro.data());
 	result.emplace_back(_structPropertyMacro.data());
+	result.emplace_back(_variablePropertyMacro.data());
 	result.emplace_back(_fieldPropertyMacro.data());
 	result.emplace_back(_methodPropertyMacro.data());
 	result.emplace_back(_functionPropertyMacro.data());

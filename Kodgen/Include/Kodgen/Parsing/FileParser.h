@@ -33,6 +33,7 @@ namespace kodgen
 			std::string						_namespacePropertyMacro;
 			std::string						_classPropertyMacro;
 			std::string						_structPropertyMacro;
+			std::string						_variablePropertyMacro;
 			std::string						_fieldPropertyMacro;
 			std::string						_functionPropertyMacro;
 			std::string						_methodPropertyMacro;
