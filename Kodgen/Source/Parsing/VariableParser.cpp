@@ -8,21 +8,21 @@
 
 using namespace kodgen;
 
-CXChildVisitResult VariableParser::parse(CXCursor const& functionCursor, ParsingContext const& parentContext, VariableParsingResult& out_result) noexcept
+CXChildVisitResult VariableParser::parse(CXCursor const& variableCursor, ParsingContext const& parentContext, VariableParsingResult& out_result) noexcept
 {
 	//Make sure the cursor is compatible for the variable parser
-	assert(functionCursor.kind == CXCursorKind::CXCursor_VarDecl);
+	assert(variableCursor.kind == CXCursorKind::CXCursor_VarDecl);
 
 	//Init context
-	ParsingContext& context = pushContext(functionCursor, parentContext, out_result);
+	ParsingContext& context = pushContext(variableCursor, parentContext, out_result);
 
-	if (!clang_visitChildren(functionCursor, &VariableParser::parseNestedEntity, this) && context.shouldCheckProperties)
+	if (!clang_visitChildren(variableCursor, &VariableParser::parseNestedEntity, this) && context.shouldCheckProperties)
 	{
 		//If we reach this point, the cursor had no child (no annotation)
 		//Check if the parent has the shouldParseAllNested flag set
 		if (shouldParseCurrentEntity())
 		{
-			getParsingResult()->parsedVariable.emplace(functionCursor, PropertyGroup());
+			getParsingResult()->parsedVariable.emplace(variableCursor, PropertyGroup());
 		}
 	}
 
@@ -35,9 +35,9 @@ CXChildVisitResult VariableParser::parse(CXCursor const& functionCursor, Parsing
 	popContext();
 
 	DISABLE_WARNING_PUSH
-		DISABLE_WARNING_UNSCOPED_ENUM
+	DISABLE_WARNING_UNSCOPED_ENUM
 
-		return (parentContext.parsingSettings->shouldAbortParsingOnFirstError && !out_result.errors.empty()) ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
+	return (parentContext.parsingSettings->shouldAbortParsingOnFirstError && !out_result.errors.empty()) ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
 
 	DISABLE_WARNING_POP
 }
@@ -58,7 +58,7 @@ CXChildVisitResult VariableParser::parseNestedEntity(CXCursor cursor, CXCursor /
 		}
 		else
 		{
-			//Set parsed method in result if it is valid
+			//Set parsed variable in result if it is valid
 			return parser->setParsedEntity(cursor);
 		}
 	}

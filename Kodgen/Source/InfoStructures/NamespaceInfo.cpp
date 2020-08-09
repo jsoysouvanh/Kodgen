@@ -38,9 +38,8 @@ void NamespaceInfo::refreshOuterEntity() noexcept
 		functionInfo.outerEntity = this;
 	}
 
-	//TODO
-	/*for (VariableInfo& variableInfo : variables)
+	for (VariableInfo& variableInfo : variables)
 	{
 		variableInfo.outerEntity = this;
-	}*/
+	}
 }

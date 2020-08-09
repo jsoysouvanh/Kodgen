@@ -115,7 +115,7 @@ CXChildVisitResult FileParser::parseNestedEntity(CXCursor cursor, CXCursor /* pa
 				break;
 
 			case CXCursorKind::CXCursor_VarDecl:
-				//TODO: Handle variables
+				parser->addVariableResult(parser->parseVariable(cursor, visitResult));
 				break;
 
 			default:
@@ -150,11 +150,7 @@ void FileParser::addNamespaceResult(NamespaceParsingResult&& result) noexcept
 		getParsingResult()->namespaces.emplace_back(std::move(result.parsedNamespace).value());
 	}
 
-	//Append errors if any
-	if (!result.errors.empty())
-	{
-		getContext().parsingResult->errors.insert(getParsingResult()->errors.cend(), std::make_move_iterator(result.errors.cbegin()), std::make_move_iterator(result.errors.cend()));
-	}
+	getParsingResult()->appendResultErrors(result);
 }
 
 void FileParser::addClassResult(ClassParsingResult&& result) noexcept
@@ -177,11 +173,7 @@ void FileParser::addClassResult(ClassParsingResult&& result) noexcept
 		}
 	}
 
-	//Append errors if any
-	if (!result.errors.empty())
-	{
-		getContext().parsingResult->errors.insert(getParsingResult()->errors.cend(), std::make_move_iterator(result.errors.cbegin()), std::make_move_iterator(result.errors.cend()));
-	}
+	getParsingResult()->appendResultErrors(result);
 }
 
 void FileParser::addEnumResult(EnumParsingResult&& result) noexcept
@@ -191,11 +183,17 @@ void FileParser::addEnumResult(EnumParsingResult&& result) noexcept
 		getParsingResult()->enums.emplace_back(std::move(result.parsedEnum).value());
 	}
 
-	//Append errors if any
-	if (!result.errors.empty())
+	getParsingResult()->appendResultErrors(result);
+}
+
+void FileParser::addVariableResult(VariableParsingResult&& result) noexcept
+{
+	if (result.parsedVariable.has_value())
 	{
-		getContext().parsingResult->errors.insert(getParsingResult()->errors.cend(), std::make_move_iterator(result.errors.cbegin()), std::make_move_iterator(result.errors.cend()));
+		getParsingResult()->variables.emplace_back(std::move(result.parsedVariable).value());
 	}
+
+	getParsingResult()->appendResultErrors(result);
 }
 
 void FileParser::addFunctionResult(FunctionParsingResult&& result) noexcept
@@ -205,11 +203,7 @@ void FileParser::addFunctionResult(FunctionParsingResult&& result) noexcept
 		getParsingResult()->functions.emplace_back(std::move(result.parsedFunction).value());
 	}
 
-	//Append errors if any
-	if (!result.errors.empty())
-	{
-		getContext().parsingResult->errors.insert(getParsingResult()->errors.cend(), std::make_move_iterator(result.errors.cbegin()), std::make_move_iterator(result.errors.cend()));
-	}
+	getParsingResult()->appendResultErrors(result);
 }
 
 void FileParser::refreshOuterEntity(FileParsingResult& out_result) const noexcept
@@ -254,7 +248,7 @@ void FileParser::refreshBuildCommandStrings() noexcept
 	_namespacePropertyMacro	= "-D" + parsingSettings.propertyParsingSettings.namespaceMacroName	+ "(...)=__attribute__((annotate(\"KGN:\"#__VA_ARGS__)))";
 	_classPropertyMacro		= "-D" + parsingSettings.propertyParsingSettings.classMacroName		+ "(...)=__attribute__((annotate(\"KGC:\"#__VA_ARGS__)))";
 	_structPropertyMacro	= "-D" + parsingSettings.propertyParsingSettings.structMacroName	+ "(...)=__attribute__((annotate(\"KGS:\"#__VA_ARGS__)))";
-	_variablePropertyMacro	= "-D" + parsingSettings.propertyParsingSettings.structMacroName	+ "(...)=__attribute__((annotate(\"KGV:\"#__VA_ARGS__)))";
+	_variablePropertyMacro	= "-D" + parsingSettings.propertyParsingSettings.variableMacroName	+ "(...)=__attribute__((annotate(\"KGV:\"#__VA_ARGS__)))";
 	_fieldPropertyMacro		= "-D" + parsingSettings.propertyParsingSettings.fieldMacroName		+ "(...)=__attribute__((annotate(\"KGF:\"#__VA_ARGS__)))";
 	_functionPropertyMacro	= "-D" + parsingSettings.propertyParsingSettings.functionMacroName	+ "(...)=__attribute__((annotate(\"KGFu:\"#__VA_ARGS__)))";
 	_methodPropertyMacro	= "-D" + parsingSettings.propertyParsingSettings.methodMacroName	+ "(...)=__attribute__((annotate(\"KGM:\"#__VA_ARGS__)))";

@@ -9,7 +9,8 @@ using namespace kodgen;
 
 FunctionInfo::FunctionInfo(CXCursor const& cursor, PropertyGroup&& propertyGroup, EEntityType entityType) noexcept:
 	EntityInfo(cursor, std::forward<PropertyGroup>(propertyGroup), entityType),
-	isInline{clang_Cursor_isFunctionInlined(cursor) != 0u}
+	isInline{clang_Cursor_isFunctionInlined(cursor) != 0u},
+	isStatic{false}
 {
 	CXType functionType = clang_getCursorType(cursor);
 

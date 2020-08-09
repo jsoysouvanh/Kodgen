@@ -16,6 +16,7 @@
 #include "Kodgen/InfoStructures/StructClassInfo.h"
 #include "Kodgen/InfoStructures/EnumInfo.h"
 #include "Kodgen/InfoStructures/FunctionInfo.h"
+#include "Kodgen/InfoStructures/VariableInfo.h"
 #include "Kodgen/Misc/Filesystem.h"
 
 namespace kodgen
@@ -40,6 +41,7 @@ namespace kodgen
 		/** All functions contained directly under file level. */
 		std::vector<FunctionInfo>		functions;
 
-		//TODO: Global fields
+		/** All variables contained directory under file level. */
+		std::vector<VariableInfo>		variables;
 	};
 }

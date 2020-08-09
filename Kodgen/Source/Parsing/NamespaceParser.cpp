@@ -81,10 +81,8 @@ CXChildVisitResult NamespaceParser::parseNestedEntity(CXCursor cursor, CXCursor 
 			parser->addEnumResult(parser->parseEnum(cursor, visitResult));
 			break;
 
-		case CXCursorKind::CXCursor_VarDecl:	//For static fields
-			[[fallthrough]];
-		case CXCursorKind::CXCursor_FieldDecl:
-			//TODO: return parser->parseField(cursor);
+		case CXCursorKind::CXCursor_VarDecl:
+			parser->addVariableResult(parser->parseVariable(cursor, visitResult));
 			break;
 
 		case CXCursorKind::CXCursor_FunctionDecl:
@@ -114,6 +112,15 @@ FunctionParsingResult NamespaceParser::parseFunction(CXCursor const& functionCur
 	out_visitResult = _functionParser.parse(functionCursor, getContext(), functionResult);
 
 	return functionResult;
+}
+
+VariableParsingResult NamespaceParser::parseVariable(CXCursor const& variableCursor, CXChildVisitResult& out_visitResult) noexcept
+{
+	VariableParsingResult variableResult;
+
+	out_visitResult = _variableParser.parse(variableCursor, getContext(), variableResult);
+
+	return variableResult;
 }
 
 ParsingContext& NamespaceParser::pushContext(CXCursor const& namespaceCursor, ParsingContext const& parentContext, NamespaceParsingResult& out_result) noexcept
@@ -173,11 +180,7 @@ void NamespaceParser::addNamespaceResult(NamespaceParsingResult&& result) noexce
 		getParsingResult()->parsedNamespace->namespaces.emplace_back(std::move(result.parsedNamespace).value());
 	}
 
-	//Append errors if any
-	if (!result.errors.empty())
-	{
-		getContext().parsingResult->errors.insert(getParsingResult()->errors.cend(), std::make_move_iterator(result.errors.cbegin()), std::make_move_iterator(result.errors.cend()));
-	}
+	getParsingResult()->appendResultErrors(result);
 }
 
 void NamespaceParser::addClassResult(ClassParsingResult&& result) noexcept
@@ -200,11 +203,7 @@ void NamespaceParser::addClassResult(ClassParsingResult&& result) noexcept
 		}
 	}
 
-	//Append errors if any
-	if (!result.errors.empty())
-	{
-		getContext().parsingResult->errors.insert(getParsingResult()->errors.cend(), std::make_move_iterator(result.errors.cbegin()), std::make_move_iterator(result.errors.cend()));
-	}
+	getParsingResult()->appendResultErrors(result);
 }
 
 void NamespaceParser::addEnumResult(EnumParsingResult&& result) noexcept
@@ -214,11 +213,7 @@ void NamespaceParser::addEnumResult(EnumParsingResult&& result) noexcept
 		getParsingResult()->parsedNamespace->enums.emplace_back(std::move(result.parsedEnum).value());
 	}
 
-	//Append errors if any
-	if (!result.errors.empty())
-	{
-		getContext().parsingResult->errors.insert(getParsingResult()->errors.cend(), std::make_move_iterator(result.errors.cbegin()), std::make_move_iterator(result.errors.cend()));
-	}
+	getParsingResult()->appendResultErrors(result);
 }
 
 void NamespaceParser::addFunctionResult(FunctionParsingResult&& result) noexcept
@@ -228,9 +223,15 @@ void NamespaceParser::addFunctionResult(FunctionParsingResult&& result) noexcept
 		getParsingResult()->parsedNamespace->functions.emplace_back(std::move(result.parsedFunction).value());
 	}
 
-	//Append errors if any
-	if (!result.errors.empty())
+	getParsingResult()->appendResultErrors(result);
+}
+
+void NamespaceParser::addVariableResult(VariableParsingResult&& result) noexcept
+{
+	if (result.parsedVariable.has_value() && getParsingResult()->parsedNamespace.has_value())
 	{
-		getContext().parsingResult->errors.insert(getParsingResult()->errors.cend(), std::make_move_iterator(result.errors.cbegin()), std::make_move_iterator(result.errors.cend()));
+		getParsingResult()->parsedNamespace->variables.emplace_back(std::move(result.parsedVariable).value());
 	}
+
+	getParsingResult()->appendResultErrors(result);
 }

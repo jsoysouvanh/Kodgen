@@ -72,9 +72,9 @@ opt::optional<PropertyGroup> PropertyParser::getStructProperties(std::string ann
 
 opt::optional<PropertyGroup> PropertyParser::getVariableProperties(std::string annotateMessage) noexcept
 {
-	static std::string structAnnotation = "KGV:";
+	static std::string variableAnnotation = "KGV:";
 
-	return getProperties(std::move(annotateMessage), structAnnotation, EEntityType::Variable);
+	return getProperties(std::move(annotateMessage), variableAnnotation, EEntityType::Variable);
 }
 
 opt::optional<PropertyGroup> PropertyParser::getFieldProperties(std::string annotateMessage) noexcept
