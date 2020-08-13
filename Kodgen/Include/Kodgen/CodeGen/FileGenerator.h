@@ -251,7 +251,7 @@ namespace kodgen
 			*	@param functionInfo		Function we generate the code from.
 			*	@param genResult		Reference to the generation result to fill during file generation.
 			*/
-			virtual void	writeFunctionToFile(GeneratedFile&		generatedFile,
+			virtual void	writeFunctionToFile(GeneratedFile&			generatedFile,
 												EntityInfo const&		functionInfo,
 												FileGenerationResult&	genResult)								noexcept;
 
