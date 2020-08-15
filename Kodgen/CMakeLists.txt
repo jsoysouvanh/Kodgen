@@ -58,6 +58,9 @@ add_library(${KodgenTargetLibrary}
 					Source/CodeGen/EFileGenerationError.cpp
 					Source/CodeGen/FileGenerationError.cpp
 					Source/CodeGen/GeneratedFile.cpp
+			 
+					Source/Threading/ThreadPool.cpp
+					Source/Threading/Task.cpp
 			)
 
 # Setup warning level
@@ -105,3 +108,4 @@ if (WIN32)
 endif()
 
 add_subdirectory(Examples)
+add_subdirectory(Tests)
