@@ -20,7 +20,7 @@
 namespace kodgen
 {
 	template <typename ReturnType>
-	class Task : public TaskBase
+	class Task final : public TaskBase
 	{
 		friend class TaskHelper;
 
@@ -37,7 +37,7 @@ namespace kodgen
 				 std::vector<std::shared_ptr<TaskBase>>&&	deps = {})	noexcept;
 			Task(Task const&)											= default;
 			Task(Task&&)												= default;
-			~Task()														= default;
+			virtual ~Task()												= default;
 
 			virtual bool	isReadyToExecute()	const	noexcept override;
 			virtual void	execute()					noexcept override;

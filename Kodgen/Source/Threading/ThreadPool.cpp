@@ -13,7 +13,6 @@ ThreadPool::ThreadPool(uint32 threadCount, ETerminationMode	terminationMode) noe
 	assert(threadCount > 0u);
 
 	std::cout << "Start a thread pool with " << threadCount << " workers." << std::endl;
-	std::cout << "Working: " << _workingWorkers << std::endl;
 
 	//Preallocate enough space to avoid reallocations
 	_workers.reserve(threadCount);

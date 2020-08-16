@@ -26,7 +26,7 @@ namespace kodgen
 			TaskBase(std::vector<std::shared_ptr<TaskBase>>&& deps = {})	noexcept;
 			TaskBase(TaskBase const&)										= default;
 			TaskBase(TaskBase&&)											= default;
-			~TaskBase()														= default;
+			virtual ~TaskBase()												= default;
 
 			/**
 			*	@brief	Check if this task is ready to execute, i.e. it has no dependency or
