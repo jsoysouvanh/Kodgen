@@ -39,66 +39,47 @@ void ThreadPool::workerRoutine() noexcept
 	{
 		if (!_tasks.empty())
 		{
-			std::optional<Task> task = getTask();
-			
-			lock.unlock();
+			//We own the mutex before grabbing a task
+			std::shared_ptr<TaskBase> task = getTask();
 
-			//Execute the task without the lock to allow other workers to grab tasks
-			if (task.has_value())
+			if (task != nullptr)
 			{
-				task->execute();
-			}
+				//Release the mutex before executing the task to allow other workers to grab tasks during execution
+				lock.unlock();
 
-			lock.lock();
+				task->execute();
+
+				lock.lock();
+			}
 		}
 
+		//A worker is about to sleep, decrement working workers count
 		_workingWorkers.fetch_sub(1u);
 
 		_taskCondition.wait(lock, [this]() { return !_tasks.empty() || _destructorCalled; });
 
+		//A worker is resuming its activity, increment working workers count
 		_workingWorkers.fetch_add(1u);
 	}
 }
 
-opt::optional<Task>	ThreadPool::getTask() noexcept
+std::shared_ptr<TaskBase> ThreadPool::getTask() noexcept
 {
-	opt::optional<Task>	result = opt::nullopt;
-
 	//Iterate over all tasks
 	for (decltype(_tasks)::iterator it = _tasks.begin(); it != _tasks.end(); it++)
 	{
 		//Get the first ready task
-		if (it->isReadyToExecute())
+		if ((*it)->isReadyToExecute())
 		{
-			result.emplace(std::move(*it));
+			std::shared_ptr<TaskBase> result = std::move(*it);
+
 			_tasks.erase(it);
 
-			break;
+			return result;
 		}
 	}
 
-	return result;
-}
-
-void ThreadPool::submitTask(Task&& task) noexcept
-{
-	std::unique_lock lock(_taskMutex);
-
-	_tasks.emplace_back(std::forward<Task>(task));
-
-	lock.unlock();
-	_taskCondition.notify_one();
-}
-
-void ThreadPool::killWorkers() noexcept
-{
-	for (std::thread& worker : _workers)
-	{
-		if (worker.joinable())
-		{
-			worker.detach();
-		}
-	}
+	return nullptr;
 }
 
 void ThreadPool::joinWorkers() noexcept
@@ -119,7 +100,7 @@ void ThreadPool::joinWorkers() noexcept
 	}
 	else
 	{
-		//If the destructor hasn't been called, just wait for all workers to be idle
+		//Just wait for all workers to be blocked on the _taskCondition
 		while (_workingWorkers.load() != 0u)
 		{
 			std::this_thread::yield();

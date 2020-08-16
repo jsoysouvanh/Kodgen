@@ -60,7 +60,7 @@ add_library(${KodgenTargetLibrary}
 					Source/CodeGen/GeneratedFile.cpp
 			 
 					Source/Threading/ThreadPool.cpp
-					Source/Threading/Task.cpp
+					Source/Threading/TaskBase.cpp
 			)
 
 # Setup warning level

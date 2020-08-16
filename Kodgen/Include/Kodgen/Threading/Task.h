@@ -7,37 +7,41 @@
 
 #pragma once
 
-#include <functional>	//std::function
+#include <functional>		//std::function
+#include <unordered_set>
+#include <memory>			//std::shared_ptr
+#include <atomic>
+#include <future>
+#include <chrono>			//std::chrono::nanoseconds
+#include <cassert>
+
+#include "Kodgen/Threading/TaskBase.h"
 
 namespace kodgen
 {
-	class Task
+	template <typename ReturnType>
+	class Task : public TaskBase
 	{
+		friend class TaskHelper;
+
 		private:
 			/** Underlying task to execute. */
-			std::function<void()>	_task;
+			std::packaged_task<ReturnType(TaskBase*)>	_task;
+
+			/** Result of the call of the underlying _task. */
+			std::future<ReturnType>						_result;
 
 		public:
-			Task()								= delete;
-			Task(std::function<void()>&& task)	noexcept;
-			Task(Task const&)					= default;
-			Task(Task&&)						= default;
-			~Task()								= default;
+			Task()														= delete;
+			Task(std::function<ReturnType(TaskBase*)>&&		task,
+				 std::vector<std::shared_ptr<TaskBase>>&&	deps = {})	noexcept;
+			Task(Task const&)											= default;
+			Task(Task&&)												= default;
+			~Task()														= default;
 
-			/**
-			*	@brief	Check if this task is ready to execute, i.e. it has no dependency or
-			*			all its dependencies have finished their execution.
-			*	
-			*	@return true if this task is ready to execute, else false.
-			*/
-			inline bool	isReadyToExecute() const noexcept;
-
-			/**
-			*	@brief Execute the underlying task.
-			*/
-			inline void execute() const noexcept;
-
-			Task& operator=(Task&&)	= default;
+			virtual bool	isReadyToExecute()	const	noexcept override;
+			virtual void	execute()					noexcept override;
+			virtual bool	hasFinished()		const	noexcept override;
 	};
 
 	#include "Kodgen/Threading/Task.inl"
