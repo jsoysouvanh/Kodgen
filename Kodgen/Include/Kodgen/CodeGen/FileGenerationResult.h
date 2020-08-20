@@ -26,7 +26,10 @@ namespace kodgen
 			*	Even if completed is true, errors might have happened during parsing and/or file generation.
 			*	Make sure to check parsingErrors and fileGenerationErrors.
 			*/
-			bool								completed = false;
+			bool								completed	= false;
+
+			/** Time elapsed to discover files to parse, parse, generate and collect results of all files. */
+			float								duration	= 0.0f;
 
 			/** List of errors which occured during files parsing. If a file has parsing error, no code is generated. */
 			std::vector<ParsingError>			parsingErrors;

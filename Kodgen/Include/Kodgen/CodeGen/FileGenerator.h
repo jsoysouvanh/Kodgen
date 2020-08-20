@@ -10,6 +10,7 @@
 #include <set>
 #include <cassert>
 #include <type_traits>	//std::is_base_of
+#include <chrono>
 
 #include "Kodgen/Misc/ILogger.h"
 #include "Kodgen/Misc/TomlUtility.h"

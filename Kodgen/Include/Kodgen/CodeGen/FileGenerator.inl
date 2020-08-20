@@ -131,7 +131,9 @@ FileGenerationResult FileGenerator::generateFiles(FileParserType& fileParser, Fi
 
 		if (fs::is_directory(settings.outputDirectory))
 		{
-			std::set<fs::path> filesToProcess = identifyFilesToProcess(genResult, forceRegenerateAll);
+			//Start timer here
+			std::chrono::time_point	start			= std::chrono::high_resolution_clock::now();
+			std::set<fs::path>		filesToProcess	= identifyFilesToProcess(genResult, forceRegenerateAll);
 
 			//Don't setup anything if there are no files to generate
 			if (filesToProcess.size() > 0u)
@@ -153,6 +155,8 @@ FileGenerationResult FileGenerator::generateFiles(FileParserType& fileParser, Fi
 
 				clearNativePropertyRules(fileParser.parsingSettings.propertyParsingSettings);
 			}
+
+			genResult.duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() / 1000.0f;
 
 			genResult.completed = true;
 		}
