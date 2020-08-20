@@ -54,10 +54,12 @@ add_library(${KodgenTargetLibrary}
 					Source/Misc/Helpers.cpp
 					Source/Misc/DefaultLogger.cpp
 	
-					Source/CodeGen/FileGenerator.cpp
+					Source/CodeGen/FileGenerationUnit.cpp
+					Source/CodeGen/FileGenerationResult.cpp
 					Source/CodeGen/EFileGenerationError.cpp
 					Source/CodeGen/FileGenerationError.cpp
 					Source/CodeGen/GeneratedFile.cpp
+					Source/CodeGen/FileGenerator.cpp
 			 
 					Source/Threading/ThreadPool.cpp
 					Source/Threading/TaskBase.cpp

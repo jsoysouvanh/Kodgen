@@ -14,7 +14,7 @@
 
 namespace kodgen
 {
-	struct FileGenerationResult
+	class FileGenerationResult
 	{
 		public:
 			/**
@@ -39,5 +39,29 @@ namespace kodgen
 
 			/** List of paths to files which metadata are up-to-date. */
 			std::vector<fs::path>				upToDateFiles;
+
+			FileGenerationResult()								= default;
+			FileGenerationResult(FileGenerationResult const&)	= default;
+			FileGenerationResult(FileGenerationResult&&)		= default;
+			~FileGenerationResult()								= default;
+
+			/**
+			*	@brief Merge a result to this result.
+			*	
+			*	@param otherResult	The result to merge with this result.
+			*						After the call, otherResult state is UB.
+			*/
+			void mergeResult(FileGenerationResult&& otherResult)		noexcept;
+
+			/**
+			*	@brief Merge a result errors to this result errors.
+			*	
+			*	@param otherResult	The result to merge with this result.
+			*						After the call, otherResult state is UB.
+			*/
+			void mergeResultErrors(FileGenerationResult&& otherResult)	noexcept;
+
+			FileGenerationResult& operator=(FileGenerationResult const&)	= default;
+			FileGenerationResult& operator=(FileGenerationResult&&)			= default;
 	};
 }

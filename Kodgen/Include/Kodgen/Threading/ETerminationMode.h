@@ -13,10 +13,10 @@ namespace kodgen
 {
 	enum class ETerminationMode : uint8
 	{
-		/** Finish all tasks applied to the thread pool. */
+		/** Finish all tasks submitted to the thread pool before complete destruction of the pool. */
 		FinishAll		= 0,
 
-		/** Finish running tasks and discard tasks which have not started yet. */
+		/** Finish currently running tasks and discard submitted tasks which have not started yet. */
 		FinishCurrent	= 1 << 0
 	};
 }
