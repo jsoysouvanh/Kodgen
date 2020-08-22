@@ -147,6 +147,7 @@ void FileGenerator::generateMacrosFile(FileParserFactoryBase& fileParserFactory)
 
 	//Generate simple property rules macros + doc
 	std::string macroDefinition;
+
 	for (kodgen::SimplePropertyRule const* propertyRule : fileParserFactory.parsingSettings.propertyParsingSettings.simplePropertyRules)
 	{
 		macroDefinition = propertyRule->getMacroDefinition();
@@ -154,7 +155,7 @@ void FileGenerator::generateMacrosFile(FileParserFactoryBase& fileParserFactory)
 		if (!macroDefinition.empty())
 		{
 			macrosDefinitionFile.writeLines("",
-											propertyRule->getMacroDefinition());
+											macroDefinition);
 		}
 	}
 
@@ -166,7 +167,7 @@ void FileGenerator::generateMacrosFile(FileParserFactoryBase& fileParserFactory)
 		if (!macroDefinition.empty())
 		{
 			macrosDefinitionFile.writeLines("",
-											propertyRule->getMacroDefinition());
+											macroDefinition);
 		}
 	}
 

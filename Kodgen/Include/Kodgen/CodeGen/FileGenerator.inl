@@ -141,8 +141,6 @@ FileGenerationResult FileGenerator::generateFiles(FileParserFactoryType<FilePars
 			//Don't setup anything if there are no files to generate
 			if (filesToProcess.size() > 0u)
 			{
-				generateMacrosFile(fileParserFactory);
-
 				//Forward FileGenerator necessary data to the file generation unit
 				setupFileGenerationUnit(fileGenerationUnit);
 
@@ -150,6 +148,8 @@ FileGenerationResult FileGenerator::generateFiles(FileParserFactoryType<FilePars
 
 				//Initialize the file parser factory compilation arguments
 				fileParserFactory._init();
+
+				generateMacrosFile(fileParserFactory);
 
 				if (threadCount == 0u)
 				{
