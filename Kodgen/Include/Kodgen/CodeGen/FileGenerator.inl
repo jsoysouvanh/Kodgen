@@ -33,7 +33,7 @@ void FileGenerator::processFilesMultithread(FileParserFactoryType<FileParserType
 
 		generationTasks.emplace_back(threadPool.submitTask([&](TaskBase* parsingTask) -> FileGenerationResult
 									 {
-										FileGenerationResult	generationResult;
+										FileGenerationResult	out_generationResult;
 										
 										//Copy the generation unit model to have a fresh one for this generation unit
 										FileGenerationUnitType	generationUnit = fileGenerationUnit;
@@ -44,15 +44,15 @@ void FileGenerator::processFilesMultithread(FileParserFactoryType<FileParserType
 										//Generate the file if no errors occured during parsing
 										if (parsingResult.errors.empty())
 										{
-											generationUnit.generateFile(generationResult, parsingResult);
+											generationUnit.generateFile(parsingResult, out_generationResult);
 										}
 										else
 										{
 											//Transfer parsing errors into the file generation result
-											generationResult.parsingErrors.insert(generationResult.parsingErrors.cend(), std::make_move_iterator(parsingResult.errors.cbegin()), std::make_move_iterator(parsingResult.errors.cend()));
+											out_generationResult.parsingErrors.insert(out_generationResult.parsingErrors.cend(), std::make_move_iterator(parsingResult.errors.cbegin()), std::make_move_iterator(parsingResult.errors.cend()));
 										}
 										
-										return generationResult;
+										return out_generationResult;
 									 
 									 }, { parsingTask }));
 	}
@@ -79,7 +79,7 @@ void FileGenerator::processFilesMonothread(FileParserFactoryType<FileParserType>
 		if (fileParser.parse(file, fileParserFactory.getCompilationArguments(), parsingResult))
 		{
 			//Generate file according to parsing result
-			fileGenerationUnit.generateFile(out_genResult, parsingResult);
+			fileGenerationUnit.generateFile(parsingResult, out_genResult);
 		}
 		else
 		{
