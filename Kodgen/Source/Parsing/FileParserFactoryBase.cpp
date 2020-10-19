@@ -29,16 +29,26 @@ void FileParserFactoryBase::refreshCompilationArguments() noexcept
 
 	refreshBuildCommandStrings();
 
+#if KODGEN_DEV
+	constexpr size_t baseCompilationArgCount = 4u;	//-xc++, -v, -std=c++1z & _kodgenParsingMacro
+#else
+	constexpr size_t baseCompilationArgCount = 3u;	//-xc++, -std=c++1z & _kodgenParsingMacro
+#endif
+
 	/**
 	*	3 to include -xc++, -std=c++1z & _kodgenParsingMacro
 	*
 	*	9 because we make an additional parameter per possible entity
 	*	Namespace, Class, Struct, Variable, Field, Function, Method, Enum, EnumValue
 	*/
-	_compilationArguments.reserve(3u + 9u + _projectIncludeDirs.size());
+	_compilationArguments.reserve(baseCompilationArgCount + 9u + _projectIncludeDirs.size());
 
 	//Parsing C++
 	_compilationArguments.emplace_back("-xc++");
+
+#if KODGEN_DEV
+	_compilationArguments.emplace_back("-v");
+#endif
 
 	//Use C++17
 	_compilationArguments.emplace_back("-std=c++1z"); 

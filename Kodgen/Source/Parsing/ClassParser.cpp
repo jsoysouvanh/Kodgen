@@ -242,14 +242,23 @@ void ClassParser::addBaseClass(CXCursor cursor) noexcept
 
 		if (!parsedClass.isObject)
 		{
+			std::cout << "------ Test " << parsedClass.name << std::endl;
+
 			//we haven't confirmed that the current parsed class inherits from Object, search again
 			parsedClass.isObject = isBaseOf("kodgen::Object", parentType);
+
+			if (parsedClass.isObject)
+			{
+				std::cout << parsedClass.name << " is a kodgen::Object." << std::endl;
+			}
 		}
 	}
 }
 
 bool ClassParser::isBaseOf(std::string const& baseClassName, CXType const& childClass) noexcept
 {
+	std::cout << "? " << Helpers::getString(clang_getTypeSpelling(clang_getCanonicalType(childClass))) << std::endl;
+
 	//Check if the base class is actually the child class
 	if (Helpers::getString(clang_getTypeSpelling(clang_getCanonicalType(childClass))) == baseClassName)
 	{
@@ -265,9 +274,7 @@ bool ClassParser::isBaseOf(std::string const& baseClassName, CXType const& child
 
 		if (cursor.kind == CXCursorKind::CXCursor_CXXBaseSpecifier)
 		{
-			CXType const& type = clang_getCanonicalType(clang_getCursorType(cursor));
-
-			if (Helpers::getString(clang_getTypeSpelling(type)) == searchData.baseClassName)
+			if (isBaseOf(searchData.baseClassName, clang_getCanonicalType(clang_getCursorType(cursor))))
 			{
 				searchData.doesInherit = true;
 
@@ -275,10 +282,7 @@ bool ClassParser::isBaseOf(std::string const& baseClassName, CXType const& child
 			}
 			else
 			{
-				//Recurse
-				searchData.doesInherit = isBaseOf(searchData.baseClassName, type);
-				
-				return (searchData.doesInherit) ? CXChildVisitResult::CXChildVisit_Break : CXChildVisitResult::CXChildVisit_Continue;
+				return CXChildVisitResult::CXChildVisit_Continue;
 			}
 		}
 		else if (cursor.kind == CXCursorKind::CXCursor_CXXFinalAttr || cursor.kind == CXCursorKind::CXCursor_AnnotateAttr)
