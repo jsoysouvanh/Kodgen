@@ -131,6 +131,7 @@ bool FileParserFactoryBase::loadSettings(fs::path const& pathToSettingsFile) noe
 			TomlUtility::updateSetting(parserSettings, "shouldParseAllEntities", parsingSettings.shouldParseAllEntities);
 			TomlUtility::updateSetting(parserSettings, "shouldAbortParsingOnFirstError", parsingSettings.shouldAbortParsingOnFirstError);
 			TomlUtility::updateSetting(parserSettings, "projectIncludeDirectories", parsingSettings.projectIncludeDirectories);
+			TomlUtility::updateSetting(parserSettings, "compilerExeName", parsingSettings.compilerExeName);
 
 			//Update Property settings
 			if (parserSettings.contains("Properties"))
