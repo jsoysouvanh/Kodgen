@@ -1,5 +1,7 @@
 #include "Kodgen/Parsing/FileParserFactoryBase.h"
 
+#include "Kodgen/Misc/CompilerHelpers.h"
+
 using namespace kodgen;
 
 void FileParserFactoryBase::refreshBuildCommandStrings() noexcept
@@ -14,12 +16,27 @@ void FileParserFactoryBase::refreshBuildCommandStrings() noexcept
 	_enumPropertyMacro		= "-D" + parsingSettings.propertyParsingSettings.enumMacroName		+ "(...)=__attribute__((annotate(\"KGE:\"#__VA_ARGS__)))";
 	_enumValuePropertyMacro	= "-D" + parsingSettings.propertyParsingSettings.enumValueMacroName	+ "(...)=__attribute__((annotate(\"KGEV:\"#__VA_ARGS__)))";
 
-	_projectIncludeDirs.clear();
-	_projectIncludeDirs.reserve(parsingSettings.projectIncludeDirectories.size());
+	//Setup project include directories
+	std::vector<std::string> nativeIncludeDirectories = CompilerHelpers::getCompilerNativeIncludeDirectories(parsingSettings.compilerExeName);
 
+	if (nativeIncludeDirectories.empty())
+	{
+		logger->log("Could not find any include directory from the specified compiler. Make sure the compiler is installed on your computer.", kodgen::ILogger::ELogSeverity::Warning);
+	}
+
+	_projectIncludeDirs.clear();
+	_projectIncludeDirs.reserve(parsingSettings.projectIncludeDirectories.size() + nativeIncludeDirectories.size());
+
+	//Add user manually specified include directories
 	for (fs::path const& includeDir : parsingSettings.projectIncludeDirectories)
 	{
 		_projectIncludeDirs.emplace_back("-I" + includeDir.string());
+	}
+
+	//Add compiler native include directories
+	for (std::string& includeDir : nativeIncludeDirectories)
+	{
+		_projectIncludeDirs.emplace_back("-I" + std::move(includeDir));
 	}
 }
 
