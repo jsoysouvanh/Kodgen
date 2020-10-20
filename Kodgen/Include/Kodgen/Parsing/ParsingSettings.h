@@ -41,7 +41,6 @@ namespace kodgen
 			*	Name of the compiler used to compile the header files being parsed.
 			*	This is used to make sure the parser recognizes the included headers.
 			*	As for now, supported values are "clang", "gcc" and "msvc".
-			*	(/!\ MSVC include directories search is not implemented yet)
 			*/
 			std::string								compilerExeName					= "clang";
 	};
