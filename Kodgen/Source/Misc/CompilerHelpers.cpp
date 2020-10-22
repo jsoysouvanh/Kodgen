@@ -28,7 +28,7 @@ bool CompilerHelpers::isSupportedCompiler(std::string const& compiler) noexcept
 
 bool CompilerHelpers::isGCCSupported(std::string const& gccExeName) noexcept
 {
-	std::stringstream cmdResult(System::executeCommand(gccExeName));
+	std::stringstream cmdResult(System::executeCommand(gccExeName + " 2>&1"));
 
 	std::string line;
 	while (!cmdResult.eof())
@@ -46,7 +46,7 @@ bool CompilerHelpers::isGCCSupported(std::string const& gccExeName) noexcept
 
 bool CompilerHelpers::isClangSupported(std::string const& clangExeName) noexcept
 {
-	std::stringstream cmdResult(System::executeCommand(clangExeName));
+	std::stringstream cmdResult(System::executeCommand(clangExeName + " 2>&1"));
 
 	std::string line;
 	while (!cmdResult.eof())

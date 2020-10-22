@@ -68,7 +68,7 @@ std::set<fs::path> FileGenerator::identifyFilesToProcess(FileGenerationResult& o
 		else
 		{
 			//Add FileGenerationFile invalid path
-			out_genResult.fileGenerationErrors.emplace_back(pathToIncludedDir, "", "This path was find in the toParseDirectories list but it doesn't exist or is not a directory.");
+			//out_genResult.fileGenerationErrors.emplace_back(pathToIncludedDir, "", "This path was find in the toParseDirectories list but it doesn't exist or is not a directory.");
 			logger->log("Directory " + pathToIncludedDir.string() + " doesn't exist", ILogger::ELogSeverity::Warning);
 		}
 	}

@@ -132,49 +132,53 @@ void FileParserFactoryBase::_init() noexcept
 #endif
 }
 
+void FileParserFactoryBase::loadProjectIncludeDirectories(toml::value const& tomlFileParsingSettings) noexcept
+{
+	std::unordered_set<fs::path, PathHash> includeDirectories;
+	TomlUtility::updateSetting(tomlFileParsingSettings, "projectIncludeDirectories", includeDirectories, logger);
+
+	for (fs::path const& includeDirectoryPath : includeDirectories)
+	{
+		if (!parsingSettings.addProjectIncludeDirectory(includeDirectoryPath) && logger != nullptr)
+		{
+			logger->log("Discard " + includeDirectoryPath.string() + " from the project include directories as it doesn't exist or is not a directory.", ILogger::ELogSeverity::Warning);
+		}
+	}
+}
+
+void FileParserFactoryBase::loadCompilerExeName(toml::value const& tomlFileParsingSettings) noexcept
+{
+	std::string compilerExeName;
+	TomlUtility::updateSetting(tomlFileParsingSettings, "compilerExeName", compilerExeName, logger);
+
+	if (!parsingSettings.setCompilerExeName(compilerExeName) && logger != nullptr)
+	{
+		logger->log(compilerExeName + " compiler doesn't exist, is not supported or could not be run on the current computer.", ILogger::ELogSeverity::Error);
+	}
+}
+
 bool FileParserFactoryBase::loadSettings(fs::path const& pathToSettingsFile) noexcept
 {
 	try
 	{
-		toml::value settings = toml::parse(pathToSettingsFile.string());
+		toml::value tomlContent = toml::parse(pathToSettingsFile.string());
 
-		if (settings.contains("FileParsingSettings"))
+		if (tomlContent.contains("FileParsingSettings"))
 		{
 			//Get the FileParserSettings table
-			toml::value const& parserSettings = toml::find(settings, "FileParsingSettings");
+			toml::value const& tomlFileParsingSettings = toml::find(tomlContent, "FileParsingSettings");
 
 			//Update Parsing settings
-			TomlUtility::updateSetting(parserSettings, "shouldParseAllEntities", parsingSettings.shouldParseAllEntities, logger);
-			TomlUtility::updateSetting(parserSettings, "shouldAbortParsingOnFirstError", parsingSettings.shouldAbortParsingOnFirstError, logger);
+			TomlUtility::updateSetting(tomlFileParsingSettings, "shouldParseAllEntities", parsingSettings.shouldParseAllEntities, logger);
+			TomlUtility::updateSetting(tomlFileParsingSettings, "shouldAbortParsingOnFirstError", parsingSettings.shouldAbortParsingOnFirstError, logger);
 
-			// -----------------
-			//TODO: Move that to another function loadProjectIncludeDirectories
-			std::unordered_set<fs::path, PathHash> includeDirectories;
-			TomlUtility::updateSetting(parserSettings, "projectIncludeDirectories", includeDirectories, logger);
-
-			for (fs::path const& includeDirectoryPath : includeDirectories)
-			{
-				if (!parsingSettings.addProjectIncludeDirectory(includeDirectoryPath) && logger != nullptr)
-				{
-					logger->log("Discard " + includeDirectoryPath.string() + " from the project include directories as it doesn't exist or is not a directory.", ILogger::ELogSeverity::Warning);
-				}
-			}
-			// -----------------
-
-			// -----------------
-			std::string compilerExeName;
-			TomlUtility::updateSetting(parserSettings, "compilerExeName", compilerExeName, logger);
-
-			if (!parsingSettings.setCompilerExeName(compilerExeName) && logger != nullptr)
-			{
-				logger->log(compilerExeName + " is not supported on the current computer.", ILogger::ELogSeverity::Error);
-			}
-			// -----------------
+			loadProjectIncludeDirectories(tomlFileParsingSettings);
+			loadCompilerExeName(tomlFileParsingSettings);
 
 			//Update Property settings
-			if (parserSettings.contains("Properties"))
+			if (tomlFileParsingSettings.contains("Properties"))
 			{
-				parsingSettings.propertyParsingSettings.loadSettings(toml::find(parserSettings, "Properties"), logger);
+				parsingSettings.propertyParsingSettings.loadSettings(toml::find(tomlFileParsingSettings, "Properties"), logger);
 			}
 		}
 
