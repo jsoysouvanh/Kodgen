@@ -21,11 +21,18 @@ void FileParserFactoryBase::refreshBuildCommandStrings() noexcept
 	
 	try
 	{
-		nativeIncludeDirectories = CompilerHelpers::getCompilerNativeIncludeDirectories(parsingSettings.compilerExeName);
-
-		if (nativeIncludeDirectories.empty())
+		if (!parsingSettings.getCompilerExeName().empty())
 		{
-			logger->log("Could not find any include directory from the specified compiler. Make sure the compiler is installed on your computer.", kodgen::ILogger::ELogSeverity::Warning);
+			nativeIncludeDirectories = CompilerHelpers::getCompilerNativeIncludeDirectories(parsingSettings.getCompilerExeName());
+
+			if (nativeIncludeDirectories.empty())
+			{
+				logger->log("Could not find any include directory from the specified compiler. Make sure the compiler is installed on your computer.", kodgen::ILogger::ELogSeverity::Warning);
+			}
+		}
+		else
+		{
+			logger->log("FileParserFactory compiler must be set to parse files.", kodgen::ILogger::ELogSeverity::Error);
 		}
 	}
 	catch (std::exception const& e)
@@ -34,10 +41,10 @@ void FileParserFactoryBase::refreshBuildCommandStrings() noexcept
 	}
 
 	_projectIncludeDirs.clear();
-	_projectIncludeDirs.reserve(parsingSettings.projectIncludeDirectories.size() + nativeIncludeDirectories.size());
+	_projectIncludeDirs.reserve(parsingSettings.getProjectIncludeDirectories().size() + nativeIncludeDirectories.size());
 
 	//Add user manually specified include directories
-	for (fs::path const& includeDir : parsingSettings.projectIncludeDirectories)
+	for (fs::path const& includeDir : parsingSettings.getProjectIncludeDirectories())
 	{
 		_projectIncludeDirs.emplace_back("-I" + includeDir.string());
 	}
@@ -45,7 +52,7 @@ void FileParserFactoryBase::refreshBuildCommandStrings() noexcept
 	//Add compiler native include directories
 	for (fs::path& includeDir : nativeIncludeDirectories)
 	{
-		_projectIncludeDirs.emplace_back("-I" + std::move(includeDir.string()));
+		_projectIncludeDirs.emplace_back("-I" + includeDir.string());
 	}
 }
 
@@ -137,15 +144,37 @@ bool FileParserFactoryBase::loadSettings(fs::path const& pathToSettingsFile) noe
 			toml::value const& parserSettings = toml::find(settings, "FileParsingSettings");
 
 			//Update Parsing settings
-			TomlUtility::updateSetting(parserSettings, "shouldParseAllEntities", parsingSettings.shouldParseAllEntities);
-			TomlUtility::updateSetting(parserSettings, "shouldAbortParsingOnFirstError", parsingSettings.shouldAbortParsingOnFirstError);
-			TomlUtility::updateSetting(parserSettings, "projectIncludeDirectories", parsingSettings.projectIncludeDirectories);
-			TomlUtility::updateSetting(parserSettings, "compilerExeName", parsingSettings.compilerExeName);
+			TomlUtility::updateSetting(parserSettings, "shouldParseAllEntities", parsingSettings.shouldParseAllEntities, logger);
+			TomlUtility::updateSetting(parserSettings, "shouldAbortParsingOnFirstError", parsingSettings.shouldAbortParsingOnFirstError, logger);
+
+			// -----------------
+			//TODO: Move that to another function loadProjectIncludeDirectories
+			std::unordered_set<fs::path, PathHash> includeDirectories;
+			TomlUtility::updateSetting(parserSettings, "projectIncludeDirectories", includeDirectories, logger);
+
+			for (fs::path const& includeDirectoryPath : includeDirectories)
+			{
+				if (!parsingSettings.addProjectIncludeDirectory(includeDirectoryPath) && logger != nullptr)
+				{
+					logger->log("Discard " + includeDirectoryPath.string() + " from the project include directories as it doesn't exist or is not a directory.", ILogger::ELogSeverity::Warning);
+				}
+			}
+			// -----------------
+
+			// -----------------
+			std::string compilerExeName;
+			TomlUtility::updateSetting(parserSettings, "compilerExeName", compilerExeName, logger);
+
+			if (!parsingSettings.setCompilerExeName(compilerExeName) && logger != nullptr)
+			{
+				logger->log(compilerExeName + " is not supported on the current computer.", ILogger::ELogSeverity::Error);
+			}
+			// -----------------
 
 			//Update Property settings
 			if (parserSettings.contains("Properties"))
 			{
-				parsingSettings.propertyParsingSettings.loadSettings(toml::find(parserSettings, "Properties"));
+				parsingSettings.propertyParsingSettings.loadSettings(toml::find(parserSettings, "Properties"), logger);
 			}
 		}
 

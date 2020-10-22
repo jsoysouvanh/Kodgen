@@ -192,14 +192,14 @@ bool FileGenerator::loadSettings(fs::path const& pathToSettingsFile) noexcept
 		{
 			toml::value const& generatorSettings = toml::find(tomlContent, "FileGenerationSettings");
 
-			TomlUtility::updateSetting<std::string>(generatorSettings, "generatedFilesExtension", settings.generatedFilesExtension);
-			TomlUtility::updateSetting<fs::path>(generatorSettings, "outputDirectory", settings.outputDirectory);
-			TomlUtility::updateSetting<std::string>(generatorSettings, "entityMacrosFilename", settings.entityMacrosFilename);
-			TomlUtility::updateSetting(generatorSettings, "toParseFiles", settings.toParseFiles);
-			TomlUtility::updateSetting(generatorSettings, "toParseDirectories", settings.toParseDirectories);
-			TomlUtility::updateSetting(generatorSettings, "ignoredFiles", settings.ignoredFiles);
-			TomlUtility::updateSetting(generatorSettings, "ignoredDirectories", settings.ignoredDirectories);
-			TomlUtility::updateSetting(generatorSettings, "supportedExtensions", settings.supportedExtensions);
+			TomlUtility::updateSetting(generatorSettings, "generatedFilesExtension", settings.generatedFilesExtension, logger);
+			TomlUtility::updateSetting(generatorSettings, "outputDirectory", settings.outputDirectory, logger);
+			TomlUtility::updateSetting(generatorSettings, "entityMacrosFilename", settings.entityMacrosFilename, logger);
+			TomlUtility::updateSetting(generatorSettings, "toParseFiles", settings.toParseFiles, logger);
+			TomlUtility::updateSetting(generatorSettings, "toParseDirectories", settings.toParseDirectories, logger);
+			TomlUtility::updateSetting(generatorSettings, "ignoredFiles", settings.ignoredFiles, logger);
+			TomlUtility::updateSetting(generatorSettings, "ignoredDirectories", settings.ignoredDirectories, logger);
+			TomlUtility::updateSetting(generatorSettings, "supportedExtensions", settings.supportedExtensions, logger);
 		}
 
 		return true;

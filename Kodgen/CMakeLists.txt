@@ -50,12 +50,14 @@ add_library(${KodgenTargetLibrary}
 					Source/Parsing/EnumValueParser.cpp
 					Source/Parsing/FileParser.cpp
 					Source/Parsing/FileParserFactoryBase.cpp
+					Source/Parsing/ParsingSettings.cpp
 					
 					Source/Misc/EAccessSpecifier.cpp
 					Source/Misc/Helpers.cpp
 					Source/Misc/DefaultLogger.cpp
 					Source/Misc/CompilerHelpers.cpp
 					Source/Misc/System.cpp
+					Source/Misc/Filesystem.cpp
 	
 					Source/CodeGen/FileGenerationUnit.cpp
 					Source/CodeGen/FileGenerationResult.cpp
