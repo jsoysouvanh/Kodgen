@@ -64,6 +64,7 @@ add_library(${KodgenTargetLibrary}
 					Source/CodeGen/FileGenerationError.cpp
 					Source/CodeGen/GeneratedFile.cpp
 					Source/CodeGen/FileGenerator.cpp
+					Source/CodeGen/FileGenerationSettings.cpp
 			 
 					Source/Threading/ThreadPool.cpp
 					Source/Threading/TaskBase.cpp
