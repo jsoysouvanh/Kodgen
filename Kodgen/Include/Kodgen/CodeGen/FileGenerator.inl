@@ -141,8 +141,8 @@ FileGenerationResult FileGenerator::generateFiles(FileParserFactoryType<FilePars
 		if (fs::is_directory(settings.getOutputDirectory()))
 		{
 			//Start timer here
-			std::chrono::time_point	start			= std::chrono::high_resolution_clock::now();
-			std::set<fs::path>		filesToProcess	= identifyFilesToProcess(genResult, forceRegenerateAll);
+			auto				start			= std::chrono::high_resolution_clock::now();
+			std::set<fs::path>	filesToProcess	= identifyFilesToProcess(genResult, forceRegenerateAll);
 
 			//Don't setup anything if there are no files to generate
 			if (filesToProcess.size() > 0u)
