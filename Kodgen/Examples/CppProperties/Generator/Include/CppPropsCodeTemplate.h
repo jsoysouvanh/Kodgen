@@ -1,7 +1,7 @@
 #pragma once
 
-#include <CodeGen/GeneratedCodeTemplate.h>
-#include <InfoStructures/FieldInfo.h>
+#include <Kodgen/CodeGen/GeneratedCodeTemplate.h>
+#include <Kodgen/InfoStructures/FieldInfo.h>
 
 class CppPropsCodeTemplate : public kodgen::GeneratedCodeTemplate
 {
@@ -15,6 +15,8 @@ class CppPropsCodeTemplate : public kodgen::GeneratedCodeTemplate
 								std::string const&		generatedMacroName)			const	noexcept;
 
 	protected:
-		virtual void generateCode(kodgen::GeneratedFile&	generatedFile,
-								  kodgen::EntityInfo const& entityInfo)		noexcept override;
+		virtual void generateCode(kodgen::GeneratedFile&		generatedFile,
+								  kodgen::EntityInfo const&		entityInfo,
+								  kodgen::FileGenerationUnit&	fgu,
+								  std::string&					out_errorDescription)	const noexcept override;
 };

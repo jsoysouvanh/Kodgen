@@ -1,8 +1,8 @@
-#include "Properties/FixedComplexPropertyRule.h"
+#include "Kodgen/Properties/FixedComplexPropertyRule.h"
 
 using namespace kodgen;
 
-FixedComplexPropertyRule::FixedComplexPropertyRule(std::string mainPropName, std::unordered_set<EntityInfo::EType> validEntityTypes, std::string description) noexcept:
+FixedComplexPropertyRule::FixedComplexPropertyRule(std::string mainPropName, EEntityType validEntityTypes, std::string description) noexcept:
 	DefaultComplexPropertyRule(std::move(mainPropName), std::move(validEntityTypes), description)
 {
 }

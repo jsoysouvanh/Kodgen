@@ -1,12 +1,11 @@
-#include "Parsing/MethodParser.h"
+#include "Kodgen/Parsing/MethodParser.h"
 
 #include <assert.h>
 
-#include "Parsing/ParsingSettings.h"
-#include "Parsing/PropertyParser.h"
-#include "InfoStructures/MethodParamInfo.h"
-#include "Misc/Helpers.h"
-#include "Misc/DisableWarningMacros.h"
+#include "Kodgen/Parsing/ParsingSettings.h"
+#include "Kodgen/Parsing/PropertyParser.h"
+#include "Kodgen/Misc/Helpers.h"
+#include "Kodgen/Misc/DisableWarningMacros.h"
 
 using namespace kodgen;
 
@@ -70,21 +69,21 @@ CXChildVisitResult MethodParser::parseNestedEntity(CXCursor cursor, CXCursor /* 
 		case CXCursorKind::CXCursor_CXXFinalAttr:
 			if (parser->getParsingResult()->parsedMethod.has_value())
 			{
-				parser->getParsingResult()->parsedMethod->qualifiers.isFinal = true;
+				parser->getParsingResult()->parsedMethod->isFinal = true;
 			}
 			break;
 
 		case CXCursorKind::CXCursor_CXXOverrideAttr:
 			if (parser->getParsingResult()->parsedMethod.has_value())
 			{
-				parser->getParsingResult()->parsedMethod->qualifiers.isOverride = true;
+				parser->getParsingResult()->parsedMethod->isOverride = true;
 			}
 			break;
 
 		case CXCursorKind::CXCursor_ParmDecl:
 			if (parser->getParsingResult()->parsedMethod.has_value())
 			{
-				parser->getParsingResult()->parsedMethod->parameters.emplace_back(MethodParamInfo{TypeInfo(clang_getCursorType(cursor)), Helpers::getString(clang_getCursorDisplayName(cursor))});
+				parser->getParsingResult()->parsedMethod->parameters.emplace_back(FunctionParamInfo{TypeInfo(clang_getCursorType(cursor)), Helpers::getString(clang_getCursorDisplayName(cursor))});
 			}
 			break;
 

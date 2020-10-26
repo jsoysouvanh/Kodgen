@@ -1,9 +1,9 @@
-#include "InfoStructures/EnumInfo.h"
+#include "Kodgen/InfoStructures/EnumInfo.h"
 
 using namespace kodgen;
 
 EnumInfo::EnumInfo(CXCursor const& cursor, PropertyGroup&& propertyGroup) noexcept:
-	EntityInfo(cursor, std::forward<PropertyGroup>(propertyGroup), EType::Enum),
+	EntityInfo(cursor, std::forward<PropertyGroup>(propertyGroup), EEntityType::Enum),
 	type{clang_getCursorType(cursor)},
 	underlyingType{clang_getEnumDeclIntegerType(cursor)}
 {

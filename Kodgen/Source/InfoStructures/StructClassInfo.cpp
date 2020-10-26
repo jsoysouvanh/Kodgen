@@ -1,19 +1,21 @@
-#include "InfoStructures/StructClassInfo.h"
+#include "Kodgen/InfoStructures/StructClassInfo.h"
 
-#include "InfoStructures/NestedStructClassInfo.h"
+#include "Kodgen/InfoStructures/NestedStructClassInfo.h"
 
 using namespace kodgen;
 
 StructClassInfo::StructClassInfo() noexcept:
 	EntityInfo(),
-	qualifiers{ false }
+	qualifiers{false},
+	isObject{false}
 {
 }
 
-StructClassInfo::StructClassInfo(CXCursor const& cursor, PropertyGroup&& propertyGroup, EType&& entityType) noexcept:
-	EntityInfo(cursor, std::forward<PropertyGroup>(propertyGroup), std::forward<EType>(entityType)),
+StructClassInfo::StructClassInfo(CXCursor const& cursor, PropertyGroup&& propertyGroup, EEntityType&& entityType) noexcept:
+	EntityInfo(cursor, std::forward<PropertyGroup>(propertyGroup), std::forward<EEntityType>(entityType)),
 	qualifiers{false},
-	type{clang_getCursorType(cursor)}
+	type{clang_getCursorType(cursor)},
+	isObject{false}
 {
 }
 
