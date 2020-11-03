@@ -84,15 +84,13 @@ namespace kodgen
 			/**
 			*	@brief Entry point to generate code for a given entity and property.
 			*	
-			*	@param entity			Entity the property is attached to.
-			*	@param propertyIndex	Index of the property in the list of properties attached to the entity.
-			*	@param property			Property bound to this rule.
-			*	@param userData			Any data the user might want to pass.
+			*	@param entity	Entity the property is attached to.
+			*	@param property	Property bound to this rule.
+			*	@param userData	Any data the user might want to pass.
 			*	
 			*	@return Generated code as string.
 			*/
 			virtual std::string	generateCode(EntityInfo const&	entity,
-											 uint8				propertyIndex,
 											 Property const&	property,
 											 void*				userData)							const	noexcept;
 	};
