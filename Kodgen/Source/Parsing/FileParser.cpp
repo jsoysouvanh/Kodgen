@@ -154,6 +154,7 @@ ParsingContext& FileParser::pushContext(CXTranslationUnit const& translationUnit
 	newContext.rootCursor		= clang_getTranslationUnitCursor(translationUnit);
 	newContext.propertyParser	= &_propertyParser;
 	newContext.parsingSettings	= parsingSettings;
+	newContext.structClassTree	= &out_result.structClassTree;
 	newContext.parsingResult	= &out_result;
 
 	contextsStack.push(std::move(newContext));
