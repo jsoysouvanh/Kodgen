@@ -33,13 +33,6 @@ namespace kodgen
 			void	updateShouldParseAllNested(EntityInfo const& parsingEntity)		noexcept;
 
 			/**
-			*	@brief Check that the property group of the provided entity is valid for that entity.
-			*	
-			*	@param entity The entity to check.
-			*/
-			void	performFinalPropertiesCheck(EntityInfo& entity)			const	noexcept;
-
-			/**
 			*	@brief Check if the current entity (stored in the current context) should be parsed.
 			*	
 			*	@return true if it should be parsed regardless whether it is annotated or not, else false.

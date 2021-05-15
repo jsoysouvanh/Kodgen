@@ -8,20 +8,20 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 namespace kodgen
 {
-	class Property
+	//Forward declaration
+	class PropertyRule;
+
+	struct Property
 	{
 		public:
 			/** Name of this property. */
-			std::string	mainProperty;
+			std::string					name;
 
-			Property()							= default;
-			Property(std::string mainProperty)	noexcept;
-			Property(Property const&)			= default;
-			Property(Property&&)				= default;
-			~Property()							= default;
-
+			/** Collection of all arguments of this property. */
+			std::vector<std::string>	arguments;
 	};
 }

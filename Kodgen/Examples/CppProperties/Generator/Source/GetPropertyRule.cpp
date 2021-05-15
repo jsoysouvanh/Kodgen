@@ -4,41 +4,44 @@
 
 using namespace kodgen;
 
-bool GetPropertyRule::isMainPropSyntaxValid(std::string const& mainProperty, EEntityType entityType) const noexcept
+GetPropertyRule::GetPropertyRule() noexcept:
+	DefaultPropertyRule("Get", EEntityType::Field)
 {
-	return mainProperty == "Get" && entityType == EEntityType::Field;
 }
 
-bool GetPropertyRule::isSubPropSyntaxValid(std::string const& subProperty, uint8 /* subPropIndex */, std::string& out_errorDescription) const noexcept
+bool GetPropertyRule::isValid(EntityInfo const& entity, uint8 propertyIndex) const noexcept
 {
-	if (subProperty != "*" && subProperty != "&" && subProperty != "const" && subProperty != "explicit")
+	if (!DefaultPropertyRule::isValid(entity, propertyIndex))
 	{
-		out_errorDescription = subProperty + " is not a valid subproperty.";
-
 		return false;
 	}
 
-	return true;
-}
+	Property const& prop = entity.propertyGroup.properties[propertyIndex];
 
-bool GetPropertyRule::isPropertyGroupValid(PropertyGroup const& propertyGroup, uint8 propertyIndex, std::string& out_errorDescription) const noexcept
-{
-	ComplexProperty const& complexProp = propertyGroup.complexProperties[propertyIndex];
+	//Check that arguments are valid
+	for (std::string const& arg : prop.arguments)
+	{
+		if (arg != "*" && arg != "&" && arg != "const" && arg != "explicit")
+		{
+			return false;
+		}
+	}
 
 	//Can't have * and & at the same time
-	if (std::find(complexProp.subProperties.cbegin(), complexProp.subProperties.cend(), "*") != complexProp.subProperties.cend() &&
-		std::find(complexProp.subProperties.cbegin(), complexProp.subProperties.cend(), "&") != complexProp.subProperties.cend())
+	if (std::find(prop.arguments.cbegin(), prop.arguments.cend(), "*") != prop.arguments.cend() &&
+		std::find(prop.arguments.cbegin(), prop.arguments.cend(), "&") != prop.arguments.cend())
 	{
-		out_errorDescription = "Can't use * and & in the same time.";
-
 		return false;
 	}
 
-	return isUsedOnlyOnce(propertyGroup, propertyIndex, out_errorDescription);
-}
+	//Make sure no previous property was already valid for this rule
+	for (int i = 0; i < propertyIndex; i++)
+	{
+		if (isValid(entity, i))
+		{
+			return false;
+		}
+	}
 
-bool GetPropertyRule::isEntityValid(EntityInfo const& /* entity */, uint8 /* propertyIndex */, std::string& /* out_errorDescription */) const noexcept
-{
-	//No specific check to perform here
 	return true;
 }

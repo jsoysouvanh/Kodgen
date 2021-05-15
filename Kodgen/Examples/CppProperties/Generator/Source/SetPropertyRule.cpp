@@ -2,30 +2,34 @@
 
 using namespace kodgen;
 
-bool SetPropertyRule::isMainPropSyntaxValid(std::string const& mainProperty, EEntityType entityType) const noexcept
+SetPropertyRule::SetPropertyRule() noexcept:
+	DefaultPropertyRule("Set", EEntityType::Field)
 {
-	return mainProperty == "Set" && entityType == EEntityType::Field;
 }
 
-bool SetPropertyRule::isSubPropSyntaxValid(std::string const& subProperty, uint8 /* subPropIndex */, std::string& out_errorDescription) const noexcept
+bool SetPropertyRule::isValid(EntityInfo const& entity, uint8 propertyIndex) const noexcept
 {
-	if (subProperty != "explicit")
+	if (!DefaultPropertyRule::isValid(entity, propertyIndex))
 	{
-		out_errorDescription = subProperty + " is not a valid subproperty.";
-
 		return false;
 	}
 
-	return true;
-}
+	Property const& prop = entity.propertyGroup.properties[propertyIndex];
 
-bool SetPropertyRule::isPropertyGroupValid(PropertyGroup const& propertyGroup, uint8 propertyIndex, std::string& out_errorDescription) const noexcept
-{
-	return isUsedOnlyOnce(propertyGroup, propertyIndex, out_errorDescription);
-}
+	//Check that there is at most 1 argument and the only valid one is 'explicit'
+	if (prop.arguments.size() > 1 || (prop.arguments.size() > 0 && prop.arguments[0] != "explicit"))
+	{
+		return false;
+	}
 
-bool SetPropertyRule::isEntityValid(EntityInfo const& /* entity */, uint8 /* propertyIndex */, std::string& /* out_errorDescription */) const noexcept
-{
-	//No specific check to perform here
+	//Make sure no previous property was already valid for this rule
+	for (int i = 0; i < propertyIndex; i++)
+	{
+		if (isValid(entity, i))
+		{
+			return false;
+		}
+	}
+
 	return true;
 }

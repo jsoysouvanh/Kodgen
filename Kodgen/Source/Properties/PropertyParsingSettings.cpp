@@ -5,9 +5,9 @@ using namespace kodgen;
 void PropertyParsingSettings::loadSettings(toml::value const& table, ILogger* logger) noexcept
 {
 	TomlUtility::updateSetting(table, "propertySeparator", propertySeparator, logger);
-	TomlUtility::updateSetting(table, "subPropertySeparator", subPropertySeparator, logger);
-	TomlUtility::updateSetting(table, "subPropertyStartEncloser", subPropertyEnclosers[0], logger);
-	TomlUtility::updateSetting(table, "subPropertyEndEncloser", subPropertyEnclosers[1], logger);
+	TomlUtility::updateSetting(table, "subPropertySeparator", argumentSeparator, logger);
+	TomlUtility::updateSetting(table, "subPropertyStartEncloser", argumentEnclosers[0], logger);
+	TomlUtility::updateSetting(table, "subPropertyEndEncloser", argumentEnclosers[1], logger);
 
 	TomlUtility::updateSetting(table, "namespaceMacroName", namespaceMacroName, logger);
 	TomlUtility::updateSetting(table, "classMacroName", classMacroName, logger);

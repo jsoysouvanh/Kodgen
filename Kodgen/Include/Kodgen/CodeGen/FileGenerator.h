@@ -19,7 +19,6 @@
 #include "Kodgen/CodeGen/FileGenerationUnit.h"
 #include "Kodgen/Parsing/FileParserFactory.h"
 #include "Kodgen/Properties/NativeProperties/ParseAllNestedPropertyRule.h"
-#include "Kodgen/Properties/NativeProperties/GenCodeTemplatePropertyRule.h"
 #include "Kodgen/Threading/ThreadPool.h"
 #include "Kodgen/Threading/TaskHelper.h"
 
@@ -33,7 +32,6 @@ namespace kodgen
 
 			/** Native property rules. */
 			ParseAllNestedPropertyRule		_parseAllNestedPropertyRule;
-			GenCodeTemplatePropertyRule		_generatedCodeTemplatePropertyRule;
 
 			/**
 			*	@brief Process all provided files on multiple threads.

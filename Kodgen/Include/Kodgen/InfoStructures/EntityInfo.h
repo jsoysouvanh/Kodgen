@@ -34,7 +34,7 @@ namespace kodgen
 			EntityInfo const*	outerEntity	= nullptr;
 			
 			/** All properties bound to this entity. */
-			PropertyGroup		properties;
+			PropertyGroup		propertyGroup;
 
 			EntityInfo()								= default;
 			EntityInfo(CXCursor const&	cursor,

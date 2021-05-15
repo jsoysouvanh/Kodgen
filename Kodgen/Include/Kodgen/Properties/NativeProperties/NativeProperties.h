@@ -15,10 +15,7 @@ namespace kodgen
 	{
 		public:
 			/** Property used to automatically parse all nested entities without having to annotate them. */
-			inline static std::string const	parseAllNestedProperty			= "ParseAllNested";
-
-			/** Property used to attach a specific generated code template to an entity. */
-			inline static std::string const generatedCodeTemplateProperty	= "GenCodeTemplate";
+			inline static std::string const	parseAllNestedProperty	= "ParseAllNested";
 
 			NativeProperties()							= delete;
 			NativeProperties(NativeProperties const&)	= delete;

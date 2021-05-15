@@ -35,12 +35,6 @@ CXChildVisitResult ClassParser::parse(CXCursor const& classCursor, ParsingContex
 		}
 	}
 
-	//Check properties validy one last time
-	if (out_result.parsedClass.has_value())
-	{
-		performFinalPropertiesCheck(*out_result.parsedClass);
-	}
-
 	popContext();
 
 	DISABLE_WARNING_PUSH

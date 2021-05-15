@@ -27,12 +27,6 @@ CXChildVisitResult NamespaceParser::parse(CXCursor const& namespaceCursor, Parsi
 		}
 	}
 
-	//Check properties validy one last time
-	if (out_result.parsedNamespace.has_value())
-	{
-		performFinalPropertiesCheck(*out_result.parsedNamespace);
-	}
-
 	popContext();
 
 	DISABLE_WARNING_PUSH

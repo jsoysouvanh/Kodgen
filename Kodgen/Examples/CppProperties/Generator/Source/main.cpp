@@ -60,7 +60,7 @@ int main(int argc, char** argv)
 			*/
 			fileGenerator.setDefaultGeneratedCodeTemplate(kodgen::EEntityType::Class, "PropertyCodeTemplate");
 
-			kodgen::FileGenerationResult genResult = fileGenerator.generateFiles(fileParserFactory, fileGenUnit);
+			kodgen::FileGenerationResult genResult = fileGenerator.generateFiles(fileParserFactory, fileGenUnit, true);
 
 			if (genResult.completed)
 			{

@@ -24,17 +24,17 @@ void CppPropsCodeTemplate::generateCode(kodgen::GeneratedFile& generatedFile, ko
 
 	for (kodgen::FieldInfo const& fieldInfo : classInfo.fields)
 	{
-		for (kodgen::ComplexProperty const& complexProp : fieldInfo.properties.complexProperties)
+		for (kodgen::Property const& prop : fieldInfo.propertyGroup.properties)
 		{
 			//Getter
-			if (complexProp.mainProperty == GetterPropName)
+			if (prop.name == GetterPropName)
 			{
-				generatedFile.writeLine(generateGetter(fieldInfo, complexProp) + "	\\");
+				generatedFile.writeLine(generateGetter(fieldInfo, prop) + "	\\");
 			}
 			//Setter
-			else if (complexProp.mainProperty == SetterPropName)
+			else if (prop.name == SetterPropName)
 			{
-				generatedFile.writeLine(generateSetter(fieldInfo, complexProp) + "	\\");
+				generatedFile.writeLine(generateSetter(fieldInfo, prop) + "	\\");
 			}
 		}
 	}
@@ -48,7 +48,7 @@ void CppPropsCodeTemplate::undefMacros(kodgen::GeneratedFile& generatedFile, std
 	generatedFile.writeLines("#ifdef DEFINE_GETTERS_AND_SETTERS", "\t#undef DEFINE_GETTERS_AND_SETTERS", "#endif\n");
 }
 
-std::string CppPropsCodeTemplate::generateGetter(kodgen::FieldInfo const& fieldInfo, kodgen::ComplexProperty const& complexProp) const noexcept
+std::string CppPropsCodeTemplate::generateGetter(kodgen::FieldInfo const& fieldInfo, kodgen::Property const& prop) const noexcept
 {
 	std::string postQualifiers;
 	std::string rawReturnType		= fieldInfo.type.getName() + " ";
@@ -58,7 +58,7 @@ std::string CppPropsCodeTemplate::generateGetter(kodgen::FieldInfo const& fieldI
 	bool		isPtr				= false;
 	bool		isExplicit			= false;
 
-	for (std::string const& subprop : complexProp.subProperties)
+	for (std::string const& subprop : prop.arguments)
 	{
 		if (!isConst && subprop.at(0) == 'c')			//const
 		{
@@ -124,7 +124,7 @@ std::string CppPropsCodeTemplate::generateGetter(kodgen::FieldInfo const& fieldI
 	}
 }
 
-std::string CppPropsCodeTemplate::generateSetter(kodgen::FieldInfo const& fieldInfo, kodgen::ComplexProperty const& complexProp) const noexcept
+std::string CppPropsCodeTemplate::generateSetter(kodgen::FieldInfo const& fieldInfo, kodgen::Property const& prop) const noexcept
 {
 	//Can't generate any setter if the field is originally const qualified
 	if (fieldInfo.type.typeParts.back().descriptor & kodgen::ETypeDescriptor::Const)
@@ -136,7 +136,7 @@ std::string CppPropsCodeTemplate::generateSetter(kodgen::FieldInfo const& fieldI
 	std::string paramName		= "_kodgen" + fieldInfo.name;
 	bool		isExplicit		= false;
 
-	if (!complexProp.subProperties.empty())	//explicit is the only supported subprop, so if it is not empty is must be explicit
+	if (!prop.arguments.empty())	//explicit is the only supported subprop, so if it is not empty is must be explicit
 		isExplicit = true;
 
 	std::string preTypeQualifiers;

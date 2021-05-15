@@ -9,28 +9,16 @@
 
 #include <string>
 
-#include "Kodgen/Properties/ComplexPropertyRule.h"
+#include "Kodgen/Properties/DefaultPropertyRule.h"
 
-class GetPropertyRule : public kodgen::ComplexPropertyRule
+class GetPropertyRule : public kodgen::DefaultPropertyRule
 {
 	public:
-		GetPropertyRule()						= default;
+		GetPropertyRule()						noexcept;
 		GetPropertyRule(GetPropertyRule const&)	= default;
 		GetPropertyRule(GetPropertyRule&&)		= default;
 		virtual ~GetPropertyRule()				= default;
 
-		virtual bool	isMainPropSyntaxValid(std::string const&	mainProperty,
-											  kodgen::EEntityType	entityType)						const noexcept override;
-
-		virtual bool	isSubPropSyntaxValid(std::string const& subProperty,
-											 kodgen::uint8		subPropIndex,
-											 std::string&		out_errorDescription)				const noexcept override;
-
-		virtual bool	isPropertyGroupValid(kodgen::PropertyGroup const&	propertyGroup,
-											 kodgen::uint8					propertyIndex,
-											 std::string&					out_errorDescription)	const noexcept override;
-
-		virtual bool	isEntityValid(kodgen::EntityInfo const& entity,
-									  kodgen::uint8				propertyIndex,
-									  std::string&				out_errorDescription)				const noexcept override;
+		virtual bool	isValid(kodgen::EntityInfo const&	entity,
+								kodgen::uint8				propertyIndex)	const noexcept override;
 };

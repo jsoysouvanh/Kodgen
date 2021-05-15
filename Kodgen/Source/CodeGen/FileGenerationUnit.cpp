@@ -90,44 +90,11 @@ void FileGenerationUnit::writeFileContent(GeneratedFile& generatedFile, FilePars
 
 GeneratedCodeTemplate* FileGenerationUnit::getEntityGeneratedCodeTemplate(EntityInfo const& entityInfo) const noexcept
 {
-	GeneratedCodeTemplate* result = nullptr;
+	//Use this syntax to avoid changing anything if container type ever changes
+	//Search for the default generated code template corresponding to this kind of entity
+	decltype(_settings->_defaultGeneratedCodeTemplates)::const_iterator it = _settings->_defaultGeneratedCodeTemplates.find(entityInfo.entityType);
 
-	//Find the specified code template
-	decltype(entityInfo.properties.complexProperties)::const_iterator it = std::find_if(entityInfo.properties.complexProperties.cbegin(), entityInfo.properties.complexProperties.cend(),
-																						[](ComplexProperty const& prop) { return prop.mainProperty == NativeProperties::generatedCodeTemplateProperty; });
-
-	if (it == entityInfo.properties.complexProperties.cend())	//No main property corresponding to codeTemplateMainComplexPropertyName found
-	{
-		//Use this syntax to avoid changing anything if container type ever changes
-		//Search for the default generated code template corresponding to this kind of entity
-		decltype(_settings->_defaultGeneratedCodeTemplates)::const_iterator it2 = _settings->_defaultGeneratedCodeTemplates.find(entityInfo.entityType);
-
-		if (it2 != _settings->_defaultGeneratedCodeTemplates.cend())
-		{
-			//We found a default generated code template!
-			result = it2->second;
-		}
-		else
-		{
-			//Didn't find a default generated code template, generate no code for this entity
-			return nullptr;
-		}
-	}
-	else
-	{
-		std::string const& generatedCodeTemplateName = it->subProperties[0];
-
-		//All these preconditions should have already been checked by the GenCodeTemplatePropertyRule during parsing
-		assert(generatedCodeTemplateName.size() >= 2u && generatedCodeTemplateName.front() == '"' && generatedCodeTemplateName.back());
-
-		//Again, this should have been checked by the GenCodeTemplatePropertyRule during parsing
-		//substr remove start and end "
-		assert(_settings->_generatedCodeTemplates.find(generatedCodeTemplateName.substr(1u, generatedCodeTemplateName.size() - 2u)) != _settings->_generatedCodeTemplates.cend());
-
-		result = _settings->_generatedCodeTemplates.find(generatedCodeTemplateName.substr(1u, generatedCodeTemplateName.size() - 2u))->second;
-	}
-
-	return result;
+	return (it != _settings->_defaultGeneratedCodeTemplates.cend()) ? it->second : nullptr;
 }
 
 bool FileGenerationUnit::writeEntityToFile(GeneratedFile& generatedFile, EntityInfo& entityInfo, FileParsingResult const& parsingResult, FileGenerationResult& out_genResult) noexcept

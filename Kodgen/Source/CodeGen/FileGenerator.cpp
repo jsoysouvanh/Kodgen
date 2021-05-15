@@ -95,8 +95,6 @@ void FileGenerator::addGeneratedCodeTemplate(std::string const& templateName, Ge
 	if (codeTemplate != nullptr)
 	{
 		settings._generatedCodeTemplates[templateName] = codeTemplate;
-
-		_generatedCodeTemplatePropertyRule.validTemplateNames.insert(templateName);
 	}
 }
 
@@ -116,14 +114,12 @@ bool FileGenerator::setDefaultGeneratedCodeTemplate(EEntityType entityType, std:
 
 void FileGenerator::addNativePropertyRules(PropertyParsingSettings& propParsingSettings) const noexcept
 {
-	propParsingSettings.simplePropertyRules.push_back(&_parseAllNestedPropertyRule);
-	propParsingSettings.complexPropertyRules.push_back(&_generatedCodeTemplatePropertyRule);
+	propParsingSettings.propertyRules.push_back(&_parseAllNestedPropertyRule);
 }
 
 void FileGenerator::clearNativePropertyRules(PropertyParsingSettings& propParsingSettings) const noexcept
 {
-	propParsingSettings.simplePropertyRules.pop_back();		//Remove _parseAllNestedPropertyRule
-	propParsingSettings.complexPropertyRules.pop_back();	//Remove _generatedCodeTemplatePropertyRule
+	propParsingSettings.propertyRules.pop_back();	//Remove _parseAllNestedPropertyRule
 }
 
 void FileGenerator::generateMacrosFile(FileParserFactoryBase& fileParserFactory) const noexcept

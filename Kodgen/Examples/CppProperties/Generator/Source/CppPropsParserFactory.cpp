@@ -10,17 +10,15 @@ CppPropsParserFactory::CppPropsParserFactory() noexcept:
 	parsingSettings.propertyParsingSettings.propertySeparator = ',';
 
 	//Subproperties are surrounded by []
-	parsingSettings.propertyParsingSettings.subPropertyEnclosers[0] = '[';
-	parsingSettings.propertyParsingSettings.subPropertyEnclosers[1] = ']';
+	parsingSettings.propertyParsingSettings.argumentEnclosers[0] = '[';
+	parsingSettings.propertyParsingSettings.argumentEnclosers[1] = ']';
 
 	//Each subproperty will be separed by a ,
-	parsingSettings.propertyParsingSettings.subPropertySeparator = ',';
-
-	//kodgen::PropertyRules& fieldPropertyRules = parsingSettings.propertyParsingSettings.fieldPropertyRules;
+	parsingSettings.propertyParsingSettings.argumentSeparator = ',';
 
 	////Define the Get property, which can take
-	parsingSettings.propertyParsingSettings.complexPropertyRules.push_back(&_getPropertyRule);
-	parsingSettings.propertyParsingSettings.complexPropertyRules.push_back(&_setPropertyRule);
+	parsingSettings.propertyParsingSettings.propertyRules.push_back(&_getPropertyRule);
+	parsingSettings.propertyParsingSettings.propertyRules.push_back(&_setPropertyRule);
 
 	//Define the macros to use for each entity type
 	parsingSettings.propertyParsingSettings.namespaceMacroName	= "KGNamespace";

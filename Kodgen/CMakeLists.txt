@@ -11,21 +11,14 @@ set(KodgenTargetLibrary Kodgen)
 
 add_library(${KodgenTargetLibrary}
 				STATIC
-					Source/Properties/PropertyParsingSettings.cpp
-					Source/Properties/Property.cpp
-					Source/Properties/SimpleProperty.cpp
-					Source/Properties/ComplexProperty.cpp
+					Source/Properties/Property.cpp		
 					Source/Properties/PropertyGroup.cpp
-					Source/Properties/SimplePropertyRule.cpp
-					Source/Properties/ComplexPropertyRule.cpp
-					Source/Properties/DefaultSimplePropertyRule.cpp
-					Source/Properties/DefaultComplexPropertyRule.cpp
-					Source/Properties/ComplexPropertySubProperty.cpp
-					Source/Properties/FixedComplexPropertyRule.cpp
-
+					Source/Properties/PropertyRule.cpp
+					Source/Properties/DefaultPropertyRule.cpp
+					Source/Properties/PropertyParsingSettings.cpp
+					
 					Source/Properties/NativeProperties/ParseAllNestedPropertyRule.cpp
-					Source/Properties/NativeProperties/GenCodeTemplatePropertyRule.cpp
-
+					
 					Source/InfoStructures/EntityInfo.cpp
 					Source/InfoStructures/NamespaceInfo.cpp
 					Source/InfoStructures/VariableInfo.cpp

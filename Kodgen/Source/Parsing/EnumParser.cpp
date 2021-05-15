@@ -26,12 +26,6 @@ CXChildVisitResult EnumParser::parse(CXCursor const& enumCursor, ParsingContext 
 		}
 	}
 
-	//Check properties validy one last time
-	if (out_result.parsedEnum.has_value())
-	{
-		performFinalPropertiesCheck(*out_result.parsedEnum);
-	}
-
 	popContext();
 
 	DISABLE_WARNING_PUSH
