@@ -13,5 +13,5 @@ class CppPropsFileGenerationUnit : public kodgen::FileGenerationUnit
 		virtual void generateCodeInternal(kodgen::FileParsingResult const& parsingResult, kodgen::FileGenerationResult& out_genResult) noexcept override;
 
 	public:
-		virtual bool isUpToDate(fs::path const& sourceFile)	const override;
+		virtual bool isUpToDate(fs::path const& sourceFile)	const noexcept override;
 };

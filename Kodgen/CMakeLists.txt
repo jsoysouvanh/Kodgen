@@ -55,6 +55,7 @@ add_library(${KodgenTargetLibrary}
 					Source/Misc/System.cpp
 					Source/Misc/Filesystem.cpp
 					Source/Misc/TomlUtility.cpp
+					Source/Misc/Settings.cpp
 	
 					Source/CodeGen/FileGenerationUnit.cpp
 					Source/CodeGen/FileGenerationResult.cpp
@@ -62,6 +63,9 @@ add_library(${KodgenTargetLibrary}
 					Source/CodeGen/FileGenerator.cpp
 					Source/CodeGen/FileGenerationSettings.cpp
 					Source/CodeGen/GeneratedFile.cpp
+
+					Source/CodeGen/Macro/MacroCodeGenerationModule.cpp
+					Source/CodeGen/Macro/MacroFileGenerationUnit.cpp
 			 
 					Source/Threading/ThreadPool.cpp
 					Source/Threading/TaskBase.cpp

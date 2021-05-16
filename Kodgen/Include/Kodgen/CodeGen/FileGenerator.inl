@@ -101,7 +101,7 @@ FileGenerationResult FileGenerator::generateFiles(FileParserFactoryType<FilePars
 
 	FileGenerationResult genResult;
 
-	if (settings.getOutputDirectory().empty())
+	if (settings->getOutputDirectory().empty())
 	{
 		//Generator can't run without outputDirectory
 		genResult.fileGenerationErrors.emplace_back("", "", "Output directory is empty, it must be specified for the files to be generated.");

@@ -20,7 +20,7 @@ void CppPropsFileGenerationUnit::generateCodeInternal(kodgen::FileParsingResult 
 	//TODO: Modules
 }
 
-bool CppPropsFileGenerationUnit::isUpToDate(fs::path const& sourceFile)	const
+bool CppPropsFileGenerationUnit::isUpToDate(fs::path const& sourceFile)	const noexcept
 {
 	assert(fs::exists(sourceFile));
 	assert(fs::is_regular_file(sourceFile));

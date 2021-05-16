@@ -8,27 +8,19 @@
 #pragma once
 
 #include <string>
-#include <unordered_map>
 #include <unordered_set>
 
-#include "Kodgen/CodeGen/GeneratedCodeTemplate.h"
+#include "Kodgen/Misc/Settings.h"
 #include "Kodgen/Misc/Filesystem.h"
 
 namespace kodgen
 {
-	class FileGenerationSettings
+	class FileGenerationSettings : public Settings
 	{
-		//FileGenerator and FileGenerationUnit can use private members
-		friend class FileGenerator;
-		friend class FileGenerationUnit;
-
 		private:
-			/** All generated code templates usable by this generator. */
-			std::unordered_map<std::string,	GeneratedCodeTemplate*>	_generatedCodeTemplates;
-
-			/** Default generated code templates to use when none is specified in entity property parameters. */
-			std::unordered_map<EEntityType, GeneratedCodeTemplate*>	_defaultGeneratedCodeTemplates;
-
+			/** Section name used in the toml file for FileGenerator settings. */
+			static constexpr char const*							_tomlSettingsSectionName	= "FileGenerationSettings";
+			
 			/**
 			*	Collection of files to parse.
 			*	These files will be parsed without any further check if they exist.
@@ -65,6 +57,79 @@ namespace kodgen
 			*/
 			fs::path												_outputDirectory;
 
+			/**
+			*	@brief Load the generatedFilesExtension setting from toml.
+			*
+			*	@param generationSettings Toml content.
+			*/
+			void					loadGeneratedFilesExtension(toml::value const&	generationSettings,
+																ILogger*			logger)				noexcept;
+
+			/**
+			*	@brief Load the entityMacrosFilename setting from toml.
+			*
+			*	@param generationSettings Toml content.
+			*/
+			void					loadEntityMacrosFilename(toml::value const& generationSettings,
+															 ILogger*			logger)					noexcept;
+
+			/**
+			*	@brief	Load the supportedExtensions setting from toml.
+			*			Loaded extensions completely replace previously supported extensions if any.
+			*
+			*	@param generationSettings Toml content.
+			*/
+			void					loadSupportedExtensions(toml::value const&	generationSettings,
+															ILogger*			logger)					noexcept;
+
+			/**
+			*	@brief Load the outputDirectory setting from toml.
+			*
+			*	@param generationSettings Toml content.
+			*/
+			void					loadOutputDirectory(toml::value const&	generationSettings,
+														ILogger*			logger)						noexcept;
+
+			/**
+			*	@brief	Load the toParseFiles setting from toml.
+			*			Loaded files completely replace previous toParseFiles if any.
+			*
+			*	@param generationSettings Toml content.
+			*/
+			void					loadToParseFiles(toml::value const&	generationSettings,
+													 ILogger*			logger)							noexcept;
+
+			/**
+			*	@brief	Load the toParseDirectories setting from toml.
+			*			Loaded directories completely replace previous toParseDirectories if any.
+			*
+			*	@param generationSettings Toml content.
+			*/
+			void					loadToParseDirectories(toml::value const&	generationSettings,
+														   ILogger*				logger)					noexcept;
+
+			/**
+			*	@brief	Load the ignoredFiles setting from toml.
+			*			Loaded files completely replace previous ignoredFiles if any.
+			*
+			*	@param generationSettings Toml content.
+			*/
+			void					loadIgnoredFiles(toml::value const&	generationSettings,
+													 ILogger*			logger)							noexcept;
+
+			/**
+			*	@brief	Load the ignoredDirectories setting from toml.
+			*			Loaded directories completely replace previous ignoredDirectories if any.
+			*
+			*	@param generationSettings Toml content.
+			*/
+			void					loadIgnoredDirectories(toml::value const&	generationSettings,
+														   ILogger*				logger)					noexcept;
+
+		protected:
+			virtual bool	loadSettingsValues(toml::value const&	tomlData,
+											   ILogger*				logger)		noexcept override;
+
 		public:
 			/** Name of the internally generated header containing empty definitions for entity macros. */
 			std::string								entityMacrosFilename	= "EntityMacros.h";
@@ -74,11 +139,6 @@ namespace kodgen
 
 			/** Extensions of files which should be considered for parsing. */
 			std::unordered_set<std::string>			supportedExtensions;
-
-			FileGenerationSettings()								= default;
-			FileGenerationSettings(FileGenerationSettings const&)	= default;
-			FileGenerationSettings(FileGenerationSettings&&)		= default;
-			~FileGenerationSettings()								= default;
 
 			/**
 			*	@brief	Setter for _outputDirectory.

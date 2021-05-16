@@ -13,8 +13,7 @@
 #include <chrono>
 
 #include "Kodgen/Misc/ILogger.h"
-#include "Kodgen/Misc/TomlUtility.h"
-#include "Kodgen/CodeGen/FileGenerationSettings.h"
+#include "Kodgen/Misc/Settings.h"
 #include "Kodgen/CodeGen/FileGenerationResult.h"
 #include "Kodgen/CodeGen/FileGenerationUnit.h"
 #include "Kodgen/Parsing/FileParserFactory.h"
@@ -27,9 +26,6 @@ namespace kodgen
 	class FileGenerator
 	{
 		private:
-			/** Section name used in the toml file for FileGenerator settings. */
-			static constexpr char const*	_tomlSettingsSectionName	= "FileGenerationSettings";
-
 			/** Native property rules. */
 			ParseAllNestedPropertyRule		_parseAllNestedPropertyRule;
 
@@ -77,10 +73,10 @@ namespace kodgen
 														   bool							forceRegenerateAll)	const	noexcept;
 
 			/**
-			*	@brief	Check that the generation output directory is a valid directory.
 			*			If the directory doesn't exist, the method will try to create it.
 			* 
 			*	@param out_genResult Reference to the generation result to fill during file generation.
+			*	@brief	Check that the generation output directory is a valid directory.
 			* 
 			*	@return true if the output directory is a valid directory at the end of the function (the directory was already valid or was created successfully), else false.
 			*/
@@ -148,78 +144,16 @@ namespace kodgen
 			*/
 			void					checkGenerationSettings()												const	noexcept;
 
-			/**
-			*	@brief Load the generatedFilesExtension setting from toml.
-			*
-			*	@param tomlGeneratorSettings Toml content.
-			*/
-			void					loadGeneratedFilesExtension(toml::value const& tomlGeneratorSettings)			noexcept;
-
-			/**
-			*	@brief Load the entityMacrosFilename setting from toml.
-			*
-			*	@param tomlGeneratorSettings Toml content.
-			*/
-			void					loadEntityMacrosFilename(toml::value const& tomlGeneratorSettings)				noexcept;
-
-			/**
-			*	@brief	Load the supportedExtensions setting from toml.
-			*			Loaded extensions completely replace previously supported extensions if any.
-			*
-			*	@param tomlGeneratorSettings Toml content.
-			*/
-			void					loadSupportedExtensions(toml::value const& tomlGeneratorSettings)				noexcept;
-
-			/**
-			*	@brief Load the outputDirectory setting from toml.
-			*
-			*	@param tomlGeneratorSettings Toml content.
-			*/
-			void					loadOutputDirectory(toml::value const& tomlGeneratorSettings)					noexcept;
-
-			/**
-			*	@brief	Load the toParseFiles setting from toml.
-			*			Loaded files completely replace previous toParseFiles if any.
-			*
-			*	@param tomlGeneratorSettings Toml content.
-			*/
-			void					loadToParseFiles(toml::value const& tomlGeneratorSettings)						noexcept;
-
-			/**
-			*	@brief	Load the toParseDirectories setting from toml.
-			*			Loaded directories completely replace previous toParseDirectories if any.
-			*
-			*	@param tomlGeneratorSettings Toml content.
-			*/
-			void					loadToParseDirectories(toml::value const& tomlGeneratorSettings)				noexcept;
-
-			/**
-			*	@brief	Load the ignoredFiles setting from toml.
-			*			Loaded files completely replace previous ignoredFiles if any.
-			*
-			*	@param tomlGeneratorSettings Toml content.
-			*/
-			void					loadIgnoredFiles(toml::value const& tomlGeneratorSettings)						noexcept;
-
-			/**
-			*	@brief	Load the ignoredDirectories setting from toml.
-			*			Loaded directories completely replace previous ignoredDirectories if any.
-			*
-			*	@param tomlGeneratorSettings Toml content.
-			*/
-			void					loadIgnoredDirectories(toml::value const& tomlGeneratorSettings)				noexcept;
-
 		public:
+			using Settings = FileGenerationSettings;
+
 			/** Logger used to issue logs from the FileGenerator. */
-			ILogger*				logger	= nullptr;
+			ILogger*						logger		= nullptr;
 
 			/** Struct containing all generation settings. */
-			FileGenerationSettings	settings;
+			FileGenerationSettings const*	settings	= nullptr;
 
-			FileGenerator()						= default;
-			FileGenerator(FileGenerator const&)	= default;
-			FileGenerator(FileGenerator&&)		= default;
-			virtual ~FileGenerator()			= default;
+			virtual ~FileGenerator() = default;
 
 			/**
 			*	@brief Parse registered files if they were modified since last generation (or don't exist)
@@ -239,39 +173,6 @@ namespace kodgen
 											   FileGenerationUnitType&					fileGenerationUnit,
 											   bool										forceRegenerateAll	= false,
 											   uint32									threadCount			= 0)	noexcept;
-
-			/**
-			*	@brief Add a new template to the list of generated code templates.
-			*		   if @param templateName is already defined in the generator, replace it.
-			*
-			*	@param templateName Name of the code template which will be specified in the source code.
-			*	@param codeTemplate Pointer to a GeneratedCodeTemplate instance.
-			*						The provided instance has be deleted manually by the user if newed.
-			*/
-			void addGeneratedCodeTemplate(std::string const&		templateName,
-										  GeneratedCodeTemplate*	codeTemplate)	noexcept;
-
-			/**
-			*	@brief Set the default generated code template to use with the specified entity type when no template is specified in the entity properties.
-			*
-			*	@brief entityType	Type of the entity we set the default generated code template for.
-			*						It can only be one of the following: Namespace, Class, Struct, Enum.
-			*	@brief template		Name of the default generated code template.
-			*						It must have been setup using the addGeneratedCodeTemplate(...) method before.
-			*
-			*	@return true if the new default generated code template was setup successfully, else false.
-			*/
-			bool setDefaultGeneratedCodeTemplate(EEntityType		entityType,
-												 std::string const&	templateName)	noexcept;
-
-			/**
-			*	@brief Setup this object's parameters with the provided toml file. Unset settings remain unchanged.
-			*
-			*	@param pathToSettingsFile Path to the toml file.
-			*
-			*	@return true if a file could be loaded, else false.
-			*/
-			bool loadSettings(fs::path const& pathToSettingsFile)					noexcept;
 	};
 
 	#include "Kodgen/CodeGen/FileGenerator.inl"

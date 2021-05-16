@@ -1,16 +1,16 @@
 #include "Kodgen/CodeGen/FileGenerationUnit.h"
 
-#include "Kodgen/Properties/NativeProperties/NativeProperties.h"
-#include "Kodgen/InfoStructures/NamespaceInfo.h"
-#include "Kodgen/InfoStructures/StructClassInfo.h"
-#include "Kodgen/InfoStructures/NestedStructClassInfo.h"
-#include "Kodgen/InfoStructures/EnumInfo.h"
-#include "Kodgen/InfoStructures/NestedEnumInfo.h"
-#include "Kodgen/InfoStructures/EnumValueInfo.h"
-#include "Kodgen/InfoStructures/VariableInfo.h"
-#include "Kodgen/InfoStructures/FieldInfo.h"
-#include "Kodgen/InfoStructures/FunctionInfo.h"
-#include "Kodgen/InfoStructures/MethodInfo.h"
+//#include "Kodgen/Properties/NativeProperties/NativeProperties.h"
+//#include "Kodgen/InfoStructures/NamespaceInfo.h"
+//#include "Kodgen/InfoStructures/StructClassInfo.h"
+//#include "Kodgen/InfoStructures/NestedStructClassInfo.h"
+//#include "Kodgen/InfoStructures/EnumInfo.h"
+//#include "Kodgen/InfoStructures/NestedEnumInfo.h"
+//#include "Kodgen/InfoStructures/EnumValueInfo.h"
+//#include "Kodgen/InfoStructures/VariableInfo.h"
+//#include "Kodgen/InfoStructures/FieldInfo.h"
+//#include "Kodgen/InfoStructures/FunctionInfo.h"
+//#include "Kodgen/InfoStructures/MethodInfo.h"
 
 using namespace kodgen;
 

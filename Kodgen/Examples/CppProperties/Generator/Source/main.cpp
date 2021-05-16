@@ -34,32 +34,36 @@ int main(int argc, char** argv)
 
 			fileParserFactory.parsingSettings.setCompilerExeName("clang++");
 
+			kodgen::FileGenerator::Settings	fileGenSettings;
+
 			//Parse WorkingDir/...
-			fileGenerator.settings.addToParseDirectory(includeDirectory);
+			fileGenSettings.addToParseDirectory(includeDirectory);
 
 			//Ignore generated files...
-			fileGenerator.settings.addIgnoredDirectory(generatedDirectory);
+			fileGenSettings.addIgnoredDirectory(generatedDirectory);
 			
 			//Only parse .h files
-			fileGenerator.settings.supportedExtensions.emplace(".h");
+			fileGenSettings.supportedExtensions.emplace(".h");
 
 			//All generated files will be located in WorkingDir/Include/Generated
-			fileGenerator.settings.setOutputDirectory(generatedDirectory);
+			fileGenSettings.setOutputDirectory(generatedDirectory);
 
 			//Generated files will use .myCustomExtension.h extension
-			fileGenerator.settings.generatedFilesExtension = ".myCustomExtension.h";
+			fileGenSettings.generatedFilesExtension = ".myCustomExtension.h";
+
+			fileGenerator.settings = &fileGenSettings;
 
 			//Bind the PropertyCodeTemplate name to the CppPropsCodeTemplate class
-			CppPropsCodeTemplate propsCodeTemplate;
-			fileGenerator.addGeneratedCodeTemplate("PropertyCodeTemplate", &propsCodeTemplate);
+			//CppPropsCodeTemplate propsCodeTemplate;
+			//fileGenerator.addGeneratedCodeTemplate("PropertyCodeTemplate", &propsCodeTemplate);
 
-			/**
-			*	Set a default class template so that we don't have to specify it manually
-			*
-			*	Now we can simply write:
-			*		class KGClass() MyClass {};
-			*/
-			fileGenerator.setDefaultGeneratedCodeTemplate(kodgen::EEntityType::Class, "PropertyCodeTemplate");
+			///**
+			//*	Set a default class template so that we don't have to specify it manually
+			//*
+			//*	Now we can simply write:
+			//*		class KGClass() MyClass {};
+			//*/
+			//fileGenerator.setDefaultGeneratedCodeTemplate(kodgen::EEntityType::Class, "PropertyCodeTemplate");
 
 			kodgen::FileGenerationResult genResult = fileGenerator.generateFiles(fileParserFactory, fileGenUnit, true);
 
