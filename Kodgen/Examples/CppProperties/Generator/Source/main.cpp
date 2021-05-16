@@ -6,6 +6,7 @@
 
 #include "CppPropsParserFactory.h"
 #include "CppPropsCodeTemplate.h"
+#include "CppPropsFileGenerationUnit.h"
 
 int main(int argc, char** argv)
 {
@@ -24,7 +25,7 @@ int main(int argc, char** argv)
 			fs::path generatedDirectory	= includeDirectory / "Generated";
 
 			CppPropsParserFactory		fileParserFactory;
-			kodgen::FileGenerationUnit	fileGenUnit;
+			CppPropsFileGenerationUnit	fileGenUnit;
 			kodgen::FileGenerator		fileGenerator;
 
 			//Parser and generator should log through logger

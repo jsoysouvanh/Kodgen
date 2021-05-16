@@ -13,6 +13,7 @@ add_executable(${CppPropertiesDemoProjectGeneratorTarget}
 					Generator/Source/CppPropsCodeTemplate.cpp
 					Generator/Source/GetPropertyRule.cpp
 					Generator/Source/SetPropertyRule.cpp
+					Generator/Source/CppPropsFileGenerationUnit.cpp
 					
 					Generator/Source/main.cpp)
 

@@ -24,15 +24,12 @@ namespace kodgen
 		friend class FileGenerator;
 
 		private:
-			/** Generation settings. */
-			FileGenerationSettings const*	_settings = nullptr;
-
 			/**
-			*
+			*	
 			*/
-			void					writeFileContent(GeneratedFile&			generatedFile,
+			/*void					writeFileContent(GeneratedFile&			generatedFile,
 													 FileParsingResult&		parsingResult,
-													 FileGenerationResult&	out_genResult)					noexcept;
+													 FileGenerationResult&	out_genResult)					noexcept;*/
 
 			/**
 			*	@brief Retrieve the appropriate generated code template to use for a given entity.
@@ -41,207 +38,219 @@ namespace kodgen
 			*
 			*	@return The appropriate generated code template if found, else nullptr.
 			*/
-			GeneratedCodeTemplate*	getEntityGeneratedCodeTemplate(EntityInfo const& entityInfo)	const	noexcept;
-
-			/**
-			*	@brief Provide information on whether the generated code for the provided filePath should be regenerated or not.
-			*
-			*	@param filePath Path to the file we want to check the status.
-			*
-			*	@return true if the corresponding generated file should be regenerated, else false.
-			*/
-			bool					shouldRegenerateFile(fs::path const& filePath)					const	noexcept;
-
-			/**
-			*	@brief Build the generated file path from a source file.
-			*	
-			*	@param sourceFilePath	Path to the source file to parse & generate code from.
-			*	
-			*	@return The path to the generated file.
-			*/
-			fs::path				makePathToGeneratedFile(fs::path const& sourceFilePath)			const	noexcept;
+			//GeneratedCodeTemplate*	getEntityGeneratedCodeTemplate(EntityInfo const& entityInfo)	const	noexcept;
 
 		protected:
 			/** Logger used to issue logs from the FileGenerationUnit. */
-			ILogger*	logger = nullptr;
+			ILogger*						logger		= nullptr;
+
+			/** Generation settings. */
+			FileGenerationSettings const*	settings	= nullptr;
 
 			/**
-			*	@brief Called just before generating a file. Can be used to perform any pre-generation initialization.
-			*/
-			virtual void	preGenerateFile(FileParsingResult const& parsingResult)							noexcept;
-
-			/**
-			*	@brief Called just after generating a file. Can be used to perform any post-generation cleanup.
-			*/
-			virtual void	postGenerateFile(FileParsingResult const& parsingResult)						noexcept;
-
-			/**
-			*	@brief Write a header into the provided file.
-			*
-			*	@param file Reference to the generated file.
-			*	@param parsingResult Structure containing info about the parsed file.
-			*/
-			virtual void	writeHeader(GeneratedFile&				file,
-										FileParsingResult const&	parsingResult)					const	noexcept;
-
-			/**
-			*	@brief Write a footer into the provided file.
-			*
-			*	@param file Reference to the generated file.
-			*	@param parsingResult Structure containing info about the parsed file.
-			*/
-			virtual void	writeFooter(GeneratedFile&				file,
-										FileParsingResult const&	parsingResult)					const	noexcept;
-
-			/**
-			*	@brief Generate code for entityInfo in generatedFile.
-			*
-			*	@param generatedFile	Generated file to write in.
-			*	@param entityInfo		Entity we generate the code from.
-			*	@param parsingResult	Result of the file parsing.
+			*	@brief Called just before FileGenerationUnit::generateCodeInternal. Can be used to perform any pre-generation initialization.
+			* 
+			*	@param parsingResult	Result of a file parsing used to generate code.
 			*	@param out_genResult	Reference to the generation result to fill during file generation.
-			*
-			*	@return true if no generation happened (no code template) or if no error happened during generation, false otherwise.
 			*/
-			virtual bool	writeEntityToFile(GeneratedFile&			generatedFile,
-											  EntityInfo&				entityInfo,
-											  FileParsingResult const&	parsingResult,
-											  FileGenerationResult&		out_genResult)						noexcept;
-
-			/**
-			*	@brief Generate code for namespaceInfo in generatedFile.
-			*
-			*	@param generatedFile	Generated file to write in.
-			*	@param namespaceInfo	Namespace we generate the code from.
-			*	@param parsingResult	Result of the file parsing.
-			*	@param out_genResult	Reference to the generation result to fill during file generation.
-			*
-			*	@return true if no generation happened (no code template) or if no error happened during generation, false otherwise.
-			*/
-			virtual bool	writeNamespaceToFile(GeneratedFile&				generatedFile,
-												 EntityInfo&				namespaceInfo,
-												 FileParsingResult const&	parsingResult,
-												 FileGenerationResult&		out_genResult)					noexcept;
-
-			/**
-			*	@brief Generate code for structClassInfo in generatedFile.
-			*
-			*	@param generatedFile	Generated file to write in.
-			*	@param structClassInfo	Struct/class we generate the code from.
-			*	@param parsingResult	Result of the file parsing.
-			*	@param out_genResult	Reference to the generation result to fill during file generation.
-			*
-			*	@return true if no generation happened (no code template) or if no error happened during generation, false otherwise.
-			*/
-			virtual bool	writeStructOrClassToFile(GeneratedFile&				generatedFile,
-													 EntityInfo&				structClassInfo,
-													 FileParsingResult const&	parsingResult,
-													 FileGenerationResult&		out_genResult)				noexcept;
-
-			/**
-			*	@brief Generate code for nestedStructClassInfo in generatedFile.
-			*
-			*	@param generatedFile			Generated file to write in.
-			*	@param nestedStructClassInfo	Nested struct/class we generate the code from.
-			*	@param parsingResult			Result of the file parsing.
-			*	@param out_genResult			Reference to the generation result to fill during file generation.
-			*
-			*	@return true if no generation happened (no code template) or if no error happened during generation, false otherwise.
-			*/
-			virtual bool	writeNestedStructOrClassToFile(GeneratedFile&			generatedFile,
-														   EntityInfo&				nestedStructClassInfo,
-														   FileParsingResult const&	parsingResult,
-														   FileGenerationResult&	out_genResult)			noexcept;
-
-			/**
-			*	@brief Generate code for enumInfo in generatedFile.
-			*
-			*	@param generatedFile	Generated file to write in.
-			*	@param enumInfo			Enum we generate the code from.
-			*	@param parsingResult	Result of the file parsing.
-			*	@param out_genResult	Reference to the generation result to fill during file generation.
-			*
-			*	@return true if no generation happened (no code template) or if no error happened during generation, false otherwise.
-			*/
-			virtual bool	writeEnumToFile(GeneratedFile&				generatedFile,
-											EntityInfo&					enumInfo,
-											FileParsingResult const&	parsingResult,
+			virtual void	preGenerateCode(FileParsingResult const&	parsingResult,
 											FileGenerationResult&		out_genResult)						noexcept;
 
 			/**
-			*	@brief Generate code for enumValueInfo in generatedFile.
+			*	@brief	Generate code based on the provided parsing result.
+			*			It is up to this method to create files to write to or not.
 			*
-			*	@param generatedFile	Generated file to write in.
-			*	@param enumValueInfo	Enum we generate the code from.
-			*	@param parsingResult	Result of the file parsing.
+			*	@param parsingResult	Result of a file parsing used to generate the new file.
 			*	@param out_genResult	Reference to the generation result to fill during file generation.
-			*
-			*	@return true if no generation happened (no code template) or if no error happened during generation, false otherwise.
 			*/
-			virtual bool	writeEnumValueToFile(GeneratedFile&				generatedFile,
-												 EntityInfo&				enumValueInfo,
-												 FileParsingResult const&	parsingResult,
-												 FileGenerationResult&		out_genResult)					noexcept;
+			virtual void	generateCodeInternal(FileParsingResult const&	parsingResult,
+												 FileGenerationResult&		out_genResult)					noexcept = 0;
 
 			/**
-			*	@brief Generate code for a variable in generatedFile.
-			*
-			*	@param generatedFile	Generated file to write in.
-			*	@param variableInfo		Variable we generate the code from.
-			*	@param parsingResult	Result of the file parsing.
-			*	@param out_genResult	Reference to the generation result to fill during file generation.
-			*
-			*	@return true if no generation happened (no code template) or if no error happened during generation, false otherwise.
+			*	@brief Called just after FileGenerationUnit::generateCodeInternal. Can be used to perform any post-generation cleanup.
 			*/
-			virtual bool	writeVariableToFile(GeneratedFile&				generatedFile,
-												EntityInfo&					variableInfo,
-												FileParsingResult const&	parsingResult,
-												FileGenerationResult&		out_genResult)					noexcept;
-
-			/**
-			*	@brief Generate code for fieldInfo in generatedFile.
-			*
-			*	@param generatedFile	Generated file to write in.
-			*	@param fieldInfo		Field we generate the code from.
-			*	@param parsingResult	Result of the file parsing.
-			*	@param out_genResult	Reference to the generation result to fill during file generation.
-			*
-			*	@return true if no generation happened (no code template) or if no error happened during generation, false otherwise.
-			*/
-			virtual bool	writeFieldToFile(GeneratedFile&				generatedFile,
-											 EntityInfo&				fieldInfo,
-											 FileParsingResult const&	parsingResult,
+			virtual void	postGenerateCode(FileParsingResult const&	parsingResult,
 											 FileGenerationResult&		out_genResult)						noexcept;
 
-			/**
-			*	@brief Generate code for a (non-member) function in generatedFile.
-			*
-			*	@param generatedFile	Generated file to write in.
-			*	@param functionInfo		Function we generate the code from.
-			*	@param parsingResult	Result of the file parsing.
-			*	@param out_genResult	Reference to the generation result to fill during file generation.
-			*
-			*	@return true if no generation happened (no code template) or if no error happened during generation, false otherwise.
-			*/
-			virtual bool	writeFunctionToFile(GeneratedFile&				generatedFile,
-												EntityInfo&					functionInfo,
-												FileParsingResult const&	parsingResult,
-												FileGenerationResult&		out_genResult)					noexcept;
+			///**
+			//*	@brief Write a header into the provided file.
+			//*
+			//*	@param file Reference to the generated file.
+			//*	@param parsingResult Structure containing info about the parsed file.
+			//*/
+			//virtual void	writeHeader(GeneratedFile&				file,
+			//							FileParsingResult const&	parsingResult)					const	noexcept;
+
+			///**
+			//*	@brief Write a footer into the provided file.
+			//*
+			//*	@param file Reference to the generated file.
+			//*	@param parsingResult Structure containing info about the parsed file.
+			//*/
+			//virtual void	writeFooter(GeneratedFile&				file,
+			//							FileParsingResult const&	parsingResult)					const	noexcept;
+
+			///**
+			//*	@brief Generate code for entityInfo in generatedFile.
+			//*
+			//*	@param generatedFile	Generated file to write in.
+			//*	@param entityInfo		Entity we generate the code from.
+			//*	@param parsingResult	Result of the file parsing.
+			//*	@param out_genResult	Reference to the generation result to fill during file generation.
+			//*
+			//*	@return true if no generation happened (no code template) or if no error happened during generation, false otherwise.
+			//*/
+			//virtual bool	writeEntityToFile(GeneratedFile&			generatedFile,
+			//								  EntityInfo&				entityInfo,
+			//								  FileParsingResult const&	parsingResult,
+			//								  FileGenerationResult&		out_genResult)						noexcept;
+
+			///**
+			//*	@brief Generate code for namespaceInfo in generatedFile.
+			//*
+			//*	@param generatedFile	Generated file to write in.
+			//*	@param namespaceInfo	Namespace we generate the code from.
+			//*	@param parsingResult	Result of the file parsing.
+			//*	@param out_genResult	Reference to the generation result to fill during file generation.
+			//*
+			//*	@return true if no generation happened (no code template) or if no error happened during generation, false otherwise.
+			//*/
+			//virtual bool	writeNamespaceToFile(GeneratedFile&				generatedFile,
+			//									 EntityInfo&				namespaceInfo,
+			//									 FileParsingResult const&	parsingResult,
+			//									 FileGenerationResult&		out_genResult)					noexcept;
+
+			///**
+			//*	@brief Generate code for structClassInfo in generatedFile.
+			//*
+			//*	@param generatedFile	Generated file to write in.
+			//*	@param structClassInfo	Struct/class we generate the code from.
+			//*	@param parsingResult	Result of the file parsing.
+			//*	@param out_genResult	Reference to the generation result to fill during file generation.
+			//*
+			//*	@return true if no generation happened (no code template) or if no error happened during generation, false otherwise.
+			//*/
+			//virtual bool	writeStructOrClassToFile(GeneratedFile&				generatedFile,
+			//										 EntityInfo&				structClassInfo,
+			//										 FileParsingResult const&	parsingResult,
+			//										 FileGenerationResult&		out_genResult)				noexcept;
+
+			///**
+			//*	@brief Generate code for nestedStructClassInfo in generatedFile.
+			//*
+			//*	@param generatedFile			Generated file to write in.
+			//*	@param nestedStructClassInfo	Nested struct/class we generate the code from.
+			//*	@param parsingResult			Result of the file parsing.
+			//*	@param out_genResult			Reference to the generation result to fill during file generation.
+			//*
+			//*	@return true if no generation happened (no code template) or if no error happened during generation, false otherwise.
+			//*/
+			//virtual bool	writeNestedStructOrClassToFile(GeneratedFile&			generatedFile,
+			//											   EntityInfo&				nestedStructClassInfo,
+			//											   FileParsingResult const&	parsingResult,
+			//											   FileGenerationResult&	out_genResult)			noexcept;
+
+			///**
+			//*	@brief Generate code for enumInfo in generatedFile.
+			//*
+			//*	@param generatedFile	Generated file to write in.
+			//*	@param enumInfo			Enum we generate the code from.
+			//*	@param parsingResult	Result of the file parsing.
+			//*	@param out_genResult	Reference to the generation result to fill during file generation.
+			//*
+			//*	@return true if no generation happened (no code template) or if no error happened during generation, false otherwise.
+			//*/
+			//virtual bool	writeEnumToFile(GeneratedFile&				generatedFile,
+			//								EntityInfo&					enumInfo,
+			//								FileParsingResult const&	parsingResult,
+			//								FileGenerationResult&		out_genResult)						noexcept;
+
+			///**
+			//*	@brief Generate code for enumValueInfo in generatedFile.
+			//*
+			//*	@param generatedFile	Generated file to write in.
+			//*	@param enumValueInfo	Enum we generate the code from.
+			//*	@param parsingResult	Result of the file parsing.
+			//*	@param out_genResult	Reference to the generation result to fill during file generation.
+			//*
+			//*	@return true if no generation happened (no code template) or if no error happened during generation, false otherwise.
+			//*/
+			//virtual bool	writeEnumValueToFile(GeneratedFile&				generatedFile,
+			//									 EntityInfo&				enumValueInfo,
+			//									 FileParsingResult const&	parsingResult,
+			//									 FileGenerationResult&		out_genResult)					noexcept;
+
+			///**
+			//*	@brief Generate code for a variable in generatedFile.
+			//*
+			//*	@param generatedFile	Generated file to write in.
+			//*	@param variableInfo		Variable we generate the code from.
+			//*	@param parsingResult	Result of the file parsing.
+			//*	@param out_genResult	Reference to the generation result to fill during file generation.
+			//*
+			//*	@return true if no generation happened (no code template) or if no error happened during generation, false otherwise.
+			//*/
+			//virtual bool	writeVariableToFile(GeneratedFile&				generatedFile,
+			//									EntityInfo&					variableInfo,
+			//									FileParsingResult const&	parsingResult,
+			//									FileGenerationResult&		out_genResult)					noexcept;
+
+			///**
+			//*	@brief Generate code for fieldInfo in generatedFile.
+			//*
+			//*	@param generatedFile	Generated file to write in.
+			//*	@param fieldInfo		Field we generate the code from.
+			//*	@param parsingResult	Result of the file parsing.
+			//*	@param out_genResult	Reference to the generation result to fill during file generation.
+			//*
+			//*	@return true if no generation happened (no code template) or if no error happened during generation, false otherwise.
+			//*/
+			//virtual bool	writeFieldToFile(GeneratedFile&				generatedFile,
+			//								 EntityInfo&				fieldInfo,
+			//								 FileParsingResult const&	parsingResult,
+			//								 FileGenerationResult&		out_genResult)						noexcept;
+
+			///**
+			//*	@brief Generate code for a (non-member) function in generatedFile.
+			//*
+			//*	@param generatedFile	Generated file to write in.
+			//*	@param functionInfo		Function we generate the code from.
+			//*	@param parsingResult	Result of the file parsing.
+			//*	@param out_genResult	Reference to the generation result to fill during file generation.
+			//*
+			//*	@return true if no generation happened (no code template) or if no error happened during generation, false otherwise.
+			//*/
+			//virtual bool	writeFunctionToFile(GeneratedFile&				generatedFile,
+			//									EntityInfo&					functionInfo,
+			//									FileParsingResult const&	parsingResult,
+			//									FileGenerationResult&		out_genResult)					noexcept;
+
+			///**
+			//*	@brief Generate code for methodInfo in generatedFile.
+			//*
+			//*	@param generatedFile	Generated file to write in.
+			//*	@param methodInfo		Method we generate the code from.
+			//*	@param parsingResult	Result of the file parsing.
+			//*	@param out_genResult	Reference to the generation result to fill during file generation.
+			//*
+			//*	@return true if no generation happened (no code template) or if no error happened during generation, false otherwise.
+			//*/
+			//virtual bool	writeMethodToFile(GeneratedFile&			generatedFile,
+			//								  EntityInfo&				methodInfo,
+			//								  FileParsingResult const&	parsingResult,
+			//								  FileGenerationResult&		out_genResult)						noexcept;
 
 			/**
-			*	@brief Generate code for methodInfo in generatedFile.
-			*
-			*	@param generatedFile	Generated file to write in.
-			*	@param methodInfo		Method we generate the code from.
-			*	@param parsingResult	Result of the file parsing.
-			*	@param out_genResult	Reference to the generation result to fill during file generation.
-			*
-			*	@return true if no generation happened (no code template) or if no error happened during generation, false otherwise.
+			*	@brief Check if file last write time is newer than reference file last write time.
+			*			The method will assert if a path is invalid or is not a file.
+			* 
+			*	@param file				Path to the file to compare.
+			*	@param referenceFile	Path to the reference file to compare.
+			* 
+			*	@return true if file last write time is newer than referenceFile's, else false.
 			*/
-			virtual bool	writeMethodToFile(GeneratedFile&			generatedFile,
-											  EntityInfo&				methodInfo,
-											  FileParsingResult const&	parsingResult,
-											  FileGenerationResult&		out_genResult)						noexcept;
+			bool			isFileNewerThan(fs::path const& file,
+											fs::path const& referenceFile)							const	noexcept;
 
 		public:
 			FileGenerationUnit()							= default;
@@ -250,12 +259,21 @@ namespace kodgen
 			virtual ~FileGenerationUnit()					= default;
 
 			/**
-			*	@brief Generate a file based on the @param genResult.
+			*	@brief Generate code based on the provided parsing result.
 			*
-			*	@param out_genResult	Reference to the generation result to fill during file generation.
 			*	@param parsingResult	Result of a file parsing used to generate the new file.
+			*	@param out_genResult	Reference to the generation result to fill during file generation.
 			*/
-			void	generateFile(FileParsingResult&		parsingResult,
-								 FileGenerationResult&	out_genResult)	noexcept;
+			void	generateCode(FileParsingResult const&	parsingResult,
+								 FileGenerationResult&		out_genResult)	noexcept;
+
+			/**
+			*	@brief Check whether the generated code for a given source file is up-to-date or not.
+			* 
+			*	@param sourceFile Path to the source file.
+			*
+			*	@return true if the code generated for sourceFile is up-to-date, else false.
+			*/
+			virtual bool	isUpToDate(fs::path const& sourceFile)	const = 0;
 	};
 }

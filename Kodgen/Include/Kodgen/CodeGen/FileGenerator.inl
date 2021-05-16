@@ -44,7 +44,7 @@ void FileGenerator::processFilesMultithread(FileParserFactoryType<FileParserType
 										//Generate the file if no errors occured during parsing
 										if (parsingResult.errors.empty())
 										{
-											generationUnit.generateFile(parsingResult, out_generationResult);
+											generationUnit.generateCode(parsingResult, out_generationResult);
 										}
 										else
 										{
@@ -79,7 +79,7 @@ void FileGenerator::processFilesMonothread(FileParserFactoryType<FileParserType>
 		if (fileParser.parse(file, fileParserFactory.getCompilationArguments(), parsingResult))
 		{
 			//Generate file according to parsing result
-			fileGenerationUnit.generateFile(parsingResult, out_genResult);
+			fileGenerationUnit.generateCode(parsingResult, out_genResult);
 		}
 		else
 		{
@@ -111,73 +111,47 @@ FileGenerationResult FileGenerator::generateFiles(FileParserFactoryType<FilePars
 			logger->log("Output directory is empty, it must be specified for the files to be generated.", ILogger::ELogSeverity::Error);
 		}
 	}
-	else
+	else if (checkOutputDirectory(genResult))
 	{
-		//Before doing anything, make sure destination folder exists
-		//If it doesn't, create it
-		if (!fs::exists(settings.getOutputDirectory()))
+		checkGenerationSettings();
+
+		//Forward FileGenerator necessary data to the file generation unit
+		setupFileGenerationUnit(fileGenerationUnit);
+
+		//Start timer here
+		auto				start			= std::chrono::high_resolution_clock::now();
+		std::set<fs::path>	filesToProcess	= identifyFilesToProcess(fileGenerationUnit, genResult, forceRegenerateAll);
+
+		//Don't setup anything if there are no files to generate
+		if (filesToProcess.size() > 0u)
 		{
-			//Try to create them is it doesn't exist
-			try
+			addNativePropertyRules(fileParserFactory.parsingSettings.propertyParsingSettings);
+
+			//Initialize the file parser factory compilation arguments
+			fileParserFactory._init();
+
+			generateMacrosFile(fileParserFactory);
+
+			threadCount = getThreadCount(threadCount);
+
+			//At this point thread count can't be 0
+			assert(threadCount > 0);
+
+			if (threadCount == 1u)
 			{
-				genResult.completed = fs::create_directories(settings.getOutputDirectory());
-				
-				if (logger != nullptr)
-				{
-					logger->log("Specified output directory doesn't exist. Create " + FilesystemHelpers::sanitizePath(settings.getOutputDirectory()).string(), ILogger::ELogSeverity::Info);
-				}
+				processFilesMonothread(fileParserFactory, fileGenerationUnit, filesToProcess, genResult);
 			}
-			catch (fs::filesystem_error const& exception)
+			else
 			{
-				genResult.fileGenerationErrors.emplace_back("", "", "Output directory is invalid: " + std::string(exception.what()));
-				
-				if (logger != nullptr)
-				{
-					logger->log("Output directory is invalid: " + std::string(exception.what()), ILogger::ELogSeverity::Error);
-				}
+				processFilesMultithread(fileParserFactory, fileGenerationUnit, filesToProcess, genResult, threadCount);
 			}
+
+			clearNativePropertyRules(fileParserFactory.parsingSettings.propertyParsingSettings);
 		}
 
-		if (fs::is_directory(settings.getOutputDirectory()))
-		{
-			checkGenerationSettings();
+		genResult.duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() / 1000.0f;
 
-			//Start timer here
-			auto				start			= std::chrono::high_resolution_clock::now();
-			std::set<fs::path>	filesToProcess	= identifyFilesToProcess(genResult, forceRegenerateAll);
-
-			//Don't setup anything if there are no files to generate
-			if (filesToProcess.size() > 0u)
-			{
-				//Forward FileGenerator necessary data to the file generation unit
-				setupFileGenerationUnit(fileGenerationUnit);
-
-				addNativePropertyRules(fileParserFactory.parsingSettings.propertyParsingSettings);
-
-				//Initialize the file parser factory compilation arguments
-				fileParserFactory._init();
-
-				generateMacrosFile(fileParserFactory);
-
-				//Generate missing metadata files (empty) just to make sure we do not encounter "inexistant header file" fatal error during parsing
-				//generateMissingMetadataFiles(filesToProcess);
-
-				if (threadCount == 0u)
-				{
-					processFilesMonothread(fileParserFactory, fileGenerationUnit, filesToProcess, genResult);
-				}
-				else
-				{
-					processFilesMultithread(fileParserFactory, fileGenerationUnit, filesToProcess, genResult, threadCount);
-				}
-
-				clearNativePropertyRules(fileParserFactory.parsingSettings.propertyParsingSettings);
-			}
-
-			genResult.duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() / 1000.0f;
-
-			genResult.completed = true;
-		}
+		genResult.completed = true;
 	}
 	
 	return genResult;

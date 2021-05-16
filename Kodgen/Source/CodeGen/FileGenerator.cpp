@@ -4,7 +4,7 @@
 
 using namespace kodgen;
 
-std::set<fs::path> FileGenerator::identifyFilesToProcess(FileGenerationResult& out_genResult, bool forceRegenerateAll) const noexcept
+std::set<fs::path> FileGenerator::identifyFilesToProcess(FileGenerationUnit const& fileGenerationUnit, FileGenerationResult& out_genResult, bool forceRegenerateAll) const noexcept
 {
 	std::set<fs::path> result;
 
@@ -13,7 +13,7 @@ std::set<fs::path> FileGenerator::identifyFilesToProcess(FileGenerationResult& o
 	{
 		if (fs::exists(path) && !fs::is_directory(path))
 		{
-			if (forceRegenerateAll || shouldRegenerateFile(path))
+			if (forceRegenerateAll || !fileGenerationUnit.isUpToDate(path))
 			{
 				result.emplace(path);
 			}
@@ -47,7 +47,7 @@ std::set<fs::path> FileGenerator::identifyFilesToProcess(FileGenerationResult& o
 						if (settings.supportedExtensions.find(entry.path().extension().string()) != settings.supportedExtensions.cend() &&	//supported extension
 							settings.getIgnoredFiles().find(entry.path()) == settings.getIgnoredFiles().cend())								//file is not ignored
 						{
-							if (forceRegenerateAll || shouldRegenerateFile(entry.path()))
+							if (forceRegenerateAll || !fileGenerationUnit.isUpToDate(entry.path()))
 							{
 								result.emplace(entry.path());
 							}
@@ -68,12 +68,58 @@ std::set<fs::path> FileGenerator::identifyFilesToProcess(FileGenerationResult& o
 		else
 		{
 			//Add FileGenerationFile invalid path
-			//out_genResult.fileGenerationErrors.emplace_back(pathToIncludedDir, "", "This path was find in the toParseDirectories list but it doesn't exist or is not a directory.");
 			logger->log("Directory " + pathToIncludedDir.string() + " doesn't exist", ILogger::ELogSeverity::Warning);
 		}
 	}
 
 	return result;
+}
+
+bool FileGenerator::checkOutputDirectory(FileGenerationResult& out_genResult) const noexcept
+{
+	//Before doing anything, make sure the output directory exists
+	//If it doesn't, create it
+	if (!fs::exists(settings.getOutputDirectory()))
+	{
+		//Try to create them is it doesn't exist
+		try
+		{
+			out_genResult.completed = fs::create_directories(settings.getOutputDirectory());
+
+			if (logger != nullptr)
+			{
+				logger->log("Specified output directory doesn't exist. Create " + FilesystemHelpers::sanitizePath(settings.getOutputDirectory()).string(), ILogger::ELogSeverity::Info);
+			}
+		}
+		catch (fs::filesystem_error const& exception)
+		{
+			out_genResult.fileGenerationErrors.emplace_back("", "", "Output directory is invalid: " + std::string(exception.what()));
+
+			if (logger != nullptr)
+			{
+				logger->log("Output directory is invalid: " + std::string(exception.what()), ILogger::ELogSeverity::Error);
+			}
+		}
+	}
+
+	return fs::is_directory(settings.getOutputDirectory());
+}
+
+uint32 FileGenerator::getThreadCount(uint32 initialThreadCount) const noexcept
+{
+	if (initialThreadCount == 0)
+	{
+		//Use hardware_concurrency if possible
+		initialThreadCount = std::thread::hardware_concurrency();
+
+		//If hardware_concurrency hints to 0, use 8 threads
+		if (initialThreadCount == 0)
+		{
+			initialThreadCount = 8u;
+		}
+	}
+
+	return initialThreadCount;
 }
 
 bool FileGenerator::shouldRegenerateFile(fs::path const& filePath) const noexcept
@@ -146,26 +192,10 @@ void FileGenerator::generateMacrosFile(FileParserFactoryBase& fileParserFactory)
 	macrosDefinitionFile.writeLine("\n#endif");
 }
 
-void FileGenerator::generateMissingMetadataFiles(std::set<fs::path> const& files) const noexcept
-{
-	for (fs::path const& file : files)
-	{
-		assert(fs::exists(file) && fs::is_regular_file(file));
-
-		fs::path generatedFilePath = makePathToGeneratedFile(file);
-
-		//Generate metadata file if it doesn't exist yet
-		if (!fs::exists(generatedFilePath))
-		{
-			std::fstream generatedFile(generatedFilePath, std::ios::out);
-		}
-	}
-}
-
 void FileGenerator::setupFileGenerationUnit(FileGenerationUnit& fileGenerationUnit) const noexcept
 {
-	fileGenerationUnit.logger		= logger;
-	fileGenerationUnit._settings	= &settings;
+	fileGenerationUnit.logger	= logger;
+	fileGenerationUnit.settings	= &settings;
 }
 
 void FileGenerator::checkGenerationSettings() const noexcept
