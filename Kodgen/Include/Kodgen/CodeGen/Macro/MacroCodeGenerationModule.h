@@ -18,12 +18,13 @@ namespace kodgen
 	class MacroCodeGenerationModule : public CodeGenerationModule
 	{
 		public:
-			struct Data : public CodeGenerationModule::Data
+			struct Data : public CodeGenerationData
 			{
 				ECodeGenLocation generationLocation;
 			};
 
-			virtual std::string generateCode(CodeGenerationModule::Data&	data,
-											 std::string&					out_errorMessage) const noexcept override;
+			virtual bool generateCode(EntityInfo const&		entity,
+									  CodeGenerationData&	data,
+									  std::string&			out_errorMessage) const noexcept override;
 	};
 }

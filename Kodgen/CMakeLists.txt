@@ -63,6 +63,7 @@ add_library(${KodgenTargetLibrary}
 					Source/CodeGen/FileGenerator.cpp
 					Source/CodeGen/FileGenerationSettings.cpp
 					Source/CodeGen/GeneratedFile.cpp
+					Source/CodeGen/CodeGenerationModuleGroup.cpp
 
 					Source/CodeGen/Macro/MacroCodeGenerationModule.cpp
 					Source/CodeGen/Macro/MacroFileGenerationUnit.cpp

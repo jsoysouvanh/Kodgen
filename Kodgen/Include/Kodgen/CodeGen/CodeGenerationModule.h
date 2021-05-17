@@ -10,12 +10,12 @@
 #include <string>
 #include <vector>
 
-#include "Kodgen/Parsing/ParsingResults/FileParsingResult.h"
+#include "Kodgen/CodeGen/CodeGenerationData.h"
 #include "Kodgen/Properties/PropertyRule.h"
 
 namespace kodgen
 {
-	//TODO: Add module dependency functionnality?
+	//TODO: Add module dependency functionality?
 	class CodeGenerationModule
 	{
 		protected:
@@ -23,33 +23,25 @@ namespace kodgen
 			std::vector<PropertyRule const*> propertyRules;
 
 		public:
-			struct Data
-			{
-				/** Entity we generate the code for. */
-				EntityInfo const&			entity;
-
-				/** Whole parsing result. */
-				FileParsingResult const&	parsingResult;
-
-				//TODO: Add FileGenerationSettings?
-			};
-
 			/**
 			*	Number defining in which order this module will generate code compared to other modules.
 			*	Modules with a lower generationOrder will execute first, and modules a high generationOrder will execute last.
 			*	Modules having the same generationOrder value will execute in an undefined order.
 			*/
-			int32	generationOrder	= 0;
+			static constexpr int32 const generationOrder = 0;
 
 			/**
-			*	@brief Generate code using the provided data as input.
+			*	@brief Generate code for an entity using the provided data as input.
 			* 
+			*	@param entity			Data of the entity the module is generating code for.
 			*	@param data				Data provided by the FileGenerationUnit. You can cast data to a more concrete type if you know the type provided by the FileGenerationUnit.
-			*	@param out_errorMessage	Optional error message to fill if something unexpected happens during code generation.
+			*	@param out_errorMessage	Error message to fill if an error happened during code generation.
 			* 
-			*	@return The generated code as a string.
+			*	@return true if the code generation completed successfully, else false.
+			*			If false is returned, out_errorMessage must be filled with an informative message describing why code generation failed.
 			*/
-			virtual std::string generateCode(CodeGenerationModule::Data&	data,
-											 std::string&					out_errorMessage) const noexcept = 0;
+			virtual bool generateCode(EntityInfo const&		entity,
+									  CodeGenerationData&	data,
+									  std::string&			out_errorMessage) const noexcept = 0;
 	};
 }

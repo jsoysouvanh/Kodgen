@@ -1,15 +1,19 @@
 #include "Kodgen/CodeGen/Macro/MacroFileGenerationUnit.h"
 
+#include <iostream>
+
 using namespace kodgen;
 
-void MacroFileGenerationUnit::generateCodeInternal(FileParsingResult const& parsingResult, FileGenerationResult& out_genResult) noexcept
+bool MacroFileGenerationUnit::generateCodeInternal(FileParsingResult const& parsingResult, FileGenerationResult& out_genResult) noexcept
 {
-	for (NamespaceInfo const& n : parsingResult.namespaces)
-	{
+	CodeGenerationData data{parsingResult, logger};
 
-	}
+	return foreachEntity([](EntityInfo const& entity, CodeGenerationData& data)
+			{
+				std::cout << "entity: " << entity.getFullName() << std::endl;
 
-	//TODO: iterate over all entities & each module & call module.generateCode(data);
+				return EIterationResult::Recurse;
+			}, data) != EIterationResult::AbortWithFailure;
 }
 
 bool MacroFileGenerationUnit::isUpToDate(fs::path const& sourceFile) const noexcept

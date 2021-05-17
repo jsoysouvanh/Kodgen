@@ -21,7 +21,7 @@ namespace kodgen
 			*	@param parsingResult	Result of a file parsing used to generate the new file.
 			*	@param out_genResult	Reference to the generation result to fill during file generation.
 			*/
-			virtual void	generateCodeInternal(FileParsingResult const&	parsingResult,
+			virtual bool	generateCodeInternal(FileParsingResult const&	parsingResult,
 												 FileGenerationResult&		out_genResult)	noexcept override;
 
 		public:

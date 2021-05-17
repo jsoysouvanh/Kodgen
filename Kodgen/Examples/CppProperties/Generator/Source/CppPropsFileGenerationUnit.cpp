@@ -1,5 +1,7 @@
 #include "CppPropsFileGenerationUnit.h"
 
+#include <iostream>
+
 using namespace kodgen;
 
 fs::path CppPropsFileGenerationUnit::makeGeneratedFilePath(fs::path const& sourceFilePath) const noexcept
@@ -7,15 +9,26 @@ fs::path CppPropsFileGenerationUnit::makeGeneratedFilePath(fs::path const& sourc
 	return (settings->getOutputDirectory() / sourceFilePath.filename()).replace_extension(settings->generatedFilesExtension);
 }
 
-void CppPropsFileGenerationUnit::generateCodeInternal(kodgen::FileParsingResult const& parsingResult, kodgen::FileGenerationResult& /* out_genResult */) noexcept
+bool CppPropsFileGenerationUnit::generateCodeInternal(kodgen::FileParsingResult const& parsingResult, kodgen::FileGenerationResult& out_genResult) noexcept
 {
-	kodgen::GeneratedFile generatedFile(makeGeneratedFilePath(parsingResult.parsedFile), parsingResult.parsedFile);
+	//kodgen::GeneratedFile generatedFile(makeGeneratedFilePath(parsingResult.parsedFile), parsingResult.parsedFile);
 
-	generatedFile.writeLines("#pragma once\n",
-							 "/**",
-							 "*	Source file: " + generatedFile.getSourceFilePath().string(),
-							 "*/\n",
-							 "#include \"" + settings->entityMacrosFilename + "\"\n");
+	//generatedFile.writeLines("#pragma once\n",
+	//						 "/**",
+	//						 "*	Source file: " + generatedFile.getSourceFilePath().string(),
+	//						 "*/\n",
+	//						 "#include \"" + settings->entityMacrosFilename + "\"\n");
+
+	logger->log("ICI", ILogger::ELogSeverity::Info);
+
+	CodeGenerationData data{parsingResult, logger};
+
+	return foreachEntity([](EntityInfo const& entity, CodeGenerationData& data)
+						 {
+							 data.logger->log("entity: " + entity.getFullName(), ILogger::ELogSeverity::Info);
+
+							 return EIterationResult::Recurse;
+						 }, data) != EIterationResult::AbortWithFailure;
 
 	//TODO: Modules
 }

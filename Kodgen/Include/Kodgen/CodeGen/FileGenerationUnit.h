@@ -9,6 +9,7 @@
 
 #include "Kodgen/CodeGen/FileGenerationSettings.h"
 #include "Kodgen/CodeGen/FileGenerationResult.h"
+#include "Kodgen/CodeGen/CodeGenerationData.h"
 #include "Kodgen/Parsing/ParsingResults/FileParsingResult.h"
 #include "Kodgen/Misc/ILogger.h"
 #include "Kodgen/Misc/Filesystem.h"
@@ -18,10 +19,59 @@ namespace kodgen
 {
 	class FileGenerationUnit
 	{
+		//TODO: Delete this
 		//FileGenerator can access FileGenerationUnit class to forward logger and settings
 		friend class FileGenerator;
 
 		protected:
+			enum class EIterationResult
+			{
+				/**
+				*	Recursively traverse the entities contained in the current entity, using
+				*	the same visitor and data.
+				*/
+				Recurse = 0,
+
+				/**
+				*	Continues the entities traversal with the next sibling entity without visiting
+				*	nested entities.
+				*/
+				Continue,
+
+				/**
+				*	Cancel the iteration on the parent's nested entities and continue with the next parent's sibling.
+				*/
+				Break,
+
+				/**
+				*	Abort completely the entity iteration but make the generateCode method return true (success).
+				*/
+				AbortWithSuccess,
+
+				/**
+				*	Abort completely the entity iteration and make the generateCode method return false (failure).
+				*/
+				AbortWithFailure
+			};
+
+		private:
+			/**
+			*	TODO
+			*/
+			EIterationResult foreachEntityInNamespace(NamespaceInfo const&	namespace_,
+													  EIterationResult (*visitor)(EntityInfo const&, CodeGenerationData&),
+													  CodeGenerationData&	data)											noexcept;
+
+			EIterationResult foreachEntityInStruct(StructClassInfo const&	struct_,
+												   EIterationResult (*visitor)(EntityInfo const&, CodeGenerationData&),
+												   CodeGenerationData&		data)											noexcept;
+
+			EIterationResult foreachEntityInEnum(EnumInfo const&		enum_,
+												 EIterationResult (*visitor)(EntityInfo const&, CodeGenerationData&),
+												 CodeGenerationData&	data)												noexcept;
+
+		protected:
+			/////TODO: Move this as public field and make the user load generation settings directly in the generation unit?
 			/** Logger used to issue logs from the FileGenerationUnit. */
 			ILogger*						logger		= nullptr;
 
@@ -35,7 +85,7 @@ namespace kodgen
 			*	@param parsingResult	Result of a file parsing used to generate the new file.
 			*	@param out_genResult	Reference to the generation result to fill during file generation.
 			*/
-			virtual void	generateCodeInternal(FileParsingResult const&	parsingResult,
+			virtual bool	generateCodeInternal(FileParsingResult const&	parsingResult,
 												 FileGenerationResult&		out_genResult)					noexcept = 0;
 
 			/**
@@ -44,14 +94,22 @@ namespace kodgen
 			*	@param parsingResult	Result of a file parsing used to generate code.
 			*	@param out_genResult	Reference to the generation result to fill during file generation.
 			*/
-			virtual void	preGenerateCode(FileParsingResult const&	parsingResult,
-											FileGenerationResult&		out_genResult)						noexcept;
+			virtual bool		preGenerateCode(FileParsingResult const&	parsingResult,
+												FileGenerationResult&		out_genResult)						noexcept;
 
 			/**
 			*	@brief Called just after FileGenerationUnit::generateCodeInternal. Can be used to perform any post-generation cleanup.
 			*/
-			virtual void	postGenerateCode(FileParsingResult const&	parsingResult,
-											 FileGenerationResult&		out_genResult)						noexcept;
+			virtual bool		postGenerateCode(FileParsingResult const&	parsingResult,
+												 FileGenerationResult&		out_genResult)						noexcept;
+
+			/**
+			*	@brief Iterate and execute recursively a function on each parsed entity.
+			* 
+			*	@TODO
+			*/
+			EIterationResult	foreachEntity(EIterationResult (*visitor)(EntityInfo const&, CodeGenerationData&),
+											  CodeGenerationData& data)											noexcept;
 
 			/**
 			*	@brief Check if file last write time is newer than reference file last write time.
@@ -76,12 +134,16 @@ namespace kodgen
 			virtual bool	isUpToDate(fs::path const& sourceFile)					const	noexcept = 0;
 
 			/**
-			*	@brief Generate code based on the provided parsing result.
+			*	@brief	Generate code based on the provided parsing result.
+			*			If any of preGenerateCode, generateCodeInternal or postGenerateCode returns false,
+			*			the code generation is aborted for this generation unit and false is returned.
 			*
 			*	@param parsingResult	Result of a file parsing used to generate the new file.
 			*	@param out_genResult	Reference to the generation result to fill during file generation.
+			* 
+			*	@return false if the generation process was aborted prematurely because of any error, else true.
 			*/
-			void			generateCode(FileParsingResult const&	parsingResult,
+			bool			generateCode(FileParsingResult const&	parsingResult,
 										 FileGenerationResult&		out_genResult)			noexcept;
 	};
 }
