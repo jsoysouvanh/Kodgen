@@ -11,7 +11,7 @@
 #include <array>
 
 #include "Kodgen/CodeGen/CodeGenData.h"
-#include "Kodgen/CodeGen/ECodeGenLocation.h"
+#include "Kodgen/CodeGen/Macro/ECodeGenLocation.h"
 
 namespace kodgen
 {
@@ -28,8 +28,8 @@ namespace kodgen
 			static inline std::array<std::string, static_cast<size_t>(ECodeGenLocation::Count)> const	_separators
 			{
 				"\n",	//HeaderFileHeader is not wrapped inside a macro, so can use \n without breaking the code
-				"\\\n",	//ClassFooter is wrapped in a macro so must use \ to keep it valid
-				"\\\n",	//HeaderFileFooter is wrapped in a macro so must use \ to keep it valid
+				"\\\n",	//ClassFooter is wrapped in a macro so must use \ to keep multiline generated code valid
+				"\\\n",	//HeaderFileFooter is wrapped in a macro so must use \ to keep multiline generated code valid
 				"\n"	//SourceFileHeader is not wrapped in a macro, so can use \n without breaking the code
 			};
 
@@ -45,6 +45,9 @@ namespace kodgen
 
 			/** Location the code should be generated in. */
 			ECodeGenLocation	codeGenLocation;
+
+			/** Separator to use to split the generated code. */
+			std::string			separator;
 
 			MacroCodeGenData(FileParsingResult const&	parsingResult,
 							 ILogger*					logger,

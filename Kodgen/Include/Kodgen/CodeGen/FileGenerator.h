@@ -17,7 +17,6 @@
 #include "Kodgen/CodeGen/FileGenerationResult.h"
 #include "Kodgen/CodeGen/CodeGenUnit.h"
 #include "Kodgen/Parsing/FileParserFactory.h"
-#include "Kodgen/Properties/NativeProperties/ParseAllNestedPropertyRule.h"
 #include "Kodgen/Threading/ThreadPool.h"
 #include "Kodgen/Threading/TaskHelper.h"
 
@@ -26,9 +25,6 @@ namespace kodgen
 	class FileGenerator
 	{
 		private:
-			/** Native property rules. */
-			ParseAllNestedPropertyRule		_parseAllNestedPropertyRule; //TODO: Delete
-
 			/**
 			*	@brief Process all provided files on multiple threads.
 			*	
@@ -111,20 +107,6 @@ namespace kodgen
 			*/
 			fs::path				makePathToGeneratedFile(fs::path const& sourceFilePath)					const	noexcept;
 			
-			/**
-			*	@brief Add native property rules to the parsing settings.
-			*	
-			*	@param propParsingSettings Property parsing settings of the file parser.
-			*/
-			void					addNativePropertyRules(PropertyParsingSettings& propParsingSettings)	const	noexcept;
-			
-			/**
-			*	@brief Remove native property rules from the parsing settings.
-			*	
-			*	@param propParsingSettings Property parsing settings of the file parser.
-			*/
-			void					clearNativePropertyRules(PropertyParsingSettings& propParsingSettings)	const	noexcept;
-
 			/**
 			*	@brief Generate / update the entity macros file.
 			*	

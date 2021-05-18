@@ -15,8 +15,7 @@ namespace kodgen
 {
 	struct PropertyGroup
 	{
-		public:
-			/** Collection containing all properties of an entity. */
-			std::vector<Property>	properties;
+		/** Collection containing all properties of an entity. */
+		std::vector<Property> properties;
 	};
 }

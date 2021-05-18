@@ -23,31 +23,13 @@ namespace kodgen
 			/** Collection of generation modules. */
 			std::vector<CodeGenModule*>	_generationModules;
 
-			/**
-			*	@brief	Execute code generation on a single generation module.
-			* 
-			*	@param generationModule	Module generating code.
-			*	@param entity			Entity the code is generated for.
-			*	@param data				Code generation data (yes).
-			*	@param out_result		String filled with the generated code.
-			*	@param out_errorMessage	Error message filled if an error happened during code generation.
-			* 
-			*	@return true if the generation module completed code generation successfully, else false.
-			*			If false is returned, out_errorMessage must be filled with an informative message describing why code generation failed.
-			*/
-			bool generateCodeInternal(CodeGenModule*	generationModule,
-									  EntityInfo const&		entity,
-									  CodeGenData&	data,
-									  std::string&			out_result,
-									  std::string&			out_errorMessage)	noexcept;
-
 		public:
 			/**
 			*	@brief Add a module to the internal list of generation modules.
 			* 
 			*	@param generationModule The generation module to add.
 			*/
-			void addModule(CodeGenModule& generationModule)		noexcept;
+			void addModule(CodeGenModule& generationModule)				noexcept;
 
 			/**
 			*	@brief Remove a module from the internal list of generation modules.
@@ -56,24 +38,19 @@ namespace kodgen
 			* 
 			*	@return true if a module has been successfully removed, else false.
 			*/
-			bool removeModule(CodeGenModule& generationModule)	noexcept;
+			bool removeModule(CodeGenModule& generationModule)			noexcept;
 
 			/**
-			*	@brief	Generate code by executing the generateCode method of each registered generation module.
+			*	@brief Generate code by executing the generateCode method of each registered generation module.
 			* 
-			*	@param entity			Entity the code is generated for.
-			*	@param data				Code generation data (yes).
-			*	@param separator		String to append to out_result between each module code generation.
-			*	@param out_result		String filled with the generated code.
-			*	@param out_errorMessage	Error message filled if an error happened during code generation.
+			*	@param entity		Entity the code is generated for. Might be nullptr, in which case the code is not generated for a specific entity.
+			*	@param data			Code generation data (yes).
+			*	@param out_result	String filled with the generated code.
 			* 
 			*	@return true if all registered generation modules completed their code generation successfully, else false.
-			*			If false is returned, out_errorMessage must be filled with an informative message describing why code generation failed.
 			*/
-			bool generateCode(EntityInfo const&		entity,
-							  CodeGenData&	data,
-							  std::string const&	separator,
-							  std::string&			out_result,
-							  std::string&			out_errorMessage)	noexcept;
+			bool generateCode(EntityInfo const*		entity,
+							  CodeGenData&			data,
+							  std::string&			out_result)	const	noexcept;
 	};
 }

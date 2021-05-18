@@ -12,16 +12,12 @@
 
 namespace kodgen
 {
-	//Forward declaration
-	class PropertyRule;
-
 	struct Property
 	{
-		public:
-			/** Name of this property. */
-			std::string					name;
+		/** Name of this property. */
+		std::string					name;
 
-			/** Collection of all arguments of this property. */
-			std::vector<std::string>	arguments;
+		/** Collection of all arguments of this property. */
+		std::vector<std::string>	arguments;
 	};
 }

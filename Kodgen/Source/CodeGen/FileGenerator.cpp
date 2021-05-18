@@ -138,16 +138,6 @@ fs::path FileGenerator::makePathToGeneratedFile(fs::path const& sourceFilePath) 
 	return (settings->getOutputDirectory() / sourceFilePath.filename()).replace_extension(settings->generatedFilesExtension);
 }
 
-void FileGenerator::addNativePropertyRules(PropertyParsingSettings& propParsingSettings) const noexcept
-{
-	propParsingSettings.propertyRules.push_back(&_parseAllNestedPropertyRule);
-}
-
-void FileGenerator::clearNativePropertyRules(PropertyParsingSettings& propParsingSettings) const noexcept
-{
-	propParsingSettings.propertyRules.pop_back();	//Remove _parseAllNestedPropertyRule
-}
-
 void FileGenerator::generateMacrosFile(FileParserFactoryBase& fileParserFactory) const noexcept
 {
 	GeneratedFile macrosDefinitionFile(settings->getOutputDirectory() / settings->entityMacrosFilename);

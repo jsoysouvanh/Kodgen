@@ -4,18 +4,18 @@
 
 using namespace kodgen;
 
-void CodeGenModule::registerPropertyRule(PropertyRule const& propertyRule) noexcept
+void CodeGenModule::addPropertyRule(PropertyCodeGen const& propertyRule) noexcept
 {
-	_propertyRules.push_back(&propertyRule);
+	_propertyCodeGenerators.push_back(&propertyRule);
 }
 
-bool CodeGenModule::unregisterPropertyRule(PropertyRule const& propertyRule) noexcept
+bool CodeGenModule::removePropertyRule(PropertyCodeGen const& propertyRule) noexcept
 {
-	auto it = std::find(_propertyRules.cbegin(), _propertyRules.cend(), &propertyRule);
+	auto it = std::find(_propertyCodeGenerators.cbegin(), _propertyCodeGenerators.cend(), &propertyRule);
 
-	if (it != _propertyRules.cend())
+	if (it != _propertyCodeGenerators.cend())
 	{
-		_propertyRules.erase(it);
+		_propertyCodeGenerators.erase(it);
 
 		return true;
 	}
@@ -23,7 +23,42 @@ bool CodeGenModule::unregisterPropertyRule(PropertyRule const& propertyRule) noe
 	return false;
 }
 
-std::vector<PropertyRule const*> const& CodeGenModule::getPropertyRules() const noexcept
+bool CodeGenModule::generateCode(EntityInfo const* entity, CodeGenData& data, std::string& inout_result) const noexcept
 {
-	return _propertyRules;
+	if (entity != nullptr)
+	{
+		return runPropertyCodeGenerators(*entity, data, inout_result);
+	}
+
+	return true;
+}
+
+bool CodeGenModule::runPropertyCodeGenerators(EntityInfo const& entity, CodeGenData& data, std::string& inout_result) const noexcept
+{
+	Property const* currentProperty;
+
+	//Iterate over all entity's properties
+	for (uint8 i = 0u; i < entity.propertyGroup.properties.size(); i++)
+	{
+		currentProperty = &entity.propertyGroup.properties[i];
+
+		//Try to generate code with each registered property generator
+		for (PropertyCodeGen const* propertyCodeGen : _propertyCodeGenerators)
+		{
+			if (propertyCodeGen->shouldGenerateCode(entity, *currentProperty, i))
+			{
+				if (!propertyCodeGen->generateCode(entity, *currentProperty, i, data, inout_result))
+				{
+					return false;
+				}
+			}
+		}
+	}
+
+	return true;
+}
+
+std::vector<PropertyCodeGen const*> const& CodeGenModule::getPropertyRules() const noexcept
+{
+	return _propertyCodeGenerators;
 }

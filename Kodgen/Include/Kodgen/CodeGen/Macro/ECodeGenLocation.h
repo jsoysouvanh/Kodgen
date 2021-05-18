@@ -12,8 +12,7 @@ namespace kodgen
 	enum class ECodeGenLocation
 	{
 		/**
-		*	Code will be generated in the generated file (without macro),
-		*	so it will be injected as soon as the generated file is included.
+		*	Code will be generated at the very top of the generated file (without macro).
 		*/
 		HeaderFileHeader = 0,
 

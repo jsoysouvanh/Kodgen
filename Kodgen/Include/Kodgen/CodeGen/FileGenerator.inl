@@ -125,8 +125,6 @@ FileGenerationResult FileGenerator::generateFiles(FileParserFactoryType<FilePars
 		//Don't setup anything if there are no files to generate
 		if (filesToProcess.size() > 0u)
 		{
-			addNativePropertyRules(fileParserFactory.parsingSettings.propertyParsingSettings);
-
 			//Initialize the file parser factory compilation arguments
 			fileParserFactory._init();
 
@@ -145,8 +143,6 @@ FileGenerationResult FileGenerator::generateFiles(FileParserFactoryType<FilePars
 			{
 				processFilesMultithread(fileParserFactory, codeGenUnit, filesToProcess, genResult, threadCount);
 			}
-
-			clearNativePropertyRules(fileParserFactory.parsingSettings.propertyParsingSettings);
 		}
 
 		genResult.duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() / 1000.0f;

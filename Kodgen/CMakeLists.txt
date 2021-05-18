@@ -13,11 +13,7 @@ add_library(${KodgenTargetLibrary}
 				STATIC
 					Source/Properties/Property.cpp		
 					Source/Properties/PropertyGroup.cpp
-					Source/Properties/PropertyRule.cpp
-					Source/Properties/DefaultPropertyRule.cpp
 					Source/Properties/PropertyParsingSettings.cpp
-					
-					Source/Properties/NativeProperties/ParseAllNestedPropertyRule.cpp
 					
 					Source/InfoStructures/EntityInfo.cpp
 					Source/InfoStructures/NamespaceInfo.cpp
@@ -65,10 +61,10 @@ add_library(${KodgenTargetLibrary}
 					Source/CodeGen/GeneratedFile.cpp
 					Source/CodeGen/CodeGenModule.cpp
 					Source/CodeGen/CodeGenModuleGroup.cpp
-
-					Source/CodeGen/Macro/MacroCodeGenModule.cpp
+					
 					Source/CodeGen/Macro/MacroCodeGenUnit.cpp
 					Source/CodeGen/Macro/MacroCodeGenData.cpp
+					Source/CodeGen/Macro/MacroPropertyCodeGen.cpp
 			 
 					Source/Threading/ThreadPool.cpp
 					Source/Threading/TaskBase.cpp

@@ -31,46 +31,21 @@ bool CodeGenModuleGroup::removeModule(CodeGenModule& generationModule) noexcept
 
 		return true;
 	}
-
+	
 	return false;
 }
 
-bool CodeGenModuleGroup::generateCode(EntityInfo const& entity, CodeGenData& data, std::string const&	separator, std::string& out_result, std::string& out_errorMessage) noexcept
+bool CodeGenModuleGroup::generateCode(EntityInfo const* entity, CodeGenData& data, std::string& out_result) const noexcept
 {
-	out_errorMessage.clear();
+	out_result.clear();
 
-	//Generate code for each module (except the last one to make sure the separator is not appended after the last module)
-	for (int i = 0; i < _generationModules.size() - 1; i++)
+	//Generate code for each module
+	for (CodeGenModule* codeGenModule : _generationModules)
 	{
-		if (!generateCodeInternal(_generationModules[i], entity, data, out_result, out_errorMessage))
+		if (!codeGenModule->generateCode(entity, data, out_result))
 		{
 			return false;
 		}
-
-		//Append the separator between each code generation module
-		out_result += separator;
-	}
-
-	//Generate code for the last module
-	if (!_generationModules.empty() && !generateCodeInternal(_generationModules[_generationModules.size() - 1], entity, data, out_result, out_errorMessage))
-	{
-		return false;
-	}
-
-	return true;
-}
-
-bool CodeGenModuleGroup::generateCodeInternal(CodeGenModule* generationModule, EntityInfo const& entity, CodeGenData& data, std::string& out_result, std::string& out_errorMessage) noexcept
-{
-	if (!generationModule->generateCode(entity, data, out_result, out_errorMessage))
-	{
-		//Fill with an error message if the generation module didn't do so
-		if (out_errorMessage.empty())
-		{
-			out_errorMessage = "Generation module failed to generate code but did not provide any error message.";
-		}
-
-		return false;
 	}
 
 	return true;

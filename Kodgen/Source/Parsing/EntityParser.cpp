@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-#include "Kodgen/Properties/NativeProperties/NativeProperties.h"
+#include "Kodgen/Properties/NativeProperties.h"
 
 using namespace kodgen;
 

@@ -7,10 +7,8 @@
 
 #pragma once
 
-#include <vector>
-#include <unordered_set>
+#include <string>
 
-#include "Kodgen/Properties/PropertyRule.h"
 #include "Kodgen/Misc/TomlUtility.h"
 #include "Kodgen/Misc/ILogger.h"
 
@@ -27,9 +25,6 @@ namespace kodgen
 
 			/** Chars used to respectively start and close a group of sub properties. */
 			char								argumentEnclosers[2]	= { '[', ']' };
-
-			/** Collection of all property rules. */
-			std::vector<PropertyRule const*>	propertyRules;
 
 			/** Macro to use to attach properties to a namespace. */
 			std::string							namespaceMacroName		= "Namespace";
@@ -64,6 +59,8 @@ namespace kodgen
 			~PropertyParsingSettings()								= default;
 
 			/**
+			*	//TODO: Inherit from TomlSettings instead
+			* 
 			*	@brief Load settings from a TOML file.
 			*	
 			*	@param table TOML file table to look into.

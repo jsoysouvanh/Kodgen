@@ -2,12 +2,19 @@
 
 #include <Kodgen/CodeGen/CodeGenModule.h>
 
+#include "GetPropertyCodeGen.h"
+#include "SetPropertyCodeGen.h"
+
 class GetSetCGM : public kodgen::CodeGenModule
 {
 	private:
-		//TODO: GetPropRule
-		//TODO: SetPropRule
+		GetPropertyCodeGen	_getPropertyCodeGen;
+		SetPropertyCodeGen	_setPropertyCodeGen;
 
 	public:
-		GetSetCGM() noexcept;
+		GetSetCGM() noexcept
+		{
+			addPropertyRule(_getPropertyCodeGen);
+			addPropertyRule(_setPropertyCodeGen);
+		}
 };

@@ -7,7 +7,7 @@
 #include <Kodgen/CodeGen/CodeGenModuleGroup.h>
 
 #include "CppPropsParserFactory.h"
-#include "CppPropsCodeTemplate.h"
+#include "GetSetCGM.h"
 
 void initGenerationSettings(fs::path const& workingDirectory, kodgen::FileGenerator::Settings& out_settings)
 {
@@ -49,10 +49,10 @@ int main(int argc, char** argv)
 			fileParserFactory.parsingSettings.setCompilerExeName("clang++");
 
 			//Setup code generation unit
-			//TODO: Module
-
 			kodgen::CodeGenModuleGroup codeGenModuleGroup;
-			//codeGenModuleGroup.addModule();
+
+			GetSetCGM getSetCodeGenModule;
+			codeGenModuleGroup.addModule(getSetCodeGenModule);
 
 			kodgen::MacroCodeGenUnit codeGenUnit;
 			codeGenUnit.codeGenModuleGroup = &codeGenModuleGroup;
