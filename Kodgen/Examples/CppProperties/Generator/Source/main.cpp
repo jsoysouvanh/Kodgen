@@ -3,10 +3,32 @@
 #include <Kodgen/Misc/Filesystem.h>
 #include <Kodgen/Misc/DefaultLogger.h>
 #include <Kodgen/CodeGen/FileGenerator.h>
+#include <Kodgen/CodeGen/Macro/MacroCodeGenUnit.h>
+#include <Kodgen/CodeGen/CodeGenModuleGroup.h>
 
 #include "CppPropsParserFactory.h"
 #include "CppPropsCodeTemplate.h"
-#include "CppPropsFileGenerationUnit.h"
+
+void initGenerationSettings(fs::path const& workingDirectory, kodgen::FileGenerator::Settings& out_settings)
+{
+	fs::path includeDirectory	= workingDirectory / "Include";
+	fs::path generatedDirectory	= includeDirectory / "Generated";
+
+	//Parse WorkingDir/...
+	out_settings.addToParseDirectory(includeDirectory);
+
+	//Ignore generated files...
+	out_settings.addIgnoredDirectory(generatedDirectory);
+
+	//Only parse .h files
+	out_settings.supportedExtensions.emplace(".h");
+
+	//All generated files will be located in WorkingDir/Include/Generated
+	out_settings.setOutputDirectory(generatedDirectory);
+
+	//Generated files will use .myCustomExtension.h extension
+	out_settings.generatedFilesExtension = ".myCustomExtension.h";
+}
 
 int main(int argc, char** argv)
 {
@@ -21,36 +43,28 @@ int main(int argc, char** argv)
 		{
 			logger.log("Working Directory: " + workingDirectory.string(), kodgen::ILogger::ELogSeverity::Info);
 
-			fs::path includeDirectory	= workingDirectory / "Include";
-			fs::path generatedDirectory	= includeDirectory / "Generated";
-
-			CppPropsParserFactory		fileParserFactory;
-			CppPropsFileGenerationUnit	fileGenUnit;
-			kodgen::FileGenerator		fileGenerator;
-
-			//Parser and generator should log through logger
-			fileParserFactory.logger	= &logger;
-			fileGenerator.logger		= &logger;
-
+			//Setup File parser factory
+			CppPropsParserFactory fileParserFactory;
+			fileParserFactory.logger = &logger;
 			fileParserFactory.parsingSettings.setCompilerExeName("clang++");
 
+			//Setup code generation unit
+			//TODO: Module
+
+			kodgen::CodeGenModuleGroup codeGenModuleGroup;
+			//codeGenModuleGroup.addModule();
+
+			kodgen::MacroCodeGenUnit codeGenUnit;
+			codeGenUnit.codeGenModuleGroup = &codeGenModuleGroup;
+
+			//TODO: 
+
+			//Setup generation settings
 			kodgen::FileGenerator::Settings	fileGenSettings;
+			initGenerationSettings(workingDirectory, fileGenSettings);
 
-			//Parse WorkingDir/...
-			fileGenSettings.addToParseDirectory(includeDirectory);
-
-			//Ignore generated files...
-			fileGenSettings.addIgnoredDirectory(generatedDirectory);
-			
-			//Only parse .h files
-			fileGenSettings.supportedExtensions.emplace(".h");
-
-			//All generated files will be located in WorkingDir/Include/Generated
-			fileGenSettings.setOutputDirectory(generatedDirectory);
-
-			//Generated files will use .myCustomExtension.h extension
-			fileGenSettings.generatedFilesExtension = ".myCustomExtension.h";
-
+			kodgen::FileGenerator fileGenerator;
+			fileGenerator.logger = &logger;
 			fileGenerator.settings = &fileGenSettings;
 
 			//Bind the PropertyCodeTemplate name to the CppPropsCodeTemplate class
@@ -65,7 +79,7 @@ int main(int argc, char** argv)
 			//*/
 			//fileGenerator.setDefaultGeneratedCodeTemplate(kodgen::EEntityType::Class, "PropertyCodeTemplate");
 
-			kodgen::FileGenerationResult genResult = fileGenerator.generateFiles(fileParserFactory, fileGenUnit, true);
+			kodgen::FileGenerationResult genResult = fileGenerator.generateFiles(fileParserFactory, codeGenUnit, true);
 
 			if (genResult.completed)
 			{

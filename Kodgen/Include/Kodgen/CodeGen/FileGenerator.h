@@ -15,7 +15,7 @@
 #include "Kodgen/Misc/ILogger.h"
 #include "Kodgen/Misc/Settings.h"
 #include "Kodgen/CodeGen/FileGenerationResult.h"
-#include "Kodgen/CodeGen/FileGenerationUnit.h"
+#include "Kodgen/CodeGen/CodeGenUnit.h"
 #include "Kodgen/Parsing/FileParserFactory.h"
 #include "Kodgen/Properties/NativeProperties/ParseAllNestedPropertyRule.h"
 #include "Kodgen/Threading/ThreadPool.h"
@@ -27,20 +27,20 @@ namespace kodgen
 	{
 		private:
 			/** Native property rules. */
-			ParseAllNestedPropertyRule		_parseAllNestedPropertyRule;
+			ParseAllNestedPropertyRule		_parseAllNestedPropertyRule; //TODO: Delete
 
 			/**
 			*	@brief Process all provided files on multiple threads.
 			*	
 			*	@param fileParserFactory	Factory to use to generate a file parser for each thread.
-			*	@param fileGenerationUnit	Generation unit used to generate files. It must have a clean state when this method is called.
+			*	@param codeGenUnit			Generation unit used to generate files. It must have a clean state when this method is called.
 			*	@param toProcessFiles		Collection of all files to process.
 			*	@param out_genResult		Reference to the generation result to fill during file generation.
 			*	@param threadCount			Number of additional threads to use to process the files.
 			*/
-			template <template <typename> typename FileParserFactoryType, typename FileParserType, typename FileGenerationUnitType>
+			template <template <typename> typename FileParserFactoryType, typename FileParserType, typename CodeGenUnitType>
 			void	processFilesMultithread(FileParserFactoryType<FileParserType>&	fileParserFactory,
-											FileGenerationUnitType&					fileGenerationUnit,
+											CodeGenUnitType&						codeGenUnit,
 											std::set<fs::path> const&				toProcessFiles,
 											FileGenerationResult&					out_genResult,
 											uint32									threadCount)			const	noexcept;
@@ -49,28 +49,28 @@ namespace kodgen
 			*	@brief Process all provided files on the main thread.
 			*
 			*	@param fileParserFactory	Factory to use to generate the file parser.
-			*	@param fileGenerationUnit	Generation unit used to generate files. It must have a clean state when this method is called.
+			*	@param codeGenUnit			Generation unit used to generate files. It must have a clean state when this method is called.
 			*	@param toProcessFiles		Collection of all files to process.
 			*	@param out_genResult		Reference to the generation result to fill during file generation.
 			*/
-			template <template <typename> typename FileParserFactoryType, typename FileParserType, typename FileGenerationUnitType>
+			template <template <typename> typename FileParserFactoryType, typename FileParserType, typename CodeGenUnitType>
 			void	processFilesMonothread(FileParserFactoryType<FileParserType>&	fileParserFactory,
-										   FileGenerationUnitType&					fileGenerationUnit,
+										   CodeGenUnitType&							codeGenUnit,
 										   std::set<fs::path> const&				toProcessFiles,
 										   FileGenerationResult&					out_genResult)			const	noexcept;
 
 			/**
 			*	@brief Identify all files which will be parsed & regenerated.
 			*	
-			*	@param fileGenerationUnit	Generation unit used to determine whether a file should be reparsed/regenerated or not.
+			*	@param codeGenUnit			Generation unit used to determine whether a file should be reparsed/regenerated or not.
 			*	@param out_genResult		Reference to the generation result to fill during file generation.
 			*	@param forceRegenerateAll	Should all files be regenerated or not (regardless of FileGenerator::shouldRegenerateFile() returned value).
 			*
 			*	@return A collection of all files which will be regenerated.
 			*/
-			std::set<fs::path>		identifyFilesToProcess(FileGenerationUnit const&	fileGenerationUnit,
-														   FileGenerationResult&		out_genResult,
-														   bool							forceRegenerateAll)	const	noexcept;
+			std::set<fs::path>		identifyFilesToProcess(CodeGenUnit const&		codeGenUnit,
+														   FileGenerationResult&	out_genResult,
+														   bool						forceRegenerateAll)	const	noexcept;
 
 			/**
 			*			If the directory doesn't exist, the method will try to create it.
@@ -135,9 +135,9 @@ namespace kodgen
 			/**
 			*	@brief Prepare the file generation unit for generation, forwarding any required generation settings.
 			*	
-			*	@param fileGenerationUnit The generationUnit to setup.
+			*	@param codeGenUnit The generation unit to setup.
 			*/
-			void					setupFileGenerationUnit(FileGenerationUnit& fileGenerationUnit)			const	noexcept;
+			void					setupFileGenerationUnit(CodeGenUnit& codeGenUnit)						const	noexcept;
 
 			/**
 			*	@brief Check that all generation settings are valid.
@@ -160,7 +160,7 @@ namespace kodgen
 			*			and forward them to individual file generation unit for code generation.
 			*
 			*	@param fileParserFactory	Factory to use to generate the file parser(s).
-			*	@param fileGenerationUnit	Generation unit used to generate files. It must have a clean state when this method is called.
+			*	@param codeGenUnit			Generation unit used to generate code. It must have a clean state when this method is called.
 			*	@param forceRegenerateAll	Ignore the last write time check and reparse / regenerate all files.
 			*	@param threadCount			Number of threads to use for file parsing and generation.
 			*								If 0 is provided, the number of concurrent threads supported by the implementation will be used (std::thread::hardware_concurrency(), and 8 if std::thread::hardware_concurrency() returns 0).
@@ -168,9 +168,9 @@ namespace kodgen
 			*
 			*	@return Structure containing file generation report.
 			*/
-			template <template <typename> typename FileParserFactoryType, typename FileParserType, typename FileGenerationUnitType>
+			template <template <typename> typename FileParserFactoryType, typename FileParserType, typename CodeGenUnitType>
 			FileGenerationResult generateFiles(FileParserFactoryType<FileParserType>&	fileParserFactory,
-											   FileGenerationUnitType&					fileGenerationUnit,
+											   CodeGenUnitType&							codeGenUnit,
 											   bool										forceRegenerateAll	= false,
 											   uint32									threadCount			= 0)	noexcept;
 	};

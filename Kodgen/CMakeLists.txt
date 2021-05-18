@@ -57,16 +57,18 @@ add_library(${KodgenTargetLibrary}
 					Source/Misc/TomlUtility.cpp
 					Source/Misc/Settings.cpp
 	
-					Source/CodeGen/FileGenerationUnit.cpp
+					Source/CodeGen/CodeGenUnit.cpp
 					Source/CodeGen/FileGenerationResult.cpp
 					Source/CodeGen/FileGenerationError.cpp
 					Source/CodeGen/FileGenerator.cpp
 					Source/CodeGen/FileGenerationSettings.cpp
 					Source/CodeGen/GeneratedFile.cpp
-					Source/CodeGen/CodeGenerationModuleGroup.cpp
+					Source/CodeGen/CodeGenModule.cpp
+					Source/CodeGen/CodeGenModuleGroup.cpp
 
-					Source/CodeGen/Macro/MacroCodeGenerationModule.cpp
-					Source/CodeGen/Macro/MacroFileGenerationUnit.cpp
+					Source/CodeGen/Macro/MacroCodeGenModule.cpp
+					Source/CodeGen/Macro/MacroCodeGenUnit.cpp
+					Source/CodeGen/Macro/MacroCodeGenData.cpp
 			 
 					Source/Threading/ThreadPool.cpp
 					Source/Threading/TaskBase.cpp

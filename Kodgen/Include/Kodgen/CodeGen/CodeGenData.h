@@ -13,7 +13,7 @@
 
 namespace kodgen
 {
-	struct CodeGenerationData
+	struct CodeGenData
 	{
 		/** Whole parsing result. */
 		FileParsingResult const&	parsingResult;

@@ -7,12 +7,28 @@
 
 #pragma once
 
-#include "Kodgen/CodeGen/FileGenerationUnit.h"
+#include "Kodgen/CodeGen/CodeGenUnit.h"
 
 namespace kodgen
 {
-	class MacroFileGenerationUnit : public FileGenerationUnit
+	//Forward declaration
+	class CodeGenModuleGroup;
+
+	class MacroCodeGenUnit : public CodeGenUnit
 	{
+		private:
+			/**
+			*	@brief Handle the whole code generation for a given entity with the provided data.
+			* 
+			*	@param entity	Entity we generate the code for.
+			*	@param data		Generation data (really??)
+			* 
+			*	@return EIterationResult::Recurse if the traversal completed successfully.
+			*			EIterationResult::AbortWithSuccess if the traversal was aborted prematurely without error.
+			*			EIterationResult::AbortWithFailure if the traversal was aborted prematurely with an error.
+			*/
+			static EIterationResult generateEntityCode(EntityInfo const& entity, CodeGenData& data)	noexcept;
+
 		protected:
 			/**
 			*	@brief	Generate code based on the provided parsing result.
@@ -25,6 +41,9 @@ namespace kodgen
 												 FileGenerationResult&		out_genResult)	noexcept override;
 
 		public:
+			/** Pointer to a collection of all generation modules used by this generation unit. */
+			CodeGenModuleGroup* codeGenModuleGroup;
+
 			/**
 			*	@brief Check whether the generated code for a given source file is up-to-date or not.
 			* 

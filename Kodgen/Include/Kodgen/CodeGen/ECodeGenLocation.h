@@ -30,6 +30,11 @@ namespace kodgen
 		/**
 		*	Code will be inserted at the top of the source file.
 		*/
-		SourceFileHeader
+		SourceFileHeader,
+
+		/**
+		*	Internal use only.
+		*/
+		Count
 	};
 }

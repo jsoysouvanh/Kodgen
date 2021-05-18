@@ -6,7 +6,7 @@
 
 using namespace kodgen;
 
-std::set<fs::path> FileGenerator::identifyFilesToProcess(FileGenerationUnit const& fileGenerationUnit, FileGenerationResult& out_genResult, bool forceRegenerateAll) const noexcept
+std::set<fs::path> FileGenerator::identifyFilesToProcess(CodeGenUnit const& codeGenUnit, FileGenerationResult& out_genResult, bool forceRegenerateAll) const noexcept
 {
 	std::set<fs::path> result;
 
@@ -15,7 +15,7 @@ std::set<fs::path> FileGenerator::identifyFilesToProcess(FileGenerationUnit cons
 	{
 		if (fs::exists(path) && !fs::is_directory(path))
 		{
-			if (forceRegenerateAll || !fileGenerationUnit.isUpToDate(path))
+			if (forceRegenerateAll || !codeGenUnit.isUpToDate(path))
 			{
 				result.emplace(path);
 			}
@@ -49,7 +49,7 @@ std::set<fs::path> FileGenerator::identifyFilesToProcess(FileGenerationUnit cons
 						if (settings->supportedExtensions.find(entry.path().extension().string()) != settings->supportedExtensions.cend() &&	//supported extension
 							settings->getIgnoredFiles().find(entry.path()) == settings->getIgnoredFiles().cend())								//file is not ignored
 						{
-							if (forceRegenerateAll || !fileGenerationUnit.isUpToDate(entry.path()))
+							if (forceRegenerateAll || !codeGenUnit.isUpToDate(entry.path()))
 							{
 								result.emplace(entry.path());
 							}
@@ -172,9 +172,9 @@ void FileGenerator::generateMacrosFile(FileParserFactoryBase& fileParserFactory)
 	macrosDefinitionFile.writeLine("\n#endif");
 }
 
-void FileGenerator::setupFileGenerationUnit(FileGenerationUnit& fileGenerationUnit) const noexcept
+void FileGenerator::setupFileGenerationUnit(CodeGenUnit& codeGenUnit) const noexcept
 {
-	fileGenerationUnit.logger	= logger;
+	codeGenUnit.logger	= logger;
 	//fileGenerationUnit.settings	= &settings;
 }
 

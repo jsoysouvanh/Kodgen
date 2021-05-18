@@ -1,4 +1,4 @@
-#include "Kodgen/CodeGen/FileGenerationUnit.h"
+#include "Kodgen/CodeGen/CodeGenUnit.h"
 
 #define HANDLE_NESTED_ENTITY_ITERATION_RESULT(result)														\
 	if (result == EIterationResult::Break)																	\
@@ -12,14 +12,14 @@
 
 using namespace kodgen;
 
-bool FileGenerationUnit::generateCode(FileParsingResult const& parsingResult, FileGenerationResult& out_genResult) noexcept
+bool CodeGenUnit::generateCode(FileParsingResult const& parsingResult, FileGenerationResult& out_genResult) noexcept
 {
 	return	preGenerateCode(parsingResult, out_genResult) &&
 			generateCodeInternal(parsingResult, out_genResult) &&
 			postGenerateCode(parsingResult, out_genResult);
 }
 
-bool FileGenerationUnit::isFileNewerThan(fs::path const& file, fs::path const& referenceFile) const noexcept
+bool CodeGenUnit::isFileNewerThan(fs::path const& file, fs::path const& referenceFile) const noexcept
 {
 	assert(fs::exists(file));
 	assert(fs::is_regular_file(file));
@@ -29,19 +29,19 @@ bool FileGenerationUnit::isFileNewerThan(fs::path const& file, fs::path const& r
 	return fs::last_write_time(file) > fs::last_write_time(referenceFile);
 }
 
-bool FileGenerationUnit::preGenerateCode(FileParsingResult const& /* parsingResult */, FileGenerationResult& /* out_genResult */) noexcept
+bool CodeGenUnit::preGenerateCode(FileParsingResult const& /* parsingResult */, FileGenerationResult& /* out_genResult */) noexcept
 {
 	//Default implementation does nothing
 	return true;
 }
 
-bool FileGenerationUnit::postGenerateCode(FileParsingResult const& /* parsingResult */, FileGenerationResult& /* out_genResult */) noexcept
+bool CodeGenUnit::postGenerateCode(FileParsingResult const& /* parsingResult */, FileGenerationResult& /* out_genResult */) noexcept
 {
 	//Default implementation does nothing
 	return true;
 }
 
-FileGenerationUnit::EIterationResult FileGenerationUnit::foreachEntity(EIterationResult (*visitor)(EntityInfo const&, CodeGenerationData&), CodeGenerationData& data) noexcept
+CodeGenUnit::EIterationResult CodeGenUnit::foreachEntity(EIterationResult (*visitor)(EntityInfo const&, CodeGenData&), CodeGenData& data) noexcept
 {
 	assert(visitor != nullptr);
 
@@ -93,7 +93,7 @@ FileGenerationUnit::EIterationResult FileGenerationUnit::foreachEntity(EIteratio
 	return EIterationResult::Recurse;
 }
 
-FileGenerationUnit::EIterationResult FileGenerationUnit::foreachEntityInNamespace(NamespaceInfo const& namespace_, EIterationResult (*visitor)(EntityInfo const&, CodeGenerationData&), CodeGenerationData& data) noexcept
+CodeGenUnit::EIterationResult CodeGenUnit::foreachEntityInNamespace(NamespaceInfo const& namespace_, EIterationResult (*visitor)(EntityInfo const&, CodeGenData&), CodeGenData& data) noexcept
 {
 	assert(visitor != nullptr);
 	
@@ -148,10 +148,10 @@ FileGenerationUnit::EIterationResult FileGenerationUnit::foreachEntityInNamespac
 		HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
 	}
 
-	return FileGenerationUnit::EIterationResult::Recurse;
+	return EIterationResult::Recurse;
 }
 
-FileGenerationUnit::EIterationResult FileGenerationUnit::foreachEntityInStruct(StructClassInfo const& struct_, EIterationResult (*visitor)(EntityInfo const&, CodeGenerationData&), CodeGenerationData& data) noexcept
+CodeGenUnit::EIterationResult CodeGenUnit::foreachEntityInStruct(StructClassInfo const& struct_, EIterationResult (*visitor)(EntityInfo const&, CodeGenData&), CodeGenData& data) noexcept
 {
 	assert(visitor != nullptr);
 
@@ -199,10 +199,10 @@ FileGenerationUnit::EIterationResult FileGenerationUnit::foreachEntityInStruct(S
 		HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
 	}
 	
-	return FileGenerationUnit::EIterationResult::Recurse;
+	return EIterationResult::Recurse;
 }
 
-FileGenerationUnit::EIterationResult FileGenerationUnit::foreachEntityInEnum(EnumInfo const& enum_, EIterationResult (*visitor)(EntityInfo const&, CodeGenerationData&), CodeGenerationData& data) noexcept
+CodeGenUnit::EIterationResult CodeGenUnit::foreachEntityInEnum(EnumInfo const& enum_, EIterationResult (*visitor)(EntityInfo const&, CodeGenData&), CodeGenData& data) noexcept
 {
 	assert(visitor != nullptr);
 
@@ -222,5 +222,5 @@ FileGenerationUnit::EIterationResult FileGenerationUnit::foreachEntityInEnum(Enu
 		HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
 	}
 	
-	return FileGenerationUnit::EIterationResult::Recurse;
+	return EIterationResult::Recurse;
 }
