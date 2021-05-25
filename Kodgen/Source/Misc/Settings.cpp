@@ -1,5 +1,6 @@
 #include "Kodgen/Misc/Settings.h"
 
+#include "Kodgen/Misc/ILogger.h"
 #include "Kodgen/Misc/TomlUtility.h"
 
 using namespace kodgen;

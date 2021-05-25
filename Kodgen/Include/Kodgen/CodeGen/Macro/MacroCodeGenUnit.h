@@ -12,7 +12,8 @@
 namespace kodgen
 {
 	//Forward declaration
-	class CodeGenModuleGroup;
+	class	CodeGenModuleGroup;
+	struct	MacroCodeGenData;
 
 	class MacroCodeGenUnit : public CodeGenUnit
 	{
@@ -21,7 +22,7 @@ namespace kodgen
 			*	@brief Handle the whole code generation for a given entity with the provided data.
 			* 
 			*	@param entity	Entity we generate the code for.
-			*	@param data		Generation data (really??)
+			*	@param data		Generation data (this is some concise documentation).
 			* 
 			*	@return EIterationResult::Recurse if the traversal completed successfully.
 			*			EIterationResult::AbortWithSuccess if the traversal was aborted prematurely without error.
@@ -29,28 +30,87 @@ namespace kodgen
 			*/
 			static EIterationResult generateEntityCode(EntityInfo const& entity, CodeGenData& data)	noexcept;
 
+			/**
+			*	@brief Handle the code generation for class footer code gen location.
+			* 
+			*	@param entity	Entity we generate the code for. Must be one of Struct/Class/Field/Method.
+			*	@param data		Generation data (this is some concise documentation).
+			* 
+			*	@return EIterationResult::Recurse if the traversal completed successfully.
+			*			EIterationResult::AbortWithSuccess if the traversal was aborted prematurely without error.
+			*			EIterationResult::AbortWithFailure if the traversal was aborted prematurely with an error.
+			*/
+			static EIterationResult generateEntityClassFooterCode(EntityInfo const&	entity,
+																  MacroCodeGenData&	data)			noexcept;
+
 		protected:
 			/**
 			*	@brief	Generate code based on the provided parsing result.
-			*			It is up to this method to create files to write to or not.
+			*			Generated code will be dispatched in 2 different files (1 header, 1 source).
 			*
 			*	@param parsingResult	Result of a file parsing used to generate the new file.
 			*	@param out_genResult	Reference to the generation result to fill during file generation.
 			*/
 			virtual bool	generateCodeInternal(FileParsingResult const&	parsingResult,
-												 FileGenerationResult&		out_genResult)	noexcept override;
+												 FileGenerationResult&		out_genResult)			noexcept	override;
+
+			/**
+			*	@brief	(Re)generate the header file.
+			* 
+			*	@param parsingResult	Result of the parsing process.
+			*	@param data				Generation data (this is some concise documentation).
+			*/
+			void			generateHeaderFile(FileParsingResult const& parsingResult,
+											   MacroCodeGenData&	data)					const	noexcept;
+
+			/**
+			*	@brief	(Re)generate the source file.
+			* 
+			*	@param parsingResult	Result of the parsing process.
+			*	@param data				Generation data (this is some concise documentation)
+			*/
+			void			generateSourceFile(FileParsingResult const& parsingResult,
+											   MacroCodeGenData&	data)					const	noexcept;
+
+			/**
+			*	@brief Compute the path of the header file generated from the provided source file.
+			* 
+			*	@param sourceFile Path to the source file.
+			* 
+			*	@return the path of the header file generated from the provided source file.
+			*/
+			fs::path	getGeneratedHeaderFilePath(fs::path const& sourceFile)				const	noexcept;
+
+			/**
+			*	@brief Compute the path of the source file generated from the provided source file.
+			* 
+			*	@param sourceFile Path to the source file.
+			* 
+			*	@return the path of the source file generated from the provided source file.
+			*/
+			fs::path	getGeneratedSourceFilePath(fs::path const& sourceFile)				const	noexcept;
 
 		public:
 			/** Pointer to a collection of all generation modules used by this generation unit. */
 			CodeGenModuleGroup* codeGenModuleGroup;
 
 			/**
-			*	@brief Check whether the generated code for a given source file is up-to-date or not.
+			*	@brief Check that both the generated header and source files are newer than the source file.
 			* 
 			*	@param sourceFile Path to the source file.
 			*
 			*	@return true if the code generated for sourceFile is up-to-date, else false.
 			*/
-			virtual bool	isUpToDate(fs::path const& sourceFile)					const noexcept override;
+			virtual bool	isUpToDate(fs::path const& sourceFile)	const	noexcept	override;
+
+			/**
+			*	@brief	Check whether all settings are setup correctly for this unit to work.
+			*			If output directory path is valid but doesn't exist yet, it is created.
+			*			If the assigned settings can't be cast to "MacroCodeGenUnitSettings", fail.
+			* 
+			*	@return	true if all settings are valid, else false.
+			*			Note that the method will return false if the output directory failed to be created (only if it didn't exist).
+			*/
+			virtual bool	checkSettings()							const	noexcept	override;
 	};
 }

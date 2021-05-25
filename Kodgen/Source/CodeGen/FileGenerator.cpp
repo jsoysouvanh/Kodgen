@@ -1,7 +1,6 @@
 #include "Kodgen/CodeGen/FileGenerator.h"
 
-#include <fstream>	//fstream
-
+#include "Kodgen/CodeGen/FileGeneratorSettings.h"
 #include "Kodgen/CodeGen/GeneratedFile.h"
 
 using namespace kodgen;
@@ -46,7 +45,7 @@ std::set<fs::path> FileGenerator::identifyFilesToProcess(CodeGenUnit const& code
 				{
 					if (entry.is_regular_file())
 					{
-						if (settings->supportedExtensions.find(entry.path().extension().string()) != settings->supportedExtensions.cend() &&	//supported extension
+						if (settings->getSupportedExtensions().find(entry.path().extension().string()) != settings->getSupportedExtensions().cend() &&	//supported extension
 							settings->getIgnoredFiles().find(entry.path()) == settings->getIgnoredFiles().cend())								//file is not ignored
 						{
 							if (forceRegenerateAll || !codeGenUnit.isUpToDate(entry.path()))
@@ -77,36 +76,6 @@ std::set<fs::path> FileGenerator::identifyFilesToProcess(CodeGenUnit const& code
 	return result;
 }
 
-bool FileGenerator::checkOutputDirectory(FileGenerationResult& out_genResult) const noexcept
-{
-	//Before doing anything, make sure the output directory exists
-	//If it doesn't, create it
-	if (!fs::exists(settings->getOutputDirectory()))
-	{
-		//Try to create them is it doesn't exist
-		try
-		{
-			out_genResult.completed = fs::create_directories(settings->getOutputDirectory());
-
-			if (logger != nullptr)
-			{
-				logger->log("Specified output directory doesn't exist. Create " + FilesystemHelpers::sanitizePath(settings->getOutputDirectory()).string(), ILogger::ELogSeverity::Info);
-			}
-		}
-		catch (fs::filesystem_error const& exception)
-		{
-			out_genResult.fileGenerationErrors.emplace_back("", "", "Output directory is invalid: " + std::string(exception.what()));
-
-			if (logger != nullptr)
-			{
-				logger->log("Output directory is invalid: " + std::string(exception.what()), ILogger::ELogSeverity::Error);
-			}
-		}
-	}
-
-	return fs::is_directory(settings->getOutputDirectory());
-}
-
 uint32 FileGenerator::getThreadCount(uint32 initialThreadCount) const noexcept
 {
 	if (initialThreadCount == 0)
@@ -124,23 +93,9 @@ uint32 FileGenerator::getThreadCount(uint32 initialThreadCount) const noexcept
 	return initialThreadCount;
 }
 
-bool FileGenerator::shouldRegenerateFile(fs::path const& filePath) const noexcept
+void FileGenerator::generateMacrosFile(FileParserFactoryBase& fileParserFactory, CodeGenUnit const& codeGenUnit) const noexcept
 {
-	fs::path pathToGeneratedFile = makePathToGeneratedFile(filePath);
-
-	return !fs::exists(pathToGeneratedFile) || fs::last_write_time(filePath) > fs::last_write_time(pathToGeneratedFile);
-}
-
-fs::path FileGenerator::makePathToGeneratedFile(fs::path const& sourceFilePath) const noexcept
-{
-	assert(fs::exists(sourceFilePath) && fs::is_regular_file(sourceFilePath));
-
-	return (settings->getOutputDirectory() / sourceFilePath.filename()).replace_extension(settings->generatedFilesExtension);
-}
-
-void FileGenerator::generateMacrosFile(FileParserFactoryBase& fileParserFactory) const noexcept
-{
-	GeneratedFile macrosDefinitionFile(settings->getOutputDirectory() / settings->entityMacrosFilename);
+	GeneratedFile macrosDefinitionFile(codeGenUnit.settings->getOutputDirectory() / CodeGenUnitSettings::entityMacrosFilename);
 
 	PropertyParsingSettings& pps = fileParserFactory.parsingSettings.propertyParsingSettings;
 
@@ -162,32 +117,42 @@ void FileGenerator::generateMacrosFile(FileParserFactoryBase& fileParserFactory)
 	macrosDefinitionFile.writeLine("\n#endif");
 }
 
-void FileGenerator::setupFileGenerationUnit(CodeGenUnit& codeGenUnit) const noexcept
+bool FileGenerator::checkGenerationSetup(CodeGenUnit const& codeGenUnit) const noexcept
 {
-	codeGenUnit.logger	= logger;
-	//fileGenerationUnit.settings	= &settings;
-}
-
-void FileGenerator::checkGenerationSettings() const noexcept
-{
-	auto& ignoredDirectories = settings->getIgnoredDirectories();
-
-	//Emit a warning if the output directory content is going to be parsed
-	if (fs::exists(settings->getOutputDirectory()) &&											//abort check if the output directory doesn't exist
-		!fs::is_empty(settings->getOutputDirectory()) &&											//abort check if the output directory is empty
-		ignoredDirectories.find(settings->getOutputDirectory()) == ignoredDirectories.cend())	//abort check if the output directory is already ignored
+	bool canLog	= logger != nullptr;
+	bool result	= codeGenUnit.checkSettings();
+	
+	if (settings == nullptr)
 	{
-		for (fs::path const& parsedDirectory : settings->getToParseDirectories())
+		if (canLog)
 		{
-			if (FilesystemHelpers::isChildPath(settings->getOutputDirectory(), parsedDirectory))
-			{
-				if (logger != nullptr)
-				{
-					logger->log("Output directory is contained in a parsed directory, hence generated files will be parsed. If this is not intended, add the output directory to the list of ignored directories.", ILogger::ELogSeverity::Warning);
-				}
+			logger->log("FileGenerator settings have not been set.", ILogger::ELogSeverity::Error);
+		}
 
-				break;
+		result &= false;
+	}
+	else if (codeGenUnit.settings != nullptr)
+	{
+		auto const& ignoredDirectories = settings->getIgnoredDirectories();
+
+		//Emit a warning if the output directory content is going to be parsed
+		if (fs::exists(codeGenUnit.settings->getOutputDirectory()) &&											//abort check if the output directory doesn't exist
+			ignoredDirectories.find(codeGenUnit.settings->getOutputDirectory()) == ignoredDirectories.cend())	//abort check if the output directory is already ignored
+		{
+			for (fs::path const& parsedDirectory : settings->getToParseDirectories())
+			{
+				if (FilesystemHelpers::isChildPath(codeGenUnit.settings->getOutputDirectory(), parsedDirectory))
+				{
+					if (canLog)
+					{
+						logger->log("Output directory is contained in a parsed directory, hence generated files will be parsed. If this is not intended, add the output directory to the list of ignored directories.", ILogger::ELogSeverity::Warning);
+					}
+
+					break;
+				}
 			}
 		}
 	}
+	
+	return result;
 }

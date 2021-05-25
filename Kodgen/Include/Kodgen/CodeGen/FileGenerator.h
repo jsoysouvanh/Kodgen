@@ -22,6 +22,9 @@
 
 namespace kodgen
 {
+	//Forward declaration
+	class FileGeneratorSettings;
+
 	class FileGenerator
 	{
 		private:
@@ -69,16 +72,6 @@ namespace kodgen
 														   bool						forceRegenerateAll)	const	noexcept;
 
 			/**
-			*			If the directory doesn't exist, the method will try to create it.
-			* 
-			*	@param out_genResult Reference to the generation result to fill during file generation.
-			*	@brief	Check that the generation output directory is a valid directory.
-			* 
-			*	@return true if the output directory is a valid directory at the end of the function (the directory was already valid or was created successfully), else false.
-			*/
-			bool					checkOutputDirectory(FileGenerationResult& out_genResult)				const	noexcept;
-
-			/**
 			*	@brief	Get the number of threads to use based on the provided thread count.
 			*			If 0 is provided, std::thread::hardware_concurrency is used, or 8 if std::thread::hardware_concurrency returns 0.
 			*			For all other initial thread count values, the function returns immediately this number.
@@ -90,52 +83,28 @@ namespace kodgen
 			uint32					getThreadCount(uint32 initialThreadCount)								const	noexcept;
 
 			/**
-			*	@brief Provide information on whether the generated code for @param filePath should be regenerated or not.
-			*
-			*	@param filePath Path to the file we want to check the status.
-			*
-			*	@return true if the corresponding generated file should be regenerated, else false.
-			*/
-			bool					shouldRegenerateFile(fs::path const& filePath)							const	noexcept;
-			
-			/**
-			*	@brief Build the generated file path from a source file.
-			*	
-			*	@param sourceFilePath	Path to the source file to parse & generate code from.
-			*	
-			*	@return The path to the generated file.
-			*/
-			fs::path				makePathToGeneratedFile(fs::path const& sourceFilePath)					const	noexcept;
-			
-			/**
 			*	@brief Generate / update the entity macros file.
 			*	
 			*	@param fileParserFactory FileParserFactory containing parsing settings.
 			*/
-			void					generateMacrosFile(FileParserFactoryBase& fileParserFactory)			const	noexcept;
+			void					generateMacrosFile(FileParserFactoryBase&	fileParserFactory,
+													   CodeGenUnit const&		codeGenUnit)				const	noexcept;
 
 			/**
-			*	@brief Prepare the file generation unit for generation, forwarding any required generation settings.
-			*	
-			*	@param codeGenUnit The generation unit to setup.
+			*	@brief Check that everything is setup correctly for generation.
+			* 
+			*	@param codeGenUnit The code generation to use during the generation process.
+			* 
+			*	@return true if all settings are correct, else false.
 			*/
-			void					setupFileGenerationUnit(CodeGenUnit& codeGenUnit)						const	noexcept;
-
-			/**
-			*	@brief Check that all generation settings are valid.
-			*/
-			void					checkGenerationSettings()												const	noexcept;
+			bool					checkGenerationSetup(CodeGenUnit const& codeGenUnit)					const	noexcept;
 
 		public:
-			using Settings = FileGenerationSettings;
-
 			/** Logger used to issue logs from the FileGenerator. */
 			ILogger*						logger		= nullptr;
 
 			/** Struct containing all generation settings. */
-			FileGenerationSettings const*	settings	= nullptr;
-
-			virtual ~FileGenerator() = default;
+			FileGeneratorSettings const*	settings	= nullptr;
 
 			/**
 			*	@brief Parse registered files if they were modified since last generation (or don't exist)

@@ -1,8 +1,11 @@
 #pragma once
 
+#include <vector>
+#include <unordered_map>
+
 #include "SomeClass.h"
 
-#include "Generated/SomeOtherClass.myCustomExtension.h"
+#include "Generated/SomeOtherClass_hgenerated.h"
 
 template <typename T>
 class SomeTemplateClass
@@ -16,26 +19,28 @@ namespace SomeNamespace KGNamespace()
 	{
 		private:
 			KGField(Get[const, &])
-			float									_someFloat	= 42.42f; 
-
-			KGField(Get[const, &])
-			np1::SomeClass							_someClass;
-
-			KGField(Get[const, &])
-			SomeTemplateClass<np1::SomeClass>		_someTemplateClass;
-
-			//RfrkField(Get[const, &])
-			//std::vector<int>						_someVectorOfInt;
+			float										_someFloat	= 42.42f; 
 			
-			//RfrkField(Get[const, &])
-			//std::vector<SomeClass*>				_someVectorOfSomeClass;
+			KGField(Get[const, &])
+			np1::SomeClass								_someClass;
 
-			//RfrkField(Get[const, &])
-			//std::unordered_map<int, SomeClass*>	_someVectorOfSomeClass2; 
+			KGField(Get[const, &])
+			SomeTemplateClass<np1::SomeClass>			_someTemplateClass;
+
+			KGField(Get[const, &])
+			std::vector<int>							_someVectorOfInt;
+			
+			KGField(Get[const, &])
+			std::vector<np1::SomeClass*>				_someVectorOfSomeClass;
+
+			KGField(Get[const, &])
+			std::unordered_map<int, np1::SomeClass*>	_someUmapOfSomeClass2;
 
 		public:
 			SomeOtherClass() = default;
 
-		SomeOtherClass_GENERATED
+		SomeNamespace_SomeOtherClass_GENERATED
 	};
 }
+
+File_SomeOtherClass_GENERATED

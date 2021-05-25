@@ -9,6 +9,7 @@
 
 #include <string>
 #include <array>
+#include <unordered_map>
 
 #include "Kodgen/CodeGen/CodeGenData.h"
 #include "Kodgen/CodeGen/Macro/ECodeGenLocation.h"
@@ -38,6 +39,9 @@ namespace kodgen
 
 			/** Array containing the generated code per location. */
 			std::array<std::string, static_cast<size_t>(ECodeGenLocation::Count)>	_generatedCodePerLocation;
+
+			/** Map containing the class footer generated code for each struct/class. */
+			std::unordered_map<StructClassInfo const*, std::string>					_classFooterGeneratedCode;
 
 		public:
 			/** All modules generating for the generation unit. */

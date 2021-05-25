@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include "Kodgen/CodeGen/FileGenerationSettings.h"
 #include "Kodgen/CodeGen/FileGenerationResult.h"
-#include "Kodgen/CodeGen/CodeGenData.h"
 #include "Kodgen/Parsing/ParsingResults/FileParsingResult.h"
+#include "Kodgen/CodeGen/CodeGenData.h"
+#include "Kodgen/CodeGen/CodeGenUnitSettings.h"
 #include "Kodgen/Misc/ILogger.h"
 #include "Kodgen/Misc/Filesystem.h"
 #include "Kodgen/Misc/FundamentalTypes.h"
@@ -56,13 +56,6 @@ namespace kodgen
 			};
 
 		protected:
-			/////TODO: Move this as public field and make the user load generation settings directly in the generation unit?
-			/** Logger used to issue logs from the FileGenerationUnit. */
-			ILogger*						logger		= nullptr;
-
-			/** Generation settings. */
-			FileGenerationSettings const*	settings	= nullptr;
-
 			/**
 			*	@brief	Generate code based on the provided parsing result.
 			*			It is up to this method to create files to write to or not.
@@ -170,6 +163,12 @@ namespace kodgen
 												fs::path const& referenceFile)											const	noexcept;
 
 		public:
+			/** Logger used to issue logs from the FileGenerationUnit. */
+			ILogger*					logger		= nullptr;
+
+			/** Generation settings. */
+			CodeGenUnitSettings const*	settings	= nullptr;
+
 			/**
 			*	@brief Check whether the generated code for a given source file is up-to-date or not.
 			* 
@@ -178,6 +177,15 @@ namespace kodgen
 			*	@return true if the code generated for sourceFile is up-to-date, else false.
 			*/
 			virtual bool	isUpToDate(fs::path const& sourceFile)					const	noexcept = 0;
+
+			/**
+			*	@brief	Check whether all settings are setup correctly for this unit to work.
+			*			If output directory path is valid but doesn't exist yet, it is created.
+			* 
+			*	@return	true if all settings are valid, else false.
+			*			Note that the method will return false if the output directory failed to be created (only if it didn't exist).
+			*/
+			virtual bool	checkSettings()											const	noexcept;
 
 			/**
 			*	@brief	Generate code based on the provided parsing result.

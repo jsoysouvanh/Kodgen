@@ -4,30 +4,35 @@
 #include <Kodgen/Misc/DefaultLogger.h>
 #include <Kodgen/CodeGen/FileGenerator.h>
 #include <Kodgen/CodeGen/Macro/MacroCodeGenUnit.h>
+#include <Kodgen/CodeGen/Macro/MacroCodeGenUnitSettings.h>
 #include <Kodgen/CodeGen/CodeGenModuleGroup.h>
+#include <Kodgen/CodeGen/FileGeneratorSettings.h>
 
 #include "CppPropsParserFactory.h"
 #include "GetSetCGM.h"
 
-void initGenerationSettings(fs::path const& workingDirectory, kodgen::FileGenerator::Settings& out_settings)
+void initGenerationSettings(fs::path const& workingDirectory, kodgen::FileGeneratorSettings& out_generatorSettings, kodgen::MacroCodeGenUnitSettings& out_cguSettings)
 {
 	fs::path includeDirectory	= workingDirectory / "Include";
 	fs::path generatedDirectory	= includeDirectory / "Generated";
 
 	//Parse WorkingDir/...
-	out_settings.addToParseDirectory(includeDirectory);
+	out_generatorSettings.addToParseDirectory(includeDirectory);
 
 	//Ignore generated files...
-	out_settings.addIgnoredDirectory(generatedDirectory);
+	out_generatorSettings.addIgnoredDirectory(generatedDirectory);
 
 	//Only parse .h files
-	out_settings.supportedExtensions.emplace(".h");
+	out_generatorSettings.addSupportedExtension(".h");
 
 	//All generated files will be located in WorkingDir/Include/Generated
-	out_settings.setOutputDirectory(generatedDirectory);
-
-	//Generated files will use .myCustomExtension.h extension
-	out_settings.generatedFilesExtension = ".myCustomExtension.h";
+	out_cguSettings.setOutputDirectory(generatedDirectory);
+	
+	//Setup generated files name pattern
+	out_cguSettings.setGeneratedHeaderFileNamePattern("##FILENAME##_hgenerated.h");
+	out_cguSettings.setGeneratedSourceFileNamePattern("##FILENAME##_srcgenerated.h");
+	out_cguSettings.setClassFooterMacroPattern("##CLASSFULLNAME##_GENERATED");
+	out_cguSettings.setHeaderFileFooterMacroPattern("File_##FILENAME##_GENERATED");
 }
 
 int main(int argc, char** argv)
@@ -48,6 +53,12 @@ int main(int argc, char** argv)
 			fileParserFactory.logger = &logger;
 			fileParserFactory.parsingSettings.setCompilerExeName("clang++");
 
+			//Setup settings
+			kodgen::FileGeneratorSettings		fileGenSettings;
+			kodgen::MacroCodeGenUnitSettings	cguSettings;
+
+			initGenerationSettings(workingDirectory, fileGenSettings, cguSettings);
+
 			//Setup code generation unit
 			kodgen::CodeGenModuleGroup codeGenModuleGroup;
 
@@ -56,29 +67,15 @@ int main(int argc, char** argv)
 
 			kodgen::MacroCodeGenUnit codeGenUnit;
 			codeGenUnit.codeGenModuleGroup = &codeGenModuleGroup;
-
-			//TODO: 
+			codeGenUnit.logger = &logger;
+			codeGenUnit.settings = &cguSettings;
 
 			//Setup generation settings
-			kodgen::FileGenerator::Settings	fileGenSettings;
-			initGenerationSettings(workingDirectory, fileGenSettings);
-
 			kodgen::FileGenerator fileGenerator;
 			fileGenerator.logger = &logger;
 			fileGenerator.settings = &fileGenSettings;
 
-			//Bind the PropertyCodeTemplate name to the CppPropsCodeTemplate class
-			//CppPropsCodeTemplate propsCodeTemplate;
-			//fileGenerator.addGeneratedCodeTemplate("PropertyCodeTemplate", &propsCodeTemplate);
-
-			///**
-			//*	Set a default class template so that we don't have to specify it manually
-			//*
-			//*	Now we can simply write:
-			//*		class KGClass() MyClass {};
-			//*/
-			//fileGenerator.setDefaultGeneratedCodeTemplate(kodgen::EEntityType::Class, "PropertyCodeTemplate");
-
+			//Kick-off code generation
 			kodgen::FileGenerationResult genResult = fileGenerator.generateFiles(fileParserFactory, codeGenUnit, true);
 
 			if (genResult.completed)

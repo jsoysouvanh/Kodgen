@@ -34,10 +34,14 @@ void GeneratedFile::writeLines(std::string&& line) noexcept
 	writeLine(std::forward<std::string>(line));
 }
 
+void GeneratedFile::expandWriteMacroLines(std::string const& line) noexcept
+{
+	writeLine("\t" + line + "\n");
+}
+
 void GeneratedFile::expandWriteMacroLines(std::string&& line) noexcept
 {
-	writeLine("\t" + std::forward<std::string>(line));
-	writeLine("");
+	writeLine("\t" + std::forward<std::string>(line) + "\n");
 }
 
 void GeneratedFile::writeMacro(std::string&& macroName) noexcept
@@ -45,9 +49,9 @@ void GeneratedFile::writeMacro(std::string&& macroName) noexcept
 	writeLine("#define " + std::forward<std::string>(macroName));
 }
 
-void GeneratedFile::undefMacro(std::string macroName) noexcept
+void GeneratedFile::undefMacro(std::string const& macroName) noexcept
 {
-	writeLine("#ifdef " + macroName + "\n\t#undef " + std::move(macroName) + "\n#endif");
+	writeLine("#ifdef " + macroName + "\n\t#undef " + macroName + "\n#endif");
 }
 
 fs::path const& GeneratedFile::getPath() const noexcept

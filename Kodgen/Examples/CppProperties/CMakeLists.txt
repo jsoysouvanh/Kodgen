@@ -29,6 +29,7 @@ target_link_libraries(${CppPropertiesDemoProjectGeneratorTarget} PRIVATE ${Kodge
 set(CppPropertiesDemoProjectTarget CppPropertiesDemoProject)
 add_executable(${CppPropertiesDemoProjectTarget}
 					Source/SomeClass.cpp
+					Source/SomeOtherClass.cpp
 
 					Source/main.cpp)
 

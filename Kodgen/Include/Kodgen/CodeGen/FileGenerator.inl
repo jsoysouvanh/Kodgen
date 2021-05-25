@@ -101,23 +101,8 @@ FileGenerationResult FileGenerator::generateFiles(FileParserFactoryType<FilePars
 
 	FileGenerationResult genResult;
 
-	if (settings->getOutputDirectory().empty())
+	if (checkGenerationSetup(codeGenUnit))
 	{
-		//Generator can't run without outputDirectory
-		genResult.fileGenerationErrors.emplace_back("", "", "Output directory is empty, it must be specified for the files to be generated.");
-		
-		if (logger != nullptr)
-		{
-			logger->log("Output directory is empty, it must be specified for the files to be generated.", ILogger::ELogSeverity::Error);
-		}
-	}
-	else if (checkOutputDirectory(genResult))
-	{
-		checkGenerationSettings();
-
-		//Forward FileGenerator necessary data to the file generation unit
-		setupFileGenerationUnit(codeGenUnit);
-
 		//Start timer here
 		auto				start			= std::chrono::high_resolution_clock::now();
 		std::set<fs::path>	filesToProcess	= identifyFilesToProcess(codeGenUnit, genResult, forceRegenerateAll);
@@ -128,7 +113,7 @@ FileGenerationResult FileGenerator::generateFiles(FileParserFactoryType<FilePars
 			//Initialize the file parser factory compilation arguments
 			fileParserFactory._init();
 
-			generateMacrosFile(fileParserFactory);
+			generateMacrosFile(fileParserFactory, codeGenUnit);
 
 			threadCount = getThreadCount(threadCount);
 
@@ -145,8 +130,7 @@ FileGenerationResult FileGenerator::generateFiles(FileParserFactoryType<FilePars
 			}
 		}
 
-		genResult.duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() / 1000.0f;
-
+		genResult.duration	= std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() / 1000.0f;
 		genResult.completed = true;
 	}
 	

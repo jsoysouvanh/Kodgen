@@ -57,14 +57,16 @@ add_library(${KodgenTargetLibrary}
 					Source/CodeGen/FileGenerationResult.cpp
 					Source/CodeGen/FileGenerationError.cpp
 					Source/CodeGen/FileGenerator.cpp
-					Source/CodeGen/FileGenerationSettings.cpp
 					Source/CodeGen/GeneratedFile.cpp
 					Source/CodeGen/CodeGenModule.cpp
 					Source/CodeGen/CodeGenModuleGroup.cpp
+					Source/CodeGen/CodeGenUnitSettings.cpp
+					Source/CodeGen/FileGeneratorSettings.cpp
 					
 					Source/CodeGen/Macro/MacroCodeGenUnit.cpp
 					Source/CodeGen/Macro/MacroCodeGenData.cpp
 					Source/CodeGen/Macro/MacroPropertyCodeGen.cpp
+					Source/CodeGen/Macro/MacroCodeGenUnitSettings.cpp
 			 
 					Source/Threading/ThreadPool.cpp
 					Source/Threading/TaskBase.cpp

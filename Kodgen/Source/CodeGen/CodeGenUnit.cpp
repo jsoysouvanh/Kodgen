@@ -19,6 +19,62 @@ bool CodeGenUnit::generateCode(FileParsingResult const& parsingResult, FileGener
 			postGenerateCode(parsingResult, out_genResult);
 }
 
+bool CodeGenUnit::checkSettings() const noexcept
+{
+	bool result = true;
+	bool canLog	= logger != nullptr;
+
+	if (settings == nullptr)
+	{
+		if (canLog)
+		{
+			logger->log("CodeGenUnit settings have not been set.", ILogger::ELogSeverity::Error);
+		}
+
+		result &= false;
+	}
+	else
+	{
+		if (settings->getOutputDirectory().empty())
+		{
+			if (canLog)
+			{
+				logger->log("Output directory is empty, it must be specified for the files to be generated.", ILogger::ELogSeverity::Error);
+			}
+
+			result &= false;
+		}
+		else if (!fs::exists(settings->getOutputDirectory()))
+		{
+			//Before doing anything, make sure the output directory exists
+			//If it doesn't, create it
+
+			//Try to create them is it doesn't exist
+			try
+			{
+				fs::create_directories(settings->getOutputDirectory());
+
+				if (canLog)
+				{
+					logger->log("Specified output directory doesn't exist. Create " + FilesystemHelpers::sanitizePath(settings->getOutputDirectory()).string(), ILogger::ELogSeverity::Info);
+				}
+			}
+			catch (fs::filesystem_error const& exception)
+			{
+				if (canLog)
+				{
+					logger->log("Tried to create directory " + settings->getOutputDirectory().string() + " but failed: " + std::string(exception.what()), ILogger::ELogSeverity::Error);
+				}
+
+				//Directory failed to be created, so settings are incorrect
+				result &= false;
+			}
+		}
+	}
+
+	return result;
+}
+
 bool CodeGenUnit::isFileNewerThan(fs::path const& file, fs::path const& referenceFile) const noexcept
 {
 	assert(fs::exists(file));

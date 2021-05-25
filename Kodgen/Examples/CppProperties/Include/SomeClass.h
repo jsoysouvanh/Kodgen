@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "Generated/SomeClass.myCustomExtension.h"
+#include "Generated/SomeClass_hgenerated.h"
 
 namespace SomeNamespace KGNamespace()
 {
@@ -35,7 +35,9 @@ namespace SomeNamespace KGNamespace()
 			public:
 				SomeClass() = default;
 
-			SomeClass_GENERATED
+			SomeNamespace_np1_SomeClass_GENERATED
 		};
 	}
 }
+
+File_SomeClass_GENERATED

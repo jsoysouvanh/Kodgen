@@ -1,19 +1,17 @@
-#include "Kodgen/CodeGen/FileGenerationSettings.h"
+#include "Kodgen/CodeGen/FileGeneratorSettings.h"
 
 #include "Kodgen/Misc/TomlUtility.h"
+#include "Kodgen/Misc/ILogger.h"
 
 using namespace kodgen;
 
-bool FileGenerationSettings::loadSettingsValues(toml::value const& tomlData, ILogger* logger) noexcept
+bool FileGeneratorSettings::loadSettingsValues(toml::value const& tomlData, ILogger* logger) noexcept
 {
-	if (tomlData.contains(_tomlSettingsSectionName))
+	if (tomlData.contains(_tomlSectionName))
 	{
-		toml::value const& tomlGeneratorSettings = toml::find(tomlData, _tomlSettingsSectionName);
+		toml::value const& tomlGeneratorSettings = toml::find(tomlData, _tomlSectionName);
 		
-		loadGeneratedFilesExtension(tomlGeneratorSettings, logger);
-		loadEntityMacrosFilename(tomlGeneratorSettings, logger);
 		loadSupportedExtensions(tomlGeneratorSettings, logger);
-		loadOutputDirectory(tomlGeneratorSettings, logger);
 		loadToParseFiles(tomlGeneratorSettings, logger);
 		loadToParseDirectories(tomlGeneratorSettings, logger);
 		loadIgnoredFiles(tomlGeneratorSettings, logger);
@@ -23,48 +21,13 @@ bool FileGenerationSettings::loadSettingsValues(toml::value const& tomlData, ILo
 	}
 	else if (logger != nullptr)
 	{
-		logger->log("Could not find the [" + std::string(_tomlSettingsSectionName) + "] section in the TOML file.", ILogger::ELogSeverity::Warning);
+		logger->log("Could not find the [" + std::string(_tomlSectionName) + "] section in the TOML file.", ILogger::ELogSeverity::Warning);
 	}
 
 	return false;
 }
 
-bool FileGenerationSettings::setOutputDirectory(fs::path outputDirectory) noexcept
-{
-	if (!outputDirectory.empty())
-	{
-		outputDirectory.make_preferred();
-
-		if (fs::exists(outputDirectory))
-		{
-			if (fs::is_directory(outputDirectory))
-			{
-				_outputDirectory = FilesystemHelpers::sanitizePath(outputDirectory);
-
-				return true;
-			}
-
-			//the path points to a file
-		}
-		else //the provided path doesn't exist
-		{
-			//Make it absolute first
-			std::error_code error;
-			outputDirectory = fs::absolute(outputDirectory, error);
-
-			if (!outputDirectory.empty())
-			{
-				_outputDirectory = outputDirectory;
-
-				return true;
-			}
-		}
-	}
-
-	return false;
-}
-
-bool FileGenerationSettings::addToParseFile(fs::path const& path) noexcept
+bool FileGeneratorSettings::addToParseFile(fs::path const& path) noexcept
 {
 	fs::path sanitizedPath = FilesystemHelpers::sanitizePath(path);
 
@@ -76,7 +39,7 @@ bool FileGenerationSettings::addToParseFile(fs::path const& path) noexcept
 	return false;
 }
 
-bool FileGenerationSettings::addToParseDirectory(fs::path const& path) noexcept
+bool FileGeneratorSettings::addToParseDirectory(fs::path const& path) noexcept
 {
 	fs::path sanitizedPath = FilesystemHelpers::sanitizePath(path);
 
@@ -88,7 +51,7 @@ bool FileGenerationSettings::addToParseDirectory(fs::path const& path) noexcept
 	return false;
 }
 
-bool FileGenerationSettings::addIgnoredFile(fs::path const& path) noexcept
+bool FileGeneratorSettings::addIgnoredFile(fs::path const& path) noexcept
 {
 	fs::path sanitizedPath = FilesystemHelpers::sanitizePath(path);
 
@@ -100,7 +63,7 @@ bool FileGenerationSettings::addIgnoredFile(fs::path const& path) noexcept
 	return false;
 }
 
-bool FileGenerationSettings::addIgnoredDirectory(fs::path const& path) noexcept
+bool FileGeneratorSettings::addIgnoredDirectory(fs::path const& path) noexcept
 {
 	fs::path sanitizedPath = FilesystemHelpers::sanitizePath(path);
 
@@ -112,106 +75,99 @@ bool FileGenerationSettings::addIgnoredDirectory(fs::path const& path) noexcept
 	return false;
 }
 
-void FileGenerationSettings::removeToParseFile(fs::path const& path) noexcept
+bool FileGeneratorSettings::addSupportedExtension(fs::path const& extension) noexcept
+{
+	std::string extensionAsString = extension.string();
+
+	if (!extensionAsString.empty() && extensionAsString[0] == '.' && extension.has_stem())
+	{
+		_supportedExtensions.emplace(std::move(extensionAsString));
+
+		return true;
+	}
+
+	return false;
+}
+
+void FileGeneratorSettings::removeToParseFile(fs::path const& path) noexcept
 {
 	_toParseFiles.erase(FilesystemHelpers::sanitizePath(path));
 }
 
-void FileGenerationSettings::removeToParseDirectory(fs::path const& path) noexcept
+void FileGeneratorSettings::removeToParseDirectory(fs::path const& path) noexcept
 {
 	_toParseDirectories.erase(FilesystemHelpers::sanitizePath(path));
 }
 
-void FileGenerationSettings::removeIgnoredFile(fs::path const& path) noexcept
+void FileGeneratorSettings::removeIgnoredFile(fs::path const& path) noexcept
 {
 	_ignoredFiles.erase(FilesystemHelpers::sanitizePath(path));
 }
 
-void FileGenerationSettings::removeIgnoredDirectory(fs::path const& path) noexcept
+void FileGeneratorSettings::removeSupportedExtension(fs::path const& ext) noexcept
+{
+	_supportedExtensions.erase(ext.string());
+}
+
+void FileGeneratorSettings::removeIgnoredDirectory(fs::path const& path) noexcept
 {
 	_ignoredDirectories.erase(FilesystemHelpers::sanitizePath(path));
 }
 
-void FileGenerationSettings::clearToParseFiles() noexcept
+void FileGeneratorSettings::clearToParseFiles() noexcept
 {
 	_toParseFiles.clear();
 }
 
-void FileGenerationSettings::clearToParseDirectories() noexcept
+void FileGeneratorSettings::clearToParseDirectories() noexcept
 {
 	_toParseDirectories.clear();
 }
 
-void FileGenerationSettings::clearIgnoredFiles() noexcept
+void FileGeneratorSettings::clearIgnoredFiles() noexcept
 {
 	_ignoredFiles.clear();
 }
 
-void FileGenerationSettings::clearIgnoredDirectories() noexcept
+void FileGeneratorSettings::clearIgnoredDirectories() noexcept
 {
 	_ignoredDirectories.clear();
 }
 
-void FileGenerationSettings::loadGeneratedFilesExtension(toml::value const& generationSettings, ILogger* logger) noexcept
+void FileGeneratorSettings::clearSupportedExtensions() noexcept
 {
-	if (TomlUtility::updateSetting(generationSettings, "generatedFilesExtension", generatedFilesExtension, logger) && logger != nullptr)
-	{
-		logger->log("[TOML] Load generatedFilesExtension: " + generatedFilesExtension);
-	}
+	_supportedExtensions.clear();
 }
 
-void FileGenerationSettings::loadEntityMacrosFilename(toml::value const& generationSettings, ILogger* logger) noexcept
-{
-	if (TomlUtility::updateSetting(generationSettings, "entityMacrosFilename", entityMacrosFilename, logger) && logger != nullptr)
-	{
-		logger->log("[TOML] Load entityMacrosFilename: " + entityMacrosFilename);
-	}
-}
-
-void FileGenerationSettings::loadSupportedExtensions(toml::value const& generationSettings, ILogger* logger) noexcept
+void FileGeneratorSettings::loadSupportedExtensions(toml::value const& generationSettings, ILogger* logger) noexcept
 {
 	//Clear supported extensions before loading
-	supportedExtensions.clear();
+	_supportedExtensions.clear();
 
 	std::unordered_set<std::string> loadedExtensions;
 	if (TomlUtility::updateSetting(generationSettings, "supportedExtensions", loadedExtensions, logger) && logger != nullptr)
 	{
 		for (std::string const& extension : loadedExtensions)
 		{
-			//TODO: might add extension validity check later
-			supportedExtensions.emplace(extension);
-
-			if (logger != nullptr)
+			if (addSupportedExtension(extension))
 			{
-				logger->log("[TOML] Load new supported extension: " + extension);
+				if (logger != nullptr)
+				{
+					logger->log("[TOML] Load new supported extension: " + extension);
+				}
+			}
+			else if (logger != nullptr)
+			{
+				if (logger != nullptr)
+				{
+					logger->log("[TOML] Failed to add supported extension: " + extension);
+				}
 			}
 		}
 	}
 }
 
-void FileGenerationSettings::loadOutputDirectory(toml::value const& generationSettings, ILogger* logger) noexcept
-{
-	std::string loadedOutputDirectory;
-
-	if (TomlUtility::updateSetting(generationSettings, "outputDirectory", loadedOutputDirectory, logger))
-	{
-		bool success = setOutputDirectory(loadedOutputDirectory);
-
-		if (logger != nullptr)
-		{
-			if (success)
-			{
-				logger->log("[TOML] Load output directory: " + getOutputDirectory().string());
-			}
-			else
-			{
-				logger->log("[TOML] Failed to load outputDirectory, file or invalid path: " + loadedOutputDirectory);
-			}
-		}
-	}
-}
-
-void FileGenerationSettings::loadToParseFiles(toml::value const& generationSettings, ILogger* logger) noexcept
+void FileGeneratorSettings::loadToParseFiles(toml::value const& generationSettings, ILogger* logger) noexcept
 {
 	std::unordered_set<fs::path, PathHash> toParseFiles;
 
@@ -240,7 +196,7 @@ void FileGenerationSettings::loadToParseFiles(toml::value const& generationSetti
 	}
 }
 
-void FileGenerationSettings::loadToParseDirectories(toml::value const& generationSettings, ILogger* logger) noexcept
+void FileGeneratorSettings::loadToParseDirectories(toml::value const& generationSettings, ILogger* logger) noexcept
 {
 	std::unordered_set<fs::path, PathHash> toParseDirectories;
 
@@ -269,7 +225,7 @@ void FileGenerationSettings::loadToParseDirectories(toml::value const& generatio
 	}
 }
 
-void FileGenerationSettings::loadIgnoredFiles(toml::value const& generationSettings, ILogger* logger) noexcept
+void FileGeneratorSettings::loadIgnoredFiles(toml::value const& generationSettings, ILogger* logger) noexcept
 {
 	std::unordered_set<fs::path, PathHash> ignoredFiles;
 
@@ -298,7 +254,7 @@ void FileGenerationSettings::loadIgnoredFiles(toml::value const& generationSetti
 	}
 }
 
-void FileGenerationSettings::loadIgnoredDirectories(toml::value const& generationSettings, ILogger* logger) noexcept
+void FileGeneratorSettings::loadIgnoredDirectories(toml::value const& generationSettings, ILogger* logger) noexcept
 {
 	std::unordered_set<fs::path, PathHash> ignoredDirectories;
 
@@ -325,4 +281,29 @@ void FileGenerationSettings::loadIgnoredDirectories(toml::value const& generatio
 			}
 		}
 	}
+}
+
+std::unordered_set<fs::path, PathHash> const& FileGeneratorSettings::getToParseFiles() const noexcept
+{
+	return _toParseFiles;
+}
+
+std::unordered_set<fs::path, PathHash> const& FileGeneratorSettings::getToParseDirectories() const noexcept
+{
+	return _toParseDirectories;
+}
+
+std::unordered_set<fs::path, PathHash> const& FileGeneratorSettings::getIgnoredFiles() const noexcept
+{
+	return _ignoredFiles;
+}
+
+std::unordered_set<fs::path, PathHash> const& FileGeneratorSettings::getIgnoredDirectories() const noexcept
+{
+	return _ignoredDirectories;
+}
+
+std::unordered_set<std::string> const& FileGeneratorSettings::getSupportedExtensions() const noexcept
+{
+	return _supportedExtensions;
 }
