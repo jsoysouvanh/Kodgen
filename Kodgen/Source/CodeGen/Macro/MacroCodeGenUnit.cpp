@@ -103,7 +103,7 @@ MacroCodeGenUnit::EIterationResult MacroCodeGenUnit::generateEntityCode(EntityIn
 	if (macroData.codeGenModuleGroup != nullptr)
 	{
 		//Generate code for each code location
-		for (int i = 0; i < static_cast<uint32>(ECodeGenLocation::Count); i++)
+		for (int i = 0u; i < static_cast<int>(ECodeGenLocation::Count); i++)
 		{
 			macroData.codeGenLocation = static_cast<ECodeGenLocation>(i);
 			macroData.separator = macroData._separators[i];

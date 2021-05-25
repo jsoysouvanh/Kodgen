@@ -16,7 +16,7 @@ class GetPropertyCodeGen : public kodgen::MacroPropertyCodeGen
 	public:
 		virtual ~GetPropertyCodeGen() = default;
 
-		virtual bool shouldGenerateCode(kodgen::EntityInfo const& entity, kodgen::Property const& property, kodgen::uint8 /* propertyIndex */) const noexcept
+		virtual bool shouldGenerateCode(kodgen::EntityInfo const& entity, kodgen::Property const& property, kodgen::uint8 /* propertyIndex */) const noexcept override
 		{
 			return property.name == "Get" && entityTypeOverlap(entity.entityType, kodgen::EEntityType::Field);
 		}

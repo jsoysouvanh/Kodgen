@@ -33,6 +33,11 @@ bool CodeGenModule::generateCode(EntityInfo const* entity, CodeGenData& data, st
 	return true;
 }
 
+int32 CodeGenModule::getGenerationOrder() const noexcept
+{
+	return 0u;
+}
+
 bool CodeGenModule::runPropertyCodeGenerators(EntityInfo const& entity, CodeGenData& data, std::string& inout_result) const noexcept
 {
 	Property const* currentProperty;

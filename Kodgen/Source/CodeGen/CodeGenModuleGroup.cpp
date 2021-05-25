@@ -15,7 +15,7 @@ void CodeGenModuleGroup::addModule(CodeGenModule& generationModule) noexcept
 	(
 		std::upper_bound(_generationModules.begin(), _generationModules.end(), &generationModule, [](CodeGenModule const* lhs, CodeGenModule const* rhs)
 			{
-				return lhs->generationOrder < rhs->generationOrder;
+				return lhs->getGenerationOrder() < rhs->getGenerationOrder();
 			}),
 		&generationModule
 	);

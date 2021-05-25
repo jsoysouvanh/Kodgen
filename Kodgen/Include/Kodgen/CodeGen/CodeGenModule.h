@@ -37,13 +37,6 @@ namespace kodgen
 
 		public:
 			/**
-			*	Number defining in which order this module will generate code compared to other modules.
-			*	Modules with a low generation order will execute first, and modules a high generation order will execute last.
-			*	Modules having the same generation order value will execute in an undefined order.
-			*/
-			static constexpr int32 const generationOrder = 0;
-
-			/**
 			*	@brief Generate code using the provided data as input.
 			* 
 			*	@param entity			Entity the module is generating code for. Might be nullptr, in which case the code is not generated for a specific entity.
@@ -55,6 +48,13 @@ namespace kodgen
 			virtual bool								generateCode(EntityInfo const*	entity,
 																	 CodeGenData&		data,
 																	 std::string&		inout_result)			const	noexcept;
+
+			/**
+			*	@brief The generation order is a number defining in which order this module will generate code compared to other modules.
+			*	Modules with a low generation order will execute first, and modules a high generation order will execute last.
+			*	Modules having the same generation order value will execute in an undefined order.
+			*/
+			virtual int32								getGenerationOrder()									const	noexcept;
 
 			/**
 			*	@brief Add property rule to this generation module.
