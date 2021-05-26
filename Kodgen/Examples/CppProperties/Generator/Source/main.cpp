@@ -46,7 +46,6 @@ int main(int argc, char** argv)
 	}
 
 	fs::path workingDirectory = argv[1];
-	//fs::path workingDirectory = "D:/Prog/GP3/PLA/Refureku/Refureku/Generator/Submodules/Kodgen/Examples/CppProperties";
 
 	if (!fs::is_directory(workingDirectory))
 	{
@@ -60,6 +59,9 @@ int main(int argc, char** argv)
 	CppPropsParserFactory fileParserFactory;
 	fileParserFactory.logger = &logger;
 
+	//This is setuped that way for CI tools only
+	//In reality, the compiler used by the user machine running the generator should be set.
+	//It has nothing to see with the compiler used to compile the generator.
 #if defined(__GNUC__)
 	bool compilerSetSuccessfully = fileParserFactory.parsingSettings.setCompilerExeName("gcc");
 #elif defined(__clang__)
@@ -101,15 +103,7 @@ int main(int argc, char** argv)
 
 	if (genResult.completed)
 	{
-		for (kodgen::ParsingError parsingError : genResult.parsingErrors)
-		{
-			logger.log(parsingError.toString(), kodgen::ILogger::ELogSeverity::Error);
-		}
-
-		for (kodgen::FileGenerationError fileGenError : genResult.fileGenerationErrors)
-		{
-			logger.log(fileGenError.toString(), kodgen::ILogger::ELogSeverity::Error);
-		}
+		logger.log("Generation completed successfully.");
 	}
 	else
 	{

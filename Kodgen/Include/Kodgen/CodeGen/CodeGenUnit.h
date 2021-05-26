@@ -1,5 +1,5 @@
 /**
-*	Copyright (c) 2020 Julien SOYSOUVANH - All Rights Reserved
+*	Copyright (c) 2021 Julien SOYSOUVANH - All Rights Reserved
 *
 *	This file is part of the Kodgen library project which is released under the MIT License.
 *	See the README.md file for full license details.
@@ -19,10 +19,6 @@ namespace kodgen
 {
 	class CodeGenUnit
 	{
-		//TODO: Delete this
-		//FileGenerator can access FileGenerationUnit class to forward logger and settings
-		friend class FileGenerator;
-
 		protected:
 			enum class EIterationResult
 			{
@@ -55,16 +51,16 @@ namespace kodgen
 				AbortWithFailure
 			};
 
-		protected:
+
 			/**
 			*	@brief	Generate code based on the provided parsing result.
 			*			It is up to this method to create files to write to or not.
 			*
-			*	@param parsingResult	Result of a file parsing used to generate the new file.
-			*	@param out_genResult	Reference to the generation result to fill during file generation.
+			*	@param parsingResult Result of a file parsing used to generate the new file.
+			* 
+			*	@return true if the code generation completed successfully without error, else false.
 			*/
-			virtual bool		generateCodeInternal(FileParsingResult const&	parsingResult,
-													 FileGenerationResult&		out_genResult)									noexcept = 0;
+			virtual bool		generateCodeInternal(FileParsingResult const& parsingResult)							noexcept = 0;
 
 			/**
 			*	@brief	Called just before FileGenerationUnit::generateCodeInternal.
@@ -72,25 +68,21 @@ namespace kodgen
 			*			The whole generation process is aborted if the method returns false, so
 			*			validity checks can also be performed during this step.
 			* 
-			*	@param parsingResult	Result of a file parsing used to generate code.
-			*	@param out_genResult	Reference to the generation result to fill during file generation.
+			*	@param parsingResult Result of a file parsing used to generate code.
 			* 
 			*	@return true if the method completed successfully, else false.
 			*/
-			virtual bool		preGenerateCode(FileParsingResult const&	parsingResult,
-												FileGenerationResult&		out_genResult)										noexcept;
+			virtual bool		preGenerateCode(FileParsingResult const& parsingResult)									noexcept;
 
 			/**
 			*	@brief	Called just after FileGenerationUnit::generateCodeInternal.
 			*			Can be used to perform any post-generation cleanup.
 			*
-			*	@param parsingResult	Result of a file parsing used to generate code.
-			*	@param out_genResult	Reference to the generation result to fill during file generation.
+			*	@param parsingResult Result of a file parsing used to generate code.
 			* 
 			*	@return true if the method completed successfully, else false.
 			*/
-			virtual bool		postGenerateCode(FileParsingResult const&	parsingResult,
-												 FileGenerationResult&		out_genResult)										noexcept;
+			virtual bool		postGenerateCode(FileParsingResult const& parsingResult)								noexcept;
 
 			/**
 			*	@brief Iterate and execute recursively a visitor function on each parsed entity.
@@ -102,8 +94,8 @@ namespace kodgen
 			*			EIterationResult::AbortWithSuccess if the traversal was aborted prematurely without error.
 			*			EIterationResult::AbortWithFailure if the traversal was aborted prematurely with an error.
 			*/
-			EIterationResult	foreachEntity(EIterationResult (*visitor)(EntityInfo const&, CodeGenData&),
-											  CodeGenData& data)															noexcept;
+			EIterationResult	foreachEntity(EIterationResult	(*visitor)(EntityInfo const&, CodeGenData&),
+											  CodeGenData&		data)													noexcept;
 
 			/**
 			*	@brief Iterate and execute recursively a visitor function on a namespace and all its nested entities.
@@ -116,9 +108,9 @@ namespace kodgen
 			*			EIterationResult::AbortWithSuccess if the traversal was aborted prematurely without error.
 			*			EIterationResult::AbortWithFailure if the traversal was aborted prematurely with an error.
 			*/
-			EIterationResult	foreachEntityInNamespace(NamespaceInfo const&	namespace_,
-														 EIterationResult (*visitor)(EntityInfo const&, CodeGenData&),
-														 CodeGenData&	data)											noexcept;
+			EIterationResult	foreachEntityInNamespace(NamespaceInfo const& namespace_,
+														 EIterationResult	(*visitor)(EntityInfo const&, CodeGenData&),
+														 CodeGenData&		data)										noexcept;
 
 			/**
 			*	@brief Iterate and execute recursively a visitor function on a struct or class and all its nested entities.
@@ -131,8 +123,8 @@ namespace kodgen
 			*			EIterationResult::AbortWithSuccess if the traversal was aborted prematurely without error.
 			*			EIterationResult::AbortWithFailure if the traversal was aborted prematurely with an error.
 			*/
-			EIterationResult	foreachEntityInStruct(StructClassInfo const&	struct_,
-													  EIterationResult (*visitor)(EntityInfo const&, CodeGenData&),
+			EIterationResult	foreachEntityInStruct(StructClassInfo const& struct_,
+													  EIterationResult	(*visitor)(EntityInfo const&, CodeGenData&),
 													  CodeGenData&		data)											noexcept;
 
 			/**
@@ -147,8 +139,8 @@ namespace kodgen
 			*			EIterationResult::AbortWithFailure if the traversal was aborted prematurely with an error.
 			*/
 			EIterationResult	foreachEntityInEnum(EnumInfo const&		enum_,
-													EIterationResult (*visitor)(EntityInfo const&, CodeGenData&),
-													CodeGenData&	data)													noexcept;
+													EIterationResult	(*visitor)(EntityInfo const&, CodeGenData&),
+													CodeGenData&		data)											noexcept;
 
 			/**
 			*	@brief Check if file last write time is newer than reference file last write time.
@@ -160,7 +152,7 @@ namespace kodgen
 			*	@return true if file last write time is newer than referenceFile's, else false.
 			*/
 			bool				isFileNewerThan(fs::path const& file,
-												fs::path const& referenceFile)											const	noexcept;
+												fs::path const& referenceFile)									const	noexcept;
 
 		public:
 			/** Logger used to issue logs from the FileGenerationUnit. */
@@ -168,6 +160,18 @@ namespace kodgen
 
 			/** Generation settings. */
 			CodeGenUnitSettings const*	settings	= nullptr;
+
+			/**
+			*	@brief	Generate code based on the provided parsing result.
+			*			If any of preGenerateCode, generateCodeInternal or postGenerateCode returns false,
+			*			the code generation is aborted for this generation unit and false is returned.
+			*
+			*	@param parsingResult Result of a file parsing used to generate the new file.
+			* 
+			*	@return false if the generation process was aborted prematurely because of any error, else true.
+			*/
+			//template <typename CodeGenDataType>
+			bool			generateCode(FileParsingResult const& parsingResult)			noexcept;
 
 			/**
 			*	@brief Check whether the generated code for a given source file is up-to-date or not.
@@ -186,18 +190,5 @@ namespace kodgen
 			*			Note that the method will return false if the output directory failed to be created (only if it didn't exist).
 			*/
 			virtual bool	checkSettings()											const	noexcept;
-
-			/**
-			*	@brief	Generate code based on the provided parsing result.
-			*			If any of preGenerateCode, generateCodeInternal or postGenerateCode returns false,
-			*			the code generation is aborted for this generation unit and false is returned.
-			*
-			*	@param parsingResult	Result of a file parsing used to generate the new file.
-			*	@param out_genResult	Reference to the generation result to fill during file generation.
-			* 
-			*	@return false if the generation process was aborted prematurely because of any error, else true.
-			*/
-			bool			generateCode(FileParsingResult const&	parsingResult,
-										 FileGenerationResult&		out_genResult)			noexcept;
 	};
 }

@@ -8,9 +8,14 @@
 
 using namespace kodgen;
 
-bool MacroCodeGenUnit::generateCodeInternal(FileParsingResult const& parsingResult, FileGenerationResult& /* out_genResult */) noexcept
+bool MacroCodeGenUnit::generateCodeInternal(FileParsingResult const& parsingResult) noexcept
 {
-	MacroCodeGenData data(parsingResult, logger, codeGenModuleGroup);
+	//TODO: Move MacroCodeGen creation to another method, then forwarded to this method through args
+	MacroCodeGenData data;
+	
+	data.parsingResult		= &parsingResult;
+	data.logger				= logger;
+	data.codeGenModuleGroup = codeGenModuleGroup;
 
 	EIterationResult result = foreachEntity(&MacroCodeGenUnit::generateEntityCode, data);
 

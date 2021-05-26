@@ -46,11 +46,11 @@ namespace kodgen
 			*	@brief	Generate code based on the provided parsing result.
 			*			Generated code will be dispatched in 2 different files (1 header, 1 source).
 			*
-			*	@param parsingResult	Result of a file parsing used to generate the new file.
-			*	@param out_genResult	Reference to the generation result to fill during file generation.
+			*	@param parsingResult Result of a file parsing used to generate the new file.
+			* 
+			*	@return true if the code generation completed successfully without error, else false.
 			*/
-			virtual bool	generateCodeInternal(FileParsingResult const&	parsingResult,
-												 FileGenerationResult&		out_genResult)			noexcept	override;
+			virtual bool	generateCodeInternal(FileParsingResult const& parsingResult)			noexcept	override;
 
 			/**
 			*	@brief	(Re)generate the header file.
@@ -90,7 +90,7 @@ namespace kodgen
 
 		public:
 			/** Pointer to a collection of all generation modules used by this generation unit. */
-			CodeGenModuleGroup* codeGenModuleGroup;
+			CodeGenModuleGroup* codeGenModuleGroup = nullptr;
 
 			/**
 			*	@brief Check that both the generated header and source files are newer than the source file.

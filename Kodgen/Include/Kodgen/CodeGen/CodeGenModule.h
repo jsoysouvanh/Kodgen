@@ -10,11 +10,15 @@
 #include <string>
 #include <vector>
 
-#include "Kodgen/CodeGen/CodeGenData.h"
-#include "Kodgen/CodeGen/PropertyCodeGen.h"
+#include "Kodgen/Misc/FundamentalTypes.h"
 
 namespace kodgen
 {
+	//Forward declaration
+	class	PropertyCodeGen;
+	struct	CodeGenData;
+	class	EntityInfo;
+
 	//TODO: Add module dependency functionality?
 	class CodeGenModule
 	{

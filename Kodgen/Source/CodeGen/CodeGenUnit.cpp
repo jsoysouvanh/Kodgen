@@ -12,11 +12,11 @@
 
 using namespace kodgen;
 
-bool CodeGenUnit::generateCode(FileParsingResult const& parsingResult, FileGenerationResult& out_genResult) noexcept
+bool CodeGenUnit::generateCode(FileParsingResult const& parsingResult) noexcept
 {
-	return	preGenerateCode(parsingResult, out_genResult) &&
-			generateCodeInternal(parsingResult, out_genResult) &&
-			postGenerateCode(parsingResult, out_genResult);
+	return	preGenerateCode(parsingResult) &&
+		generateCodeInternal(parsingResult) &&
+		postGenerateCode(parsingResult);
 }
 
 bool CodeGenUnit::checkSettings() const noexcept
@@ -85,13 +85,13 @@ bool CodeGenUnit::isFileNewerThan(fs::path const& file, fs::path const& referenc
 	return fs::last_write_time(file) > fs::last_write_time(referenceFile);
 }
 
-bool CodeGenUnit::preGenerateCode(FileParsingResult const& /* parsingResult */, FileGenerationResult& /* out_genResult */) noexcept
+bool CodeGenUnit::preGenerateCode(FileParsingResult const& /* parsingResult */) noexcept
 {
 	//Default implementation does nothing
 	return true;
 }
 
-bool CodeGenUnit::postGenerateCode(FileParsingResult const& /* parsingResult */, FileGenerationResult& /* out_genResult */) noexcept
+bool CodeGenUnit::postGenerateCode(FileParsingResult const& /* parsingResult */) noexcept
 {
 	//Default implementation does nothing
 	return true;
@@ -101,45 +101,44 @@ CodeGenUnit::EIterationResult CodeGenUnit::foreachEntity(EIterationResult (*visi
 {
 	assert(visitor != nullptr);
 
-	//If there is no nested entity, the method will return recurse by default
 	EIterationResult result;
 
-	for (NamespaceInfo const& namespace_ : data.parsingResult.namespaces)
+	for (NamespaceInfo const& namespace_ : data.parsingResult->namespaces)
 	{
 		result = foreachEntityInNamespace(namespace_, visitor, data);
 
 		HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
 	}
 
-	for (StructClassInfo const& struct_ : data.parsingResult.structs)
+	for (StructClassInfo const& struct_ : data.parsingResult->structs)
 	{
 		result = foreachEntityInStruct(struct_, visitor, data);
 
 		HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
 	}
 
-	for (StructClassInfo const& class_ : data.parsingResult.classes)
+	for (StructClassInfo const& class_ : data.parsingResult->classes)
 	{
 		result = foreachEntityInStruct(class_, visitor, data);
 
 		HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
 	}
 
-	for (EnumInfo const& enum_ : data.parsingResult.enums)
+	for (EnumInfo const& enum_ : data.parsingResult->enums)
 	{
 		result = foreachEntityInEnum(enum_, visitor, data);
 
 		HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
 	}
 
-	for (VariableInfo const& variable : data.parsingResult.variables)
+	for (VariableInfo const& variable : data.parsingResult->variables)
 	{
 		result = visitor(variable, data);
 
 		HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
 	}
 
-	for (FunctionInfo const& function : data.parsingResult.functions)
+	for (FunctionInfo const& function : data.parsingResult->functions)
 	{
 		result = visitor(function, data);
 
@@ -211,7 +210,7 @@ CodeGenUnit::EIterationResult CodeGenUnit::foreachEntityInStruct(StructClassInfo
 {
 	assert(visitor != nullptr);
 
-	//Execute the visitor function on the current namespace
+	//Execute the visitor function on the current struct/class
 	EIterationResult result = visitor(struct_, data);
 
 	if (result != EIterationResult::Recurse)
@@ -262,7 +261,7 @@ CodeGenUnit::EIterationResult CodeGenUnit::foreachEntityInEnum(EnumInfo const& e
 {
 	assert(visitor != nullptr);
 
-	//Execute the visitor function on the current namespace
+	//Execute the visitor function on the current enum
 	EIterationResult result = visitor(enum_, data);
 
 	if (result != EIterationResult::Recurse)

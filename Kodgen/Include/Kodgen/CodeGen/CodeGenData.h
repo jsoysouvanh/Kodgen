@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include "Kodgen/CodeGen/FileGenerationResult.h"
 #include "Kodgen/Parsing/ParsingResults/FileParsingResult.h"
 #include "Kodgen/Misc/ILogger.h"
 
@@ -16,11 +15,9 @@ namespace kodgen
 	struct CodeGenData
 	{
 		/** Whole parsing result. */
-		FileParsingResult const&	parsingResult;
+		FileParsingResult const*	parsingResult;
 
 		/** Logger used to log data in the code generation process. Can be nullptr. */
-		ILogger*					logger;
-
-		//TODO: Add FileGenerationSettings?
+		ILogger*					logger	= nullptr;
 	};
 }

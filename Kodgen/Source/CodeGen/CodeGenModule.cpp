@@ -1,6 +1,9 @@
-#include <Kodgen/CodeGen/CodeGenModule.h>
+#include "Kodgen/CodeGen/CodeGenModule.h"
 
 #include <algorithm>
+
+#include "Kodgen/CodeGen/PropertyCodeGen.h"
+#include "Kodgen/CodeGen/CodeGenData.h"
 
 using namespace kodgen;
 

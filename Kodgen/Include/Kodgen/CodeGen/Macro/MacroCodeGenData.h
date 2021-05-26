@@ -52,9 +52,5 @@ namespace kodgen
 
 			/** Separator to use to split the generated code. */
 			std::string			separator;
-
-			MacroCodeGenData(FileParsingResult const&	parsingResult,
-							 ILogger*					logger,
-							 CodeGenModuleGroup*		codeGenModuleGroup)	noexcept;
 	};
 }

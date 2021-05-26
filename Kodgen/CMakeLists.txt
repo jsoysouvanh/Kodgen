@@ -41,6 +41,8 @@ add_library(${KodgenTargetLibrary}
 					Source/Parsing/FileParser.cpp
 					Source/Parsing/FileParserFactoryBase.cpp
 					Source/Parsing/ParsingSettings.cpp
+
+					Source/Parsing/ParsingResults/ParsingResultBase.cpp
 					
 					Source/Misc/EAccessSpecifier.cpp
 					Source/Misc/Helpers.cpp
@@ -53,7 +55,6 @@ add_library(${KodgenTargetLibrary}
 	
 					Source/CodeGen/CodeGenUnit.cpp
 					Source/CodeGen/FileGenerationResult.cpp
-					Source/CodeGen/FileGenerationError.cpp
 					Source/CodeGen/FileGenerator.cpp
 					Source/CodeGen/GeneratedFile.cpp
 					Source/CodeGen/CodeGenModule.cpp

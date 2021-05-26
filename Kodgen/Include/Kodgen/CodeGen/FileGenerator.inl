@@ -33,23 +33,18 @@ void FileGenerator::processFilesMultithread(FileParserFactoryType<FileParserType
 
 		generationTasks.emplace_back(threadPool.submitTask([&](TaskBase* parsingTask) -> FileGenerationResult
 									 {
-										FileGenerationResult	out_generationResult;
+										FileGenerationResult out_generationResult;
 										
 										//Copy the generation unit model to have a fresh one for this generation unit
 										CodeGenUnitType	generationUnit = codeGenUnit;
 
 										//Get the result of the parsing task
-										FileParsingResult		parsingResult = TaskHelper::getDependencyResult<FileParsingResult>(parsingTask, 0u);
+										FileParsingResult parsingResult = TaskHelper::getDependencyResult<FileParsingResult>(parsingTask, 0u);
 
 										//Generate the file if no errors occured during parsing
 										if (parsingResult.errors.empty())
 										{
-											generationUnit.generateCode(parsingResult, out_generationResult);
-										}
-										else
-										{
-											//Transfer parsing errors into the file generation result
-											out_generationResult.parsingErrors.insert(out_generationResult.parsingErrors.cend(), std::make_move_iterator(parsingResult.errors.cbegin()), std::make_move_iterator(parsingResult.errors.cend()));
+											out_generationResult.completed = generationUnit.generateCode(parsingResult);
 										}
 										
 										return out_generationResult;
@@ -60,7 +55,7 @@ void FileGenerator::processFilesMultithread(FileParserFactoryType<FileParserType
 	//Merge all generation results together
 	for (std::shared_ptr<TaskBase>& generationTask : generationTasks)
 	{
-		out_genResult.mergeResultErrors(TaskHelper::getResult<FileGenerationResult>(generationTask.get()));
+		out_genResult.mergeResult(TaskHelper::getResult<FileGenerationResult>(generationTask.get()));
 	}
 }
 
@@ -79,12 +74,7 @@ void FileGenerator::processFilesMonothread(FileParserFactoryType<FileParserType>
 		if (fileParser.parse(file, fileParserFactory.getCompilationArguments(), parsingResult))
 		{
 			//Generate file according to parsing result
-			codeGenUnit.generateCode(parsingResult, out_genResult);
-		}
-		else
-		{
-			//Transfer parsing errors into the file generation result
-			out_genResult.parsingErrors.insert(out_genResult.parsingErrors.cend(), std::make_move_iterator(parsingResult.errors.cbegin()), std::make_move_iterator(parsingResult.errors.cend()));
+			out_genResult.completed &= codeGenUnit.generateCode(parsingResult);
 		}
 	}
 }
@@ -100,8 +90,13 @@ FileGenerationResult FileGenerator::generateFiles(FileParserFactoryType<FilePars
 	static_assert(std::is_copy_constructible_v<CodeGenUnitType>, "The CodeGenUnit you provide must be copy-constructible.");
 
 	FileGenerationResult genResult;
+	genResult.completed = true;
 
-	if (checkGenerationSetup(codeGenUnit))
+	if (!checkGenerationSetup(codeGenUnit))
+	{
+		genResult.completed = false;
+	}
+	else
 	{
 		//Start timer here
 		auto				start			= std::chrono::high_resolution_clock::now();
@@ -130,8 +125,7 @@ FileGenerationResult FileGenerator::generateFiles(FileParserFactoryType<FilePars
 			}
 		}
 
-		genResult.duration	= std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() / 1000.0f;
-		genResult.completed = true;
+		genResult.duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() / 1000.0f;
 	}
 	
 	return genResult;
