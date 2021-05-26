@@ -46,7 +46,7 @@ jobs:
           echo "CXX=${{ matrix.compiler }}" >> $GITHUB_ENV
 
       - name: Generate Project
-        run: cmake -B Build/${{ matrix.build_config }} -DCMAKE_BUILD_TYPE=${{ matrix.build_config }} -G "Ninja"
+        run: cmake -B Build/${{ matrix.build_config }} -DCMAKE_BUILD_TYPE=${{ matrix.build_config }} -DKODGEN_DEV=1 -G "Ninja"
 
       - name: Build Kodgen
         run: cmake --build Build/${{ matrix.build_config }} --config ${{ matrix.build_config }} --verbose

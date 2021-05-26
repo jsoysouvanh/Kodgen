@@ -11,8 +11,6 @@ set(KodgenTargetLibrary Kodgen)
 
 add_library(${KodgenTargetLibrary}
 				STATIC
-					Source/Properties/Property.cpp		
-					Source/Properties/PropertyGroup.cpp
 					Source/Properties/PropertyParsingSettings.cpp
 					
 					Source/InfoStructures/EntityInfo.cpp

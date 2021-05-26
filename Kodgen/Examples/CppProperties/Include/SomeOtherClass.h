@@ -5,16 +5,16 @@
 
 #include "SomeClass.h"
 
-#include "Generated/SomeOtherClass_hgenerated.h"
-
-template <typename T>
-class SomeTemplateClass
-{
-	T* someT = nullptr;
-};
+#include "Generated/SomeOtherClass_h.h"
 
 namespace SomeNamespace KGNamespace()
 {
+	template <typename T>
+	class SomeTemplateClass
+	{
+		T* someT = nullptr;
+	};
+
 	class KGClass() SomeOtherClass
 	{
 		private:
