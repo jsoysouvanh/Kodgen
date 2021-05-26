@@ -68,9 +68,14 @@ void MacroCodeGenUnit::generateSourceFile(FileParsingResult const& parsingResult
 
 bool MacroCodeGenUnit::isUpToDate(fs::path const& sourceFile) const noexcept
 {
-	fs::path generatedHeader = getGeneratedHeaderFilePath(sourceFile);
+	fs::path generatedHeaderPath = getGeneratedHeaderFilePath(sourceFile);
 
-	if (fs::exists(generatedHeader) && isFileNewerThan(generatedHeader, sourceFile))
+	//If the generated header doesn't exist, create it and return false
+	if (!fs::exists(generatedHeaderPath))
+	{
+		GeneratedFile generatedHeader(fs::path(generatedHeaderPath), sourceFile);
+	}
+	else if (isFileNewerThan(generatedHeaderPath, sourceFile))
 	{
 		fs::path generatedSource = getGeneratedSourceFilePath(sourceFile);
 

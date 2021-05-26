@@ -14,7 +14,7 @@ std::set<fs::path> FileGenerator::identifyFilesToProcess(CodeGenUnit const& code
 	{
 		if (fs::exists(path) && !fs::is_directory(path))
 		{
-			if (forceRegenerateAll || !codeGenUnit.isUpToDate(path))
+			if (!codeGenUnit.isUpToDate(path) || forceRegenerateAll)
 			{
 				result.emplace(path);
 			}
@@ -47,7 +47,7 @@ std::set<fs::path> FileGenerator::identifyFilesToProcess(CodeGenUnit const& code
 						if (settings->getSupportedExtensions().find(entry.path().extension().string()) != settings->getSupportedExtensions().cend() &&	//supported extension
 							settings->getIgnoredFiles().find(entry.path()) == settings->getIgnoredFiles().cend())								//file is not ignored
 						{
-							if (forceRegenerateAll || !codeGenUnit.isUpToDate(entry.path()))
+							if (!codeGenUnit.isUpToDate(entry.path()) || forceRegenerateAll)
 							{
 								result.emplace(entry.path());
 							}

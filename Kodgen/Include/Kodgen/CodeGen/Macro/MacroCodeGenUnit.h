@@ -93,7 +93,10 @@ namespace kodgen
 			CodeGenModuleGroup* codeGenModuleGroup = nullptr;
 
 			/**
-			*	@brief Check that both the generated header and source files are newer than the source file.
+			*	@brief	Check that both the generated header and source files are newer than the source file.
+			*			If the generated header file doesn't exist, create it and leave it empty.
+			*			We do that because since the generated header is included in the source code,
+			*			it could generate an undefined behaviour if the header doesn't exist.
 			* 
 			*	@param sourceFile Path to the source file.
 			*
