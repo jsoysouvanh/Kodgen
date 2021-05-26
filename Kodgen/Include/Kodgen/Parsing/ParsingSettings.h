@@ -92,6 +92,7 @@ namespace kodgen
 			*	@brief	Setter for _compilerExeName field.
 			*			This will also check that the compiler is indeed available on the running computer.
 			*			If the compiler is not available on the running computer, the field is not set.
+			*			As for now, supported values are "clang", "gcc" and "msvc".
 			*	
 			*	@return true if the compiler is valid on the running computer, else false.
 			*/

@@ -37,75 +37,84 @@ void initGenerationSettings(fs::path const& workingDirectory, kodgen::FileGenera
 
 int main(int argc, char** argv)
 {
-	kodgen::DefaultLogger	logger;
-	int						result = EXIT_SUCCESS;
+	kodgen::DefaultLogger logger;
 
-	if (argc > 1)
+	if (argc <= 1)
 	{
-		fs::path workingDirectory = argv[1];
+		logger.log("No working directory provided as first program argument", kodgen::ILogger::ELogSeverity::Error);
+		return EXIT_FAILURE;
+	}
 
-		if (fs::is_directory(workingDirectory))
+	fs::path workingDirectory = argv[1];
+	//fs::path workingDirectory = "D:/Prog/GP3/PLA/Refureku/Refureku/Generator/Submodules/Kodgen/Examples/CppProperties";
+
+	if (!fs::is_directory(workingDirectory))
+	{
+		logger.log("Provided working directory is not a directory or doesn't exist", kodgen::ILogger::ELogSeverity::Error);
+		return EXIT_FAILURE;
+	}
+
+	logger.log("Working Directory: " + workingDirectory.string(), kodgen::ILogger::ELogSeverity::Info);
+
+	//Setup File parser factory
+	CppPropsParserFactory fileParserFactory;
+	fileParserFactory.logger = &logger;
+
+#if defined(__GNUC__)
+	bool compilerSetSuccessfully = fileParserFactory.parsingSettings.setCompilerExeName("gcc");
+#elif defined(__clang__)
+	bool compilerSetSuccessfully = fileParserFactory.parsingSettings.setCompilerExeName("clang");
+#elif defined(_MSC_VER)
+	bool compilerSetSuccessfully = fileParserFactory.parsingSettings.setCompilerExeName("msvc");
+#endif
+
+	if (!compilerSetSuccessfully)
+	{
+		logger.log("Compiler could not be set because it is not supported on the current machine or vswhere could not be found (Windows|MSVC only).", kodgen::ILogger::ELogSeverity::Error);
+		return EXIT_FAILURE;
+	}
+
+	//Setup settings
+	kodgen::FileGeneratorSettings		fileGenSettings;
+	kodgen::MacroCodeGenUnitSettings	cguSettings;
+
+	initGenerationSettings(workingDirectory, fileGenSettings, cguSettings);
+
+	//Setup code generation unit
+	kodgen::CodeGenModuleGroup codeGenModuleGroup;
+
+	GetSetCGM getSetCodeGenModule;
+	codeGenModuleGroup.addModule(getSetCodeGenModule);
+
+	kodgen::MacroCodeGenUnit codeGenUnit;
+	codeGenUnit.codeGenModuleGroup = &codeGenModuleGroup;
+	codeGenUnit.logger = &logger;
+	codeGenUnit.settings = &cguSettings;
+
+	//Setup generation settings
+	kodgen::FileGenerator fileGenerator;
+	fileGenerator.logger = &logger;
+	fileGenerator.settings = &fileGenSettings;
+
+	//Kick-off code generation
+	kodgen::FileGenerationResult genResult = fileGenerator.generateFiles(fileParserFactory, codeGenUnit, true);
+
+	if (genResult.completed)
+	{
+		for (kodgen::ParsingError parsingError : genResult.parsingErrors)
 		{
-			logger.log("Working Directory: " + workingDirectory.string(), kodgen::ILogger::ELogSeverity::Info);
-
-			//Setup File parser factory
-			CppPropsParserFactory fileParserFactory;
-			fileParserFactory.logger = &logger;
-			fileParserFactory.parsingSettings.setCompilerExeName("clang++");
-
-			//Setup settings
-			kodgen::FileGeneratorSettings		fileGenSettings;
-			kodgen::MacroCodeGenUnitSettings	cguSettings;
-
-			initGenerationSettings(workingDirectory, fileGenSettings, cguSettings);
-
-			//Setup code generation unit
-			kodgen::CodeGenModuleGroup codeGenModuleGroup;
-
-			GetSetCGM getSetCodeGenModule;
-			codeGenModuleGroup.addModule(getSetCodeGenModule);
-
-			kodgen::MacroCodeGenUnit codeGenUnit;
-			codeGenUnit.codeGenModuleGroup = &codeGenModuleGroup;
-			codeGenUnit.logger = &logger;
-			codeGenUnit.settings = &cguSettings;
-
-			//Setup generation settings
-			kodgen::FileGenerator fileGenerator;
-			fileGenerator.logger = &logger;
-			fileGenerator.settings = &fileGenSettings;
-
-			//Kick-off code generation
-			kodgen::FileGenerationResult genResult = fileGenerator.generateFiles(fileParserFactory, codeGenUnit, true);
-
-			if (genResult.completed)
-			{
-				for (kodgen::ParsingError parsingError : genResult.parsingErrors)
-				{
-					logger.log(parsingError.toString(), kodgen::ILogger::ELogSeverity::Error);
-				}
-
-				for (kodgen::FileGenerationError fileGenError : genResult.fileGenerationErrors)
-				{
-					logger.log(fileGenError.toString(), kodgen::ILogger::ELogSeverity::Error);
-				}
-			}
-			else
-			{
-				logger.log("Invalid FileGenerator::outputDirectory", kodgen::ILogger::ELogSeverity::Error);
-			}
+			logger.log(parsingError.toString(), kodgen::ILogger::ELogSeverity::Error);
 		}
-		else
+
+		for (kodgen::FileGenerationError fileGenError : genResult.fileGenerationErrors)
 		{
-			logger.log("Provided working directory is not a directory or doesn't exist", kodgen::ILogger::ELogSeverity::Error);
-			result = EXIT_FAILURE;
+			logger.log(fileGenError.toString(), kodgen::ILogger::ELogSeverity::Error);
 		}
 	}
 	else
 	{
-		logger.log("No working directory provided as first program argument", kodgen::ILogger::ELogSeverity::Error);
-		result = EXIT_FAILURE;
+		logger.log("Invalid FileGenerator::outputDirectory", kodgen::ILogger::ELogSeverity::Error);
 	}
 
-	return result;
+	return EXIT_SUCCESS;
 }

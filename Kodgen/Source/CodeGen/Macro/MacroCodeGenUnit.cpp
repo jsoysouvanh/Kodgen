@@ -122,9 +122,9 @@ MacroCodeGenUnit::EIterationResult MacroCodeGenUnit::generateEntityCode(EntityIn
 				{
 					continue;
 				}
-				else
+				else if (!generateEntityClassFooterCode(entity, macroData))
 				{
-					return generateEntityClassFooterCode(entity, macroData);
+					return EIterationResult::AbortWithFailure;
 				}
 			}
 			else
@@ -145,7 +145,7 @@ MacroCodeGenUnit::EIterationResult MacroCodeGenUnit::generateEntityCode(EntityIn
 	return EIterationResult::Recurse;
 }
 
-MacroCodeGenUnit::EIterationResult MacroCodeGenUnit::generateEntityClassFooterCode(EntityInfo const& entity, MacroCodeGenData& data) noexcept
+bool MacroCodeGenUnit::generateEntityClassFooterCode(EntityInfo const& entity, MacroCodeGenData& data) noexcept
 {
 	if (data.codeGenModuleGroup->generateCode(&entity, data, data._generatedCodeTmp))
 	{
@@ -162,11 +162,11 @@ MacroCodeGenUnit::EIterationResult MacroCodeGenUnit::generateEntityClassFooterCo
 			data._classFooterGeneratedCode[static_cast<StructClassInfo const*>(entity.outerEntity)] += data._generatedCodeTmp;
 		}
 
-		return EIterationResult::Recurse;
+		return true;
 	}
 	else
 	{
-		return EIterationResult::AbortWithFailure;
+		return false;
 	}
 }
 

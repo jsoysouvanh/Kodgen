@@ -137,6 +137,7 @@ bool FileGenerator::checkGenerationSetup(CodeGenUnit const& codeGenUnit) const n
 
 		//Emit a warning if the output directory content is going to be parsed
 		if (fs::exists(codeGenUnit.settings->getOutputDirectory()) &&											//abort check if the output directory doesn't exist
+			!fs::is_empty(codeGenUnit.settings->getOutputDirectory()) &&										//abort check if the output directory contains no file
 			ignoredDirectories.find(codeGenUnit.settings->getOutputDirectory()) == ignoredDirectories.cend())	//abort check if the output directory is already ignored
 		{
 			for (fs::path const& parsedDirectory : settings->getToParseDirectories())

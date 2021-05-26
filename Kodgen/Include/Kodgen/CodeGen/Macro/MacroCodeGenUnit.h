@@ -36,11 +36,9 @@ namespace kodgen
 			*	@param entity	Entity we generate the code for. Must be one of Struct/Class/Field/Method.
 			*	@param data		Generation data (this is some concise documentation).
 			* 
-			*	@return EIterationResult::Recurse if the traversal completed successfully.
-			*			EIterationResult::AbortWithSuccess if the traversal was aborted prematurely without error.
-			*			EIterationResult::AbortWithFailure if the traversal was aborted prematurely with an error.
+			*	@return true if the entity class footer code was generated successfully, else false.
 			*/
-			static EIterationResult generateEntityClassFooterCode(EntityInfo const&	entity,
+			static bool				generateEntityClassFooterCode(EntityInfo const&	entity,
 																  MacroCodeGenData&	data)			noexcept;
 
 		protected:
