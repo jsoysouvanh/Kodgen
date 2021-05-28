@@ -1,2 +1,2 @@
-#include "Generated/SomeOtherClass_src.h"
+#include "Generated/SomeOtherClass.src.h"
 

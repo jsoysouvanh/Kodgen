@@ -29,8 +29,8 @@ void initGenerationSettings(fs::path const& workingDirectory, kodgen::FileGenera
 	out_cguSettings.setOutputDirectory(generatedDirectory);
 	
 	//Setup generated files name pattern
-	out_cguSettings.setGeneratedHeaderFileNamePattern("##FILENAME##_h.h");
-	out_cguSettings.setGeneratedSourceFileNamePattern("##FILENAME##_src.h");
+	out_cguSettings.setGeneratedHeaderFileNamePattern("##FILENAME##.h.h");
+	out_cguSettings.setGeneratedSourceFileNamePattern("##FILENAME##.src.h");
 	out_cguSettings.setClassFooterMacroPattern("##CLASSFULLNAME##_GENERATED");
 	out_cguSettings.setHeaderFileFooterMacroPattern("File_##FILENAME##_GENERATED");
 }

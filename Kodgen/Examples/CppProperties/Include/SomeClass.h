@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "Generated/SomeClass_h.h"
+#include "Generated/SomeClass.h.h"
 
 namespace SomeNamespace KGNamespace()
 {

@@ -41,13 +41,13 @@ namespace kodgen
 			*	Pattern to use to generate header files.
 			*	##FILENAME## will be replaced by the target file name.
 			*/
-			std::string		_generatedHeaderFileNamePattern	= "##FILENAME##_h.h";
+			std::string		_generatedHeaderFileNamePattern	= "##FILENAME##.h.h";
 
 			/**
 			*	Pattern to use to generate source files.
 			*	##FILENAME## will be replaced by the target file name.
 			*/
-			std::string		_generatedSourceFileNamePattern	= "##FILENAME##_src.h";
+			std::string		_generatedSourceFileNamePattern	= "##FILENAME##.src.h";
 
 			/**
 			*	Pattern to use to generate class footer macro.

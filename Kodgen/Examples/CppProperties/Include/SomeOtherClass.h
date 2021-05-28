@@ -5,7 +5,7 @@
 
 #include "SomeClass.h"
 
-#include "Generated/SomeOtherClass_h.h"	//Last include
+#include "Generated/SomeOtherClass.h.h"	//Last include
 
 namespace SomeNamespace KGNamespace()
 {

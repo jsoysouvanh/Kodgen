@@ -11,9 +11,11 @@ bool MacroCodeGenUnitSettings::loadSettingsValues(toml::value const& tomlData, I
 {
 	if (CodeGenUnitSettings::loadSettingsValues(tomlData, logger))
 	{
-		toml::value const& tomlGeneratorSettings = toml::find(tomlData, tomlSectionName);
+		toml::value const& tomlMacroCGUSettings = toml::find(tomlData, tomlSectionName);
 
-		loadFileNamePatterns(tomlGeneratorSettings, logger);
+		loadFileNamePatterns(tomlMacroCGUSettings, logger);
+		loadClassFooterMacroPattern(tomlMacroCGUSettings, logger);
+		loadHeaderFileFooterMacroPattern(tomlMacroCGUSettings, logger);
 
 		return true;
 	}
@@ -55,11 +57,11 @@ void MacroCodeGenUnitSettings::loadClassFooterMacroPattern(toml::value const& ge
 	//Load class footer macro pattern
 	if (TomlUtility::updateSetting(generationSettings, "classFooterMacroPattern", classFooterMacroPattern, logger))
 	{
-		//TODO: setGeneratedHeaderFileNamePattern(classFooterMacroPattern);
+		setClassFooterMacroPattern(classFooterMacroPattern);
 
 		if (logger != nullptr)
 		{
-			logger->log("[TOML] Load generated header file name pattern: " + _generatedHeaderFileNamePattern);
+			logger->log("[TOML] Load class footer macro pattern: " + _generatedHeaderFileNamePattern);
 		}
 	}
 }
@@ -71,11 +73,11 @@ void MacroCodeGenUnitSettings::loadHeaderFileFooterMacroPattern(toml::value cons
 	//Load class footer macro pattern
 	if (TomlUtility::updateSetting(generationSettings, "headerFileFooterMacroPattern", headerFileFooterMacroPattern, logger))
 	{
-		//TODO: setGeneratedHeaderFileNamePattern(headerFileFooterMacroPattern);
+		setHeaderFileFooterMacroPattern(headerFileFooterMacroPattern);
 
 		if (logger != nullptr)
 		{
-			logger->log("[TOML] Load generated header file name pattern: " + _generatedHeaderFileNamePattern);
+			logger->log("[TOML] Load header file footer macro pattern: " + _generatedHeaderFileNamePattern);
 		}
 	}
 }
