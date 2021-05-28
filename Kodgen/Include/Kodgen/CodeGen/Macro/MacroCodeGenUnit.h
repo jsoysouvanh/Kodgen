@@ -13,6 +13,7 @@ namespace kodgen
 {
 	//Forward declaration
 	class	CodeGenModuleGroup;
+	class	MacroCodeGenUnitSettings;
 	struct	MacroCodeGenData;
 
 	class MacroCodeGenUnit : public CodeGenUnit
@@ -102,16 +103,11 @@ namespace kodgen
 			*
 			*	@return true if the code generated for sourceFile is up-to-date, else false.
 			*/
-			virtual bool	isUpToDate(fs::path const& sourceFile)	const	noexcept	override;
+			virtual bool	isUpToDate(fs::path const& sourceFile)				const	noexcept	override;
 
 			/**
-			*	@brief	Check whether all settings are setup correctly for this unit to work.
-			*			If output directory path is valid but doesn't exist yet, it is created.
-			*			If the assigned settings can't be cast to "MacroCodeGenUnitSettings", fail.
-			* 
-			*	@return	true if all settings are valid, else false.
-			*			Note that the method will return false if the output directory failed to be created (only if it didn't exist).
+			*	@brief Setter for the inherited settings field with suitable derived settings class.
 			*/
-			virtual bool	checkSettings()							const	noexcept	override;
+			void			setSettings(MacroCodeGenUnitSettings const* cguSettings)	noexcept;
 	};
 }

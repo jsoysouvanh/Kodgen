@@ -279,3 +279,8 @@ CodeGenUnit::EIterationResult CodeGenUnit::foreachEntityInEnum(EnumInfo const& e
 	
 	return EIterationResult::Recurse;
 }
+
+CodeGenUnitSettings const* CodeGenUnit::getSettings() const noexcept
+{
+	return settings;
+}

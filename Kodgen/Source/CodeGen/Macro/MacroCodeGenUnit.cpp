@@ -85,26 +85,6 @@ bool MacroCodeGenUnit::isUpToDate(fs::path const& sourceFile) const noexcept
 	return false;
 }
 
-bool MacroCodeGenUnit::checkSettings() const noexcept
-{
-	bool result = CodeGenUnit::checkSettings();
-
-	//Check the type of settings
-#if defined(RTTI_ENABLED)
-	if (dynamic_cast<MacroCodeGenUnitSettings const*>(settings) == nullptr)
-	{
-		if (logger != nullptr)
-		{
-			logger->log("MacroCodeGenUnit needs settings of type MacroCodeGenUnitSettings or derived to work properly.", ILogger::ELogSeverity::Error);
-		}
-
-		result &= false;
-	}
-#endif
-
-	return result;
-}
-
 MacroCodeGenUnit::EIterationResult MacroCodeGenUnit::generateEntityCode(EntityInfo const& entity, CodeGenData& data) noexcept
 {
 	//Data MUST be a MacroCodeGenData or derived for this generation unit to work
@@ -188,4 +168,9 @@ fs::path MacroCodeGenUnit::getGeneratedHeaderFilePath(fs::path const& sourceFile
 fs::path MacroCodeGenUnit::getGeneratedSourceFilePath(fs::path const& sourceFile) const noexcept
 {
 	return settings->getOutputDirectory() / static_cast<MacroCodeGenUnitSettings const*>(settings)->getGeneratedSourceFileName(sourceFile);
+}
+
+void MacroCodeGenUnit::setSettings(MacroCodeGenUnitSettings const* cguSettings) noexcept
+{
+	settings = cguSettings;
 }

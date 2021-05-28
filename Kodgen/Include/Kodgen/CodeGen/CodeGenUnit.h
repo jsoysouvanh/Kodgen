@@ -51,6 +51,8 @@ namespace kodgen
 				AbortWithFailure
 			};
 
+			/** Settings used for code generation. */
+			CodeGenUnitSettings const*	settings	= nullptr;
 
 			/**
 			*	@brief	Generate code based on the provided parsing result.
@@ -155,11 +157,8 @@ namespace kodgen
 												fs::path const& referenceFile)									const	noexcept;
 
 		public:
-			/** Logger used to issue logs from the FileGenerationUnit. */
-			ILogger*					logger		= nullptr;
-
-			/** Generation settings. */
-			CodeGenUnitSettings const*	settings	= nullptr;
+			/** Logger used to issue logs from this CodeGenUnit. */
+			ILogger*	logger	= nullptr;
 
 			/**
 			*	@brief	Generate code based on the provided parsing result.
@@ -190,5 +189,13 @@ namespace kodgen
 			*			Note that the method will return false if the output directory failed to be created (only if it didn't exist).
 			*/
 			virtual bool	checkSettings()											const	noexcept;
+
+
+			/**
+			*	@brief Getter for settings field.
+			* 
+			*	@return settings.
+			*/
+			CodeGenUnitSettings const*	getSettings()	const	noexcept;
 	};
 }

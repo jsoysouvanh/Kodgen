@@ -91,7 +91,7 @@ int main(int argc, char** argv)
 	kodgen::MacroCodeGenUnit codeGenUnit;
 	codeGenUnit.codeGenModuleGroup = &codeGenModuleGroup;
 	codeGenUnit.logger = &logger;
-	codeGenUnit.settings = &cguSettings;
+	codeGenUnit.setSettings(&cguSettings);
 
 	//Setup generation settings
 	kodgen::FileGenerator fileGenerator;
