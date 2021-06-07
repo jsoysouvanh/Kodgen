@@ -40,6 +40,8 @@ namespace kodgen
 											  std::string&			inout_result)	const	noexcept;
 
 		public:
+			virtual ~CodeGenModule() = default;
+
 			/**
 			*	@brief Generate code using the provided data as input.
 			* 

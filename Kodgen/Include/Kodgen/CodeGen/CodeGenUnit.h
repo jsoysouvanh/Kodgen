@@ -160,6 +160,8 @@ namespace kodgen
 			/** Logger used to issue logs from this CodeGenUnit. */
 			ILogger*	logger	= nullptr;
 
+			virtual ~CodeGenUnit() = default;
+
 			/**
 			*	@brief	Generate code based on the provided parsing result.
 			*			If any of preGenerateCode, generateCodeInternal or postGenerateCode returns false,

@@ -1,11 +1,11 @@
 #pragma once
 
-#include <Kodgen/CodeGen/CodeGenModule.h>
+#include <Kodgen/CodeGen/Macro/MacroCodeGenModule.h>
 
 #include "GetPropertyCodeGen.h"
 #include "SetPropertyCodeGen.h"
 
-class GetSetCGM : public kodgen::CodeGenModule
+class GetSetCGM : public kodgen::MacroCodeGenModule
 {
 	private:
 		GetPropertyCodeGen	_getPropertyCodeGen;
