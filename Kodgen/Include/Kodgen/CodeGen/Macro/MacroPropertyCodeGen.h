@@ -30,7 +30,7 @@ namespace kodgen
 														 Property const&	property,
 														 uint8				propertyIndex,
 														 MacroCodeGenData&	data,
-														 std::string&		inout_result)	const noexcept;
+														 std::string&		inout_result)	const	noexcept;
 
 			/**
 			*	@brief	Generate code in the class footer for the given entity.
@@ -48,7 +48,7 @@ namespace kodgen
 													Property const&		property,
 													uint8				propertyIndex,
 													MacroCodeGenData&	data,
-													std::string&		inout_result)		const noexcept;
+													std::string&		inout_result)		const	noexcept;
 
 			/**
 			*	@brief Generate code in the header file footer for the given entity.
@@ -65,10 +65,10 @@ namespace kodgen
 														 Property const&	property,
 														 uint8				propertyIndex,
 														 MacroCodeGenData&	data,
-														 std::string&		inout_result)	const noexcept;
+														 std::string&		inout_result)	const	noexcept;
 
 			/**
-			*	@brief Generate code in the dource file header for the given entity.
+			*	@brief Generate code in the source file header for the given entity.
 			*	
 			*	@param entity			Entity to generate code for.
 			*	@param property			Property that triggered the property generation.
@@ -82,7 +82,41 @@ namespace kodgen
 														 Property const&	property,
 														 uint8				propertyIndex,
 														 MacroCodeGenData&	data,
-														 std::string&		inout_result)	const noexcept;
+														 std::string&		inout_result)	const	noexcept;
+
+			/**
+			*	@brief	Called just before calling generateHeaderFileHeaderCode, generateClassFooterCode, generateHeaderFileFooterCode,
+			*			and generateSourceFileHeaderCode on a given entity.
+			*			Can be used to initialize the data structure or perform any pre generation initialization.
+			* 
+			*	@param entity			Entity to generate code for.
+			*	@param property			Property that triggered the property generation.
+			*	@param propertyIndex	Index of the property in the entity's propertyGroup.
+			*	@param data				Generation data structure.
+			* 
+			*	@return true if the pre-generation completed successfully, else false.
+			*/
+			virtual bool	preGenerateCode(EntityInfo const&	entity,
+											Property const&		property,
+											uint8				propertyIndex,
+											CodeGenData&		data)						const	noexcept;
+
+			/**
+			*	@brief	Called right after generateHeaderFileHeaderCode, generateClassFooterCode, generateHeaderFileFooterCode,
+			*			and generateSourceFileHeaderCode have been called on a given entity.
+			*			Can be used to modify the data structure or perform any post generation cleanup.
+			* 
+			*	@param entity			Entity to generate code for.
+			*	@param property			Property that triggered the property generation.
+			*	@param propertyIndex	Index of the property in the entity's propertyGroup.
+			*	@param data				Generation data structure.
+			* 
+			*	@return true if the post-generation completed successfully, else false.
+			*/
+			virtual bool	postGenerateCode(EntityInfo const&	entity,
+											 Property const&	property,
+											 uint8				propertyIndex,
+											 CodeGenData&		data)						const	noexcept;
 
 		public:
 			/**

@@ -8,7 +8,6 @@
 #pragma once
 
 #include "Kodgen/Misc/Settings.h"
-#include "Kodgen/Misc/Filesystem.h"
 
 namespace kodgen
 {
