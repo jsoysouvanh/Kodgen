@@ -41,8 +41,25 @@ FileParser::~FileParser() noexcept
 	}
 }
 
-bool FileParser::parse(fs::path const& toParseFile, std::vector<char const*> const& compilArgs, FileParsingResult& out_result) noexcept
+bool FileParser::checkSettings() const noexcept
 {
+	if (parsingSettings == nullptr)
+	{
+		if (logger != nullptr)
+		{
+			logger->log("FileParser::parsingSettings have not been set.", ILogger::ELogSeverity::Error);
+		}
+
+		return false;
+	}
+
+	return true;
+}
+
+bool FileParser::parse(fs::path const& toParseFile, FileParsingResult& out_result) noexcept
+{
+	assert(parsingSettings != nullptr);
+
 	bool isSuccess = false;
 
 	preParse(toParseFile);
@@ -53,7 +70,7 @@ bool FileParser::parse(fs::path const& toParseFile, std::vector<char const*> con
 		out_result.parsedFile = toParseFile;
 
 		//Parse the given file
-		CXTranslationUnit translationUnit = clang_parseTranslationUnit(_clangIndex, toParseFile.string().c_str(), compilArgs.data(), static_cast<int32>(compilArgs.size()), nullptr, 0, CXTranslationUnit_SkipFunctionBodies | CXTranslationUnit_Incomplete | CXTranslationUnit_KeepGoing);
+		CXTranslationUnit translationUnit = clang_parseTranslationUnit(_clangIndex, toParseFile.string().c_str(), parsingSettings->getCompilationArguments().data(), static_cast<int32>(parsingSettings->getCompilationArguments().size()), nullptr, 0, CXTranslationUnit_SkipFunctionBodies | CXTranslationUnit_Incomplete | CXTranslationUnit_KeepGoing);
 
 		if (translationUnit != nullptr)
 		{

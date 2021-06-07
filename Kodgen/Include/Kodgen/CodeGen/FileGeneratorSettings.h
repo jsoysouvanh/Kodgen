@@ -66,7 +66,8 @@ namespace kodgen
 			*	@brief	Load the supportedExtensions setting from toml.
 			*			Loaded extensions completely replace previously supported extensions if any.
 			*
-			*	@param generationSettings Toml content.
+			*	@param generationSettings	Toml content.
+			*	@param logger				Optional logger used to issue loading logs. Can be nullptr.
 			*/
 			void	loadSupportedExtensions(toml::value const&	generationSettings,
 											ILogger*			logger)					noexcept;
@@ -75,7 +76,8 @@ namespace kodgen
 			*	@brief	Load the toParseFiles setting from toml.
 			*			Loaded files completely replace previous toParseFiles if any.
 			*
-			*	@param generationSettings Toml content.
+			*	@param generationSettings	Toml content.
+			*	@param logger				Optional logger used to issue loading logs. Can be nullptr.
 			*/
 			void	loadToParseFiles(toml::value const&	generationSettings,
 									 ILogger*			logger)							noexcept;
@@ -84,7 +86,8 @@ namespace kodgen
 			*	@brief	Load the toParseDirectories setting from toml.
 			*			Loaded directories completely replace previous toParseDirectories if any.
 			*
-			*	@param generationSettings Toml content.
+			*	@param generationSettings	Toml content.
+			*	@param logger				Optional logger used to issue loading logs. Can be nullptr.
 			*/
 			void	loadToParseDirectories(toml::value const&	generationSettings,
 										   ILogger*				logger)					noexcept;
@@ -93,7 +96,8 @@ namespace kodgen
 			*	@brief	Load the ignoredFiles setting from toml.
 			*			Loaded files completely replace previous ignoredFiles if any.
 			*
-			*	@param generationSettings Toml content.
+			*	@param generationSettings	Toml content.
+			*	@param logger				Optional logger used to issue loading logs. Can be nullptr.
 			*/
 			void	loadIgnoredFiles(toml::value const&	generationSettings,
 									 ILogger*			logger)							noexcept;
@@ -102,7 +106,8 @@ namespace kodgen
 			*	@brief	Load the ignoredDirectories setting from toml.
 			*			Loaded directories completely replace previous ignoredDirectories if any.
 			*
-			*	@param generationSettings Toml content.
+			*	@param generationSettings	Toml content.
+			*	@param logger				Optional logger used to issue loading logs. Can be nullptr.
 			*/
 			void	loadIgnoredDirectories(toml::value const&	generationSettings,
 										   ILogger*				logger)					noexcept;

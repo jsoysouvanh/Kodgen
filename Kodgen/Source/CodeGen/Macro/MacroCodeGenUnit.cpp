@@ -10,7 +10,7 @@ using namespace kodgen;
 
 bool MacroCodeGenUnit::generateCodeInternal(FileParsingResult const& parsingResult) noexcept
 {
-	//TODO: Move MacroCodeGen creation to another method, then forwarded to this method through args
+	//TODO: Move MacroCodeGenData creation to another method, then forwarded to this method through args
 	MacroCodeGenData data;
 	
 	data.parsingResult		= &parsingResult;
@@ -108,7 +108,7 @@ MacroCodeGenUnit::EIterationResult MacroCodeGenUnit::generateEntityCode(EntityIn
 			if (macroData.codeGenLocation == ECodeGenLocation::ClassFooter)
 			{
 				if (!(entity.entityType == EEntityType::Struct || entity.entityType == EEntityType::Class ||
-					entity.entityType == EEntityType::Method || entity.entityType == EEntityType::Field))
+					  entity.entityType == EEntityType::Method || entity.entityType == EEntityType::Field))
 				{
 					continue;
 				}

@@ -2,6 +2,7 @@
 
 #include "Kodgen/CodeGen/FileGeneratorSettings.h"
 #include "Kodgen/CodeGen/GeneratedFile.h"
+#include "Kodgen/Parsing/ParsingSettings.h"	//ParsingSettings::parsingMacro
 
 using namespace kodgen;
 
@@ -92,34 +93,32 @@ uint32 FileGenerator::getThreadCount(uint32 initialThreadCount) const noexcept
 	return initialThreadCount;
 }
 
-void FileGenerator::generateMacrosFile(FileParserFactoryBase& fileParserFactory, CodeGenUnit const& codeGenUnit) const noexcept
+void FileGenerator::generateMacrosFile(ParsingSettings const& parsingSettings, fs::path const& outputDirectory) const noexcept
 {
-	GeneratedFile macrosDefinitionFile(codeGenUnit.getSettings()->getOutputDirectory() / CodeGenUnitSettings::entityMacrosFilename);
-
-	PropertyParsingSettings& pps = fileParserFactory.parsingSettings.propertyParsingSettings;
+	GeneratedFile macrosDefinitionFile(outputDirectory / CodeGenUnitSettings::entityMacrosFilename);
 
 	//Define empty entity macros to allow compilation outside of the Kodgen parsing
 	macrosDefinitionFile.writeLines("#pragma once",
 									"",
-									"#ifndef " + FileParserFactoryBase::parsingMacro,
+									"#ifndef " + ParsingSettings::parsingMacro,
 									"",
-									"#define " + pps.namespaceMacroName	+ "(...)",
-									"#define " + pps.classMacroName		+ "(...)",
-									"#define " + pps.structMacroName	+ "(...)",
-									"#define " + pps.variableMacroName	+ "(...)",
-									"#define " + pps.fieldMacroName		+ "(...)",
-									"#define " + pps.methodMacroName	+ "(...)",
-									"#define " + pps.enumMacroName		+ "(...)",
-									"#define " + pps.enumValueMacroName	+ "(...)",
-									"#define " + pps.functionMacroName	+ "(...)");
+									"#define " + parsingSettings.propertyParsingSettings.namespaceMacroName	+ "(...)",
+									"#define " + parsingSettings.propertyParsingSettings.classMacroName		+ "(...)",
+									"#define " + parsingSettings.propertyParsingSettings.structMacroName	+ "(...)",
+									"#define " + parsingSettings.propertyParsingSettings.variableMacroName	+ "(...)",
+									"#define " + parsingSettings.propertyParsingSettings.fieldMacroName		+ "(...)",
+									"#define " + parsingSettings.propertyParsingSettings.methodMacroName	+ "(...)",
+									"#define " + parsingSettings.propertyParsingSettings.enumMacroName		+ "(...)",
+									"#define " + parsingSettings.propertyParsingSettings.enumValueMacroName	+ "(...)",
+									"#define " + parsingSettings.propertyParsingSettings.functionMacroName	+ "(...)");
 
 	macrosDefinitionFile.writeLine("\n#endif");
 }
 
-bool FileGenerator::checkGenerationSetup(CodeGenUnit const& codeGenUnit) const noexcept
+bool FileGenerator::checkGenerationSetup(FileParser const& fileParser, CodeGenUnit const& codeGenUnit) const noexcept
 {
 	bool canLog	= logger != nullptr;
-	bool result	= codeGenUnit.checkSettings();
+	bool result	= codeGenUnit.checkSettings() && fileParser.checkSettings();
 	
 	if (settings == nullptr)
 	{
@@ -136,7 +135,7 @@ bool FileGenerator::checkGenerationSetup(CodeGenUnit const& codeGenUnit) const n
 
 		//Emit a warning if the output directory content is going to be parsed
 		if (fs::exists(codeGenUnitSettings->getOutputDirectory()) &&											//abort check if the output directory doesn't exist
-			!fs::is_empty(codeGenUnitSettings->getOutputDirectory()) &&										//abort check if the output directory contains no file
+			!fs::is_empty(codeGenUnitSettings->getOutputDirectory()) &&											//abort check if the output directory contains no file
 			ignoredDirectories.find(codeGenUnitSettings->getOutputDirectory()) == ignoredDirectories.cend())	//abort check if the output directory is already ignored
 		{
 			for (fs::path const& parsedDirectory : settings->getToParseDirectories())

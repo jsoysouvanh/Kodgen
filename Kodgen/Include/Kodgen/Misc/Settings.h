@@ -30,8 +30,11 @@ namespace kodgen
 											ILogger*			logger)		noexcept = 0;
 
 		public:
+			virtual ~Settings() = default;
+
 			/**
-			*	@brief Setup this object's parameters with the provided toml file. Unset settings remain unchanged.
+			*	@brief	Setup this object's member variables with the provided toml file.
+			*			Member variables not specified in the toml file remain unchanged.
 			*
 			*	@param pathToSettingsFile	Path to the toml file.
 			*	@param logger				Optional logger used to issue loading logs.

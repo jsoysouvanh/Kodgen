@@ -1,21 +1,26 @@
 #include "Kodgen/Properties/PropertyParsingSettings.h"
 
+#include "Kodgen/Misc/TomlUtility.h"
+#include "Kodgen/Misc/ILogger.h"
+
 using namespace kodgen;
 
-void PropertyParsingSettings::loadSettings(toml::value const& table, ILogger* logger) noexcept
+bool PropertyParsingSettings::loadSettingsValues(toml::value const& tomlData, ILogger* logger) noexcept
 {
-	TomlUtility::updateSetting(table, "propertySeparator", propertySeparator, logger);
-	TomlUtility::updateSetting(table, "subPropertySeparator", argumentSeparator, logger);
-	TomlUtility::updateSetting(table, "subPropertyStartEncloser", argumentEnclosers[0], logger);
-	TomlUtility::updateSetting(table, "subPropertyEndEncloser", argumentEnclosers[1], logger);
+	TomlUtility::updateSetting(tomlData, "propertySeparator", propertySeparator, logger);
+	TomlUtility::updateSetting(tomlData, "subPropertySeparator", argumentSeparator, logger);
+	TomlUtility::updateSetting(tomlData, "subPropertyStartEncloser", argumentEnclosers[0], logger);
+	TomlUtility::updateSetting(tomlData, "subPropertyEndEncloser", argumentEnclosers[1], logger);
 
-	TomlUtility::updateSetting(table, "namespaceMacroName", namespaceMacroName, logger);
-	TomlUtility::updateSetting(table, "classMacroName", classMacroName, logger);
-	TomlUtility::updateSetting(table, "structMacroName", structMacroName, logger);
-	TomlUtility::updateSetting(table, "variableMacroName", variableMacroName, logger);
-	TomlUtility::updateSetting(table, "fieldMacroName", fieldMacroName, logger);
-	TomlUtility::updateSetting(table, "functionMacroName", functionMacroName, logger);
-	TomlUtility::updateSetting(table, "methodMacroName", methodMacroName, logger);
-	TomlUtility::updateSetting(table, "enumMacroName", enumMacroName, logger);
-	TomlUtility::updateSetting(table, "enumValueMacroName", enumValueMacroName, logger);
+	TomlUtility::updateSetting(tomlData, "namespaceMacroName", namespaceMacroName, logger);
+	TomlUtility::updateSetting(tomlData, "classMacroName", classMacroName, logger);
+	TomlUtility::updateSetting(tomlData, "structMacroName", structMacroName, logger);
+	TomlUtility::updateSetting(tomlData, "variableMacroName", variableMacroName, logger);
+	TomlUtility::updateSetting(tomlData, "fieldMacroName", fieldMacroName, logger);
+	TomlUtility::updateSetting(tomlData, "functionMacroName", functionMacroName, logger);
+	TomlUtility::updateSetting(tomlData, "methodMacroName", methodMacroName, logger);
+	TomlUtility::updateSetting(tomlData, "enumMacroName", enumMacroName, logger);
+	TomlUtility::updateSetting(tomlData, "enumValueMacroName", enumValueMacroName, logger);
+
+	return true;
 }

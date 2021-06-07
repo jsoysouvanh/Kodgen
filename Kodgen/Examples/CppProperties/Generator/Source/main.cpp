@@ -8,7 +8,6 @@
 #include <Kodgen/CodeGen/CodeGenModuleGroup.h>
 #include <Kodgen/CodeGen/FileGeneratorSettings.h>
 
-#include "CppPropsParserFactory.h"
 #include "GetSetCGM.h"
 
 void initGenerationSettings(fs::path const& workingDirectory, kodgen::FileGeneratorSettings& out_generatorSettings, kodgen::MacroCodeGenUnitSettings& out_cguSettings)
@@ -35,6 +34,46 @@ void initGenerationSettings(fs::path const& workingDirectory, kodgen::FileGenera
 	out_cguSettings.setHeaderFileFooterMacroPattern("File_##FILENAME##_GENERATED");
 }
 
+bool setupParsingSettings(kodgen::ParsingSettings& parsingSettings)
+{
+	//We abort parsing if we encounter a single error while parsing
+	parsingSettings.shouldAbortParsingOnFirstError = true;
+
+	//Each property will be separed by a ,
+	parsingSettings.propertyParsingSettings.propertySeparator = ',';
+
+	//Subproperties are surrounded by []
+	parsingSettings.propertyParsingSettings.argumentEnclosers[0] = '[';
+	parsingSettings.propertyParsingSettings.argumentEnclosers[1] = ']';
+
+	//Each subproperty will be separed by a ,
+	parsingSettings.propertyParsingSettings.argumentSeparator = ',';
+
+	//Define the macros to use for each entity type
+	parsingSettings.propertyParsingSettings.namespaceMacroName	= "KGNamespace";
+	parsingSettings.propertyParsingSettings.classMacroName		= "KGClass";
+	parsingSettings.propertyParsingSettings.structMacroName		= "KGStruct";
+	parsingSettings.propertyParsingSettings.fieldMacroName		= "KGVariable";
+	parsingSettings.propertyParsingSettings.fieldMacroName		= "KGField";
+	parsingSettings.propertyParsingSettings.functionMacroName	= "KGFunction";
+	parsingSettings.propertyParsingSettings.methodMacroName		= "KGMethod";
+	parsingSettings.propertyParsingSettings.enumMacroName		= "KGEnum";
+	parsingSettings.propertyParsingSettings.enumValueMacroName	= "KGEnumVal";
+
+	//This is setuped that way for CI tools only
+	//In reality, the compiler used by the user machine running the generator should be set.
+	//It has nothing to see with the compiler used to compile the generator.
+#if defined(__GNUC__)
+	bool compilerSetSuccessfully = parsingSettings.setCompilerExeName("gcc");
+#elif defined(__clang__)
+	bool compilerSetSuccessfully = parsingSettings.setCompilerExeName("clang");
+#elif defined(_MSC_VER)
+	bool compilerSetSuccessfully = parsingSettings.setCompilerExeName("msvc");
+#endif
+
+	return compilerSetSuccessfully;
+}
+
 int main(int argc, char** argv)
 {
 	kodgen::DefaultLogger logger;
@@ -55,26 +94,19 @@ int main(int argc, char** argv)
 
 	logger.log("Working Directory: " + workingDirectory.string(), kodgen::ILogger::ELogSeverity::Info);
 
-	//Setup File parser factory
-	CppPropsParserFactory fileParserFactory;
-	fileParserFactory.logger = &logger;
+	//Setup parsing settings
+	kodgen::ParsingSettings parsingSettings;
 
-	//This is setuped that way for CI tools only
-	//In reality, the compiler used by the user machine running the generator should be set.
-	//It has nothing to see with the compiler used to compile the generator.
-#if defined(__GNUC__)
-	bool compilerSetSuccessfully = fileParserFactory.parsingSettings.setCompilerExeName("gcc");
-#elif defined(__clang__)
-	bool compilerSetSuccessfully = fileParserFactory.parsingSettings.setCompilerExeName("clang");
-#elif defined(_MSC_VER)
-	bool compilerSetSuccessfully = fileParserFactory.parsingSettings.setCompilerExeName("msvc");
-#endif
-
-	if (!compilerSetSuccessfully)
+	if (!setupParsingSettings(parsingSettings))
 	{
 		logger.log("Compiler could not be set because it is not supported on the current machine or vswhere could not be found (Windows|MSVC only).", kodgen::ILogger::ELogSeverity::Error);
 		return EXIT_FAILURE;
 	}
+
+	//Setup FileParser
+	kodgen::FileParser fileParser;
+	fileParser.logger = &logger;
+	fileParser.parsingSettings = &parsingSettings;
 
 	//Setup settings
 	kodgen::FileGeneratorSettings		fileGenSettings;
@@ -99,15 +131,11 @@ int main(int argc, char** argv)
 	fileGenerator.settings = &fileGenSettings;
 
 	//Kick-off code generation
-	kodgen::FileGenerationResult genResult = fileGenerator.generateFiles(fileParserFactory, codeGenUnit, true);
+	kodgen::FileGenerationResult genResult = fileGenerator.generateFiles(fileParser, codeGenUnit, true);
 
 	if (genResult.completed)
 	{
 		logger.log("Generation completed successfully.");
-	}
-	else
-	{
-		logger.log("Invalid FileGenerator::outputDirectory", kodgen::ILogger::ELogSeverity::Error);
 	}
 
 	return EXIT_SUCCESS;

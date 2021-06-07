@@ -5,8 +5,8 @@
 *	See the README.md file for full license details.
 */
 
-template <template <typename> typename FileParserFactoryType, typename FileParserType, typename CodeGenUnitType>
-void FileGenerator::processFilesMultithread(FileParserFactoryType<FileParserType>& fileParserFactory, CodeGenUnitType& codeGenUnit, std::set<fs::path> const& toProcessFiles, FileGenerationResult& out_genResult, uint32 threadCount) const noexcept
+template <typename FileParserType, typename CodeGenUnitType>
+void FileGenerator::processFilesMultithread(FileParserType& fileParser, CodeGenUnitType& codeGenUnit, std::set<fs::path> const& toProcessFiles, FileGenerationResult& out_genResult, uint32 threadCount) const noexcept
 {
 	ThreadPool								threadPool(threadCount, ETerminationMode::FinishAll);
 	std::vector<std::shared_ptr<TaskBase>>	generationTasks;
@@ -22,11 +22,11 @@ void FileGenerator::processFilesMultithread(FileParserFactoryType<FileParserType
 
 		auto parsingTask = threadPool.submitTask([&](TaskBase*) -> FileParsingResult
 												  {
-													 //Generate a parser for this task
-													 FileParserType		fileParser = fileParserFactory.generateFileParser();
+													 //Copy a parser for this task
+													 FileParserType		fileParserCopy = fileParser;
 													 FileParsingResult	parsingResult;
 
-													 fileParser.parse(file, fileParserFactory.getCompilationArguments(), parsingResult);
+													 fileParserCopy.parse(file, parsingResult);
 
 													 return parsingResult;
 												  });
@@ -59,11 +59,9 @@ void FileGenerator::processFilesMultithread(FileParserFactoryType<FileParserType
 	}
 }
 
-template <template <typename> typename FileParserFactoryType, typename FileParserType, typename CodeGenUnitType>
-void FileGenerator::processFilesMonothread(FileParserFactoryType<FileParserType>& fileParserFactory, CodeGenUnitType& codeGenUnit, std::set<fs::path> const& toProcessFiles, FileGenerationResult& out_genResult) const noexcept
+template <typename FileParserType, typename CodeGenUnitType>
+void FileGenerator::processFilesMonothread(FileParserType& fileParser, CodeGenUnitType& codeGenUnit, std::set<fs::path> const& toProcessFiles, FileGenerationResult& out_genResult) const noexcept
 {
-	FileParserType fileParser = fileParserFactory.generateFileParser();
-
 	for (fs::path const& file : toProcessFiles)
 	{
 		FileParsingResult parsingResult;
@@ -71,7 +69,7 @@ void FileGenerator::processFilesMonothread(FileParserFactoryType<FileParserType>
 		out_genResult.parsedFiles.push_back(file);
 
 		//Parse file
-		if (fileParser.parse(file, fileParserFactory.getCompilationArguments(), parsingResult))
+		if (fileParser.parse(file, parsingResult))
 		{
 			//Generate file according to parsing result
 			out_genResult.completed &= codeGenUnit.generateCode(parsingResult);
@@ -79,11 +77,11 @@ void FileGenerator::processFilesMonothread(FileParserFactoryType<FileParserType>
 	}
 }
 
-template <template <typename> typename FileParserFactoryType, typename FileParserType, typename CodeGenUnitType>
-FileGenerationResult FileGenerator::generateFiles(FileParserFactoryType<FileParserType>& fileParserFactory, CodeGenUnitType& codeGenUnit, bool forceRegenerateAll, uint32 threadCount) noexcept
+template <typename FileParserType, typename CodeGenUnitType>
+FileGenerationResult FileGenerator::generateFiles(FileParserType& fileParser, CodeGenUnitType& codeGenUnit, bool forceRegenerateAll, uint32 threadCount) noexcept
 {
-	//Check FileParserFactory validity
-	static_assert(std::is_base_of_v<FileParserFactoryBase, FileParserFactoryType<FileParserType>>, "fileParserFactory type must be a derived class of kodgen::FileParserFactory");
+	//Check FileParser validity
+	static_assert(std::is_copy_constructible_v<FileParserType>, "The provided file parser must be copy constructible.");
 
 	//Check FileGenerationUnit validity
 	static_assert(std::is_base_of_v<CodeGenUnit, CodeGenUnitType>, "codeGenUnit type must be a derived class of kodgen::CodeGenUnit.");
@@ -92,7 +90,7 @@ FileGenerationResult FileGenerator::generateFiles(FileParserFactoryType<FilePars
 	FileGenerationResult genResult;
 	genResult.completed = true;
 
-	if (!checkGenerationSetup(codeGenUnit))
+	if (!checkGenerationSetup(fileParser, codeGenUnit))
 	{
 		genResult.completed = false;
 	}
@@ -105,10 +103,11 @@ FileGenerationResult FileGenerator::generateFiles(FileParserFactoryType<FilePars
 		//Don't setup anything if there are no files to generate
 		if (filesToProcess.size() > 0u)
 		{
-			//Initialize the file parser factory compilation arguments
-			fileParserFactory._init();
+			//Initialize the parsing settings so that compilation arguments are valid.
+			//parsingSettings can't be nullptr since it has been checked in the checkGenerationSetup call.
+			fileParser.parsingSettings->init(logger);
 
-			generateMacrosFile(fileParserFactory, codeGenUnit);
+			generateMacrosFile(*fileParser.parsingSettings, codeGenUnit.getSettings()->getOutputDirectory());
 
 			threadCount = getThreadCount(threadCount);
 
@@ -117,11 +116,11 @@ FileGenerationResult FileGenerator::generateFiles(FileParserFactoryType<FilePars
 
 			if (threadCount == 1u)
 			{
-				processFilesMonothread(fileParserFactory, codeGenUnit, filesToProcess, genResult);
+				processFilesMonothread(fileParser, codeGenUnit, filesToProcess, genResult);
 			}
 			else
 			{
-				processFilesMultithread(fileParserFactory, codeGenUnit, filesToProcess, genResult, threadCount);
+				processFilesMultithread(fileParser, codeGenUnit, filesToProcess, genResult, threadCount);
 			}
 		}
 

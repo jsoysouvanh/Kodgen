@@ -39,7 +39,7 @@ add_library(${KodgenTargetLibrary}
 					Source/Parsing/EnumParser.cpp
 					Source/Parsing/EnumValueParser.cpp
 					Source/Parsing/FileParser.cpp
-					Source/Parsing/FileParserFactoryBase.cpp
+					
 					Source/Parsing/ParsingSettings.cpp
 
 					Source/Parsing/ParsingResults/ParsingResultBase.cpp

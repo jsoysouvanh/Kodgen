@@ -9,12 +9,11 @@
 
 #include <string>
 
-#include "Kodgen/Misc/TomlUtility.h"
-#include "Kodgen/Misc/ILogger.h"
+#include "Kodgen/Misc/Settings.h"
 
 namespace kodgen
 {
-	class PropertyParsingSettings
+	class PropertyParsingSettings : public Settings
 	{
 		public:
 			/** Char used to separate two properties. */
@@ -53,20 +52,15 @@ namespace kodgen
 			/** Macro to use to attach properties to an enum value. */
 			std::string							enumValueMacroName		= "EnumVal";
 
-			PropertyParsingSettings()								= default;
-			PropertyParsingSettings(PropertyParsingSettings const&)	= default;
-			PropertyParsingSettings(PropertyParsingSettings&&)		= default;
-			~PropertyParsingSettings()								= default;
-
 			/**
-			*	//TODO: Inherit from TomlSettings instead
+			*	@brief Load all settings from the provided toml data.
 			* 
-			*	@brief Load settings from a TOML file.
-			*	
-			*	@param table TOML file table to look into.
-			*	@param logger Logger used to issue error when settings contain bad values.
+			*	@param tomlData	Data loaded from a toml file.
+			*	@param logger	Optional logger used to issue loading logs. Can be nullptr.
+			* 
+			*	@return true if no error occured during loading, else false.
 			*/
-			void	loadSettings(toml::value const& table,
-								 ILogger*			logger = nullptr)	noexcept;
+			virtual bool loadSettingsValues(toml::value const&	tomlData,
+											ILogger*			logger)		noexcept override;
 	};
 }

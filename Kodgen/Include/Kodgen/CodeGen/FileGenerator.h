@@ -16,7 +16,7 @@
 #include "Kodgen/Misc/Settings.h"
 #include "Kodgen/CodeGen/FileGenerationResult.h"
 #include "Kodgen/CodeGen/CodeGenUnit.h"
-#include "Kodgen/Parsing/FileParserFactory.h"
+#include "Kodgen/Parsing/FileParser.h"
 #include "Kodgen/Threading/ThreadPool.h"
 #include "Kodgen/Threading/TaskHelper.h"
 
@@ -31,32 +31,32 @@ namespace kodgen
 			/**
 			*	@brief Process all provided files on multiple threads.
 			*	
-			*	@param fileParserFactory	Factory to use to generate a file parser for each thread.
-			*	@param codeGenUnit			Generation unit used to generate files. It must have a clean state when this method is called.
-			*	@param toProcessFiles		Collection of all files to process.
-			*	@param out_genResult		Reference to the generation result to fill during file generation.
-			*	@param threadCount			Number of additional threads to use to process the files.
+			*	@param fileParser		Original file parser to use to parse registered files. A copy of this parser will be used for each generation thread.
+			*	@param codeGenUnit		Generation unit used to generate files. It must have a clean state when this method is called.
+			*	@param toProcessFiles	Collection of all files to process.
+			*	@param out_genResult	Reference to the generation result to fill during file generation.
+			*	@param threadCount		Number of additional threads to use to process the files.
 			*/
-			template <template <typename> typename FileParserFactoryType, typename FileParserType, typename CodeGenUnitType>
-			void	processFilesMultithread(FileParserFactoryType<FileParserType>&	fileParserFactory,
-											CodeGenUnitType&						codeGenUnit,
-											std::set<fs::path> const&				toProcessFiles,
-											FileGenerationResult&					out_genResult,
-											uint32									threadCount)			const	noexcept;
+			template <typename FileParserType, typename CodeGenUnitType>
+			void	processFilesMultithread(FileParserType&				fileParser,
+											CodeGenUnitType&			codeGenUnit,
+											std::set<fs::path> const&	toProcessFiles,
+											FileGenerationResult&		out_genResult,
+											uint32						threadCount)					const	noexcept;
 
 			/**
 			*	@brief Process all provided files on the main thread.
 			*
-			*	@param fileParserFactory	Factory to use to generate the file parser.
-			*	@param codeGenUnit			Generation unit used to generate files. It must have a clean state when this method is called.
-			*	@param toProcessFiles		Collection of all files to process.
-			*	@param out_genResult		Reference to the generation result to fill during file generation.
+			*	@param fileParser		File parser to use to parse registered files.
+			*	@param codeGenUnit		Generation unit used to generate files. It must have a clean state when this method is called.
+			*	@param toProcessFiles	Collection of all files to process.
+			*	@param out_genResult	Reference to the generation result to fill during file generation.
 			*/
-			template <template <typename> typename FileParserFactoryType, typename FileParserType, typename CodeGenUnitType>
-			void	processFilesMonothread(FileParserFactoryType<FileParserType>&	fileParserFactory,
-										   CodeGenUnitType&							codeGenUnit,
-										   std::set<fs::path> const&				toProcessFiles,
-										   FileGenerationResult&					out_genResult)			const	noexcept;
+			template <typename FileParserType, typename CodeGenUnitType>
+			void	processFilesMonothread(FileParserType&				fileParser,
+										   CodeGenUnitType&				codeGenUnit,
+										   std::set<fs::path> const&	toProcessFiles,
+										   FileGenerationResult&		out_genResult)					const	noexcept;
 
 			/**
 			*	@brief Identify all files which will be parsed & regenerated.
@@ -80,24 +80,27 @@ namespace kodgen
 			* 
 			*	@return The number of threads to use.
 			*/
-			uint32					getThreadCount(uint32 initialThreadCount)								const	noexcept;
+			uint32					getThreadCount(uint32 initialThreadCount)							const	noexcept;
 
 			/**
 			*	@brief Generate / update the entity macros file.
 			*	
-			*	@param fileParserFactory FileParserFactory containing parsing settings.
+			*	@param parsingSettings	Parsing settings.
+			*	@param outputDirectory	Directory in which the macro file should be generated.
 			*/
-			void					generateMacrosFile(FileParserFactoryBase&	fileParserFactory,
-													   CodeGenUnit const&		codeGenUnit)				const	noexcept;
+			void					generateMacrosFile(ParsingSettings const&	parsingSettings,
+													   fs::path const&			outputDirectory)		const	noexcept;
 
 			/**
 			*	@brief Check that everything is setup correctly for generation.
 			* 
-			*	@param codeGenUnit The code generation to use during the generation process.
+			*	@param fileParser	The file parser to using during the generation process.
+			*	@param codeGenUnit	The code generation to use during the generation process.
 			* 
 			*	@return true if all settings are correct, else false.
 			*/
-			bool					checkGenerationSetup(CodeGenUnit const& codeGenUnit)					const	noexcept;
+			bool					checkGenerationSetup(FileParser const&	fileParser,
+														 CodeGenUnit const& codeGenUnit)				const	noexcept;
 
 		public:
 			/** Logger used to issue logs from the FileGenerator. */
@@ -107,10 +110,10 @@ namespace kodgen
 			FileGeneratorSettings const*	settings	= nullptr;
 
 			/**
-			*	@brief Parse registered files if they were modified since last generation (or don't exist)
+			*	@brief	Parse registered files if they were modified since last generation (or don't exist)
 			*			and forward them to individual file generation unit for code generation.
 			*
-			*	@param fileParserFactory	Factory to use to generate the file parser(s).
+			*	@param fileParser			Original file parser to use to parse registered files. A copy of this parser will be used for each generation thread.
 			*	@param codeGenUnit			Generation unit used to generate code. It must have a clean state when this method is called.
 			*	@param forceRegenerateAll	Ignore the last write time check and reparse / regenerate all files.
 			*	@param threadCount			Number of threads to use for file parsing and generation.
@@ -119,11 +122,11 @@ namespace kodgen
 			*
 			*	@return Structure containing file generation report.
 			*/
-			template <template <typename> typename FileParserFactoryType, typename FileParserType, typename CodeGenUnitType>
-			FileGenerationResult generateFiles(FileParserFactoryType<FileParserType>&	fileParserFactory,
-											   CodeGenUnitType&							codeGenUnit,
-											   bool										forceRegenerateAll	= false,
-											   uint32									threadCount			= 0)	noexcept;
+			template <typename FileParserType, typename CodeGenUnitType>
+			FileGenerationResult generateFiles(FileParserType&	fileParser,
+											   CodeGenUnitType&	codeGenUnit,
+											   bool				forceRegenerateAll	= false,
+											   uint32			threadCount			= 0)	noexcept;
 	};
 
 	#include "Kodgen/CodeGen/FileGenerator.inl"
