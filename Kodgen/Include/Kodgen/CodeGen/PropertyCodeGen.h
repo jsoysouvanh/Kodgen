@@ -33,6 +33,19 @@ namespace kodgen
 			virtual ~PropertyCodeGen() = default;
 
 			/**
+			*	@brief	Initialize the property code gen and the provided environment. This method must make sure that the provided
+			*			environment is valid to generate code with (i.e. that the environment inherits from all necessary class(es)
+			*			for this property to work properly).
+			*			If the property doesn't require any specific environment, can return true right away.
+			*			The method is called by CodeGenModule::initialize before any call to PropertyCodeGen::generateCode.
+			*
+			*	@param env Generation environment.
+			* 
+			*	@return true if the environment is valid and initialization completed successfully, else false.
+			*/
+			virtual bool	initialize(CodeGenEnv& env)								const	noexcept = 0;
+
+			/**
 			*	@brief Generate code for a given entity.
 			*	
 			*	@param entity			Entity to generate code for.
@@ -61,19 +74,6 @@ namespace kodgen
 			virtual bool	shouldGenerateCode(EntityInfo const&	entity,
 											   Property const&		property,
 											   uint8				propertyIndex)	const	noexcept = 0;
-
-			/**
-			*	@brief	Initialize the property code gen and the provided environment. This method must make sure that the provided
-			*			environment is valid to generate code with (i.e. that the environment inherits from all necessary class(es)
-			*			for this property to work properly).
-			*			If the property doesn't require any specific environment, can return true right away.
-			*			The method is called by CodeGenModule::initialize before any call to PropertyCodeGen::generateCode.
-			*
-			*	@param env Generation environment.
-			* 
-			*	@return true if the environment is valid and initialization completed successfully, else false.
-			*/
-			virtual bool	initialize(CodeGenEnv& env)								const	noexcept = 0;
 	};
 
 	#include "Kodgen/CodeGen/PropertyCodeGen.inl"

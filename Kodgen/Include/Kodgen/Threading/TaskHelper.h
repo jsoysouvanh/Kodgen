@@ -17,10 +17,8 @@ namespace kodgen
 	class TaskHelper
 	{
 		public:
-			TaskHelper()					= delete;
-			TaskHelper(TaskHelper const&)	= delete;
-			TaskHelper(TaskHelper&&)		= delete;
-			~TaskHelper()					= delete;
+			TaskHelper()  = delete;
+			~TaskHelper() = delete;
 
 			/**
 			*	@brief Retrieve the result from a TaskBase object

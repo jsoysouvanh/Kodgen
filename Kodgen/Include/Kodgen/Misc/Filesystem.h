@@ -32,10 +32,8 @@ namespace kodgen
 	class FilesystemHelpers
 	{
 		public:
-			FilesystemHelpers()							= delete;
-			FilesystemHelpers(FilesystemHelpers const&) = delete;
-			FilesystemHelpers(FilesystemHelpers&&)		= delete;
-			~FilesystemHelpers()						= delete;
+			FilesystemHelpers()	 = delete;
+			~FilesystemHelpers() = delete;
 
 			/**
 			*	@brief Make a canonical path from the provided path.

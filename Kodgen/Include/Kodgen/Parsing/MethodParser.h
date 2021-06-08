@@ -70,11 +70,6 @@ namespace kodgen
 			inline MethodParsingResult*		getParsingResult()										noexcept;
 
 		public:
-			MethodParser()						= default;
-			MethodParser(MethodParser const&)	= default;
-			MethodParser(MethodParser&&)		= default;
-			~MethodParser()						= default;
-
 			/**
 			*	@brief Parse the method starting at the provided AST cursor.
 			*

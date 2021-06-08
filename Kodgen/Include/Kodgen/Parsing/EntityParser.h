@@ -57,12 +57,6 @@ namespace kodgen
 			*	@return The current context.
 			*/
 			inline ParsingContext const&	getContext()					const	noexcept;
-
-		public:
-			EntityParser()						= default;
-			EntityParser(EntityParser const&)	= default;
-			EntityParser(EntityParser&&)		= default;
-			~EntityParser()						= default;
 	};
 
 	#include "Kodgen/Parsing/EntityParser.inl"

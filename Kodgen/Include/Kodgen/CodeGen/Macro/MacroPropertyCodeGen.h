@@ -120,6 +120,15 @@ namespace kodgen
 
 		public:
 			/**
+			*	@brief Make sure that the environment is castable to MacroCodeGenEnv.
+			* 
+			*	@param env Generation environment structure.
+			* 
+			*	@return true if the environment is castable to MacroCodeGenEnv, else false.
+			*/
+			virtual bool	initialize(CodeGenEnv& env)						const noexcept override;
+
+			/**
 			*	@brief	Generate code for a given entity.
 			*			This method analyzes the code location retrieved from the MacroCodeGenEnv
 			*			and dispatch the call to the relevant method.
@@ -137,14 +146,5 @@ namespace kodgen
 										 uint8				propertyIndex,
 										 CodeGenEnv&		env,
 										 std::string&		inout_result)	const noexcept override;
-
-			/**
-			*	@brief Make sure that the environment is castable to MacroCodeGenEnv.
-			* 
-			*	@param env Generation environment structure.
-			* 
-			*	@return true if the environment is castable to MacroCodeGenEnv, else false.
-			*/
-			virtual bool	initialize(CodeGenEnv& env)						const noexcept override;
 	};
 }

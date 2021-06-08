@@ -193,11 +193,6 @@ namespace kodgen
 											CXChildVisitResult&	out_visitResult)	noexcept;
 
 		public:
-			ClassParser()					= default;
-			ClassParser(ClassParser const&)	= default;
-			ClassParser(ClassParser&&)		= default;
-			~ClassParser()					= default;
-
 			/**
 			*	@brief Parse the struct/class starting at the provided AST cursor.
 			*

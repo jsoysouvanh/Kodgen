@@ -17,9 +17,7 @@ namespace kodgen
 			/** Property used to automatically parse all nested entities without having to annotate them. */
 			inline static std::string const	parseAllNestedProperty	= "ParseAllNested";
 
-			NativeProperties()							= delete;
-			NativeProperties(NativeProperties const&)	= delete;
-			NativeProperties(NativeProperties&&)		= delete;
-			~NativeProperties()							= delete;
+			NativeProperties()	= delete;
+			~NativeProperties()	= delete;
 	};
 }

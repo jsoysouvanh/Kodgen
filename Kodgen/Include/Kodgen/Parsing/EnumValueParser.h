@@ -65,11 +65,6 @@ namespace kodgen
 			inline EnumValueParsingResult*	getParsingResult()									noexcept;
 
 		public:
-			EnumValueParser()						= default;
-			EnumValueParser(EnumValueParser const&)	= default;
-			EnumValueParser(EnumValueParser&&)		= default;
-			~EnumValueParser()						= default;
-
 			/**
 			*	@brief Parse the enum value starting at the provided AST cursor.
 			*
