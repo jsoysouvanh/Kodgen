@@ -15,9 +15,9 @@ namespace kodgen
 	struct CodeGenData
 	{
 		/** Whole parsing result. */
-		FileParsingResult const*	parsingResult;
+		FileParsingResult const*	parsingResult	= nullptr;
 
 		/** Logger used to log data in the code generation process. Can be nullptr. */
-		ILogger*					logger	= nullptr;
+		ILogger*					logger			= nullptr;
 	};
 }

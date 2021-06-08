@@ -7,10 +7,14 @@
 
 #pragma once
 
-#include "Kodgen/CodeGen/FileGenerationResult.h"
+#include <memory>	//std::shared_ptr
+#include <vector>
+
 #include "Kodgen/Parsing/ParsingResults/FileParsingResult.h"
+#include "Kodgen/CodeGen/FileGenerationResult.h"
 #include "Kodgen/CodeGen/CodeGenData.h"
 #include "Kodgen/CodeGen/CodeGenUnitSettings.h"
+#include "Kodgen/CodeGen/CodeGenModule.h"
 #include "Kodgen/Misc/ILogger.h"
 #include "Kodgen/Misc/Filesystem.h"
 #include "Kodgen/Misc/FundamentalTypes.h"
@@ -19,6 +23,17 @@ namespace kodgen
 {
 	class CodeGenUnit
 	{
+		private:
+			/** Collection of all registered generation modules. */
+			std::shared_ptr<std::vector<CodeGenModule*>>	_generationModules;
+
+			/**
+			*	@brief Create the generationModules shared pointer if it is empty.
+			* 
+			*	@return true if the generation modules has been initialized by the call, else false.
+			*/
+			bool initializeGenerationModulesIfNecessary()	noexcept;
+
 		protected:
 			enum class EIterationResult
 			{
@@ -52,7 +67,7 @@ namespace kodgen
 			};
 
 			/** Settings used for code generation. */
-			CodeGenUnitSettings const*	settings	= nullptr;
+			CodeGenUnitSettings const*						settings			= nullptr;
 
 			/**
 			*	@brief	Generate code based on the provided parsing result.
@@ -87,6 +102,19 @@ namespace kodgen
 			virtual bool		postGenerateCode(FileParsingResult const& parsingResult)								noexcept;
 
 			/**
+			*	@brief Generate code by executing the generateCode method of each registered generation module.
+			* 
+			*	@param entity		Entity the code is generated for. Might be nullptr, in which case the code is not generated for a specific entity.
+			*	@param data			Code generation data (yes).
+			*	@param out_result	String filled with the generated code.
+			* 
+			*	@return true if all registered generation modules completed their code generation successfully, else false.
+			*/
+			bool				runCodeGenModules(EntityInfo const*	entity,
+												  CodeGenData&		data,
+												  std::string&		out_result)									const	noexcept;
+
+			/**
 			*	@brief Iterate and execute recursively a visitor function on each parsed entity.
 			* 
 			*	@param visitor	Visitor function to execute on all traversed entities.
@@ -96,7 +124,7 @@ namespace kodgen
 			*			EIterationResult::AbortWithSuccess if the traversal was aborted prematurely without error.
 			*			EIterationResult::AbortWithFailure if the traversal was aborted prematurely with an error.
 			*/
-			EIterationResult	foreachEntity(EIterationResult	(*visitor)(EntityInfo const&, CodeGenData&),
+			EIterationResult	foreachEntity(EIterationResult	(*visitor)(EntityInfo const&, CodeGenUnit&, CodeGenData&),
 											  CodeGenData&		data)													noexcept;
 
 			/**
@@ -111,7 +139,7 @@ namespace kodgen
 			*			EIterationResult::AbortWithFailure if the traversal was aborted prematurely with an error.
 			*/
 			EIterationResult	foreachEntityInNamespace(NamespaceInfo const& namespace_,
-														 EIterationResult	(*visitor)(EntityInfo const&, CodeGenData&),
+														 EIterationResult	(*visitor)(EntityInfo const&, CodeGenUnit&, CodeGenData&),
 														 CodeGenData&		data)										noexcept;
 
 			/**
@@ -126,7 +154,7 @@ namespace kodgen
 			*			EIterationResult::AbortWithFailure if the traversal was aborted prematurely with an error.
 			*/
 			EIterationResult	foreachEntityInStruct(StructClassInfo const& struct_,
-													  EIterationResult	(*visitor)(EntityInfo const&, CodeGenData&),
+													  EIterationResult	(*visitor)(EntityInfo const&, CodeGenUnit&, CodeGenData&),
 													  CodeGenData&		data)											noexcept;
 
 			/**
@@ -141,7 +169,7 @@ namespace kodgen
 			*			EIterationResult::AbortWithFailure if the traversal was aborted prematurely with an error.
 			*/
 			EIterationResult	foreachEntityInEnum(EnumInfo const&		enum_,
-													EIterationResult	(*visitor)(EntityInfo const&, CodeGenData&),
+													EIterationResult	(*visitor)(EntityInfo const&, CodeGenUnit&, CodeGenData&),
 													CodeGenData&		data)											noexcept;
 
 			/**
@@ -171,8 +199,9 @@ namespace kodgen
 			* 
 			*	@return false if the generation process was aborted prematurely because of any error, else true.
 			*/
+			//TODO: Setup both CodeGenData::codeGenUnit and CodeGenData::parsingResult here.
 			//template <typename CodeGenDataType>
-			bool			generateCode(FileParsingResult const& parsingResult)			noexcept;
+			bool						generateCode(FileParsingResult const& parsingResult)			noexcept;
 
 			/**
 			*	@brief Check whether the generated code for a given source file is up-to-date or not.
@@ -181,23 +210,39 @@ namespace kodgen
 			*
 			*	@return true if the code generated for sourceFile is up-to-date, else false.
 			*/
-			virtual bool	isUpToDate(fs::path const& sourceFile)					const	noexcept = 0;
+			virtual bool				isUpToDate(fs::path const& sourceFile)					const	noexcept = 0;
 
 			/**
 			*	@brief	Check whether all settings are setup correctly for this unit to work.
 			*			If output directory path is valid but doesn't exist yet, it is created.
+			*			This method is internally called by FileGenerator::generateFiles.
 			* 
 			*	@return	true if all settings are valid, else false.
 			*			Note that the method will return false if the output directory failed to be created (only if it didn't exist).
 			*/
-			virtual bool	checkSettings()											const	noexcept;
+			virtual bool				checkSettings()											const	noexcept;
 
+			/**
+			*	@brief Add a module to the internal list of generation modules.
+			* 
+			*	@param generationModule The generation module to add.
+			*/
+			void						addModule(CodeGenModule& generationModule)				noexcept;
+
+			/**
+			*	@brief Remove a module from the internal list of generation modules.
+			* 
+			*	@param generationModule The generation module to remove.
+			* 
+			*	@return true if a module has been successfully removed, else false.
+			*/
+			bool						removeModule(CodeGenModule& generationModule)			noexcept;
 
 			/**
 			*	@brief Getter for settings field.
 			* 
 			*	@return settings.
 			*/
-			CodeGenUnitSettings const*	getSettings()	const	noexcept;
+			CodeGenUnitSettings const*	getSettings()									const	noexcept;
 	};
 }

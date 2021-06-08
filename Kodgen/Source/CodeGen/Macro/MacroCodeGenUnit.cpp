@@ -1,7 +1,6 @@
 #include "Kodgen/CodeGen/Macro/MacroCodeGenUnit.h"
 
 #include "Kodgen/Config.h"
-#include "Kodgen/CodeGen/CodeGenModuleGroup.h"
 #include "Kodgen/CodeGen/GeneratedFile.h"
 #include "Kodgen/CodeGen/Macro/MacroCodeGenData.h"
 #include "Kodgen/CodeGen/Macro/MacroCodeGenUnitSettings.h"
@@ -13,11 +12,14 @@ bool MacroCodeGenUnit::generateCodeInternal(FileParsingResult const& parsingResu
 	//TODO: Move MacroCodeGenData creation to another method, then forwarded to this method through args
 	MacroCodeGenData data;
 	
-	data.parsingResult		= &parsingResult;
-	data.logger				= logger;
-	data.codeGenModuleGroup = codeGenModuleGroup;
+	data.parsingResult = &parsingResult;
 
-	EIterationResult result = foreachEntity(&MacroCodeGenUnit::generateEntityCode, data);
+	EIterationResult result = foreachEntity([](EntityInfo const& entity, CodeGenUnit& codeGenUnit, CodeGenData& data) ->EIterationResult
+											{
+												return static_cast<MacroCodeGenUnit&>(codeGenUnit).generateEntityCode(entity, data);
+											}, data);
+
+	//EIterationResult result = foreachEntity(&MacroCodeGenUnit::generateEntityCode, data);
 
 	if (result != EIterationResult::AbortWithFailure)
 	{
@@ -119,7 +121,7 @@ MacroCodeGenUnit::EIterationResult MacroCodeGenUnit::generateEntityCode(EntityIn
 			}
 			else
 			{
-				if (macroData.codeGenModuleGroup->generateCode(&entity, data, macroData._generatedCodeTmp))
+				if (runCodeGenModules(&entity, data, macroData._generatedCodeTmp))
 				{
 					//Append the generated code to the string
 					macroData._generatedCodePerLocation[i] += macroData._generatedCodeTmp;
@@ -137,7 +139,7 @@ MacroCodeGenUnit::EIterationResult MacroCodeGenUnit::generateEntityCode(EntityIn
 
 bool MacroCodeGenUnit::generateEntityClassFooterCode(EntityInfo const& entity, MacroCodeGenData& data) noexcept
 {
-	if (data.codeGenModuleGroup->generateCode(&entity, data, data._generatedCodeTmp))
+	if (runCodeGenModules(&entity, data, data._generatedCodeTmp))
 	{
 		//Append the generated code to the relevant string
 		if (entity.entityType == EEntityType::Struct || entity.entityType == EEntityType::Class)

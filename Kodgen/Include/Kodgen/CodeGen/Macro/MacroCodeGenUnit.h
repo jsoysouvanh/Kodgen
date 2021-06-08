@@ -29,7 +29,8 @@ namespace kodgen
 			*			EIterationResult::AbortWithSuccess if the traversal was aborted prematurely without error.
 			*			EIterationResult::AbortWithFailure if the traversal was aborted prematurely with an error.
 			*/
-			static EIterationResult generateEntityCode(EntityInfo const& entity, CodeGenData& data)	noexcept;
+			EIterationResult		generateEntityCode(EntityInfo const&	entity,
+													   CodeGenData&			codeGenData)			noexcept;
 
 			/**
 			*	@brief Handle the code generation for class footer code gen location.
@@ -39,7 +40,7 @@ namespace kodgen
 			* 
 			*	@return true if the entity class footer code was generated successfully, else false.
 			*/
-			static bool				generateEntityClassFooterCode(EntityInfo const&	entity,
+			bool					generateEntityClassFooterCode(EntityInfo const&	entity,
 																  MacroCodeGenData&	data)			noexcept;
 
 		protected:
@@ -78,7 +79,7 @@ namespace kodgen
 			* 
 			*	@return the path of the header file generated from the provided source file.
 			*/
-			fs::path	getGeneratedHeaderFilePath(fs::path const& sourceFile)				const	noexcept;
+			fs::path		getGeneratedHeaderFilePath(fs::path const& sourceFile)			const	noexcept;
 
 			/**
 			*	@brief Compute the path of the source file generated from the provided source file.
@@ -87,12 +88,9 @@ namespace kodgen
 			* 
 			*	@return the path of the source file generated from the provided source file.
 			*/
-			fs::path	getGeneratedSourceFilePath(fs::path const& sourceFile)				const	noexcept;
+			fs::path		getGeneratedSourceFilePath(fs::path const& sourceFile)			const	noexcept;
 
 		public:
-			/** Pointer to a collection of all generation modules used by this generation unit. */
-			CodeGenModuleGroup* codeGenModuleGroup = nullptr;
-
 			/**
 			*	@brief	Check that both the generated header and source files are newer than the source file.
 			*			If the generated header file doesn't exist, create it and leave it empty.

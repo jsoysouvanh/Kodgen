@@ -39,7 +39,6 @@ add_library(${KodgenTargetLibrary}
 					Source/Parsing/EnumParser.cpp
 					Source/Parsing/EnumValueParser.cpp
 					Source/Parsing/FileParser.cpp
-					
 					Source/Parsing/ParsingSettings.cpp
 
 					Source/Parsing/ParsingResults/ParsingResultBase.cpp
@@ -58,7 +57,6 @@ add_library(${KodgenTargetLibrary}
 					Source/CodeGen/FileGenerator.cpp
 					Source/CodeGen/GeneratedFile.cpp
 					Source/CodeGen/CodeGenModule.cpp
-					Source/CodeGen/CodeGenModuleGroup.cpp
 					Source/CodeGen/CodeGenUnitSettings.cpp
 					Source/CodeGen/FileGeneratorSettings.cpp
 					
