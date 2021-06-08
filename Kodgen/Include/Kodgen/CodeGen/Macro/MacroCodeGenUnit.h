@@ -66,7 +66,7 @@ namespace kodgen
 			*	@return true if the method completed successfully, else false.
 			*/
 			virtual bool		preGenerateCode(FileParsingResult const&	parsingResult,
-												CodeGenEnv&					env)										noexcept;
+												CodeGenEnv&					env)				noexcept	override;
 
 			/**
 			*	@brief	(Re)generate the header file.
