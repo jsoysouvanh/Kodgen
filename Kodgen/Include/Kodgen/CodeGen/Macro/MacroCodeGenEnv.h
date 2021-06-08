@@ -11,15 +11,12 @@
 #include <array>
 #include <unordered_map>
 
-#include "Kodgen/CodeGen/CodeGenData.h"
+#include "Kodgen/CodeGen/CodeGenEnv.h"
 #include "Kodgen/CodeGen/Macro/ECodeGenLocation.h"
 
 namespace kodgen
 {
-	//Forward declaration
-	class CodeGenModuleGroup;
-
-	struct MacroCodeGenData : public CodeGenData
+	struct MacroCodeGenEnv : public CodeGenEnv
 	{
 		//Friend to access generatedCodeTmp variable and hide it to other classes
 		friend class MacroCodeGenUnit;
@@ -44,13 +41,10 @@ namespace kodgen
 			std::unordered_map<StructClassInfo const*, std::string>					_classFooterGeneratedCode;
 
 		public:
-			/** All modules generating for the generation unit. */
-			CodeGenModuleGroup*	codeGenModuleGroup;
-
 			/** Location the code should be generated in. */
-			ECodeGenLocation	codeGenLocation;
+			ECodeGenLocation	codeGenLocation	= ECodeGenLocation::Count;
 
 			/** Separator to use to split the generated code. */
-			std::string			separator;
+			std::string			separator		= "";
 	};
 }

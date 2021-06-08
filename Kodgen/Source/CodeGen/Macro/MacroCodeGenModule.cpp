@@ -1,13 +1,13 @@
 #include "Kodgen/CodeGen/Macro/MacroCodeGenModule.h"
 
 #include "Kodgen/InfoStructures/EntityInfo.h"
-#include "Kodgen/CodeGen/Macro/MacroCodeGenData.h"
+#include "Kodgen/CodeGen/Macro/MacroCodeGenEnv.h"
 
 using namespace kodgen;
 
-bool MacroCodeGenModule::generateCode(EntityInfo const* entity, CodeGenData& data, std::string& inout_result) const noexcept
+bool MacroCodeGenModule::generateCode(EntityInfo const* entity, CodeGenEnv& data, std::string& inout_result) const noexcept
 {
-	MacroCodeGenData& macroData = static_cast<MacroCodeGenData&>(data);
+	MacroCodeGenEnv& macroData = static_cast<MacroCodeGenEnv&>(data);
 
 	//Dispatch code generation call to the right sub-method
 	switch (macroData.codeGenLocation)
@@ -40,37 +40,37 @@ bool MacroCodeGenModule::generateCode(EntityInfo const* entity, CodeGenData& dat
 	return false;
 }
 
-bool MacroCodeGenModule::generateHeaderFileHeaderCode(EntityInfo const* /* entity */, MacroCodeGenData& /* data */, std::string& /* inout_result */) const noexcept
+bool MacroCodeGenModule::generateHeaderFileHeaderCode(EntityInfo const* /* entity */, MacroCodeGenEnv& /* data */, std::string& /* inout_result */) const noexcept
 {
 	//Default implementation generates no code
 	return true;
 }
 
-bool MacroCodeGenModule::generateClassFooterCode(EntityInfo const* /* entity */, MacroCodeGenData& /* data */, std::string& /* inout_result */) const noexcept
+bool MacroCodeGenModule::generateClassFooterCode(EntityInfo const* /* entity */, MacroCodeGenEnv& /* data */, std::string& /* inout_result */) const noexcept
 {
 	//Default implementation generates no code
 	return true;
 }
 
-bool MacroCodeGenModule::generateHeaderFileFooterCode(EntityInfo const* /* entity */, MacroCodeGenData& /* data */, std::string& /* inout_result */) const noexcept
+bool MacroCodeGenModule::generateHeaderFileFooterCode(EntityInfo const* /* entity */, MacroCodeGenEnv& /* data */, std::string& /* inout_result */) const noexcept
 {
 	//Default implementation generates no code
 	return true;
 }
 
-bool MacroCodeGenModule::generateSourceFileHeaderCode(EntityInfo const* /* entity */, MacroCodeGenData& /* data */, std::string& /* inout_result */) const noexcept
+bool MacroCodeGenModule::generateSourceFileHeaderCode(EntityInfo const* /* entity */, MacroCodeGenEnv& /* data */, std::string& /* inout_result */) const noexcept
 {
 	//Default implementation generates no code
 	return true;
 }
 
-bool MacroCodeGenModule::preGenerateCode(EntityInfo const* /* entity */, CodeGenData& /*data*/) const noexcept
+bool MacroCodeGenModule::preGenerateCode(EntityInfo const* /* entity */, CodeGenEnv& /*data*/) const noexcept
 {
 	//Default implementation does nothing
 	return true;
 }
 
-bool MacroCodeGenModule::postGenerateCode(EntityInfo const* /*entity*/, CodeGenData& /*data*/) const noexcept
+bool MacroCodeGenModule::postGenerateCode(EntityInfo const* /*entity*/, CodeGenEnv& /*data*/) const noexcept
 {
 	//Default implementation does nothing
 	return true;

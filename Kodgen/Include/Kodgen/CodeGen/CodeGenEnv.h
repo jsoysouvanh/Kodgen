@@ -12,12 +12,14 @@
 
 namespace kodgen
 {
-	struct CodeGenData
+	struct CodeGenEnv
 	{
 		/** Whole parsing result. */
 		FileParsingResult const*	parsingResult	= nullptr;
 
-		/** Logger used to log data in the code generation process. Can be nullptr. */
+		/** Logger used to log during the code generation process. Can be nullptr. */
 		ILogger*					logger			= nullptr;
+
+		virtual ~CodeGenEnv() = default;
 	};
 }

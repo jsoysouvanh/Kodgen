@@ -126,8 +126,10 @@ int main(int argc, char** argv)
 	fileGenerator.logger = &logger;
 	fileGenerator.settings = &fileGenSettings;
 
+	kodgen::MacroCodeGenEnv env;
+
 	//Kick-off code generation
-	kodgen::FileGenerationResult genResult = fileGenerator.generateFiles(fileParser, codeGenUnit, true);
+	kodgen::FileGenerationResult genResult = fileGenerator.generateFiles(fileParser, codeGenUnit, env, true);
 
 	if (genResult.completed)
 	{

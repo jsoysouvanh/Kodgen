@@ -9,8 +9,9 @@
 
 #include <string>
 
+#include "Kodgen/Config.h"
 #include "Kodgen/Misc/FundamentalTypes.h"
-#include "Kodgen/CodeGen/CodeGenData.h"
+#include "Kodgen/CodeGen/CodeGenEnv.h"
 #include "Kodgen/InfoStructures/EntityInfo.h"
 
 namespace kodgen
@@ -37,7 +38,7 @@ namespace kodgen
 			*	@param entity			Entity to generate code for.
 			*	@param property			Property that triggered the property generation.
 			*	@param propertyIndex	Index of the property in the entity's propertyGroup.
-			*	@param data				Generation data structure.
+			*	@param env				Generation environment structure.
 			*	@param inout_result		String the method should append the generated code to.
 			*	
 			*	@return true if the generation completed successfully, else false.
@@ -45,7 +46,7 @@ namespace kodgen
 			virtual bool	generateCode(EntityInfo const&	entity,
 										 Property const&	property,
 										 uint8				propertyIndex,
-										 CodeGenData&		data,
+										 CodeGenEnv&		env,
 										 std::string&		inout_result)			const	noexcept = 0;
 
 			/**
@@ -60,6 +61,19 @@ namespace kodgen
 			virtual bool	shouldGenerateCode(EntityInfo const&	entity,
 											   Property const&		property,
 											   uint8				propertyIndex)	const	noexcept = 0;
+
+			/**
+			*	@brief	Initialize the property code gen and the provided environment. This method must make sure that the provided
+			*			environment is valid to generate code with (i.e. that the environment inherits from all necessary class(es)
+			*			for this property to work properly).
+			*			If the property doesn't require any specific environment, can return true right away.
+			*			The method is called by CodeGenModule::initialize before any call to PropertyCodeGen::generateCode.
+			*
+			*	@param env Generation environment.
+			* 
+			*	@return true if the environment is valid and initialization completed successfully, else false.
+			*/
+			virtual bool	initialize(CodeGenEnv& env)								const	noexcept = 0;
 	};
 
 	#include "Kodgen/CodeGen/PropertyCodeGen.inl"

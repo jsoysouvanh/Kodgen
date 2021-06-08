@@ -16,7 +16,7 @@ namespace kodgen
 {
 	//Forward declaration
 	class	PropertyCodeGen;
-	struct	CodeGenData;
+	struct	CodeGenEnv;
 	class	EntityInfo;
 
 	//TODO: Add module dependency functionality?
@@ -30,29 +30,41 @@ namespace kodgen
 			*	@brief Make eligible property code generators generate code for the provided entity.
 			* 
 			*	@param entity		Entity the module is generating code for. Might be nullptr, in which case the code is not generated for a specific entity.
-			*	@param data			Data provided by the FileGenerationUnit. You can cast data to a more concrete type if you know the type provided by the FileGenerationUnit.
+			*	@param env			Data provided by the FileGenerationUnit. You can cast env to a more concrete type if you know the type provided by the FileGenerationUnit.
 			*	@param inout_result	String the method should append the generated code to.
 			* 
 			*	@return true if the code generation completed successfully for all property code generators, else false.
 			*/
 			bool	runPropertyCodeGenerators(EntityInfo const&		entity,
-											  CodeGenData&			data,
+											  CodeGenEnv&			env,
 											  std::string&			inout_result)	const	noexcept;
 
 		public:
 			virtual ~CodeGenModule() = default;
 
 			/**
-			*	@brief Generate code using the provided data as input.
+			*	@brief	Initialize the module and the provided environment. The module must make sure that the provided
+			*			environment is valid to generate code with (i.e. that the environment inherits from all necessary class(es)
+			*			for this module to work properly).
+			*			The method is called by CodeGenUnit::preGenerateCode before any call to CodeGenModule::generateCode.
+			*
+			*	@param env Generation environment.
+			* 
+			*	@return true if the environment is valid and initialization completed successfully, else false.
+			*/
+			virtual bool								initialize(CodeGenEnv& env)								const	noexcept;
+
+			/**
+			*	@brief Generate code using the provided environment as input.
 			* 
 			*	@param entity			Entity the module is generating code for. Might be nullptr, in which case the code is not generated for a specific entity.
-			*	@param data				Data provided by the FileGenerationUnit. You can cast data to a more concrete type if you know the type provided by the FileGenerationUnit.
+			*	@param env				Data provided by the FileGenerationUnit. You can cast env to a more concrete type if you know the type provided by the FileGenerationUnit.
 			*	@param inout_result		String the method should append the generated code to.
 			* 
 			*	@return true if the code generation completed successfully, else false. If false is returned
 			*/
 			virtual bool								generateCode(EntityInfo const*	entity,
-																	 CodeGenData&		data,
+																	 CodeGenEnv&		env,
 																	 std::string&		inout_result)			const	noexcept;
 
 			/**

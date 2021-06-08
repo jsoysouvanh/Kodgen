@@ -17,7 +17,7 @@ class SetPropertyCodeGen : public kodgen::MacroPropertyCodeGen
 		virtual ~SetPropertyCodeGen() = default;
 
 		virtual bool generateCode(kodgen::EntityInfo const& entity, kodgen::Property const& property, kodgen::uint8 propertyIndex,
-								  kodgen::CodeGenData& data, std::string& inout_result) const noexcept override
+								  kodgen::CodeGenEnv& env, std::string& inout_result) const noexcept override
 		{
 			std::string errorMessage;
 			
@@ -34,16 +34,16 @@ class SetPropertyCodeGen : public kodgen::MacroPropertyCodeGen
 			if (!errorMessage.empty())
 			{
 				//Log error message and abort generation
-				if (data.logger != nullptr)
+				if (env.logger != nullptr)
 				{
-					data.logger->log(errorMessage, kodgen::ILogger::ELogSeverity::Error);
+					env.logger->log(errorMessage, kodgen::ILogger::ELogSeverity::Error);
 				}
 
 				return false;
 			}
 
 			//If arguments are valid, dispatch the generation call normally
-			return kodgen::MacroPropertyCodeGen::generateCode(entity, property, propertyIndex, data, inout_result);
+			return kodgen::MacroPropertyCodeGen::generateCode(entity, property, propertyIndex, env, inout_result);
 		}
 
 		virtual bool shouldGenerateCode(kodgen::EntityInfo const& entity, kodgen::Property const& property, kodgen::uint8 /* propertyIndex */) const noexcept override
@@ -52,7 +52,7 @@ class SetPropertyCodeGen : public kodgen::MacroPropertyCodeGen
 		}
 
 		virtual bool generateClassFooterCode(kodgen::EntityInfo const& entity, kodgen::Property const& /* property */, kodgen::uint8 /* propertyIndex */,
-											 kodgen::MacroCodeGenData& data, std::string& inout_result) const noexcept override
+											 kodgen::MacroCodeGenEnv& data, std::string& inout_result) const noexcept override
 		{
 			kodgen::FieldInfo const& field = static_cast<kodgen::FieldInfo const&>(entity);
 
@@ -96,7 +96,7 @@ class SetPropertyCodeGen : public kodgen::MacroPropertyCodeGen
 		}
 
 		virtual bool generateSourceFileHeaderCode(kodgen::EntityInfo const& entity, kodgen::Property const& property, kodgen::uint8 /* propertyIndex */,
-												  kodgen::MacroCodeGenData& data, std::string& inout_result) const noexcept override
+												  kodgen::MacroCodeGenEnv& data, std::string& inout_result) const noexcept override
 		{
 			kodgen::FieldInfo const& field = static_cast<kodgen::FieldInfo const&>(entity);
 

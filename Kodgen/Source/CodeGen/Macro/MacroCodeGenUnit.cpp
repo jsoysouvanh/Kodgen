@@ -2,30 +2,49 @@
 
 #include "Kodgen/Config.h"
 #include "Kodgen/CodeGen/GeneratedFile.h"
-#include "Kodgen/CodeGen/Macro/MacroCodeGenData.h"
+#include "Kodgen/CodeGen/Macro/MacroCodeGenEnv.h"
 #include "Kodgen/CodeGen/Macro/MacroCodeGenUnitSettings.h"
 
 using namespace kodgen;
 
-bool MacroCodeGenUnit::generateCodeInternal(FileParsingResult const& parsingResult) noexcept
+bool MacroCodeGenUnit::preGenerateCode(FileParsingResult const& parsingResult, CodeGenEnv& env) noexcept
 {
-	//TODO: Move MacroCodeGenData creation to another method, then forwarded to this method through args
-	MacroCodeGenData data;
-	
-	data.parsingResult = &parsingResult;
+#ifdef RTTI_ENABLED
+	 MacroCodeGenEnv* macroEnv = dynamic_cast<MacroCodeGenEnv*>(&env);
+#else
+	//unsafe
+	 MacroCodeGenEnv* macroEnv = static_cast<MacroCodeGenEnv*>(&env);
+#endif
 
-	EIterationResult result = foreachEntity([](EntityInfo const& entity, CodeGenUnit& codeGenUnit, CodeGenData& data) ->EIterationResult
+	if (macroEnv != nullptr)
+	{
+		//Setup macro env
+		macroEnv->parsingResult = &parsingResult;	//If a crash happens here, means RTTI was disable and the provided env is not a MacroCodeGenEnv
+		macroEnv->logger		= logger;
+
+		return CodeGenUnit::preGenerateCode(parsingResult, env);
+	}
+
+	if (logger != nullptr)
+	{
+		logger->log("The provided CodeGenEnv must be castable to MacroCodeGenEnv to be used with a MacroCodeGenUnit.", ILogger::ELogSeverity::Error);
+	}
+
+	return false;
+}
+
+bool MacroCodeGenUnit::generateCodeInternal(FileParsingResult const& parsingResult, CodeGenEnv& env) noexcept
+{
+	EIterationResult result = foreachEntity([](EntityInfo const& entity, CodeGenUnit& codeGenUnit, CodeGenEnv& env) ->EIterationResult
 											{
-												return static_cast<MacroCodeGenUnit&>(codeGenUnit).generateEntityCode(entity, data);
-											}, data);
-
-	//EIterationResult result = foreachEntity(&MacroCodeGenUnit::generateEntityCode, data);
+												return static_cast<MacroCodeGenUnit&>(codeGenUnit).generateEntityCode(entity, env);
+											}, env);
 
 	if (result != EIterationResult::AbortWithFailure)
 	{
 		//Create generated header & generated source files
-		generateHeaderFile(parsingResult, data);
-		generateSourceFile(parsingResult, data);
+		generateHeaderFile(parsingResult, static_cast<MacroCodeGenEnv&>(env));
+		generateSourceFile(parsingResult, static_cast<MacroCodeGenEnv&>(env));
 
 		return true;
 	}
@@ -33,7 +52,7 @@ bool MacroCodeGenUnit::generateCodeInternal(FileParsingResult const& parsingResu
 	return false;
 }
 
-void MacroCodeGenUnit::generateHeaderFile(FileParsingResult const& parsingResult, MacroCodeGenData& data) const noexcept
+void MacroCodeGenUnit::generateHeaderFile(FileParsingResult const& parsingResult, MacroCodeGenEnv& env) const noexcept
 {
 	GeneratedFile generatedHeader(getGeneratedHeaderFilePath(parsingResult.parsedFile), parsingResult.parsedFile);
 
@@ -45,18 +64,18 @@ void MacroCodeGenUnit::generateHeaderFile(FileParsingResult const& parsingResult
 	generatedHeader.writeLine("#include \"" + CodeGenUnitSettings::entityMacrosFilename.string() + "\"");
 
 	//Write header file header code
-	generatedHeader.writeLine(std::move(data._generatedCodePerLocation[static_cast<int>(ECodeGenLocation::HeaderFileHeader)]));
+	generatedHeader.writeLine(std::move(env._generatedCodePerLocation[static_cast<int>(ECodeGenLocation::HeaderFileHeader)]));
 
 	//Write all class footer macros
-	for (auto& [structInfo, generatedCode] : data._classFooterGeneratedCode)
+	for (auto& [structInfo, generatedCode] : env._classFooterGeneratedCode)
 	{
 		generatedHeader.writeMacro(castSettings->getClassFooterMacro(*structInfo), std::move(generatedCode));
 	}
 
-	generatedHeader.writeMacro(castSettings->getHeaderFileFooterMacro(parsingResult.parsedFile), std::move(data._generatedCodePerLocation[static_cast<int>(ECodeGenLocation::HeaderFileFooter)]));
+	generatedHeader.writeMacro(castSettings->getHeaderFileFooterMacro(parsingResult.parsedFile), std::move(env._generatedCodePerLocation[static_cast<int>(ECodeGenLocation::HeaderFileFooter)]));
 }
 
-void MacroCodeGenUnit::generateSourceFile(FileParsingResult const& parsingResult, MacroCodeGenData& data) const noexcept
+void MacroCodeGenUnit::generateSourceFile(FileParsingResult const& parsingResult, MacroCodeGenEnv& env) const noexcept
 {
 	GeneratedFile generatedSource(getGeneratedSourceFilePath(parsingResult.parsedFile), parsingResult.parsedFile);
 
@@ -65,7 +84,7 @@ void MacroCodeGenUnit::generateSourceFile(FileParsingResult const& parsingResult
 	//Include the header file
 	generatedSource.writeLine("#include \"" + parsingResult.parsedFile.string() + "\"\n");
 
-	generatedSource.writeLine(std::move(data._generatedCodePerLocation[static_cast<int>(ECodeGenLocation::SourceFileHeader)]));
+	generatedSource.writeLine(std::move(env._generatedCodePerLocation[static_cast<int>(ECodeGenLocation::SourceFileHeader)]));
 }
 
 bool MacroCodeGenUnit::isUpToDate(fs::path const& sourceFile) const noexcept
@@ -87,49 +106,46 @@ bool MacroCodeGenUnit::isUpToDate(fs::path const& sourceFile) const noexcept
 	return false;
 }
 
-MacroCodeGenUnit::EIterationResult MacroCodeGenUnit::generateEntityCode(EntityInfo const& entity, CodeGenData& data) noexcept
+MacroCodeGenUnit::EIterationResult MacroCodeGenUnit::generateEntityCode(EntityInfo const& entity, CodeGenEnv& env) noexcept
 {
-	//Data MUST be a MacroCodeGenData or derived for this generation unit to work
-	MacroCodeGenData& macroData = static_cast<MacroCodeGenData&>(data);
+	//Data MUST be a MacroCodeGenEnv or derived for this generation unit to work
+	MacroCodeGenEnv& macroData = static_cast<MacroCodeGenEnv&>(env);
 
-	if (macroData.codeGenModuleGroup != nullptr)
+	//Generate code for each code location
+	for (int i = 0u; i < static_cast<int>(ECodeGenLocation::Count); i++)
 	{
-		//Generate code for each code location
-		for (int i = 0u; i < static_cast<int>(ECodeGenLocation::Count); i++)
+		macroData.codeGenLocation = static_cast<ECodeGenLocation>(i);
+		macroData.separator = macroData._separators[i];
+
+		//Clear the temp string without deallocating underlying memory
+		macroData._generatedCodeTmp.clear();
+
+		/**
+		*	Forward ECodeGenLocation::ClassFooter generation only if the entity is a
+		*	struct, class, method or field
+		*/
+		if (macroData.codeGenLocation == ECodeGenLocation::ClassFooter)
 		{
-			macroData.codeGenLocation = static_cast<ECodeGenLocation>(i);
-			macroData.separator = macroData._separators[i];
-
-			//Clear the temp string without deallocating underlying memory
-			macroData._generatedCodeTmp.clear();
-
-			/**
-			*	Forward ECodeGenLocation::ClassFooter generation only if the entity is a
-			*	struct, class, method or field
-			*/
-			if (macroData.codeGenLocation == ECodeGenLocation::ClassFooter)
+			if (!(entity.entityType == EEntityType::Struct || entity.entityType == EEntityType::Class ||
+					entity.entityType == EEntityType::Method || entity.entityType == EEntityType::Field))
 			{
-				if (!(entity.entityType == EEntityType::Struct || entity.entityType == EEntityType::Class ||
-					  entity.entityType == EEntityType::Method || entity.entityType == EEntityType::Field))
-				{
-					continue;
-				}
-				else if (!generateEntityClassFooterCode(entity, macroData))
-				{
-					return EIterationResult::AbortWithFailure;
-				}
+				continue;
+			}
+			else if (!generateEntityClassFooterCode(entity, macroData))
+			{
+				return EIterationResult::AbortWithFailure;
+			}
+		}
+		else
+		{
+			if (runCodeGenModules(&entity, env, macroData._generatedCodeTmp))
+			{
+				//Append the generated code to the string
+				macroData._generatedCodePerLocation[i] += macroData._generatedCodeTmp;
 			}
 			else
 			{
-				if (runCodeGenModules(&entity, data, macroData._generatedCodeTmp))
-				{
-					//Append the generated code to the string
-					macroData._generatedCodePerLocation[i] += macroData._generatedCodeTmp;
-				}
-				else
-				{
-					return EIterationResult::AbortWithFailure;
-				}
+				return EIterationResult::AbortWithFailure;
 			}
 		}
 	}
@@ -137,21 +153,21 @@ MacroCodeGenUnit::EIterationResult MacroCodeGenUnit::generateEntityCode(EntityIn
 	return EIterationResult::Recurse;
 }
 
-bool MacroCodeGenUnit::generateEntityClassFooterCode(EntityInfo const& entity, MacroCodeGenData& data) noexcept
+bool MacroCodeGenUnit::generateEntityClassFooterCode(EntityInfo const& entity, MacroCodeGenEnv& env) noexcept
 {
-	if (runCodeGenModules(&entity, data, data._generatedCodeTmp))
+	if (runCodeGenModules(&entity, env, env._generatedCodeTmp))
 	{
 		//Append the generated code to the relevant string
 		if (entity.entityType == EEntityType::Struct || entity.entityType == EEntityType::Class)
 		{
-			data._classFooterGeneratedCode[&static_cast<StructClassInfo const&>(entity)] += data._generatedCodeTmp;
+			env._classFooterGeneratedCode[&static_cast<StructClassInfo const&>(entity)] += env._generatedCodeTmp;
 		}
 		else
 		{
 			assert(entity.outerEntity != nullptr);
 			assert(entity.outerEntity->entityType == EEntityType::Struct || entity.outerEntity->entityType == EEntityType::Class);
 
-			data._classFooterGeneratedCode[static_cast<StructClassInfo const*>(entity.outerEntity)] += data._generatedCodeTmp;
+			env._classFooterGeneratedCode[static_cast<StructClassInfo const*>(entity.outerEntity)] += env._generatedCodeTmp;
 		}
 
 		return true;

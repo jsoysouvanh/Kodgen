@@ -7,12 +7,13 @@
 
 #pragma once
 
-#include <memory>	//std::shared_ptr
+#include <memory>		//std::shared_ptr
 #include <vector>
+#include <type_traits>	//std::is_base_of_v, std::is_copy_constructible_v
 
 #include "Kodgen/Parsing/ParsingResults/FileParsingResult.h"
 #include "Kodgen/CodeGen/FileGenerationResult.h"
-#include "Kodgen/CodeGen/CodeGenData.h"
+#include "Kodgen/CodeGen/CodeGenEnv.h"
 #include "Kodgen/CodeGen/CodeGenUnitSettings.h"
 #include "Kodgen/CodeGen/CodeGenModule.h"
 #include "Kodgen/Misc/ILogger.h"
@@ -39,7 +40,7 @@ namespace kodgen
 			{
 				/**
 				*	Recursively traverse the entities contained in the current entity, using
-				*	the same visitor and data.
+				*	the same visitor and environment.
 				*/
 				Recurse = 0,
 
@@ -73,104 +74,110 @@ namespace kodgen
 			*	@brief	Generate code based on the provided parsing result.
 			*			It is up to this method to create files to write to or not.
 			*
-			*	@param parsingResult Result of a file parsing used to generate the new file.
+			*	@param parsingResult	Result of a file parsing used to generate the new file.
+			*	@param env				Generation environment structure.
 			* 
 			*	@return true if the code generation completed successfully without error, else false.
 			*/
-			virtual bool		generateCodeInternal(FileParsingResult const& parsingResult)							noexcept = 0;
+			virtual bool		generateCodeInternal(FileParsingResult const&	parsingResult,
+													 CodeGenEnv&				env)									noexcept = 0;
 
 			/**
 			*	@brief	Called just before FileGenerationUnit::generateCodeInternal.
-			*			Can be used to perform any pre-generation initialization.
-			*			The whole generation process is aborted if the method returns false, so
-			*			validity checks can also be performed during this step.
+			*			Perform all registered modules initialization.
+			*			The whole generation process is aborted if the method returns false.
+			*			/!\ Overrides should call this base implementation as well /!\
 			* 
-			*	@param parsingResult Result of a file parsing used to generate code.
+			*	@param parsingResult	Result of a file parsing used to generate code.
+			*	@param env				Generation environment structure.
 			* 
 			*	@return true if the method completed successfully, else false.
 			*/
-			virtual bool		preGenerateCode(FileParsingResult const& parsingResult)									noexcept;
+			virtual bool		preGenerateCode(FileParsingResult const&	parsingResult,
+												CodeGenEnv&					env)										noexcept;
 
 			/**
 			*	@brief	Called just after FileGenerationUnit::generateCodeInternal.
 			*			Can be used to perform any post-generation cleanup.
 			*
-			*	@param parsingResult Result of a file parsing used to generate code.
+			*	@param parsingResult	Result of a file parsing used to generate code.
+			*	@param env				Generation environment structure.
 			* 
 			*	@return true if the method completed successfully, else false.
 			*/
-			virtual bool		postGenerateCode(FileParsingResult const& parsingResult)								noexcept;
+			virtual bool		postGenerateCode(FileParsingResult const&	parsingResult,
+												 CodeGenEnv&				env)										noexcept;
 
 			/**
 			*	@brief Generate code by executing the generateCode method of each registered generation module.
 			* 
 			*	@param entity		Entity the code is generated for. Might be nullptr, in which case the code is not generated for a specific entity.
-			*	@param data			Code generation data (yes).
+			*	@param env			Code generation environment.
 			*	@param out_result	String filled with the generated code.
 			* 
 			*	@return true if all registered generation modules completed their code generation successfully, else false.
 			*/
 			bool				runCodeGenModules(EntityInfo const*	entity,
-												  CodeGenData&		data,
+												  CodeGenEnv&		env,
 												  std::string&		out_result)									const	noexcept;
 
 			/**
 			*	@brief Iterate and execute recursively a visitor function on each parsed entity.
 			* 
 			*	@param visitor	Visitor function to execute on all traversed entities.
-			*	@param data		User defined generation data structure.
+			*	@param env		Generation environment structure.
 			* 
 			*	@return EIterationResult::Recurse if the traversal completed successfully.
 			*			EIterationResult::AbortWithSuccess if the traversal was aborted prematurely without error.
 			*			EIterationResult::AbortWithFailure if the traversal was aborted prematurely with an error.
 			*/
-			EIterationResult	foreachEntity(EIterationResult	(*visitor)(EntityInfo const&, CodeGenUnit&, CodeGenData&),
-											  CodeGenData&		data)													noexcept;
+			EIterationResult	foreachEntity(EIterationResult	(*visitor)(EntityInfo const&, CodeGenUnit&, CodeGenEnv&),
+											  CodeGenEnv&		env)													noexcept;
 
 			/**
 			*	@brief Iterate and execute recursively a visitor function on a namespace and all its nested entities.
 			* 
 			*	@param namespace_	Namespace to iterate on.
 			*	@param visitor		Visitor function to execute on all traversed entities.
-			*	@param data			User defined generation data structure.
+			*	@param env			Generation environment structure.
 			* 
 			*	@return EIterationResult::Recurse if the traversal completed successfully.
 			*			EIterationResult::AbortWithSuccess if the traversal was aborted prematurely without error.
 			*			EIterationResult::AbortWithFailure if the traversal was aborted prematurely with an error.
 			*/
-			EIterationResult	foreachEntityInNamespace(NamespaceInfo const& namespace_,
-														 EIterationResult	(*visitor)(EntityInfo const&, CodeGenUnit&, CodeGenData&),
-														 CodeGenData&		data)										noexcept;
+			EIterationResult	foreachEntityInNamespace(NamespaceInfo const&	namespace_,
+														 EIterationResult		(*visitor)(EntityInfo const&, CodeGenUnit&, CodeGenEnv&),
+														 CodeGenEnv&			env)									noexcept;
 
 			/**
 			*	@brief Iterate and execute recursively a visitor function on a struct or class and all its nested entities.
 			* 
 			*	@param struct_	Struct/class to iterate on.
 			*	@param visitor	Visitor function to execute on all traversed entities.
-			*	@param data		User defined generation data structure.
+			*	@param env		Generation environment structure.
 			* 
 			*	@return EIterationResult::Recurse if the traversal completed successfully.
 			*			EIterationResult::AbortWithSuccess if the traversal was aborted prematurely without error.
 			*			EIterationResult::AbortWithFailure if the traversal was aborted prematurely with an error.
 			*/
-			EIterationResult	foreachEntityInStruct(StructClassInfo const& struct_,
-													  EIterationResult	(*visitor)(EntityInfo const&, CodeGenUnit&, CodeGenData&),
-													  CodeGenData&		data)											noexcept;
+			EIterationResult	foreachEntityInStruct(StructClassInfo const&	struct_,
+													  EIterationResult			(*visitor)(EntityInfo const&, CodeGenUnit&, CodeGenEnv&),
+													  CodeGenEnv&				env)									noexcept;
 
 			/**
 			*	@brief Iterate and execute recursively a visitor function on an enum and all its nested entities.
 			* 
 			*	@param enum_	Enum to iterate on.
 			*	@param visitor	Visitor function to execute on all traversed entities.
-			*	@param data		User defined generation data structure.
+			*	@param env		Generation environment structure.
 			* 
 			*	@return EIterationResult::Recurse if the traversal completed successfully.
 			*			EIterationResult::AbortWithSuccess if the traversal was aborted prematurely without error.
 			*			EIterationResult::AbortWithFailure if the traversal was aborted prematurely with an error.
 			*/
 			EIterationResult	foreachEntityInEnum(EnumInfo const&		enum_,
-													EIterationResult	(*visitor)(EntityInfo const&, CodeGenUnit&, CodeGenData&),
-													CodeGenData&		data)											noexcept;
+													EIterationResult	(*visitor)(EntityInfo const&, CodeGenUnit&, CodeGenEnv&),
+													CodeGenEnv&			env)											noexcept;
 
 			/**
 			*	@brief Check if file last write time is newer than reference file last write time.
@@ -195,13 +202,15 @@ namespace kodgen
 			*			If any of preGenerateCode, generateCodeInternal or postGenerateCode returns false,
 			*			the code generation is aborted for this generation unit and false is returned.
 			*
-			*	@param parsingResult Result of a file parsing used to generate the new file.
+			*	@param parsingResult	Result of a file parsing used to generate the new file.
+			*	@param env				Generation environment.
 			* 
 			*	@return false if the generation process was aborted prematurely because of any error, else true.
 			*/
-			//TODO: Setup both CodeGenData::codeGenUnit and CodeGenData::parsingResult here.
-			//template <typename CodeGenDataType>
-			bool						generateCode(FileParsingResult const& parsingResult)			noexcept;
+			//TODO: Setup both CodeGenEnv::codeGenUnit and CodeGenEnv::parsingResult here.
+			template <typename CodeGenEnvType>
+			bool						generateCode(FileParsingResult const&	parsingResult,
+													 CodeGenEnvType&			env)					noexcept;
 
 			/**
 			*	@brief Check whether the generated code for a given source file is up-to-date or not.
@@ -245,4 +254,6 @@ namespace kodgen
 			*/
 			CodeGenUnitSettings const*	getSettings()									const	noexcept;
 	};
+
+	#include "Kodgen/CodeGen/CodeGenUnit.inl"
 }

@@ -3,9 +3,22 @@
 #include <algorithm>
 
 #include "Kodgen/CodeGen/PropertyCodeGen.h"
-#include "Kodgen/CodeGen/CodeGenData.h"
+#include "Kodgen/CodeGen/CodeGenEnv.h"
 
 using namespace kodgen;
+
+bool CodeGenModule::initialize(CodeGenEnv& env) const noexcept
+{
+	for (PropertyCodeGen const* propertyCodeGen : _propertyCodeGenerators)
+	{
+		if (!propertyCodeGen->initialize(env))
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
 
 void CodeGenModule::addPropertyRule(PropertyCodeGen const& propertyRule) noexcept
 {
@@ -26,11 +39,11 @@ bool CodeGenModule::removePropertyRule(PropertyCodeGen const& propertyRule) noex
 	return false;
 }
 
-bool CodeGenModule::generateCode(EntityInfo const* entity, CodeGenData& data, std::string& inout_result) const noexcept
+bool CodeGenModule::generateCode(EntityInfo const* entity, CodeGenEnv& env, std::string& inout_result) const noexcept
 {
 	if (entity != nullptr)
 	{
-		return runPropertyCodeGenerators(*entity, data, inout_result);
+		return runPropertyCodeGenerators(*entity, env, inout_result);
 	}
 
 	return true;
@@ -41,7 +54,7 @@ int32 CodeGenModule::getGenerationOrder() const noexcept
 	return 0u;
 }
 
-bool CodeGenModule::runPropertyCodeGenerators(EntityInfo const& entity, CodeGenData& data, std::string& inout_result) const noexcept
+bool CodeGenModule::runPropertyCodeGenerators(EntityInfo const& entity, CodeGenEnv& env, std::string& inout_result) const noexcept
 {
 	Property const* currentProperty;
 
@@ -55,7 +68,7 @@ bool CodeGenModule::runPropertyCodeGenerators(EntityInfo const& entity, CodeGenD
 		{
 			if (propertyCodeGen->shouldGenerateCode(entity, *currentProperty, i))
 			{
-				if (!propertyCodeGen->generateCode(entity, *currentProperty, i, data, inout_result))
+				if (!propertyCodeGen->generateCode(entity, *currentProperty, i, env, inout_result))
 				{
 					return false;
 				}

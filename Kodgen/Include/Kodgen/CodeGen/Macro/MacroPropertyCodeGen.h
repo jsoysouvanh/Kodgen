@@ -8,7 +8,7 @@
 #pragma once
 
 #include "Kodgen/CodeGen/PropertyCodeGen.h"
-#include "Kodgen/CodeGen/Macro/MacroCodeGenData.h"
+#include "Kodgen/CodeGen/Macro/MacroCodeGenEnv.h"
 
 namespace kodgen
 {
@@ -21,7 +21,7 @@ namespace kodgen
 			*	@param entity			Entity to generate code for.
 			*	@param property			Property that triggered the property generation.
 			*	@param propertyIndex	Index of the property in the entity's propertyGroup.
-			*	@param data				Generation data structure.
+			*	@param env				Generation environment structure.
 			*	@param inout_result		String the method should append the generated code to.
 			*	
 			*	@return true if the generation completed successfully, else false.
@@ -29,7 +29,7 @@ namespace kodgen
 			virtual bool	generateHeaderFileHeaderCode(EntityInfo const&	entity,
 														 Property const&	property,
 														 uint8				propertyIndex,
-														 MacroCodeGenData&	data,
+														 MacroCodeGenEnv&	env,
 														 std::string&		inout_result)	const	noexcept;
 
 			/**
@@ -39,7 +39,7 @@ namespace kodgen
 			*	@param entity			Entity to generate code for.
 			*	@param property			Property that triggered the property generation.
 			*	@param propertyIndex	Index of the property in the entity's propertyGroup.
-			*	@param data				Generation data structure.
+			*	@param env				Generation environment structure.
 			*	@param inout_result		String the method should append the generated code to.
 			*	
 			*	@return true if the generation completed successfully, else false.
@@ -47,7 +47,7 @@ namespace kodgen
 			virtual bool	generateClassFooterCode(EntityInfo const&	entity,
 													Property const&		property,
 													uint8				propertyIndex,
-													MacroCodeGenData&	data,
+													MacroCodeGenEnv&	env,
 													std::string&		inout_result)		const	noexcept;
 
 			/**
@@ -56,7 +56,7 @@ namespace kodgen
 			*	@param entity			Entity to generate code for.
 			*	@param property			Property that triggered the property generation.
 			*	@param propertyIndex	Index of the property in the entity's propertyGroup.
-			*	@param data				Generation data structure.
+			*	@param env				Generation environment structure.
 			*	@param inout_result		String the method should append the generated code to.
 			*	
 			*	@return true if the generation completed successfully, else false.
@@ -64,7 +64,7 @@ namespace kodgen
 			virtual bool	generateHeaderFileFooterCode(EntityInfo const&	entity,
 														 Property const&	property,
 														 uint8				propertyIndex,
-														 MacroCodeGenData&	data,
+														 MacroCodeGenEnv&	env,
 														 std::string&		inout_result)	const	noexcept;
 
 			/**
@@ -73,7 +73,7 @@ namespace kodgen
 			*	@param entity			Entity to generate code for.
 			*	@param property			Property that triggered the property generation.
 			*	@param propertyIndex	Index of the property in the entity's propertyGroup.
-			*	@param data				Generation data structure.
+			*	@param env				Generation environment structure.
 			*	@param inout_result		String the method should append the generated code to.
 			*	
 			*	@return true if the generation completed successfully, else false.
@@ -81,7 +81,7 @@ namespace kodgen
 			virtual bool	generateSourceFileHeaderCode(EntityInfo const&	entity,
 														 Property const&	property,
 														 uint8				propertyIndex,
-														 MacroCodeGenData&	data,
+														 MacroCodeGenEnv&	env,
 														 std::string&		inout_result)	const	noexcept;
 
 			/**
@@ -92,14 +92,14 @@ namespace kodgen
 			*	@param entity			Entity to generate code for.
 			*	@param property			Property that triggered the property generation.
 			*	@param propertyIndex	Index of the property in the entity's propertyGroup.
-			*	@param data				Generation data structure.
+			*	@param env				Generation environment structure.
 			* 
 			*	@return true if the pre-generation completed successfully, else false.
 			*/
 			virtual bool	preGenerateCode(EntityInfo const&	entity,
 											Property const&		property,
 											uint8				propertyIndex,
-											CodeGenData&		data)						const	noexcept;
+											CodeGenEnv&			env)						const	noexcept;
 
 			/**
 			*	@brief	Called right after generateHeaderFileHeaderCode, generateClassFooterCode, generateHeaderFileFooterCode,
@@ -109,25 +109,25 @@ namespace kodgen
 			*	@param entity			Entity to generate code for.
 			*	@param property			Property that triggered the property generation.
 			*	@param propertyIndex	Index of the property in the entity's propertyGroup.
-			*	@param data				Generation data structure.
+			*	@param env				Generation environment structure.
 			* 
 			*	@return true if the post-generation completed successfully, else false.
 			*/
 			virtual bool	postGenerateCode(EntityInfo const&	entity,
 											 Property const&	property,
 											 uint8				propertyIndex,
-											 CodeGenData&		data)						const	noexcept;
+											 CodeGenEnv&		env)						const	noexcept;
 
 		public:
 			/**
 			*	@brief	Generate code for a given entity.
-			*			This method analyzes the code location retrieved from the MacroCodeGenData
+			*			This method analyzes the code location retrieved from the MacroCodeGenEnv
 			*			and dispatch the call to the relevant method.
 			*	
 			*	@param entity			Entity to generate code for.
 			*	@param property			Property that triggered the property generation.
 			*	@param propertyIndex	Index of the property in the entity's propertyGroup.
-			*	@param data				Generation data structure.
+			*	@param env				Generation environment structure.
 			*	@param inout_result		String the method should append the generated code to.
 			*	
 			*	@return true if the generation completed successfully, else false.
@@ -135,7 +135,16 @@ namespace kodgen
 			virtual bool	generateCode(EntityInfo const&	entity,
 										 Property const&	property,
 										 uint8				propertyIndex,
-										 CodeGenData&		data,
+										 CodeGenEnv&		env,
 										 std::string&		inout_result)	const noexcept override;
+
+			/**
+			*	@brief Make sure that the environment is castable to MacroCodeGenEnv.
+			* 
+			*	@param env Generation environment structure.
+			* 
+			*	@return true if the environment is castable to MacroCodeGenEnv, else false.
+			*/
+			virtual bool	initialize(CodeGenEnv& env)						const noexcept override;
 	};
 }

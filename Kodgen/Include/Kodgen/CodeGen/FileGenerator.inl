@@ -5,8 +5,8 @@
 *	See the README.md file for full license details.
 */
 
-template <typename FileParserType, typename CodeGenUnitType>
-void FileGenerator::processFilesMultithread(FileParserType& fileParser, CodeGenUnitType& codeGenUnit, std::set<fs::path> const& toProcessFiles, FileGenerationResult& out_genResult, uint32 threadCount) const noexcept
+template <typename FileParserType, typename CodeGenUnitType, typename CodeGenEnvType>
+void FileGenerator::processFilesMultithread(FileParserType& fileParser, CodeGenUnitType& codeGenUnit, CodeGenEnvType& env, std::set<fs::path> const& toProcessFiles, FileGenerationResult& out_genResult, uint32 threadCount) const noexcept
 {
 	ThreadPool								threadPool(threadCount, ETerminationMode::FinishAll);
 	std::vector<std::shared_ptr<TaskBase>>	generationTasks;
@@ -38,13 +38,16 @@ void FileGenerator::processFilesMultithread(FileParserType& fileParser, CodeGenU
 										//Copy the generation unit model to have a fresh one for this generation unit
 										CodeGenUnitType	generationUnit = codeGenUnit;
 
+										//Copy the generation environment
+										CodeGenEnvType envCopy = env;
+
 										//Get the result of the parsing task
 										FileParsingResult parsingResult = TaskHelper::getDependencyResult<FileParsingResult>(parsingTask, 0u);
 
 										//Generate the file if no errors occured during parsing
 										if (parsingResult.errors.empty())
 										{
-											out_generationResult.completed = generationUnit.generateCode(parsingResult);
+											out_generationResult.completed = generationUnit.generateCode(parsingResult, envCopy);
 										}
 										
 										return out_generationResult;
@@ -59,8 +62,8 @@ void FileGenerator::processFilesMultithread(FileParserType& fileParser, CodeGenU
 	}
 }
 
-template <typename FileParserType, typename CodeGenUnitType>
-void FileGenerator::processFilesMonothread(FileParserType& fileParser, CodeGenUnitType& codeGenUnit, std::set<fs::path> const& toProcessFiles, FileGenerationResult& out_genResult) const noexcept
+template <typename FileParserType, typename CodeGenUnitType, typename CodeGenEnvType>
+void FileGenerator::processFilesMonothread(FileParserType& fileParser, CodeGenUnitType& codeGenUnit, CodeGenEnvType& env, std::set<fs::path> const& toProcessFiles, FileGenerationResult& out_genResult) const noexcept
 {
 	for (fs::path const& file : toProcessFiles)
 	{
@@ -72,16 +75,21 @@ void FileGenerator::processFilesMonothread(FileParserType& fileParser, CodeGenUn
 		if (fileParser.parse(file, parsingResult))
 		{
 			//Generate file according to parsing result
-			out_genResult.completed &= codeGenUnit.generateCode(parsingResult);
+			out_genResult.completed &= codeGenUnit.generateCode(parsingResult, env);
 		}
 	}
 }
 
-template <typename FileParserType, typename CodeGenUnitType>
-FileGenerationResult FileGenerator::generateFiles(FileParserType& fileParser, CodeGenUnitType& codeGenUnit, bool forceRegenerateAll, uint32 threadCount) noexcept
+template <typename FileParserType, typename CodeGenUnitType, typename CodeGenEnvType>
+FileGenerationResult FileGenerator::generateFiles(FileParserType& fileParser, CodeGenUnitType& codeGenUnit, CodeGenEnvType&	env, bool forceRegenerateAll, uint32 threadCount) noexcept
 {
 	//Check FileParser validity
-	static_assert(std::is_copy_constructible_v<FileParserType>, "The provided file parser must be copy constructible.");
+	static_assert(std::is_base_of_v<FileParser, FileParserType>, "fileParser type must be a derived class of kodgen::FileParser.");
+	static_assert(std::is_copy_constructible_v<FileParserType>, "The provided file parser must be copy-constructible.");
+
+	//Check CodeGenEnv validity
+	static_assert(std::is_base_of_v<CodeGenEnv, CodeGenEnvType>, "env type must be a derived class of kodgen::CodeGenEnv.");
+	static_assert(std::is_copy_constructible_v<CodeGenEnvType>, "The provided CodeGenEnv must be copy-constructible");
 
 	//Check FileGenerationUnit validity
 	static_assert(std::is_base_of_v<CodeGenUnit, CodeGenUnitType>, "codeGenUnit type must be a derived class of kodgen::CodeGenUnit.");
@@ -116,11 +124,11 @@ FileGenerationResult FileGenerator::generateFiles(FileParserType& fileParser, Co
 
 			if (threadCount == 1u)
 			{
-				processFilesMonothread(fileParser, codeGenUnit, filesToProcess, genResult);
+				processFilesMonothread(fileParser, codeGenUnit, env, filesToProcess, genResult);
 			}
 			else
 			{
-				processFilesMultithread(fileParser, codeGenUnit, filesToProcess, genResult, threadCount);
+				processFilesMultithread(fileParser, codeGenUnit, env, filesToProcess, genResult, threadCount);
 			}
 		}
 
