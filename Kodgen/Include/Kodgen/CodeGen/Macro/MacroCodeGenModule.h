@@ -24,11 +24,12 @@ namespace kodgen
 			*	@param env			Generation environment structure.
 			*	@param inout_result	String the method should append the generated code to.
 			*	
-			*	@return true if the generation completed successfully, else false.
+			*	@return The least prioritized ETraversalBehaviour value (ETraversalBehaviour::Break) to give the full control to
+			*			any defined override version returning a more prioritized ETraversalBehaviour.
 			*/
-			virtual bool	generateHeaderFileHeaderCode(EntityInfo const*	entity,
-														 MacroCodeGenEnv&	env,
-														 std::string&		inout_result)	const	noexcept;
+			virtual ETraversalBehaviour	generateHeaderFileHeaderCode(EntityInfo const*	entity,
+																	 MacroCodeGenEnv&	env,
+																	 std::string&		inout_result)	const	noexcept;
 
 			/**
 			*	@brief	Generate code in the class footer for the given entity.
@@ -38,11 +39,12 @@ namespace kodgen
 			*	@param env			Generation environment structure.
 			*	@param inout_result	String the method should append the generated code to.
 			*	
-			*	@return true if the generation completed successfully, else false.
+			*	@return The least prioritized ETraversalBehaviour value (ETraversalBehaviour::Break) to give the full control to
+			*			any defined override version returning a more prioritized ETraversalBehaviour.
 			*/
-			virtual bool	generateClassFooterCode(EntityInfo const*	entity,
-													MacroCodeGenEnv&	env,
-													std::string&		inout_result)		const	noexcept;
+			virtual ETraversalBehaviour	generateClassFooterCode(EntityInfo const*	entity,
+																MacroCodeGenEnv&	env,
+																std::string&		inout_result)		const	noexcept;
 
 			/**
 			*	@brief Generate code in the header file footer for the given entity.
@@ -51,11 +53,12 @@ namespace kodgen
 			*	@param env			Generation environment structure.
 			*	@param inout_result	String the method should append the generated code to.
 			*	
-			*	@return true if the generation completed successfully, else false.
+			*	@return The least prioritized ETraversalBehaviour value (ETraversalBehaviour::Break) to give the full control to
+			*			any defined override version returning a more prioritized ETraversalBehaviour.
 			*/
-			virtual bool	generateHeaderFileFooterCode(EntityInfo const*	entity,
-														 MacroCodeGenEnv&	env,
-														 std::string&		inout_result)	const	noexcept;
+			virtual ETraversalBehaviour	generateHeaderFileFooterCode(EntityInfo const*	entity,
+																	 MacroCodeGenEnv&	env,
+																	 std::string&		inout_result)	const	noexcept;
 
 			/**
 			*	@brief Generate code in the source file header for the given entity.
@@ -64,11 +67,12 @@ namespace kodgen
 			*	@param env			Generation environment structure.
 			*	@param inout_result	String the method should append the generated code to.
 			*	
-			*	@return true if the generation completed successfully, else false.
+			*	@return The least prioritized ETraversalBehaviour value (ETraversalBehaviour::Break) to give the full control to
+			*			any defined override version returning a more prioritized ETraversalBehaviour.
 			*/
-			virtual bool	generateSourceFileHeaderCode(EntityInfo const*	entity,
-														 MacroCodeGenEnv&	env,
-														 std::string&		inout_result)	const	noexcept;
+			virtual ETraversalBehaviour	generateSourceFileHeaderCode(EntityInfo const*	entity,
+																	 MacroCodeGenEnv&	env,
+																	 std::string&		inout_result)	const	noexcept;
 
 			/**
 			*	@brief	Called just before calling generateHeaderFileHeaderCode, generateClassFooterCode, generateHeaderFileFooterCode,
@@ -78,10 +82,13 @@ namespace kodgen
 			*	@param entity	Entity to generate code for.
 			*	@param env		Generation environment structure.
 			* 
-			*	@return true if the pre-generation completed successfully, else false.
+			*	@return ETraversalBehaviour::Recurse.
+			*			This method is the only one returning something different than ETraversalBehaviour::Break to make sure that
+			*			any module inheriting from MacroCodeGenModule would iterate over all entities by default.
+			*			Overriding this method and modifying the returned value will change the default iteration behaviour of the module.
 			*/
-			virtual bool	preGenerateCode(EntityInfo const*	entity,
-											CodeGenEnv&			env)						const	noexcept;
+			virtual ETraversalBehaviour	preGenerateCode(EntityInfo const*	entity,
+														CodeGenEnv&			env)						const	noexcept;
 
 			/**
 			*	@brief	Called right after generateHeaderFileHeaderCode, generateClassFooterCode, generateHeaderFileFooterCode,
@@ -91,10 +98,11 @@ namespace kodgen
 			*	@param entity	Entity to generate code for.
 			*	@param env		Generation environment structure.
 			* 
-			*	@return true if the post-generation completed successfully, else false.
+			*	@return The least prioritized ETraversalBehaviour value (ETraversalBehaviour::Break) to give the full control to
+			*			any defined override version returning a more prioritized ETraversalBehaviour.
 			*/
-			virtual bool	postGenerateCode(EntityInfo const*	entity,
-											 CodeGenEnv&		env)						const	noexcept;
+			virtual ETraversalBehaviour	postGenerateCode(EntityInfo const*	entity,
+														 CodeGenEnv&		env)						const	noexcept;
 
 		public:
 			/**
@@ -104,10 +112,10 @@ namespace kodgen
 			*	@param env				Environment provided by the FileGenerationUnit. You can cast environment to a more concrete type if you know the type provided by the FileGenerationUnit.
 			*	@param inout_result		String the method should append the generated code to.
 			* 
-			*	@return true if the code generation completed successfully, else false. If false is returned
+			*	@return A combination of all the underlying calls returning a ETraversalBehaviour.
 			*/
-			virtual bool	generateCode(EntityInfo const*	entity,
-										 CodeGenEnv&		env,
-										 std::string&		inout_result)	const noexcept override;
+			virtual ETraversalBehaviour	generateCode(EntityInfo const*	entity,
+													 CodeGenEnv&		env,
+													 std::string&		inout_result)	const noexcept override final;
 	};
 }

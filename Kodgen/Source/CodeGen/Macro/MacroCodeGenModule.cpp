@@ -3,28 +3,46 @@
 #include "Kodgen/InfoStructures/EntityInfo.h"
 #include "Kodgen/CodeGen/Macro/MacroCodeGenEnv.h"
 
+#include "Kodgen/CodeGen/CodeGenHelpers.h"
+
 using namespace kodgen;
 
-bool MacroCodeGenModule::generateCode(EntityInfo const* entity, CodeGenEnv& data, std::string& inout_result) const noexcept
+ETraversalBehaviour MacroCodeGenModule::generateCode(EntityInfo const* entity, CodeGenEnv& data, std::string& inout_result) const noexcept
 {
 	MacroCodeGenEnv& macroData = static_cast<MacroCodeGenEnv&>(data);
+
+	ETraversalBehaviour result;
 
 	//Dispatch code generation call to the right sub-method
 	switch (macroData.codeGenLocation)
 	{
 		case ECodeGenLocation::HeaderFileHeader:
 			//Property code gen are triggered AFTER MacroCodeGenModule::preGenerateCode has been called
-			return preGenerateCode(entity, macroData) && generateHeaderFileHeaderCode(entity, macroData, inout_result) && CodeGenModule::generateCode(entity, data, inout_result);
+			result = preGenerateCode(entity, macroData);
+			result = CodeGenHelpers::combineTraversalBehaviours(result, generateHeaderFileHeaderCode(entity, macroData, inout_result));
+
+			//CodeGenModule::generateCode runs eligible property code generators if any
+			return CodeGenHelpers::combineTraversalBehaviours(result, CodeGenModule::generateCode(entity, data, inout_result));
 
 		case ECodeGenLocation::ClassFooter:
-			return generateClassFooterCode(entity, macroData, inout_result) && CodeGenModule::generateCode(entity, data, inout_result);
+			result = generateClassFooterCode(entity, macroData, inout_result);
+
+			//CodeGenModule::generateCode runs eligible property code generators if any
+			return CodeGenHelpers::combineTraversalBehaviours(result, CodeGenModule::generateCode(entity, data, inout_result));
 
 		case ECodeGenLocation::HeaderFileFooter:
-			return generateHeaderFileFooterCode(entity, macroData, inout_result) && CodeGenModule::generateCode(entity, data, inout_result);
+			result = generateHeaderFileFooterCode(entity, macroData, inout_result);
+
+			//CodeGenModule::generateCode runs eligible property code generators if any
+			return CodeGenHelpers::combineTraversalBehaviours(result, CodeGenModule::generateCode(entity, data, inout_result));
 
 		case ECodeGenLocation::SourceFileHeader:
+			result = generateSourceFileHeaderCode(entity, macroData, inout_result);
+			
 			//Property code gen are triggered BEFORE calling MacroCodeGenModule::postGenerateCode
-			return generateSourceFileHeaderCode(entity, macroData, inout_result) && CodeGenModule::generateCode(entity, data, inout_result) && postGenerateCode(entity, macroData);
+			result = CodeGenHelpers::combineTraversalBehaviours(result, CodeGenModule::generateCode(entity, data, inout_result));
+
+			return CodeGenHelpers::combineTraversalBehaviours(result, postGenerateCode(entity, macroData));
 
 		case ECodeGenLocation::Count:
 			//Should never get here
@@ -32,46 +50,47 @@ bool MacroCodeGenModule::generateCode(EntityInfo const* entity, CodeGenEnv& data
 			{
 				data.logger->log("MacroPropertyCodeGen::generateCode called with ECodeGenLocation::Count location. Abort generation.", ILogger::ELogSeverity::Error);
 			}
-			return false;
+			return ETraversalBehaviour::AbortWithFailure;
 	}
-
+	
 	//Should never reach this point as all cases should be handled by the previous switch statement
 	assert(false);
-	return false;
+
+	return ETraversalBehaviour::AbortWithFailure;
 }
 
-bool MacroCodeGenModule::generateHeaderFileHeaderCode(EntityInfo const* /* entity */, MacroCodeGenEnv& /* data */, std::string& /* inout_result */) const noexcept
+ETraversalBehaviour MacroCodeGenModule::generateHeaderFileHeaderCode(EntityInfo const* /* entity */, MacroCodeGenEnv& /* data */, std::string& /* inout_result */) const noexcept
 {
 	//Default implementation generates no code
-	return true;
+	return CodeGenHelpers::leastPrioritizedTraversalBehaviour;
 }
 
-bool MacroCodeGenModule::generateClassFooterCode(EntityInfo const* /* entity */, MacroCodeGenEnv& /* data */, std::string& /* inout_result */) const noexcept
+ETraversalBehaviour MacroCodeGenModule::generateClassFooterCode(EntityInfo const* /* entity */, MacroCodeGenEnv& /* data */, std::string& /* inout_result */) const noexcept
 {
 	//Default implementation generates no code
-	return true;
+	return CodeGenHelpers::leastPrioritizedTraversalBehaviour;
 }
 
-bool MacroCodeGenModule::generateHeaderFileFooterCode(EntityInfo const* /* entity */, MacroCodeGenEnv& /* data */, std::string& /* inout_result */) const noexcept
+ETraversalBehaviour MacroCodeGenModule::generateHeaderFileFooterCode(EntityInfo const* /* entity */, MacroCodeGenEnv& /* data */, std::string& /* inout_result */) const noexcept
 {
 	//Default implementation generates no code
-	return true;
+	return CodeGenHelpers::leastPrioritizedTraversalBehaviour;
 }
 
-bool MacroCodeGenModule::generateSourceFileHeaderCode(EntityInfo const* /* entity */, MacroCodeGenEnv& /* data */, std::string& /* inout_result */) const noexcept
+ETraversalBehaviour MacroCodeGenModule::generateSourceFileHeaderCode(EntityInfo const* /* entity */, MacroCodeGenEnv& /* data */, std::string& /* inout_result */) const noexcept
 {
 	//Default implementation generates no code
-	return true;
+	return CodeGenHelpers::leastPrioritizedTraversalBehaviour;
 }
 
-bool MacroCodeGenModule::preGenerateCode(EntityInfo const* /* entity */, CodeGenEnv& /*data*/) const noexcept
+ETraversalBehaviour MacroCodeGenModule::preGenerateCode(EntityInfo const* /* entity */, CodeGenEnv& /*data*/) const noexcept
 {
 	//Default implementation does nothing
-	return true;
+	return ETraversalBehaviour::Recurse;
 }
 
-bool MacroCodeGenModule::postGenerateCode(EntityInfo const* /*entity*/, CodeGenEnv& /*data*/) const noexcept
+ETraversalBehaviour MacroCodeGenModule::postGenerateCode(EntityInfo const* /*entity*/, CodeGenEnv& /*data*/) const noexcept
 {
 	//Default implementation does nothing
-	return true;
+	return CodeGenHelpers::leastPrioritizedTraversalBehaviour;
 }

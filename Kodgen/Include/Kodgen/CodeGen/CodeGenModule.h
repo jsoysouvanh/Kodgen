@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "Kodgen/Misc/FundamentalTypes.h"
+#include "Kodgen/CodeGen/ETraversalBehaviour.h"
 
 namespace kodgen
 {
@@ -55,7 +56,9 @@ namespace kodgen
 			virtual bool								initialize(CodeGenEnv& env)								const	noexcept;
 
 			/**
-			*	@brief Generate code using the provided environment as input.
+			*	@brief	Generate code using the provided environment as input.
+			*			/!\ This method calls the code generation on registered and eligible property code generators, so this base
+			*			implementation should be called in overrides. /!\
 			* 
 			*	@param entity			Entity the module is generating code for. Might be nullptr, in which case the code is not generated for a specific entity.
 			*	@param env				Data provided by the FileGenerationUnit. You can cast env to a more concrete type if you know the type provided by the FileGenerationUnit.
@@ -63,7 +66,7 @@ namespace kodgen
 			* 
 			*	@return true if the code generation completed successfully, else false. If false is returned
 			*/
-			virtual bool								generateCode(EntityInfo const*	entity,
+			virtual ETraversalBehaviour					generateCode(EntityInfo const*	entity,
 																	 CodeGenEnv&		env,
 																	 std::string&		inout_result)			const	noexcept;
 

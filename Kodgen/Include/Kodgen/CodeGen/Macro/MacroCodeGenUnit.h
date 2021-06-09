@@ -12,50 +12,27 @@
 namespace kodgen
 {
 	//Forward declaration
-	class	CodeGenModuleGroup;
 	class	MacroCodeGenUnitSettings;
 	struct	MacroCodeGenEnv;
 
-	class MacroCodeGenUnit : public CodeGenUnit
+	class MacroCodeGenUnit final : public CodeGenUnit
 	{
 		private:
 			/**
-			*	@brief Handle the whole code generation for a given entity with the provided environment.
-			* 
-			*	@param entity	Entity we generate the code for.
-			*	@param env		Generation environment.
-			* 
-			*	@return EIterationResult::Recurse if the traversal completed successfully.
-			*			EIterationResult::AbortWithSuccess if the traversal was aborted prematurely without error.
-			*			EIterationResult::AbortWithFailure if the traversal was aborted prematurely with an error.
-			*/
-			EIterationResult		generateEntityCode(EntityInfo const&	entity,
-													   CodeGenEnv&			env)					noexcept;
-
-			/**
 			*	@brief Handle the code generation for class footer code gen location.
 			* 
-			*	@param entity	Entity we generate the code for. Must be one of Struct/Class/Field/Method.
-			*	@param env		Generation environment.
-			* 
-			*	@return true if the entity class footer code was generated successfully, else false.
-			*/
-			bool					generateEntityClassFooterCode(EntityInfo const&	entity,
-																  MacroCodeGenEnv&	env)			noexcept;
-
-		protected:
-			/**
-			*	@brief	Generate code based on the provided parsing result.
-			*			Generated code will be dispatched in 2 different files (1 header, 1 source).
-			*
-			*	@param parsingResult	Result of a file parsing used to generate the new file.
+			*	@param codeGenModule	Module calling the generateCode method.
+			*	@param entity			Entity we generate the code for. Must be one of Struct/Class/Field/Method.
 			*	@param env				Generation environment.
 			* 
-			*	@return true if the code generation completed successfully without error, else false.
+			*	@return An EIterationBehaviour instructing how the entity traversal should continue (see the EIterationResult documentation for more info).
+			*			The result of the codeGenModule->generateCode() call can be forwarded in most cases to let the module control the flow of the traversal.
 			*/
-			virtual bool	generateCodeInternal(FileParsingResult const&	parsingResult,
-												 CodeGenEnv&				env)				noexcept	override;
+			ETraversalBehaviour	generateEntityClassFooterCode(CodeGenModule const&	codeGenModule,
+															  EntityInfo const&		entity,
+															  MacroCodeGenEnv&		env)				noexcept;
 
+		protected:
 			/**
 			*	@brief	Check that the env object is castable to MacroCodeGenEnv,
 			*			and is also valid for each registered module, then setup the environment.
@@ -65,8 +42,35 @@ namespace kodgen
 			* 
 			*	@return true if the method completed successfully, else false.
 			*/
-			virtual bool		preGenerateCode(FileParsingResult const&	parsingResult,
-												CodeGenEnv&					env)				noexcept	override;
+			virtual bool				preGenerateCode(FileParsingResult const&	parsingResult,
+														CodeGenEnv&					env)					noexcept	override;
+
+			/**
+			*	@brief	Execute the codeGenModule->generateCode method 4 times with the given entity and environment, by
+			*			updating the environment between each call (MacroCodeGenEnv::codeGenLocation and
+			*			MacroCodeGenEnv::separator are updated).
+			*
+			*	@param codeGenModule	Module calling the generateCode method.
+			*	@param entity			Target entity for this code generation pass.
+			*	@param env				Generation environment structure.
+			* 
+			*	@return An EIterationBehaviour instructing how the entity traversal should continue (see the EIterationResult documentation for more info).
+			*			The result of the codeGenModule->generateCode() call can be forwarded in most cases to let the module control the flow of the traversal.
+			*/
+			virtual ETraversalBehaviour	runCodeGenModuleOnEntity(CodeGenModule const&	codeGenModule,
+																 EntityInfo const&		entity,
+																 CodeGenEnv&			env)				noexcept	override;
+
+			/**
+			*	@brief	Create/update the header and source files and fill them with the generated code.
+			* 
+			*	@param parsingResult	Result of a file parsing used to generate code.
+			*	@param env				Generation environment structure.
+			* 
+			*	@return true if the method completed successfully, else false.
+			*/
+			virtual bool				postGenerateCode(FileParsingResult const&	parsingResult,
+														 CodeGenEnv&				env)					noexcept	override;
 
 			/**
 			*	@brief	(Re)generate the header file.
@@ -74,8 +78,8 @@ namespace kodgen
 			*	@param parsingResult	Result of the parsing process.
 			*	@param env				Generation environment.
 			*/
-			void			generateHeaderFile(FileParsingResult const& parsingResult,
-											   MacroCodeGenEnv&			env)			const	noexcept;
+			void						generateHeaderFile(FileParsingResult const& parsingResult,
+														   MacroCodeGenEnv&			env)			const	noexcept;
 
 			/**
 			*	@brief	(Re)generate the source file.
@@ -83,8 +87,8 @@ namespace kodgen
 			*	@param parsingResult	Result of the parsing process.
 			*	@param env				Generation environment.
 			*/
-			void			generateSourceFile(FileParsingResult const& parsingResult,
-											   MacroCodeGenEnv&			env)			const	noexcept;
+			void						generateSourceFile(FileParsingResult const& parsingResult,
+														   MacroCodeGenEnv&			env)			const	noexcept;
 
 			/**
 			*	@brief Compute the path of the header file generated from the provided source file.
@@ -93,7 +97,7 @@ namespace kodgen
 			* 
 			*	@return the path of the header file generated from the provided source file.
 			*/
-			fs::path		getGeneratedHeaderFilePath(fs::path const& sourceFile)		const	noexcept;
+			fs::path					getGeneratedHeaderFilePath(fs::path const& sourceFile)		const	noexcept;
 
 			/**
 			*	@brief Compute the path of the source file generated from the provided source file.
@@ -102,7 +106,7 @@ namespace kodgen
 			* 
 			*	@return the path of the source file generated from the provided source file.
 			*/
-			fs::path		getGeneratedSourceFilePath(fs::path const& sourceFile)		const	noexcept;
+			fs::path					getGeneratedSourceFilePath(fs::path const& sourceFile)		const	noexcept;
 
 		public:
 			/**

@@ -135,6 +135,10 @@ int main(int argc, char** argv)
 	{
 		logger.log("Generation completed successfully.");
 	}
+	else
+	{
+		logger.log("An error happened during code generation.", kodgen::ILogger::ELogSeverity::Error);
+	}
 
 	return EXIT_SUCCESS;
 }

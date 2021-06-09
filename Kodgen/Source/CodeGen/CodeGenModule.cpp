@@ -4,6 +4,7 @@
 
 #include "Kodgen/CodeGen/PropertyCodeGen.h"
 #include "Kodgen/CodeGen/CodeGenEnv.h"
+#include "Kodgen/CodeGen/CodeGenHelpers.h"
 
 using namespace kodgen;
 
@@ -39,14 +40,16 @@ bool CodeGenModule::removePropertyRule(PropertyCodeGen const& propertyRule) noex
 	return false;
 }
 
-bool CodeGenModule::generateCode(EntityInfo const* entity, CodeGenEnv& env, std::string& inout_result) const noexcept
+ETraversalBehaviour CodeGenModule::generateCode(EntityInfo const* entity, CodeGenEnv& env, std::string& inout_result) const noexcept
 {
 	if (entity != nullptr)
 	{
-		return runPropertyCodeGenerators(*entity, env, inout_result);
+		//Abort the traversal with a failure if something wrong happened during property code generation
+		//Otherwise, return the least prioritized ETraversalBehaviour value to give the full control to this method overload.
+		return runPropertyCodeGenerators(*entity, env, inout_result) ? CodeGenHelpers::leastPrioritizedTraversalBehaviour : ETraversalBehaviour::AbortWithFailure;
 	}
 
-	return true;
+	return CodeGenHelpers::leastPrioritizedTraversalBehaviour;
 }
 
 int32 CodeGenModule::getGenerationOrder() const noexcept
