@@ -14,22 +14,22 @@ namespace SomeNamespace KGNamespace()
 				class SomeNestedClass{};
 
 			private:
-				KGField(Get[explicit], Set[])
+				KGField(Get[explicit], Set)
 				int					_someInt				= 2;
 
-				KGField(Get[const, *], Set[])
+				KGField(Get[const, *], Set)
 				float				_someFloat				= 3.14f;
 
-				KGField(Get[])
+				KGField(Get)
 				char				_someChar				= '*';
 
-				KGField(Get[], Set[])
+				KGField(Get, Set)
 				unsigned long long	_someUnsignedLongLong	= 42;
 
-				KGField(Get[], Set[])
+				KGField(Get, Set)
 				SomeNestedClass*	_someNestedClass		= nullptr;
 
-				KGField(Get[const, &], Set[])
+				KGField(Get[const, &], Set)
 				std::string			_someString				= "This is a test";
 
 			public:
