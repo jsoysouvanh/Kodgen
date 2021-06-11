@@ -45,3 +45,6 @@ add_dependencies(${RunGeneratorTarget} ${CppPropertiesDemoProjectGeneratorTarget
 
 target_include_directories(${CppPropertiesDemoProjectTarget} PRIVATE
 							Include)
+
+
+add_test(NAME ${CppPropertiesDemoProjectTarget} COMMAND ${CppPropertiesDemoProjectTarget})

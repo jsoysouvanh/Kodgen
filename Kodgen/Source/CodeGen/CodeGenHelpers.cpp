@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cassert>
+#include <cstddef>	//std::size_t
 
 using namespace kodgen;
 
@@ -17,7 +18,7 @@ ETraversalBehaviour CodeGenHelpers::combineTraversalBehaviours(ETraversalBehavio
 																		ETraversalBehaviour::Break
 																	};
 
-	for (int i = 0; i < prioritizedValues.size(); i++)
+	for (std::size_t i = 0; i < prioritizedValues.size(); i++)
 	{
 		if (lhs == prioritizedValues[i] || rhs == prioritizedValues[i])
 		{
