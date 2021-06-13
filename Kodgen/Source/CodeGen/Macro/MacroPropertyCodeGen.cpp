@@ -4,12 +4,12 @@
 
 using namespace kodgen;
 
-bool MacroPropertyCodeGen::generateCode(EntityInfo const& entity, Property const& property, uint8 propertyIndex, CodeGenEnv& data, std::string& inout_result) const noexcept
+bool MacroPropertyCodeGen::generateCode(EntityInfo const& entity, Property const& property, uint8 propertyIndex, CodeGenEnv& env, std::string& inout_result) const noexcept
 {
-	MacroCodeGenEnv& macroData = static_cast<MacroCodeGenEnv&>(data);
+	MacroCodeGenEnv& macroData = static_cast<MacroCodeGenEnv&>(env);
 
 	//Dispatch code generation call to the right sub-method
-	switch (macroData.codeGenLocation)
+	switch (macroData.getCodeGenLocation())
 	{
 		case ECodeGenLocation::HeaderFileHeader:
 			return preGenerateCode(entity, property, propertyIndex, macroData) && generateHeaderFileHeaderCode(entity, property, propertyIndex, macroData, inout_result);
@@ -25,9 +25,9 @@ bool MacroPropertyCodeGen::generateCode(EntityInfo const& entity, Property const
 
 		case ECodeGenLocation::Count:
 			//Should never get here
-			if (data.logger != nullptr)
+			if (env.getLogger() != nullptr)
 			{
-				data.logger->log("MacroPropertyCodeGen::generateCode called with ECodeGenLocation::Count location. Abort generation.", ILogger::ELogSeverity::Error);
+				env.getLogger()->log("MacroPropertyCodeGen::generateCode called with ECodeGenLocation::Count location. Abort generation.", ILogger::ELogSeverity::Error);
 			}
 			return false;
 	}
@@ -48,28 +48,28 @@ bool MacroPropertyCodeGen::initialize(CodeGenEnv& env) const noexcept
 }
 
 bool MacroPropertyCodeGen::generateHeaderFileHeaderCode(EntityInfo const& /* entity */, Property const& /* property */, uint8 /* propertyIndex */,
-														MacroCodeGenEnv& /* data */, std::string& /* inout_result */) const noexcept
+														MacroCodeGenEnv& /* env */, std::string& /* inout_result */) const noexcept
 {
 	//Default implementation generates no code
 	return true;
 }
 
 bool MacroPropertyCodeGen::generateClassFooterCode(EntityInfo const& /* entity */, Property const& /* property */, uint8 /* propertyIndex */,
-												   MacroCodeGenEnv& /* data */, std::string& /* inout_result */) const noexcept
+												   MacroCodeGenEnv& /* env */, std::string& /* inout_result */) const noexcept
 {
 	//Default implementation generates no code
 	return true;
 }
 
 bool MacroPropertyCodeGen::generateHeaderFileFooterCode(EntityInfo const& /* entity */, Property const& /* property */, uint8 /* propertyIndex */,
-														MacroCodeGenEnv& /* data */, std::string& /* inout_result */) const noexcept
+														MacroCodeGenEnv& /* env */, std::string& /* inout_result */) const noexcept
 {
 	//Default implementation generates no code
 	return true;
 }
 
 bool MacroPropertyCodeGen::generateSourceFileHeaderCode(EntityInfo const& /* entity */, Property const& /* property */, uint8 /* propertyIndex */,
-														MacroCodeGenEnv& /* data */, std::string& /* inout_result */) const noexcept
+														MacroCodeGenEnv& /* env */, std::string& /* inout_result */) const noexcept
 {
 	//Default implementation generates no code
 	return true;

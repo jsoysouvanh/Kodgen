@@ -13,16 +13,13 @@ bool MacroCodeGenUnit::preGenerateCode(FileParsingResult const& parsingResult, C
 #ifdef RTTI_ENABLED
 	 MacroCodeGenEnv* macroEnv = dynamic_cast<MacroCodeGenEnv*>(&env);
 #else
-	//unsafe
+	//unsafe because can't check whether env is castable to MacroCodeGenEnv or not
 	 MacroCodeGenEnv* macroEnv = static_cast<MacroCodeGenEnv*>(&env);
 #endif
 
 	if (macroEnv != nullptr)
 	{
 		//Setup macro env
-		macroEnv->parsingResult = &parsingResult;	//If a crash happens here, means RTTI was disable and the provided env is not a MacroCodeGenEnv
-		macroEnv->logger		= logger;
-
 		return CodeGenUnit::preGenerateCode(parsingResult, env);
 	}
 
@@ -44,8 +41,8 @@ ETraversalBehaviour MacroCodeGenUnit::runCodeGenModuleOnEntity(CodeGenModule con
 	//Generate code for each code location
 	for (int i = 0u; i < static_cast<int>(ECodeGenLocation::Count); i++)
 	{
-		macroEnv.codeGenLocation = static_cast<ECodeGenLocation>(i);
-		macroEnv.separator = macroEnv._separators[i];
+		macroEnv._codeGenLocation = static_cast<ECodeGenLocation>(i);
+		macroEnv._separator = macroEnv._separators[i];
 
 		//Clear the temp string without deallocating underlying memory
 		macroEnv._generatedCodeTmp.clear();
@@ -54,7 +51,7 @@ ETraversalBehaviour MacroCodeGenUnit::runCodeGenModuleOnEntity(CodeGenModule con
 		*	Forward ECodeGenLocation::ClassFooter generation only if the entity is a
 		*	struct, class, method or field
 		*/
-		if (macroEnv.codeGenLocation == ECodeGenLocation::ClassFooter)
+		if (macroEnv._codeGenLocation == ECodeGenLocation::ClassFooter)
 		{
 			if (!(entity.entityType == EEntityType::Struct || entity.entityType == EEntityType::Class ||
 				entity.entityType == EEntityType::Method || entity.entityType == EEntityType::Field))

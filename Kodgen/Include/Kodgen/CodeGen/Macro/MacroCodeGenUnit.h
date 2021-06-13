@@ -13,7 +13,7 @@ namespace kodgen
 {
 	//Forward declaration
 	class	MacroCodeGenUnitSettings;
-	struct	MacroCodeGenEnv;
+	class	MacroCodeGenEnv;
 
 	class MacroCodeGenUnit final : public CodeGenUnit
 	{

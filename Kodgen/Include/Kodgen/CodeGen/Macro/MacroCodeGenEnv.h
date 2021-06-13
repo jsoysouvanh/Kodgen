@@ -16,10 +16,14 @@
 
 namespace kodgen
 {
-	struct MacroCodeGenEnv : public CodeGenEnv
+	//Forward declaration
+	class MacroCodeGenUnit;
+
+	class MacroCodeGenEnv : public CodeGenEnv
 	{
-		//Friend to access generatedCodeTmp variable and hide it to other classes
-		friend class MacroCodeGenUnit;
+		//MacroCodeGenUnit is the only class allowed to set the private fields directly.
+		//Other classes must access the fields through getters.
+		friend MacroCodeGenUnit;
 
 		private:
 			/** Separator used for each code location. */
@@ -40,11 +44,29 @@ namespace kodgen
 			/** Map containing the class footer generated code for each struct/class. */
 			std::unordered_map<StructClassInfo const*, std::string>					_classFooterGeneratedCode;
 
-		public:
 			/** Location the code should be generated in. */
-			ECodeGenLocation	codeGenLocation	= ECodeGenLocation::Count;
+			ECodeGenLocation														_codeGenLocation	= ECodeGenLocation::Count;
 
 			/** Separator to use to split the generated code. */
-			std::string			separator		= "";
+			std::string																_separator;
+
+		public:
+			virtual ~MacroCodeGenEnv() = default;
+
+			/**
+			*	@brief Getter for field _codeGenLocation.
+			* 
+			*	@return _codeGenLocation.
+			*/
+			inline ECodeGenLocation		getCodeGenLocation()	const	noexcept;
+
+			/**
+			*	@brief Getter for field _separator.
+			* 
+			*	@return _separator.
+			*/
+			inline std::string const&	getSeparator()			const	noexcept;
 	};
+
+	#include "Kodgen/CodeGen/Macro/MacroCodeGenEnv.inl"
 }

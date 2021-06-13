@@ -12,7 +12,7 @@
 namespace kodgen
 {
 	//Forward declaration
-	struct MacroCodeGenEnv;
+	class MacroCodeGenEnv;
 
 	class MacroCodeGenModule : public CodeGenModule
 	{

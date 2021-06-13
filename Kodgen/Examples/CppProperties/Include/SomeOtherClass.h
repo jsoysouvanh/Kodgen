@@ -28,13 +28,13 @@ namespace SomeNamespace KGNamespace()
 			SomeTemplateClass<np1::SomeClass>			_someTemplateClass;
 
 			KGField(Get[const, &])
-			std::vector<int>							_someVectorOfInt;
+			std::vector<int>							_someVectorOfInt = { 1, 2, 3 };
 			
 			KGField(Get[const, &])
-			std::vector<np1::SomeClass*>				_someVectorOfSomeClass;
+			std::vector<np1::SomeClass*>				_someVectorOfSomeClass { nullptr, nullptr };
 
 			KGField(Get[const, &])
-			std::unordered_map<int, np1::SomeClass*>	_someUmapOfSomeClass2;
+			std::unordered_map<int, np1::SomeClass*>	_someUmapOfSomeClass2{ { 1, nullptr } };
 
 		public:
 			SomeOtherClass() = default;

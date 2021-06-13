@@ -34,9 +34,9 @@ class SetPropertyCodeGen : public kodgen::MacroPropertyCodeGen
 			if (!errorMessage.empty())
 			{
 				//Log error message and abort generation
-				if (env.logger != nullptr)
+				if (env.getLogger() != nullptr)
 				{
-					env.logger->log(errorMessage, kodgen::ILogger::ELogSeverity::Error);
+					env.getLogger()->log(errorMessage, kodgen::ILogger::ELogSeverity::Error);
 				}
 
 				return false;
@@ -52,16 +52,16 @@ class SetPropertyCodeGen : public kodgen::MacroPropertyCodeGen
 		}
 
 		virtual bool generateClassFooterCode(kodgen::EntityInfo const& entity, kodgen::Property const& /* property */, kodgen::uint8 /* propertyIndex */,
-											 kodgen::MacroCodeGenEnv& data, std::string& inout_result) const noexcept override
+											 kodgen::MacroCodeGenEnv& env, std::string& inout_result) const noexcept override
 		{
 			kodgen::FieldInfo const& field = static_cast<kodgen::FieldInfo const&>(entity);
 
 			//Can't generate any setter if the field is originally const qualified
 			if (field.type.typeParts.back().descriptor == kodgen::ETypeDescriptor::Const)
 			{
-				if (data.logger != nullptr)
+				if (env.getLogger() != nullptr)
 				{
-					data.logger->log("Can't generate setter for the field " + entity.getFullName() + " because it is const qualified. Abort generation.", kodgen::ILogger::ELogSeverity::Error);
+					env.getLogger()->log("Can't generate setter for the field " + entity.getFullName() + " because it is const qualified. Abort generation.", kodgen::ILogger::ELogSeverity::Error);
 				}
 
 				return false;
@@ -90,13 +90,13 @@ class SetPropertyCodeGen : public kodgen::MacroPropertyCodeGen
 				preTypeQualifiers = "static";
 			}
 
-			inout_result += preTypeQualifiers + "void " + methodName + ";" + data.separator;
+			inout_result += preTypeQualifiers + "void " + methodName + ";" + env.getSeparator();
 
 			return true;
 		}
 
 		virtual bool generateSourceFileHeaderCode(kodgen::EntityInfo const& entity, kodgen::Property const& property, kodgen::uint8 /* propertyIndex */,
-												  kodgen::MacroCodeGenEnv& data, std::string& inout_result) const noexcept override
+												  kodgen::MacroCodeGenEnv& env, std::string& inout_result) const noexcept override
 		{
 			kodgen::FieldInfo const& field = static_cast<kodgen::FieldInfo const&>(entity);
 
@@ -124,7 +124,7 @@ class SetPropertyCodeGen : public kodgen::MacroPropertyCodeGen
 
 			methodName += ")";
 
-			inout_result += preTypeQualifiers + "void " + entity.outerEntity->getFullName() + "::" + methodName + " { " + field.name + " = " + paramName + "; }" + data.separator;
+			inout_result += preTypeQualifiers + "void " + entity.outerEntity->getFullName() + "::" + methodName + " { " + field.name + " = " + paramName + "; }" + env.getSeparator();
 
 			return true;
 		}

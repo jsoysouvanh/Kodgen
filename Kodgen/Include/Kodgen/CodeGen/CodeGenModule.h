@@ -17,7 +17,7 @@ namespace kodgen
 {
 	//Forward declaration
 	class	PropertyCodeGen;
-	struct	CodeGenEnv;
+	class	CodeGenEnv;
 	class	EntityInfo;
 
 	//TODO: Add module dependency functionality?

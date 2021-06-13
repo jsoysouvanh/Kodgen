@@ -49,7 +49,7 @@ bool CodeGenUnit::checkSettings() const noexcept
 
 				if (canLog)
 				{
-					logger->log("Specified output directory doesn't exist. Create " + FilesystemHelpers::sanitizePath(settings->getOutputDirectory()).string(), ILogger::ELogSeverity::Info);
+					logger->log("Specified output directory doesn't exist. Create " + FilesystemHelpers::sanitizePath(settings->getOutputDirectory()).string());
 				}
 			}
 			catch (fs::filesystem_error const& exception)
@@ -93,8 +93,12 @@ bool CodeGenUnit::generateCode(FileParsingResult const& parsingResult, CodeGenEn
 	return result ? postGenerateCode(parsingResult, env) : false;
 }
 
-bool CodeGenUnit::preGenerateCode(FileParsingResult const& /* parsingResult */, CodeGenEnv& env) noexcept
+bool CodeGenUnit::preGenerateCode(FileParsingResult const& parsingResult, CodeGenEnv& env) noexcept
 {
+	//Setup generation environment
+	env._parsingResult	= &parsingResult;
+	env._logger			= logger;
+
 	if (_generationModules.get() != nullptr)
 	{
 		//Generate code for each module
@@ -128,42 +132,42 @@ ETraversalBehaviour CodeGenUnit::foreachEntity(ETraversalBehaviour (*visitor)(Co
 		//Call visitor on all possible generation module/entity pair
 		for (CodeGenModule const* codeGenModule : *_generationModules)
 		{
-			for (NamespaceInfo const& namespace_ : env.parsingResult->namespaces)
+			for (NamespaceInfo const& namespace_ : env.getParsingResult()->namespaces)
 			{
 				result = foreachEntityInNamespace(namespace_, visitor, env);
 
 				HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
 			}
 
-			for (StructClassInfo const& struct_ : env.parsingResult->structs)
+			for (StructClassInfo const& struct_ : env.getParsingResult()->structs)
 			{
 				result = foreachEntityInStruct(struct_, visitor, env);
 
 				HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
 			}
 
-			for (StructClassInfo const& class_ : env.parsingResult->classes)
+			for (StructClassInfo const& class_ : env.getParsingResult()->classes)
 			{
 				result = foreachEntityInStruct(class_, visitor, env);
 
 				HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
 			}
 
-			for (EnumInfo const& enum_ : env.parsingResult->enums)
+			for (EnumInfo const& enum_ : env.getParsingResult()->enums)
 			{
 				result = foreachEntityInEnum(enum_, visitor, env);
 
 				HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
 			}
 
-			for (VariableInfo const& variable : env.parsingResult->variables)
+			for (VariableInfo const& variable : env.getParsingResult()->variables)
 			{
 				result = visitor(*codeGenModule, variable, *this, env);
 
 				HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
 			}
 
-			for (FunctionInfo const& function : env.parsingResult->functions)
+			for (FunctionInfo const& function : env.getParsingResult()->functions)
 			{
 				result = visitor(*codeGenModule, function, *this, env);
 

@@ -12,14 +12,39 @@
 
 namespace kodgen
 {
-	struct CodeGenEnv
+	//Forward declaration
+	class CodeGenUnit;
+
+	class CodeGenEnv
 	{
-		/** Whole parsing result. */
-		FileParsingResult const*	parsingResult	= nullptr;
+		//CodeGenUnit is the only class allowed to set the private fields directly.
+		//Other classes must access the fields through getters.
+		friend CodeGenUnit;
 
-		/** Logger used to log during the code generation process. Can be nullptr. */
-		ILogger*					logger			= nullptr;
+		private:
+			/** Whole parsing result. */
+			FileParsingResult const*	_parsingResult	= nullptr;
 
-		virtual ~CodeGenEnv() = default;
+			/** Logger used to log during the code generation process. Can be nullptr. */
+			ILogger*					_logger			= nullptr;
+		
+		public:
+			virtual ~CodeGenEnv() = default;
+
+			/**
+			*	@brief Getter for the _parsingResult field.
+			* 
+			*	@return _parsingResult.
+			*/
+			inline FileParsingResult const*	getParsingResult()	const noexcept;
+
+			/**
+			*	@brief Getter for the _logger field.
+			* 
+			*	@return _logger.
+			*/
+			inline ILogger*					getLogger()			const noexcept;
 	};
+
+	#include "Kodgen/CodeGen/CodeGenEnv.inl"
 }

@@ -38,21 +38,7 @@ namespace kodgen
 
 		protected:
 			/** Settings used for code generation. */
-			CodeGenUnitSettings const*						settings			= nullptr;
-
-			/**
-			*	@brief	Called just before FileGenerationUnit::generateCodeInternal.
-			*			Perform all registered modules initialization.
-			*			The whole generation process is aborted if the method returns false.
-			*			/!\ Overrides should call this base implementation as well /!\
-			* 
-			*	@param parsingResult	Result of a file parsing used to generate code.
-			*	@param env				Generation environment structure.
-			* 
-			*	@return true if the method completed successfully, else false.
-			*/
-			virtual bool				preGenerateCode(FileParsingResult const&	parsingResult,
-														CodeGenEnv&					env)								noexcept;
+			CodeGenUnitSettings const*	settings	= nullptr;
 
 			/**
 			*	@brief	Execute the codeGenModule->generateCode method with the given entity and environment.
@@ -69,6 +55,20 @@ namespace kodgen
 			virtual ETraversalBehaviour	runCodeGenModuleOnEntity(CodeGenModule const&	codeGenModule,
 																 EntityInfo const&		entity,
 																 CodeGenEnv&			env)							noexcept	= 0;
+
+			/**
+			*	@brief	Called just before FileGenerationUnit::generateCodeInternal.
+			*			Perform all registered modules initialization and initialize CodeGenEnv fields (logger, FileParsingResult...).
+			*			The whole generation process is aborted if the method returns false.
+			*			/!\ Overrides MUST call this base implementation as well through CodeGenUnit::preGenerateCode(parsingResult, env) /!\
+			* 
+			*	@param parsingResult	Result of a file parsing used to generate code.
+			*	@param env				Generation environment structure.
+			* 
+			*	@return true if the method completed successfully, else false.
+			*/
+			virtual bool				preGenerateCode(FileParsingResult const&	parsingResult,
+														CodeGenEnv&					env)								noexcept;
 
 			/**
 			*	@brief	Called just after FileGenerationUnit::generateCodeInternal.

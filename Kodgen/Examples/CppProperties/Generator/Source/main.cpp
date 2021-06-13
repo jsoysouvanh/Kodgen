@@ -91,7 +91,7 @@ int main(int argc, char** argv)
 		return EXIT_FAILURE;
 	}
 
-	logger.log("Working Directory: " + workingDirectory.string(), kodgen::ILogger::ELogSeverity::Info);
+	logger.log("Working Directory: " + workingDirectory.string());
 
 	//Setup parsing settings
 	kodgen::ParsingSettings parsingSettings;
