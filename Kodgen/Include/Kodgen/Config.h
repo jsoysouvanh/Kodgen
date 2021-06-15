@@ -19,6 +19,27 @@
 
 #endif
 
+//Set macro if RTTI is enabled
+#if defined(__clang__)
+
+#if __has_feature(cxx_rtti)
+#define RTTI_ENABLED
+#endif
+
+#elif defined(__GNUG__)
+
+#if defined(__GXX_RTTI)
+#define RTTI_ENABLED
+#endif
+
+#elif defined(_MSC_VER)
+
+#if defined(_CPPRTTI)
+#define RTTI_ENABLED
+#endif
+
+#endif
+
 #define KODGEN_VERSION_MAJOR 1
 #define KODGEN_VERSION_MINOR 1
 #define KODGEN_VERSION_PATCH 0

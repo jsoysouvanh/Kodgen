@@ -16,10 +16,8 @@ namespace kodgen
 	class Helpers
 	{
 		public:
-			Helpers()				= delete;
-			Helpers(Helpers const&) = delete;
-			Helpers(Helpers&&)		= delete;
-			~Helpers()				= delete;
+			Helpers()	= delete;
+			~Helpers()	= delete;
 
 			/**
 			*	@brief Convert a clang string to a std::string.

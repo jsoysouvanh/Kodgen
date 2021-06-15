@@ -29,8 +29,8 @@ namespace kodgen
 			/** Chars to take into consideration when parsing a property. */
 			std::string								_relevantCharsForPropParsing;
 
-			/** Chars to take into consideration when parsing a sub property. */
-			std::string								_relevantCharsForSubPropParsing;
+			/** Chars to take into consideration when parsing property arguments. */
+			std::string								_relevantCharsForPropArgsParsing;
 
 			/**
 			*	@brief	Split properties and fill _splitProps on success.
@@ -40,76 +40,63 @@ namespace kodgen
 			*
 			*	@return true on a successful split, else false.
 			*/
-			bool splitProperties(std::string&& propertiesString)															noexcept;
+			bool							splitProperties(std::string&& propertiesString)									noexcept;
 
 			/**
-			*	@brief Remove all ignored characters from the string.
+			*	@brief Remove all starting space characters.
 			*
-			*	@param toCleanString The string we want to clean.
+			*	@param toCleanString The string to clean.
 			*/
-			void cleanString(std::string& toCleanString)															const	noexcept;
+			void							removeStartSpaces(std::string& toCleanString)							const	noexcept;
+
+			/**
+			*	@brief Remove all trailing space characters.
+			*
+			*	@param toCleanString The string to clean.
+			*/
+			void							removeTrailSpaces(std::string& toCleanString)							const	noexcept;
 
 			/**
 			*	@brief	Search the next property.
-			*			inout_parsingProps will be updated to the current parsing state and out_isParsingSubProp is filled consequently
+			*			inout_parsingProps will be updated to the current parsing state and out_isParsingArgument is updated consequently.
 			*
-			*	@param inout_parsingProps	The string we are looking the next prop in.
-			*	@param out_isParsingSubProp	Filled by this function call to indicate either the processed prop has following subprops or not.
+			*	@param inout_parsingProps		The string we are looking the next prop in.
+			*	@param out_isParsingArgument	Updated by this function call to indicate either the processed prop has following arguments or not.
 			*
-			*	@return true & add the prop to _splitProps (new vector) on success, else return false.
+			*	@return true & add the property to _splitProps (new vector) on success, else return false.
 			*/
-			bool lookForNextProp(std::string&	inout_parsingProps,
-								 bool&			out_isParsingSubProp)														noexcept;
+			bool							lookForNextProperty(std::string&	inout_parsingProps,
+																bool&			out_isParsingArgument)						noexcept;
 
 			/**
-			*	@brief	Search the next sub property.
-			*			inout_parsingProps will be updated to the current parsing state and out_isParsingSubProp is filled consequently
+			*	@brief	Search the next property argument.
+			*			inout_parsingProps will be updated to the current parsing state and out_isParsingArgument is updated consequently.
 			*
-			*	@param inout_parsingProps	The string we are looking the next prop in.
-			*	@param out_isParsingSubProp	Filled by this function call to indicate either the processed prop has following subprops or not.
+			*	@param inout_parsingProps		The string we are looking the next prop in.
+			*	@param out_isParsingArgument	Filled by this function call to indicate either the processed prop has following arguments or not.
 			*
-			*	@return true & add the prop to _splitProps (last added vector) on success, else return false.
+			*	@return true & add the argument to _splitProps (last added vector) on success, else return false.
 			*/
-			bool lookForNextSubProp(std::string&	inout_parsingProps,
-									bool&			out_isParsingSubProp)													noexcept;
+			bool							lookForNextPropertyArgument(std::string&	inout_parsingProps,
+																		bool&			out_isParsingArgument)				noexcept;
 
 			/**
-			*	@brief	Check for each prop / subprop validity and fill a propertyGroup consequently.
+			*	@brief	Fill a propertyGroup based on the parsed properties
 			*	
-			*	@param splitProps	The collection of all parsed props / subprops.
-			*	@param entityType	The type of the attached entity.
+			*	@param splitProps The collection of all parsed props / arguments.
 			*
-			*	@return A valid optional object if all properties were valid, else an empty optional.
-			*			On failure, _parsingErrorDescription is updated.
+			*	@return A PropertyGroup containing all parsed properties.
 			*/
-			opt::optional<PropertyGroup> checkAndFillPropertyGroup(std::vector<std::vector<std::string>>&	splitProps,
-																   EEntityType								entityType)		noexcept;
+			PropertyGroup					fillPropertyGroup(std::vector<std::vector<std::string>>& splitProps)			noexcept;
 
 			/**
-			*	@brief Add a single property to the given property group using the provided data.
+			*	@brief Add a property to the given property group using the provided data.
 			*
-			*	@param propertyAsVector		Vector of property (element 0 is the property to add).
-			*	@param entityType			The type of the attached entity.
+			*	@param propertyAsVector		Vector of properties. Element 0 is the property name, next elements are associated arguments.
 			*	@param out_propertyGroup	Group of property to update.
-			*
-			*	@return true and update the out_propertyGroup parameter on success, else return false and update _parsingErrorDescription value.
 			*/
-			bool addSimpleProperty(std::vector<std::string>&	propertyAsVector,
-								   EEntityType					entityType,
-								   PropertyGroup&				out_propertyGroup)											noexcept;
-
-			/**
-			*	@brief Add a complex property to the given property group using the provided data.
-			*
-			*	@param propertyAsVector		Vector of properties. Element 0 is the main prop, next elements are subprops.
-			*	@param entityType			The type of the attached entity.
-			*	@param out_propertyGroup	Group of property to update.
-			*
-			*	@return true and update the out_propertyGroup parameter on success, else return false and update _parsingErrorDescription value.
-			*/
-			bool addComplexProperty(std::vector<std::string>&	propertyAsVector,
-									EEntityType					entityType,
-									PropertyGroup&				out_propertyGroup)											noexcept;
+			void							addProperty(std::vector<std::string>&	propertyAsVector,
+														PropertyGroup&				out_propertyGroup)						noexcept;
 
 			/**
 			*	@brief Retrieve properties from a string if possible.
@@ -122,8 +109,7 @@ namespace kodgen
 			*			On failure, _parsingErrorDescription is updated.
 			*/
 			opt::optional<PropertyGroup>	getProperties(std::string&&			annotateMessage,
-														  std::string const&	annotationId,
-														  EEntityType			entityType)									noexcept;
+														  std::string const&	annotationId)								noexcept;
 
 		public:
 			/**

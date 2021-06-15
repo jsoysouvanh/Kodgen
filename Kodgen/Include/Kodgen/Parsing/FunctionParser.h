@@ -70,11 +70,6 @@ namespace kodgen
 			inline FunctionParsingResult*	getParsingResult()										noexcept;
 
 		public:
-			FunctionParser()						= default;
-			FunctionParser(FunctionParser const&)	= default;
-			FunctionParser(FunctionParser&&)		= default;
-			~FunctionParser()						= default;
-
 			/**
 			*	@brief Parse the function starting at the provided AST cursor.
 			*

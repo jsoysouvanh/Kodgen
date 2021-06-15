@@ -27,12 +27,6 @@ CXChildVisitResult NamespaceParser::parse(CXCursor const& namespaceCursor, Parsi
 		}
 	}
 
-	//Check properties validy one last time
-	if (out_result.parsedNamespace.has_value())
-	{
-		performFinalPropertiesCheck(*out_result.parsedNamespace);
-	}
-
 	popContext();
 
 	DISABLE_WARNING_PUSH
@@ -133,6 +127,7 @@ ParsingContext& NamespaceParser::pushContext(CXCursor const& namespaceCursor, Pa
 	newContext.shouldCheckProperties	= true;
 	newContext.propertyParser			= parentContext.propertyParser;
 	newContext.parsingSettings			= parentContext.parsingSettings;
+	newContext.structClassTree			= parentContext.structClassTree;
 	newContext.parsingResult			= &out_result;
 
 	contextsStack.push(std::move(newContext));

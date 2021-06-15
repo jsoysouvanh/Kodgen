@@ -9,10 +9,6 @@ project(CppPropertiesExample)
 set(CppPropertiesDemoProjectGeneratorTarget CppPropertiesDemoProjectGenerator)
 add_executable(${CppPropertiesDemoProjectGeneratorTarget}
 					Generator/Source/CppPropsParser.cpp
-					Generator/Source/CppPropsParserFactory.cpp
-					Generator/Source/CppPropsCodeTemplate.cpp
-					Generator/Source/GetPropertyRule.cpp
-					Generator/Source/SetPropertyRule.cpp
 					
 					Generator/Source/main.cpp)
 
@@ -32,6 +28,7 @@ target_link_libraries(${CppPropertiesDemoProjectGeneratorTarget} PRIVATE ${Kodge
 set(CppPropertiesDemoProjectTarget CppPropertiesDemoProject)
 add_executable(${CppPropertiesDemoProjectTarget}
 					Source/SomeClass.cpp
+					Source/SomeOtherClass.cpp
 
 					Source/main.cpp)
 
@@ -48,3 +45,6 @@ add_dependencies(${RunGeneratorTarget} ${CppPropertiesDemoProjectGeneratorTarget
 
 target_include_directories(${CppPropertiesDemoProjectTarget} PRIVATE
 							Include)
+
+
+add_test(NAME ${CppPropertiesDemoProjectTarget} COMMAND ${CppPropertiesDemoProjectTarget})

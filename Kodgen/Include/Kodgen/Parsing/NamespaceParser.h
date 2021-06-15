@@ -148,11 +148,6 @@ namespace kodgen
 												  CXChildVisitResult&	out_visitResult)	noexcept;
 
 		public:
-			NamespaceParser()						= default;
-			NamespaceParser(NamespaceParser const&)	= default;
-			NamespaceParser(NamespaceParser&&)		= default;
-			~NamespaceParser()						= default;
-
 			/**
 			*	@brief Parse the namespace starting at the provided AST cursor.
 			*

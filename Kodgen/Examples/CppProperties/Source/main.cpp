@@ -30,6 +30,9 @@ int main()
 	SomeNamespace::SomeOtherClass	someOtherClass;
 
 	std::cout << someOtherClass.get_someFloat() << std::endl;
+	std::cout << someOtherClass.get_someVectorOfInt().data() << std::endl;
+	std::cout << someOtherClass.get_someVectorOfSomeClass().data() << std::endl;
+	std::cout << someOtherClass.get_someUmapOfSomeClass2().size() << std::endl;
 
 	return EXIT_SUCCESS;
 }

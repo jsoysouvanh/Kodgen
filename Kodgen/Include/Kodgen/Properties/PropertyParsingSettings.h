@@ -7,76 +7,60 @@
 
 #pragma once
 
-#include <vector>
-#include <unordered_set>
+#include <string>
 
-#include "Kodgen/Properties/SimplePropertyRule.h"
-#include "Kodgen/Properties/ComplexPropertyRule.h"
-#include "Kodgen/Misc/TomlUtility.h"
-#include "Kodgen/Misc/ILogger.h"
+#include "Kodgen/Misc/Settings.h"
 
 namespace kodgen
 {
-	class PropertyParsingSettings
+	class PropertyParsingSettings : public Settings
 	{
 		public:
 			/** Char used to separate two properties. */
-			char									propertySeparator		= ',';
+			char								propertySeparator		= ',';
 
 			/** Char used to separate two sub properties. */
-			char									subPropertySeparator	= ',';
+			char								argumentSeparator		= ',';
 
 			/** Chars used to respectively start and close a group of sub properties. */
-			char									subPropertyEnclosers[2]	= { '[', ']' };
-
-			/** Collection of chars which will be ignored by the property parser. */
-			std::unordered_set<char>				ignoredCharacters;
-
-			/** Collection of all simple property rules. */
-			std::vector<SimplePropertyRule const*>	simplePropertyRules;
-
-			/** Collection of all complex property rules. */
-			std::vector<ComplexPropertyRule const*>	complexPropertyRules;
+			char								argumentEnclosers[2]	= { '[', ']' };
 
 			/** Macro to use to attach properties to a namespace. */
-			std::string								namespaceMacroName		= "Namespace";
+			std::string							namespaceMacroName		= "Namespace";
 
 			/** Macro to use to attach properties to a class. */
-			std::string								classMacroName			= "Class";
+			std::string							classMacroName			= "Class";
 
 			/** Macro to use to attach properties to a struct. */
-			std::string								structMacroName			= "Struct";
+			std::string							structMacroName			= "Struct";
 
 			/** Macro to use to attach properties to a variable (non-member). */
-			std::string								variableMacroName		= "Variable";
+			std::string							variableMacroName		= "Variable";
 
 			/** Macro to use to attach properties to a field. */
-			std::string								fieldMacroName			= "Field";
+			std::string							fieldMacroName			= "Field";
 
 			/** Macro to use to attach properties to a function. */
-			std::string								functionMacroName		= "Function";
+			std::string							functionMacroName		= "Function";
 
 			/** Macro to use to attach properties to a method. */
-			std::string								methodMacroName			= "Method";
+			std::string							methodMacroName			= "Method";
 
 			/** Macro to use to attach properties to an enum. */
-			std::string								enumMacroName			= "Enum";
+			std::string							enumMacroName			= "Enum";
 
 			/** Macro to use to attach properties to an enum value. */
-			std::string								enumValueMacroName		= "EnumVal";
-
-			PropertyParsingSettings()								= default;
-			PropertyParsingSettings(PropertyParsingSettings const&)	= default;
-			PropertyParsingSettings(PropertyParsingSettings&&)		= default;
-			~PropertyParsingSettings()								= default;
+			std::string							enumValueMacroName		= "EnumVal";
 
 			/**
-			*	@brief Load settings from a TOML file.
-			*	
-			*	@param table TOML file table to look into.
-			*	@param logger Logger used to issue error when settings contain bad values.
+			*	@brief Load all settings from the provided toml data.
+			* 
+			*	@param tomlData	Data loaded from a toml file.
+			*	@param logger	Optional logger used to issue loading logs. Can be nullptr.
+			* 
+			*	@return true if no error occured during loading, else false.
 			*/
-			void	loadSettings(toml::value const& table,
-								 ILogger*			logger = nullptr)	noexcept;
+			virtual bool loadSettingsValues(toml::value const&	tomlData,
+											ILogger*			logger)		noexcept override;
 	};
 }

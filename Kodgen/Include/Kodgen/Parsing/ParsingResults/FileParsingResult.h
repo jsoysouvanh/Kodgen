@@ -14,9 +14,11 @@
 #include "Kodgen/Parsing/ParsingResults/ParsingResultBase.h"
 #include "Kodgen/InfoStructures/NamespaceInfo.h"
 #include "Kodgen/InfoStructures/StructClassInfo.h"
+#include "Kodgen/InfoStructures/NestedStructClassInfo.h"
 #include "Kodgen/InfoStructures/EnumInfo.h"
 #include "Kodgen/InfoStructures/FunctionInfo.h"
 #include "Kodgen/InfoStructures/VariableInfo.h"
+#include "Kodgen/InfoStructures/StructClassTree.h"
 #include "Kodgen/Misc/Filesystem.h"
 
 namespace kodgen
@@ -43,5 +45,8 @@ namespace kodgen
 
 		/** All variables contained directory under file level. */
 		std::vector<VariableInfo>		variables;
+
+		/** Structure containing the whole struct/class hierarchy linked to parsed structs/classes. */
+		StructClassTree					structClassTree;
 	};
 }

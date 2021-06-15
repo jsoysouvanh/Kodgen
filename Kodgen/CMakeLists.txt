@@ -12,18 +12,7 @@ set(KodgenTargetLibrary Kodgen)
 add_library(${KodgenTargetLibrary}
 				STATIC
 					Source/Properties/PropertyParsingSettings.cpp
-					Source/Properties/SimpleProperty.cpp
-					Source/Properties/ComplexProperty.cpp
-					Source/Properties/SimplePropertyRule.cpp
-					Source/Properties/ComplexPropertyRule.cpp
-					Source/Properties/DefaultSimplePropertyRule.cpp
-					Source/Properties/DefaultComplexPropertyRule.cpp
-					Source/Properties/ComplexPropertySubProperty.cpp
-					Source/Properties/FixedComplexPropertyRule.cpp
-
-					Source/Properties/NativeProperties/ParseAllNestedPropertyRule.cpp
-					Source/Properties/NativeProperties/GenCodeTemplatePropertyRule.cpp
-
+					
 					Source/InfoStructures/EntityInfo.cpp
 					Source/InfoStructures/NamespaceInfo.cpp
 					Source/InfoStructures/VariableInfo.cpp
@@ -36,6 +25,7 @@ add_library(${KodgenTargetLibrary}
 					Source/InfoStructures/NestedEnumInfo.cpp
 					Source/InfoStructures/EnumValueInfo.cpp
 					Source/InfoStructures/TypeInfo.cpp
+					Source/InfoStructures/StructClassTree.cpp
 	
 					Source/Parsing/ParsingError.cpp
 					Source/Parsing/PropertyParser.cpp
@@ -49,8 +39,9 @@ add_library(${KodgenTargetLibrary}
 					Source/Parsing/EnumParser.cpp
 					Source/Parsing/EnumValueParser.cpp
 					Source/Parsing/FileParser.cpp
-					Source/Parsing/FileParserFactoryBase.cpp
 					Source/Parsing/ParsingSettings.cpp
+
+					Source/Parsing/ParsingResults/ParsingResultBase.cpp
 					
 					Source/Misc/EAccessSpecifier.cpp
 					Source/Misc/Helpers.cpp
@@ -59,17 +50,25 @@ add_library(${KodgenTargetLibrary}
 					Source/Misc/System.cpp
 					Source/Misc/Filesystem.cpp
 					Source/Misc/TomlUtility.cpp
+					Source/Misc/Settings.cpp
 	
-					Source/CodeGen/FileGenerationUnit.cpp
+					Source/CodeGen/CodeGenUnit.cpp
 					Source/CodeGen/FileGenerationResult.cpp
-					Source/CodeGen/FileGenerationError.cpp
-					Source/CodeGen/GeneratedFile.cpp
 					Source/CodeGen/FileGenerator.cpp
-					Source/CodeGen/FileGenerationSettings.cpp
-			 
+					Source/CodeGen/GeneratedFile.cpp
+					Source/CodeGen/CodeGenModule.cpp
+					Source/CodeGen/CodeGenUnitSettings.cpp
+					Source/CodeGen/FileGeneratorSettings.cpp
+					Source/CodeGen/CodeGenHelpers.cpp
+
+					Source/CodeGen/Macro/MacroCodeGenUnit.cpp
+					Source/CodeGen/Macro/MacroPropertyCodeGen.cpp
+					Source/CodeGen/Macro/MacroCodeGenUnitSettings.cpp
+					Source/CodeGen/Macro/MacroCodeGenModule.cpp
+
 					Source/Threading/ThreadPool.cpp
 					Source/Threading/TaskBase.cpp
-			)
+				)
 
 # Setup warning level
 if (MSVC)

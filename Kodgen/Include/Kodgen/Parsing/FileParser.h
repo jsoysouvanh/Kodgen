@@ -100,11 +100,13 @@ namespace kodgen
 			void						refreshOuterEntity(FileParsingResult& out_result)		const	noexcept;
 
 			/**
-			*	@brief Log the diagnostic of the provided translation units.
+			*	@brief Log the diagnostic of the provided translation unit.
 			*
 			*	@param translationUnit Translation unit we want to log the diagnostic of.
+			* 
+			*	@return true if the diagnostic could be logged, else false (logger is nullptr).
 			*/
-			void						logDiagnostic(CXTranslationUnit const& translationUnit)	const	noexcept;
+			bool						logDiagnostic(CXTranslationUnit const& translationUnit)	const	noexcept;
 
 			/**
 			*	@brief Helper to get the ParsingResult contained in the context as a FileParsingResult.
@@ -114,12 +116,6 @@ namespace kodgen
 			inline FileParsingResult*	getParsingResult()												noexcept;
 
 		protected:
-			/** Settings to use when parsing. */
-			ParsingSettings const*	parsingSettings;
-
-			/** Logger used to issue logs from the FileParser. */
-			ILogger*				logger			= nullptr;
-
 			/**
 			*	@brief Overridable method called just before starting the parsing process of a file
 			*
@@ -137,23 +133,34 @@ namespace kodgen
 			virtual void postParse(fs::path const& parseFile, FileParsingResult const& result)	noexcept;
 
 		public:
+			/** Settings to use during parsing. */
+			ParsingSettings*	parsingSettings;
+
+			/** Logger used to issue logs from the FileParser. Can be nullptr. */
+			ILogger*			logger			= nullptr;
+
 			FileParser()					noexcept;
 			FileParser(FileParser const&)	noexcept;
 			FileParser(FileParser&&)		noexcept;
 			virtual ~FileParser()			noexcept;
 
 			/**
+			*	@brief Check that all the settings are valid to parse files.
+			* 
+			*	@return true if all settings are valid, else false.
+			*/
+			virtual bool	checkSettings()									const	noexcept;
+
+			/**
 			*	@brief Parse the file and fill the FileParsingResult.
 			*
 			*	@param toParseFile	Path to the file to parse.
-			*	@param compilArgs	Arguments to use to generate the provided file AST.
 			*	@param out_result	Result filled while parsing the file.
 			*
 			*	@return true if the parsing process finished without error, else false
 			*/
-			bool	parse(fs::path const&					toParseFile,
-						  std::vector<char const*> const&	compilArgs,
-						  FileParsingResult&				out_result)		noexcept;
+			bool			parse(fs::path const&					toParseFile,
+								  FileParsingResult&				out_result)		noexcept;				
 	};
 
 	#include "Kodgen/Parsing/FileParser.inl"

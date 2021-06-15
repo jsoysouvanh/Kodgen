@@ -25,8 +25,8 @@ namespace kodgen
 			*	@brief Write a single line in the generated file
 			*	@brief This method is the same as writeLine(std::string const& line) but is here to end the variadic writeLines(...) recurrency
 			*/
-			void writeLines(std::string const& line)								noexcept;
-			void writeLines(std::string&& line)										noexcept;
+			void writeLines(std::string const& line)	noexcept;
+			void writeLines(std::string&& line)			noexcept;
 
 		protected:
 			/**
@@ -45,6 +45,7 @@ namespace kodgen
 			*
 			*	@param line Line to write in the generated file
 			*/
+			void expandWriteMacroLines(std::string const& line)		noexcept;
 			void expandWriteMacroLines(std::string&& line)			noexcept;
 
 		public:
@@ -92,6 +93,11 @@ namespace kodgen
 			*	@brief Define a macro without parameters nor value like #define MY_MACRO
 			*/
 			void writeMacro(std::string&& macroName)			noexcept;
+
+			/**
+			*	@brief Undefine a macro if it is defined.
+			*/
+			void undefMacro(std::string const& macroName)		noexcept;
 
 			/**
 			*	@return The path to this generated file

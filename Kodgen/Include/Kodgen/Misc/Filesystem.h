@@ -32,10 +32,8 @@ namespace kodgen
 	class FilesystemHelpers
 	{
 		public:
-			FilesystemHelpers()							= delete;
-			FilesystemHelpers(FilesystemHelpers const&) = delete;
-			FilesystemHelpers(FilesystemHelpers&&)		= delete;
-			~FilesystemHelpers()						= delete;
+			FilesystemHelpers()	 = delete;
+			~FilesystemHelpers() = delete;
 
 			/**
 			*	@brief Make a canonical path from the provided path.
@@ -45,5 +43,17 @@ namespace kodgen
 			*	@return A canonical path if the provided path was valid, else an empty path.
 			*/
 			static fs::path sanitizePath(fs::path const& path)	noexcept;
+
+			/**
+			*	@brief	Check that a path is a child of another path, i.e. it is contained (directly or not)
+			*			in the other path.
+			*
+			*	@param child	Potential child path.
+			*	@param other	Other path.
+			*	
+			*	@return true if child is contained in other, else false.
+			*/
+			static bool		isChildPath(fs::path const& child,
+										fs::path const& other)	noexcept;
 	};
 }

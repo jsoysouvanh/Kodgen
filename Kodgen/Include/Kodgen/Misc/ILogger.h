@@ -28,10 +28,7 @@ namespace kodgen
 				Error
 			};
 
-			ILogger()				= default;
-			ILogger(ILogger const&)	= default;
-			ILogger(ILogger&&)		= default;
-			virtual ~ILogger()		= default;
+			virtual ~ILogger() = default;
 
 			/**
 			*	@brief Log a message.

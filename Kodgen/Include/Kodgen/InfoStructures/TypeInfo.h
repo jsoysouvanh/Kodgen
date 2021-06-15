@@ -116,7 +116,7 @@ namespace kodgen
 								bool shouldRemoveNamespacesAndNestedClasses = false)				const noexcept;
 
 			/**
-			*	@brief	Get this type canonical name by removing specified qualifiers / namespaces / nested classes.
+			*	@brief	Get this type canonical name.
 			*			The canonical name is the name simplified by unwinding all aliases and/or typedefs.
 			*
 			*	@param removeQualifiers Should the const and volatile qualifiers be removed from the type name.

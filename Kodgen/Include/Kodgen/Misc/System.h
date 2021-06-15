@@ -14,10 +14,8 @@ namespace kodgen
 	class System
 	{
 		public:
-			System()				= delete;
-			System(System const&)	= delete;
-			System(System&&)		= delete;
-			~System()				= delete;
+			System()  = delete;
+			~System() = delete;
 
 			/**
 			*	@brief Execute a command on the system.

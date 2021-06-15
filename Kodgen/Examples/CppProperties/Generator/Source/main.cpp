@@ -3,91 +3,143 @@
 #include <Kodgen/Misc/Filesystem.h>
 #include <Kodgen/Misc/DefaultLogger.h>
 #include <Kodgen/CodeGen/FileGenerator.h>
+#include <Kodgen/CodeGen/Macro/MacroCodeGenUnit.h>
+#include <Kodgen/CodeGen/Macro/MacroCodeGenUnitSettings.h>
+#include <Kodgen/CodeGen/FileGeneratorSettings.h>
 
-#include "CppPropsParserFactory.h"
-#include "CppPropsCodeTemplate.h"
+#include "GetSetCGM.h"
+
+void initGenerationSettings(fs::path const& workingDirectory, kodgen::FileGeneratorSettings& out_generatorSettings, kodgen::MacroCodeGenUnitSettings& out_cguSettings)
+{
+	fs::path includeDirectory	= workingDirectory / "Include";
+	fs::path generatedDirectory	= includeDirectory / "Generated";
+
+	//Parse WorkingDir/...
+	out_generatorSettings.addToParseDirectory(includeDirectory);
+
+	//Ignore generated files...
+	out_generatorSettings.addIgnoredDirectory(generatedDirectory);
+
+	//Only parse .h files
+	out_generatorSettings.addSupportedExtension(".h");
+
+	//All generated files will be located in WorkingDir/Include/Generated
+	out_cguSettings.setOutputDirectory(generatedDirectory);
+	
+	//Setup generated files name pattern
+	out_cguSettings.setGeneratedHeaderFileNamePattern("##FILENAME##.h.h");
+	out_cguSettings.setGeneratedSourceFileNamePattern("##FILENAME##.src.h");
+	out_cguSettings.setClassFooterMacroPattern("##CLASSFULLNAME##_GENERATED");
+	out_cguSettings.setHeaderFileFooterMacroPattern("File_##FILENAME##_GENERATED");
+}
+
+bool initParsingSettings(kodgen::ParsingSettings& parsingSettings)
+{
+	//We abort parsing if we encounter a single error while parsing
+	parsingSettings.shouldAbortParsingOnFirstError = true;
+
+	//Each property will be separed by a ,
+	parsingSettings.propertyParsingSettings.propertySeparator = ',';
+
+	//Subproperties are surrounded by []
+	parsingSettings.propertyParsingSettings.argumentEnclosers[0] = '[';
+	parsingSettings.propertyParsingSettings.argumentEnclosers[1] = ']';
+
+	//Each subproperty will be separed by a ,
+	parsingSettings.propertyParsingSettings.argumentSeparator = ',';
+
+	//Define the macros to use for each entity type
+	parsingSettings.propertyParsingSettings.namespaceMacroName	= "KGNamespace";
+	parsingSettings.propertyParsingSettings.classMacroName		= "KGClass";
+	parsingSettings.propertyParsingSettings.structMacroName		= "KGStruct";
+	parsingSettings.propertyParsingSettings.fieldMacroName		= "KGVariable";
+	parsingSettings.propertyParsingSettings.fieldMacroName		= "KGField";
+	parsingSettings.propertyParsingSettings.functionMacroName	= "KGFunction";
+	parsingSettings.propertyParsingSettings.methodMacroName		= "KGMethod";
+	parsingSettings.propertyParsingSettings.enumMacroName		= "KGEnum";
+	parsingSettings.propertyParsingSettings.enumValueMacroName	= "KGEnumVal";
+
+	//This is setuped that way for CI tools only
+	//In reality, the compiler used by the user machine running the generator should be set.
+	//It has nothing to see with the compiler used to compile the generator.
+#if defined(__GNUC__)
+	return parsingSettings.setCompilerExeName("gcc");
+#elif defined(__clang__)
+	return parsingSettings.setCompilerExeName("clang");
+#elif defined(_MSC_VER)
+	return parsingSettings.setCompilerExeName("msvc");
+#else
+	return false;	//Unsupported compiler
+#endif
+}
 
 int main(int argc, char** argv)
 {
-	kodgen::DefaultLogger	logger;
-	int						result = EXIT_SUCCESS;
+	kodgen::DefaultLogger logger;
 
-	if (argc > 1)
+	if (argc <= 1)
 	{
-		fs::path workingDirectory = argv[1];
+		logger.log("No working directory provided as first program argument", kodgen::ILogger::ELogSeverity::Error);
+		return EXIT_FAILURE;
+	}
 
-		if (fs::is_directory(workingDirectory))
-		{
-			logger.log("Working Directory: " + workingDirectory.string(), kodgen::ILogger::ELogSeverity::Info);
+	fs::path workingDirectory = argv[1];
 
-			fs::path includeDirectory	= workingDirectory / "Include";
-			fs::path generatedDirectory	= includeDirectory / "Generated";
+	if (!fs::is_directory(workingDirectory))
+	{
+		logger.log("Provided working directory is not a directory or doesn't exist", kodgen::ILogger::ELogSeverity::Error);
+		return EXIT_FAILURE;
+	}
 
-			CppPropsParserFactory		fileParserFactory;
-			kodgen::FileGenerationUnit	fileGenUnit;
-			kodgen::FileGenerator		fileGenerator;
+	logger.log("Working Directory: " + workingDirectory.string());
 
-			//Parser and generator should log through logger
-			fileParserFactory.logger	= &logger;
-			fileGenerator.logger		= &logger;
+	//Setup parsing settings
+	kodgen::ParsingSettings parsingSettings;
 
-			//Parse WorkingDir/...
-			fileGenerator.settings.addToParseDirectory(includeDirectory);
+	if (!initParsingSettings(parsingSettings))
+	{
+		logger.log("Compiler could not be set because it is not supported on the current machine or vswhere could not be found (Windows|MSVC only).", kodgen::ILogger::ELogSeverity::Error);
+		return EXIT_FAILURE;
+	}
 
-			//Ignore generated files...
-			fileGenerator.settings.addIgnoredDirectory(generatedDirectory);
-			
-			//Only parse .h files
-			fileGenerator.settings.supportedExtensions.emplace(".h");
+	//Setup FileParser
+	kodgen::FileParser fileParser;
+	fileParser.logger = &logger;
+	fileParser.parsingSettings = &parsingSettings;
 
-			//All generated files will be located in WorkingDir/Include/Generated
-			fileGenerator.settings.setOutputDirectory(generatedDirectory);
+	//Setup generation settings
+	kodgen::FileGeneratorSettings		fileGenSettings;
+	kodgen::MacroCodeGenUnitSettings	cguSettings;
 
-			//Generated files will use .myCustomExtension.h extension
-			fileGenerator.settings.generatedFilesExtension = ".myCustomExtension.h";
+	initGenerationSettings(workingDirectory, fileGenSettings, cguSettings);
 
-			//Bind the PropertyCodeTemplate name to the CppPropsCodeTemplate class
-			CppPropsCodeTemplate propsCodeTemplate;
-			fileGenerator.addGeneratedCodeTemplate("PropertyCodeTemplate", &propsCodeTemplate);
+	//Setup code generation unit
+	kodgen::MacroCodeGenUnit codeGenUnit;
+	codeGenUnit.logger = &logger;
+	codeGenUnit.setSettings(&cguSettings);
 
-			/**
-			*	Set a default class template so that we don't have to specify it manually
-			*
-			*	Now we can simply write:
-			*		class KGClass() MyClass {};
-			*/
-			fileGenerator.setDefaultGeneratedCodeTemplate(kodgen::EEntityType::Class, "PropertyCodeTemplate");
+	GetSetCGM getSetCodeGenModule;
+	codeGenUnit.addModule(getSetCodeGenModule);
 
-			kodgen::FileGenerationResult genResult = fileGenerator.generateFiles(fileParserFactory, fileGenUnit);
+	//Setup file generator
+	kodgen::FileGenerator fileGenerator;
+	fileGenerator.logger = &logger;
+	fileGenerator.settings = &fileGenSettings;
 
-			if (genResult.completed)
-			{
-				for (kodgen::ParsingError parsingError : genResult.parsingErrors)
-				{
-					logger.log(parsingError.toString(), kodgen::ILogger::ELogSeverity::Error);
-				}
+	//This environment will be copied and used for each code generation unit
+	kodgen::MacroCodeGenEnv env;
 
-				for (kodgen::FileGenerationError fileGenError : genResult.fileGenerationErrors)
-				{
-					logger.log(fileGenError.toString(), kodgen::ILogger::ELogSeverity::Error);
-				}
-			}
-			else
-			{
-				logger.log("Invalid FileGenerator::outputDirectory", kodgen::ILogger::ELogSeverity::Error);
-			}
-		}
-		else
-		{
-			logger.log("Provided working directory is not a directory or doesn't exist", kodgen::ILogger::ELogSeverity::Error);
-			result = EXIT_FAILURE;
-		}
+	//Kick-off code generation
+	kodgen::FileGenerationResult genResult = fileGenerator.generateFiles(fileParser, codeGenUnit, env, true);
+
+	if (genResult.completed)
+	{
+		logger.log("Generation completed successfully.");
 	}
 	else
 	{
-		logger.log("No working directory provided as first program argument", kodgen::ILogger::ELogSeverity::Error);
-		result = EXIT_FAILURE;
+		logger.log("An error happened during code generation.", kodgen::ILogger::ELogSeverity::Error);
 	}
 
-	return result;
+	return EXIT_SUCCESS;
 }

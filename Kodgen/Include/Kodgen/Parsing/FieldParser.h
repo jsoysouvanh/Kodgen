@@ -70,11 +70,6 @@ namespace kodgen
 			inline FieldParsingResult*		getParsingResult()										noexcept;
 
 		public:
-			FieldParser()					= default;
-			FieldParser(FieldParser const&)	= default;
-			FieldParser(FieldParser&&)		= default;
-			~FieldParser()					= default;
-
 			/**
 			*	@brief Parse the field starting at the provided AST cursor.
 			*

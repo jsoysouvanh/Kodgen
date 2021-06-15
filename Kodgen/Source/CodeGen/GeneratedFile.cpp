@@ -16,12 +16,12 @@ GeneratedFile::~GeneratedFile() noexcept
 
 void GeneratedFile::writeLine(std::string const& line) noexcept
 {
-	_streamToFile << line << std::endl;
+	_streamToFile << line << "\n";
 }
 
 void GeneratedFile::writeLine(std::string&& line) noexcept
 {
-	_streamToFile << std::forward<std::string>(line) << std::endl;
+	_streamToFile << std::forward<std::string>(line) << "\n";
 }
 
 void GeneratedFile::writeLines(std::string const& line) noexcept
@@ -34,15 +34,24 @@ void GeneratedFile::writeLines(std::string&& line) noexcept
 	writeLine(std::forward<std::string>(line));
 }
 
+void GeneratedFile::expandWriteMacroLines(std::string const& line) noexcept
+{
+	writeLine("\t" + line + "\n");
+}
+
 void GeneratedFile::expandWriteMacroLines(std::string&& line) noexcept
 {
-	writeLine("\t" + std::forward<std::string>(line));
-	writeLine("");
+	writeLine("\t" + std::forward<std::string>(line) + "\n");
 }
 
 void GeneratedFile::writeMacro(std::string&& macroName) noexcept
 {
 	writeLine("#define " + std::forward<std::string>(macroName));
+}
+
+void GeneratedFile::undefMacro(std::string const& macroName) noexcept
+{
+	writeLine("#ifdef " + macroName + "\n\t#undef " + macroName + "\n#endif");
 }
 
 fs::path const& GeneratedFile::getPath() const noexcept

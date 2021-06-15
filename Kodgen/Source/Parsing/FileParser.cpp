@@ -9,7 +9,9 @@
 using namespace kodgen;
 
 FileParser::FileParser() noexcept:
-	_clangIndex{clang_createIndex(0, 0)}
+	_clangIndex{clang_createIndex(0, 0)},
+	parsingSettings{nullptr},
+	logger{nullptr}
 {
 }
 
@@ -39,8 +41,25 @@ FileParser::~FileParser() noexcept
 	}
 }
 
-bool FileParser::parse(fs::path const& toParseFile, std::vector<char const*> const& compilArgs, FileParsingResult& out_result) noexcept
+bool FileParser::checkSettings() const noexcept
 {
+	if (parsingSettings == nullptr)
+	{
+		if (logger != nullptr)
+		{
+			logger->log("FileParser::parsingSettings have not been set.", ILogger::ELogSeverity::Error);
+		}
+
+		return false;
+	}
+
+	return true;
+}
+
+bool FileParser::parse(fs::path const& toParseFile, FileParsingResult& out_result) noexcept
+{
+	assert(parsingSettings != nullptr);
+
 	bool isSuccess = false;
 
 	preParse(toParseFile);
@@ -51,7 +70,7 @@ bool FileParser::parse(fs::path const& toParseFile, std::vector<char const*> con
 		out_result.parsedFile = toParseFile;
 
 		//Parse the given file
-		CXTranslationUnit translationUnit = clang_parseTranslationUnit(_clangIndex, toParseFile.string().c_str(), compilArgs.data(), static_cast<int32>(compilArgs.size()), nullptr, 0, CXTranslationUnit_SkipFunctionBodies | CXTranslationUnit_Incomplete | CXTranslationUnit_KeepGoing);
+		CXTranslationUnit translationUnit = clang_parseTranslationUnit(_clangIndex, toParseFile.string().c_str(), parsingSettings->getCompilationArguments().data(), static_cast<int32>(parsingSettings->getCompilationArguments().size()), nullptr, 0, CXTranslationUnit_SkipFunctionBodies | CXTranslationUnit_Incomplete | CXTranslationUnit_KeepGoing);
 
 		if (translationUnit != nullptr)
 		{
@@ -69,14 +88,15 @@ bool FileParser::parse(fs::path const& toParseFile, std::vector<char const*> con
 				isSuccess = true;
 			}
 
-#if KODGEN_DEV
-			logDiagnostic(translationUnit);
-#endif
-
 			popContext();
 
 			//There should not have any context left once parsing has finished
 			assert(contextsStack.empty());
+
+			if (parsingSettings->shouldLogDiagnostic)
+			{
+				logDiagnostic(translationUnit);
+			}
 
 			clang_disposeTranslationUnit(translationUnit);
 		}
@@ -97,7 +117,7 @@ bool FileParser::parse(fs::path const& toParseFile, std::vector<char const*> con
 
 CXChildVisitResult FileParser::parseNestedEntity(CXCursor cursor, CXCursor /* parentCursor */, CXClientData clientData) noexcept
 {
-	FileParser*		parser		= reinterpret_cast<FileParser*>(clientData);
+	FileParser*	parser	= reinterpret_cast<FileParser*>(clientData);
 
 	DISABLE_WARNING_PUSH
 	DISABLE_WARNING_UNSCOPED_ENUM
@@ -151,6 +171,7 @@ ParsingContext& FileParser::pushContext(CXTranslationUnit const& translationUnit
 	newContext.rootCursor		= clang_getTranslationUnitCursor(translationUnit);
 	newContext.propertyParser	= &_propertyParser;
 	newContext.parsingSettings	= parsingSettings;
+	newContext.structClassTree	= &out_result.structClassTree;
 	newContext.parsingResult	= &out_result;
 
 	contextsStack.push(std::move(newContext));
@@ -258,25 +279,37 @@ void FileParser::postParse(fs::path const&, FileParsingResult const&) noexcept
 	*/
 }
 
-void FileParser::logDiagnostic(CXTranslationUnit const& translationUnit) const noexcept
+bool FileParser::logDiagnostic(CXTranslationUnit const& translationUnit) const noexcept
 {
 	if (logger != nullptr)
 	{
 		CXDiagnosticSet diagnostics = clang_getDiagnosticSetFromTU(translationUnit);
 
-		logger->log("DIAGNOSTICS START...", ILogger::ELogSeverity::Info);
+		unsigned int diagnosticsCount = clang_getNumDiagnosticsInSet(diagnostics);
 
-		for (unsigned i = 0u; i < clang_getNumDiagnosticsInSet(diagnostics); i++)
+		//Log only if there is at least 1 diagnostic entry
+		if (diagnosticsCount > 0)
 		{
-			CXDiagnostic diagnostic(clang_getDiagnosticInSet(diagnostics, i));
+			logger->log("Start diagnostic...", ILogger::ELogSeverity::Info);
 
-			logger->log(Helpers::getString(clang_formatDiagnostic(diagnostic, clang_defaultDiagnosticDisplayOptions())), ILogger::ELogSeverity::Warning);
+			for (unsigned i = 0u; i < diagnosticsCount; i++)
+			{
+				CXDiagnostic diagnostic(clang_getDiagnosticInSet(diagnostics, i));
 
-			clang_disposeDiagnostic(diagnostic);
+				logger->log(Helpers::getString(clang_formatDiagnostic(diagnostic, clang_defaultDiagnosticDisplayOptions())), ILogger::ELogSeverity::Warning);
+
+				clang_disposeDiagnostic(diagnostic);
+			}
+
+			logger->log("End diagnostic...", ILogger::ELogSeverity::Info);
 		}
 
-		logger->log("DIAGNOSTICS END...", ILogger::ELogSeverity::Info);
-
 		clang_disposeDiagnosticSet(diagnostics);
+
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }

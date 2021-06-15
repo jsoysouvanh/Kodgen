@@ -92,11 +92,6 @@ namespace kodgen
 												   CXChildVisitResult&	out_visitResult)	noexcept;
 
 		public:
-			EnumParser()					= default;
-			EnumParser(EnumParser const&)	= default;
-			EnumParser(EnumParser&&)		= default;
-			~EnumParser()					= default;
-
 			/**
 			*	@brief Parse the enum starting at the provided AST cursor.
 			*

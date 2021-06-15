@@ -70,11 +70,6 @@ namespace kodgen
 			inline VariableParsingResult*	getParsingResult()										noexcept;
 
 		public:
-			VariableParser()						= default;
-			VariableParser(VariableParser const&)	= default;
-			VariableParser(VariableParser&&)		= default;
-			~VariableParser()						= default;
-
 			/**
 			*	@brief Parse the variable starting at the provided AST cursor.
 			*
