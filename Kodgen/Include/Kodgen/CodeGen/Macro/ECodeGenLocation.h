@@ -12,22 +12,26 @@ namespace kodgen
 	enum class ECodeGenLocation
 	{
 		/**
-		*	Code will be generated at the very top of the generated file (without macro).
+		*	Code will be generated at the very top of the generated header file (without macro).
+		*	The code is then injected as soon as the generated header file is included in any other file.
 		*/
 		HeaderFileHeader = 0,
 
 		/**
-		*	Code will be inserted in the ClassName_GENERATED macro (also works for structs).
+		*	Code will be inserted in a macro generated for each tagged struct/class.
+		*	The generated macro name is customizable using the MacroCodeGenUnitSettings::setClassFooterMacroPattern method.
 		*/
 		ClassFooter,
 
 		/**
-		*	Code will be inserted in the File_GENERATED macro (at the very end of a file).
+		*	Code will be inserted in a macro to add at the very bottom of parsed header files.
+		*	The generated macro name is customizable using the MacroCodeGenUnitSettings::setHeaderFileFooterMacroPattern method.
 		*/
 		HeaderFileFooter,
 
 		/**
-		*	Code will be inserted at the top of the source file.
+		*	Code will be generated at the very top of the generated source file (without macro).
+		*	The code is then injected as soon as the generated source file is included in any other file.
 		*/
 		SourceFileHeader,
 

@@ -63,14 +63,14 @@ bool initParsingSettings(kodgen::ParsingSettings& parsingSettings)
 	//In reality, the compiler used by the user machine running the generator should be set.
 	//It has nothing to see with the compiler used to compile the generator.
 #if defined(__GNUC__)
-	bool compilerSetSuccessfully = parsingSettings.setCompilerExeName("gcc");
+	return parsingSettings.setCompilerExeName("gcc");
 #elif defined(__clang__)
-	bool compilerSetSuccessfully = parsingSettings.setCompilerExeName("clang");
+	return parsingSettings.setCompilerExeName("clang");
 #elif defined(_MSC_VER)
-	bool compilerSetSuccessfully = parsingSettings.setCompilerExeName("msvc");
+	return parsingSettings.setCompilerExeName("msvc");
+#else
+	return false;	//Unsupported compiler
 #endif
-
-	return compilerSetSuccessfully;
 }
 
 int main(int argc, char** argv)
@@ -107,7 +107,7 @@ int main(int argc, char** argv)
 	fileParser.logger = &logger;
 	fileParser.parsingSettings = &parsingSettings;
 
-	//Setup settings
+	//Setup generation settings
 	kodgen::FileGeneratorSettings		fileGenSettings;
 	kodgen::MacroCodeGenUnitSettings	cguSettings;
 
@@ -121,11 +121,12 @@ int main(int argc, char** argv)
 	GetSetCGM getSetCodeGenModule;
 	codeGenUnit.addModule(getSetCodeGenModule);
 
-	//Setup generation settings
+	//Setup file generator
 	kodgen::FileGenerator fileGenerator;
 	fileGenerator.logger = &logger;
 	fileGenerator.settings = &fileGenSettings;
 
+	//This environment will be copied and used for each code generation unit
 	kodgen::MacroCodeGenEnv env;
 
 	//Kick-off code generation
