@@ -17,7 +17,7 @@ class SetPropertyCodeGen : public kodgen::MacroPropertyCodeGen
 		virtual ~SetPropertyCodeGen() = default;
 
 		virtual bool generateCode(kodgen::EntityInfo const& entity, kodgen::Property const& property, kodgen::uint8 propertyIndex,
-								  kodgen::CodeGenEnv& env, std::string& inout_result) const noexcept override
+								  kodgen::CodeGenEnv& env, std::string& inout_result) noexcept override
 		{
 			std::string errorMessage;
 			
@@ -127,5 +127,10 @@ class SetPropertyCodeGen : public kodgen::MacroPropertyCodeGen
 			inout_result += preTypeQualifiers + "void " + entity.outerEntity->getFullName() + "::" + methodName + " { " + field.name + " = " + paramName + "; }" + env.getSeparator();
 
 			return true;
+		}
+
+		virtual SetPropertyCodeGen* clone() const noexcept override
+		{
+			return new SetPropertyCodeGen(*this);
 		}
 };

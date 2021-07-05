@@ -35,7 +35,7 @@ namespace kodgen
 				"\n"	//SourceFileHeader is not wrapped in a macro, so can use \n without breaking the code
 			};
 
-			/** Temporary string used internally by the MacroCodeGenUnit to avoid memory reallocations for each entity iteration. */
+			/** String used internally by the MacroCodeGenUnit to avoid string memory reallocations for each entity iteration. */
 			std::string																_generatedCodeTmp;
 
 			/** Array containing the generated code per location. */

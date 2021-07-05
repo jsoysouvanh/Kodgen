@@ -7,7 +7,7 @@
 
 using namespace kodgen;
 
-ETraversalBehaviour MacroCodeGenModule::generateCode(EntityInfo const* entity, CodeGenEnv& env, std::string& inout_result) const noexcept
+ETraversalBehaviour MacroCodeGenModule::generateCode(EntityInfo const* entity, CodeGenEnv& env, std::string& inout_result) noexcept
 {
 	MacroCodeGenEnv& macroEnv = static_cast<MacroCodeGenEnv&>(env);
 

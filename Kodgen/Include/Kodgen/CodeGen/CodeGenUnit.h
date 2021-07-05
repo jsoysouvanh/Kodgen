@@ -9,7 +9,7 @@
 
 #include <memory>		//std::shared_ptr
 #include <vector>
-#include <type_traits>	//std::is_base_of_v, std::is_copy_constructible_v
+//#include <type_traits>	//std::is_base_of_v, std::is_copy_constructible_v
 
 #include "Kodgen/Parsing/ParsingResults/FileParsingResult.h"
 #include "Kodgen/CodeGen/ETraversalBehaviour.h"
@@ -23,11 +23,17 @@
 
 namespace kodgen
 {
+	//TODO: Standalone PropertyCodeGen list
 	class CodeGenUnit
 	{
 		private:
 			/** Collection of all registered generation modules. */
-			std::shared_ptr<std::vector<CodeGenModule const*>>	_generationModules;
+			std::shared_ptr<std::vector<CodeGenModule*>>	_generationModules;
+
+			/** Keep track of either this CodeGenUnit instance was constructed from the copy constructor
+			*	or the copy assignement operator.
+			*/
+			bool											_isCopy	= false;
 
 			/**
 			*	@brief Create the generationModules shared pointer if it is empty.
@@ -36,9 +42,15 @@ namespace kodgen
 			*/
 			bool initializeGenerationModulesIfNecessary()	noexcept;
 
+			/**
+			*	@brief	Delete all the registered generation modules. If they have been dynamically instantiated,
+			*			memory is released correctly.
+			*/
+			void clearGenerationModules()					noexcept;
+
 		protected:
 			/** Settings used for code generation. */
-			CodeGenUnitSettings const*	settings	= nullptr;
+			CodeGenUnitSettings const*	settings = nullptr;
 
 			/**
 			*	@brief	Execute the codeGenModule->generateCode method with the given entity and environment.
@@ -52,9 +64,25 @@ namespace kodgen
 			*	@return An EIterationResult instructing how the entity traversal should continue (see the EIterationResult documentation for more info).
 			*			The result of the codeGenModule->generateCode() call can be forwarded in most cases to let the module control the flow of the traversal.
 			*/
-			virtual ETraversalBehaviour	runCodeGenModuleOnEntity(CodeGenModule const&	codeGenModule,
-																 EntityInfo const&		entity,
-																 CodeGenEnv&			env)							noexcept	= 0;
+			virtual ETraversalBehaviour	runCodeGenModuleOnEntity(CodeGenModule&		codeGenModule,
+																 EntityInfo const&	entity,
+																 CodeGenEnv&		env)										noexcept	= 0;
+
+			/**
+			*	@brief	This default implementation defines the underlying generation flow.
+			*			It calls preGenerateCode, foreachModuleEntityPair, and postGenerateCode in that order.
+			*			If any of the previously mentioned method returns false, the generation aborts (next methods
+			*			will not be called).
+			*
+			*			ex: If preGenerateCode returns false, both foreachModuleEntityPair and postGenerateCode calls will be skipped.
+			*			
+			*	@param parsingResult	Result of a file parsing used to generate code.
+			*	@param env				Generation environment structure.
+			* 
+			*	@return true if preGenerateCode, foreachModuleEntityPair and postGenerateCode calls have succeeded, else false.
+			*/
+			bool						generateCodeInternal(FileParsingResult const&	parsingResult,
+															 CodeGenEnv&				env)									noexcept;
 
 			/**
 			*	@brief	Called just before FileGenerationUnit::generateCodeInternal.
@@ -68,7 +96,7 @@ namespace kodgen
 			*	@return true if the method completed successfully, else false.
 			*/
 			virtual bool				preGenerateCode(FileParsingResult const&	parsingResult,
-														CodeGenEnv&					env)								noexcept;
+														CodeGenEnv&					env)										noexcept;
 
 			/**
 			*	@brief	Called just after FileGenerationUnit::generateCodeInternal.
@@ -76,13 +104,11 @@ namespace kodgen
 			*			If the unit needs to write the generated code in files, this is typically here
 			*			that files are created and written to.
 			*
-			*	@param parsingResult	Result of a file parsing used to generate code.
-			*	@param env				Generation environment structure after the preGenerateCode and generateCodeInternal have run.
+			*	@param env Generation environment structure after the preGenerateCode and generateCodeInternal have run.
 			* 
 			*	@return true if the method completed successfully, else false.
 			*/
-			virtual bool				postGenerateCode(FileParsingResult const&	parsingResult,
-														 CodeGenEnv&				env)								noexcept;
+			virtual bool				postGenerateCode(CodeGenEnv&	env)													noexcept;
 
 			/**
 			*	@brief Iterate and execute recursively a visitor function on each parsed entity/registered module pair.
@@ -94,11 +120,11 @@ namespace kodgen
 			*			ETraversalBehaviour::AbortWithSuccess if the traversal was aborted prematurely without error.
 			*			ETraversalBehaviour::AbortWithFailure if the traversal was aborted prematurely with an error.
 			*/
-			ETraversalBehaviour			foreachEntity(ETraversalBehaviour	(*visitor)(CodeGenModule const&,
-																					   EntityInfo const&,
-																					   CodeGenUnit&,
-																					   CodeGenEnv&),
-													  CodeGenEnv&			env)										noexcept;
+			ETraversalBehaviour			foreachModuleEntityPair(ETraversalBehaviour	(*visitor)(CodeGenModule&,
+																							   EntityInfo const&,
+																							   CodeGenUnit&,
+																							   CodeGenEnv&),
+																CodeGenEnv&			env)										noexcept;
 
 			/**
 			*	@brief	Iterate and execute recursively a visitor function on a namespace and
@@ -112,12 +138,12 @@ namespace kodgen
 			*			ETraversalBehaviour::AbortWithSuccess if the traversal was aborted prematurely without error.
 			*			ETraversalBehaviour::AbortWithFailure if the traversal was aborted prematurely with an error.
 			*/
-			ETraversalBehaviour			foreachEntityInNamespace(NamespaceInfo const&	namespace_,
-																 ETraversalBehaviour	(*visitor)(CodeGenModule const&,
-																								   EntityInfo const&,
-																								   CodeGenUnit&,
-																								   CodeGenEnv&),
-																 CodeGenEnv&			env)							noexcept;
+			ETraversalBehaviour			foreachModuleEntityPairInNamespace(NamespaceInfo const&	namespace_,
+																		   ETraversalBehaviour	(*visitor)(CodeGenModule&,
+																										   EntityInfo const&,
+																										   CodeGenUnit&,
+																										   CodeGenEnv&),
+																		   CodeGenEnv&			env)							noexcept;
 
 			/**
 			*	@brief	Iterate and execute recursively a visitor function on a struct or class and
@@ -131,12 +157,12 @@ namespace kodgen
 			*			ETraversalBehaviour::AbortWithSuccess if the traversal was aborted prematurely without error.
 			*			ETraversalBehaviour::AbortWithFailure if the traversal was aborted prematurely with an error.
 			*/
-			ETraversalBehaviour			foreachEntityInStruct(StructClassInfo const&	struct_,
-															  ETraversalBehaviour		(*visitor)(CodeGenModule const&,
-																								   EntityInfo const&,
-																								   CodeGenUnit&,
-																								   CodeGenEnv&),
-															  CodeGenEnv&				env)							noexcept;
+			ETraversalBehaviour			foreachModuleEntityPairInStruct(StructClassInfo const&	struct_,
+																		ETraversalBehaviour		(*visitor)(CodeGenModule&,
+																										   EntityInfo const&,
+																										   CodeGenUnit&,
+																										   CodeGenEnv&),
+																		CodeGenEnv&				env)							noexcept;
 
 			/**
 			*	@brief Iterate and execute recursively a visitor function on an enum and all its nested entities.
@@ -149,12 +175,12 @@ namespace kodgen
 			*			ETraversalBehaviour::AbortWithSuccess if the traversal was aborted prematurely without error.
 			*			ETraversalBehaviour::AbortWithFailure if the traversal was aborted prematurely with an error.
 			*/
-			ETraversalBehaviour			foreachEntityInEnum(EnumInfo const&		enum_,
-															ETraversalBehaviour	(*visitor)(CodeGenModule const&,
-																						   EntityInfo const&,
-																						   CodeGenUnit&,
-																						   CodeGenEnv&),
-															CodeGenEnv&			env)									noexcept;
+			ETraversalBehaviour			foreachModuleEntityPairInEnum(EnumInfo const&		enum_,
+																	  ETraversalBehaviour	(*visitor)(CodeGenModule&,
+																									   EntityInfo const&,
+																									   CodeGenUnit&,
+																									   CodeGenEnv&),
+																	  CodeGenEnv&			env)								noexcept;
 
 			/**
 			*	@brief Check if file last write time is newer than reference file last write time.
@@ -166,26 +192,16 @@ namespace kodgen
 			*	@return true if file last write time is newer than referenceFile's, else false.
 			*/
 			bool						isFileNewerThan(fs::path const& file,
-														fs::path const& referenceFile)							const	noexcept;
+														fs::path const& referenceFile)									const	noexcept;
 
 		public:
 			/** Logger used to issue logs from this CodeGenUnit. */
 			ILogger*	logger	= nullptr;
 
-			virtual ~CodeGenUnit() = default;
-
-			/**
-			*	@brief	Generate code based on the provided parsing result.
-			*			If any of preGenerateCode, generateCodeInternal or postGenerateCode returns false,
-			*			the code generation is aborted for this generation unit and false is returned.
-			*
-			*	@param parsingResult	Result of a file parsing used to generate the new file.
-			*	@param env				Generation environment.
-			* 
-			*	@return false if the generation process was aborted prematurely because of any error, else true.
-			*/
-			bool						generateCode(FileParsingResult const&	parsingResult,
-													 CodeGenEnv&				env)			noexcept;
+			CodeGenUnit()					= default;
+			CodeGenUnit(CodeGenUnit const&)	noexcept;
+			CodeGenUnit(CodeGenUnit&&)		= default;
+			virtual ~CodeGenUnit()			noexcept;
 
 			/**
 			*	@brief Check whether the generated code for a given source file is up-to-date or not.
@@ -195,6 +211,15 @@ namespace kodgen
 			*	@return true if the code generated for sourceFile is up-to-date, else false.
 			*/
 			virtual bool				isUpToDate(fs::path const& sourceFile)			const	noexcept = 0;
+
+			/**
+			*	@brief Create a CodeGenEnv object (or derivate) and forward it to generateCodeInternal.
+			*
+			*	@param parsingResult Result of a file parsing used to generate the new file.
+			* 
+			*	@return false if the generation process was aborted prematurely because of any error, else true.
+			*/
+			virtual bool				generateCode(FileParsingResult const& parsingResult)	noexcept;
 
 			/**
 			*	@brief	Check whether all settings are setup correctly for this unit to work.
@@ -211,7 +236,7 @@ namespace kodgen
 			* 
 			*	@param generationModule The generation module to add.
 			*/
-			void						addModule(CodeGenModule const& generationModule)		noexcept;
+			void						addModule(CodeGenModule& generationModule)				noexcept;
 
 			/**
 			*	@brief Remove a module from the internal list of generation modules.
@@ -228,5 +253,8 @@ namespace kodgen
 			*	@return settings.
 			*/
 			CodeGenUnitSettings const*	getSettings()									const	noexcept;
+
+			CodeGenUnit&	operator=(CodeGenUnit const&)	noexcept;
+			CodeGenUnit&	operator=(CodeGenUnit&&)		= default;
 	};
 }

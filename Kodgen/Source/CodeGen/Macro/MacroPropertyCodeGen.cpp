@@ -4,7 +4,7 @@
 
 using namespace kodgen;
 
-bool MacroPropertyCodeGen::generateCode(EntityInfo const& entity, Property const& property, uint8 propertyIndex, CodeGenEnv& env, std::string& inout_result) const noexcept
+bool MacroPropertyCodeGen::generateCode(EntityInfo const& entity, Property const& property, uint8 propertyIndex, CodeGenEnv& env, std::string& inout_result) noexcept
 {
 	MacroCodeGenEnv& macroData = static_cast<MacroCodeGenEnv&>(env);
 
@@ -35,16 +35,6 @@ bool MacroPropertyCodeGen::generateCode(EntityInfo const& entity, Property const
 	//Should never reach this point as all cases should be handled by the previous switch statement
 	assert(false);
 	return false;
-}
-
-bool MacroPropertyCodeGen::initialize(CodeGenEnv& env) const noexcept
-{
-#ifdef RTTI_ENABLED
-	return dynamic_cast<MacroCodeGenEnv*>(&env) != nullptr;
-#else
-	//Can't check dynamic type without RTTI, so return true by default (unsafe since it bypasses all security checks).
-	return true;
-#endif
 }
 
 bool MacroPropertyCodeGen::generateHeaderFileHeaderCode(EntityInfo const& /* entity */, Property const& /* property */, uint8 /* propertyIndex */,

@@ -11,12 +11,13 @@
 
 #include "Kodgen/Config.h"
 #include "Kodgen/Misc/FundamentalTypes.h"
+#include "Kodgen/Misc/ICloneable.h"
 #include "Kodgen/CodeGen/CodeGenEnv.h"
 #include "Kodgen/InfoStructures/EntityInfo.h"
 
 namespace kodgen
 {
-	class PropertyCodeGen
+	class PropertyCodeGen : public ICloneable
 	{
 		protected:
 			/**
@@ -27,23 +28,10 @@ namespace kodgen
 			* 
 			*	@return true if at least one entity type is common to the 2 provided masks, else false.
 			*/
-			static inline bool entityTypeOverlap(EEntityType lhs, EEntityType rhs) noexcept;
+			static inline bool entityTypeOverlap(EEntityType lhs, EEntityType rhs)	noexcept;
 
 		public:
 			virtual ~PropertyCodeGen() = default;
-
-			/**
-			*	@brief	Initialize the property code gen and the provided environment. This method must make sure that the provided
-			*			environment is valid to generate code with (i.e. that the environment inherits from all necessary class(es)
-			*			for this property to work properly).
-			*			If the property doesn't require any specific environment, can return true right away.
-			*			The method is called by CodeGenModule::initialize before any call to PropertyCodeGen::generateCode.
-			*
-			*	@param env Generation environment.
-			* 
-			*	@return true if the environment is valid and initialization completed successfully, else false.
-			*/
-			virtual bool	initialize(CodeGenEnv& env)								const	noexcept = 0;
 
 			/**
 			*	@brief Generate code for a given entity.
@@ -60,7 +48,7 @@ namespace kodgen
 										 Property const&	property,
 										 uint8				propertyIndex,
 										 CodeGenEnv&		env,
-										 std::string&		inout_result)			const	noexcept = 0;
+										 std::string&		inout_result)					noexcept = 0;
 
 			/**
 			*	@brief Check if this property should generate code for the provided entity/property pair.
@@ -74,6 +62,17 @@ namespace kodgen
 			virtual bool	shouldGenerateCode(EntityInfo const&	entity,
 											   Property const&		property,
 											   uint8				propertyIndex)	const	noexcept = 0;
+
+			/**
+			*	@brief	Initialize the property code gen with the provided environment.
+			*			The method is called by CodeGenModule::initialize before any call to PropertyCodeGen::generateCode.
+			*			This default implementation does nothing and returns true by default.
+			*
+			*	@param env Generation environment.
+			* 
+			*	@return true if the initialization completed successfully, else false.
+			*/
+			virtual bool	initialize(CodeGenEnv& env)										noexcept;
 	};
 
 	#include "Kodgen/CodeGen/PropertyCodeGen.inl"

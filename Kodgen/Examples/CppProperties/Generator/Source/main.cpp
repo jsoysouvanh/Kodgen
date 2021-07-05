@@ -93,7 +93,10 @@ int main(int argc, char** argv)
 
 	logger.log("Working Directory: " + workingDirectory.string());
 
-	//Setup parsing settings
+	//Setup FileParser
+	kodgen::FileParser fileParser;
+	fileParser.logger = &logger;
+
 	kodgen::ParsingSettings parsingSettings;
 
 	if (!initParsingSettings(parsingSettings))
@@ -102,9 +105,6 @@ int main(int argc, char** argv)
 		return EXIT_FAILURE;
 	}
 
-	//Setup FileParser
-	kodgen::FileParser fileParser;
-	fileParser.logger = &logger;
 	fileParser.parsingSettings = &parsingSettings;
 
 	//Setup generation settings
@@ -126,15 +126,12 @@ int main(int argc, char** argv)
 	fileGenerator.logger = &logger;
 	fileGenerator.settings = &fileGenSettings;
 
-	//This environment will be copied and used for each code generation unit
-	kodgen::MacroCodeGenEnv env;
-
 	//Kick-off code generation
-	kodgen::FileGenerationResult genResult = fileGenerator.generateFiles(fileParser, codeGenUnit, env, true);
+	kodgen::FileGenerationResult genResult = fileGenerator.generateFiles(fileParser, codeGenUnit, true);
 
 	if (genResult.completed)
 	{
-		logger.log("Generation completed successfully.");
+		logger.log("Generation completed successfully in " + std::to_string(genResult.duration) + " seconds.");
 	}
 	else
 	{

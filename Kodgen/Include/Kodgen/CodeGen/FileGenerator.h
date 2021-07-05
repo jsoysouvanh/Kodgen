@@ -37,10 +37,9 @@ namespace kodgen
 			*	@param out_genResult	Reference to the generation result to fill during file generation.
 			*	@param threadCount		Number of additional threads to use to process the files.
 			*/
-			template <typename FileParserType, typename CodeGenUnitType, typename CodeGenEnvType>
+			template <typename FileParserType, typename CodeGenUnitType>
 			void	processFilesMultithread(FileParserType&				fileParser,
 											CodeGenUnitType&			codeGenUnit,
-											CodeGenEnvType&				env,
 											std::set<fs::path> const&	toProcessFiles,
 											FileGenerationResult&		out_genResult,
 											uint32						threadCount)					const	noexcept;
@@ -53,10 +52,9 @@ namespace kodgen
 			*	@param toProcessFiles	Collection of all files to process.
 			*	@param out_genResult	Reference to the generation result to fill during file generation.
 			*/
-			template <typename FileParserType, typename CodeGenUnitType, typename CodeGenEnvType>
+			template <typename FileParserType, typename CodeGenUnitType>
 			void	processFilesMonothread(FileParserType&				fileParser,
 										   CodeGenUnitType&				codeGenUnit,
-										   CodeGenEnvType&				env,
 										   std::set<fs::path> const&	toProcessFiles,
 										   FileGenerationResult&		out_genResult)					const	noexcept;
 
@@ -117,7 +115,6 @@ namespace kodgen
 			*
 			*	@param fileParser			Original file parser to use to parse registered files. A copy of this parser will be used for each generation thread.
 			*	@param codeGenUnit			Generation unit used to generate code. It must have a clean state when this method is called.
-			*	@param env					Generation environment.
 			*	@param forceRegenerateAll	Ignore the last write time check and reparse / regenerate all files.
 			*	@param threadCount			Number of threads to use for file parsing and generation.
 			*								If 0 is provided, the number of concurrent threads supported by the implementation will be used (std::thread::hardware_concurrency(), and 8 if std::thread::hardware_concurrency() returns 0).
@@ -125,10 +122,9 @@ namespace kodgen
 			*
 			*	@return Structure containing file generation report.
 			*/
-			template <typename FileParserType, typename CodeGenUnitType, typename CodeGenEnvType>
+			template <typename FileParserType, typename CodeGenUnitType>
 			FileGenerationResult generateFiles(FileParserType&	fileParser,
 											   CodeGenUnitType&	codeGenUnit,
-											   CodeGenEnvType&	env,
 											   bool				forceRegenerateAll	= false,
 											   uint32			threadCount			= 0)	noexcept;
 	};

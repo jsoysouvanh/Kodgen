@@ -23,10 +23,10 @@ namespace kodgen
 
 		private:
 			/** Whole parsing result. */
-			FileParsingResult const*	_parsingResult	= nullptr;
+			FileParsingResult const*	_fileParsingResult	= nullptr;
 
 			/** Logger used to log during the code generation process. Can be nullptr. */
-			ILogger*					_logger			= nullptr;
+			ILogger*					_logger				= nullptr;
 		
 		public:
 			virtual ~CodeGenEnv() = default;
@@ -36,14 +36,14 @@ namespace kodgen
 			* 
 			*	@return _parsingResult.
 			*/
-			inline FileParsingResult const*	getParsingResult()	const noexcept;
+			inline FileParsingResult const*	getFileParsingResult()	const noexcept;
 
 			/**
 			*	@brief Getter for the _logger field.
 			* 
 			*	@return _logger.
 			*/
-			inline ILogger*					getLogger()			const noexcept;
+			inline ILogger*					getLogger()				const noexcept;
 	};
 
 	#include "Kodgen/CodeGen/CodeGenEnv.inl"

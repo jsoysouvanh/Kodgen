@@ -28,23 +28,11 @@ namespace kodgen
 			*	@return An EIterationBehaviour instructing how the entity traversal should continue (see the EIterationResult documentation for more info).
 			*			The result of the codeGenModule->generateCode() call can be forwarded in most cases to let the module control the flow of the traversal.
 			*/
-			ETraversalBehaviour	generateEntityClassFooterCode(CodeGenModule const&	codeGenModule,
-															  EntityInfo const&		entity,
-															  MacroCodeGenEnv&		env)				noexcept;
+			ETraversalBehaviour	generateEntityClassFooterCode(CodeGenModule&	codeGenModule,
+															  EntityInfo const&	entity,
+															  MacroCodeGenEnv&	env)			noexcept;
 
 		protected:
-			/**
-			*	@brief	Check that the env object is castable to MacroCodeGenEnv,
-			*			and is also valid for each registered module, then setup the environment.
-			* 
-			*	@param parsingResult	Result of a file parsing used to generate code.
-			*	@param env				Generation environment structure.
-			* 
-			*	@return true if the method completed successfully, else false.
-			*/
-			virtual bool				preGenerateCode(FileParsingResult const&	parsingResult,
-														CodeGenEnv&					env)					noexcept	override;
-
 			/**
 			*	@brief	Execute the codeGenModule->generateCode method 4 times with the given entity and environment, by
 			*			updating the environment between each call (MacroCodeGenEnv::codeGenLocation and
@@ -57,38 +45,32 @@ namespace kodgen
 			*	@return An EIterationBehaviour instructing how the entity traversal should continue (see the EIterationResult documentation for more info).
 			*			The result of the codeGenModule->generateCode() call can be forwarded in most cases to let the module control the flow of the traversal.
 			*/
-			virtual ETraversalBehaviour	runCodeGenModuleOnEntity(CodeGenModule const&	codeGenModule,
-																 EntityInfo const&		entity,
-																 CodeGenEnv&			env)				noexcept	override;
+			virtual ETraversalBehaviour	runCodeGenModuleOnEntity(CodeGenModule&		codeGenModule,
+																 EntityInfo const&	entity,
+																 CodeGenEnv&		env)					noexcept	override;
 
 			/**
 			*	@brief	Create/update the header and source files and fill them with the generated code.
 			* 
-			*	@param parsingResult	Result of a file parsing used to generate code.
 			*	@param env				Generation environment structure.
 			* 
 			*	@return true if the method completed successfully, else false.
 			*/
-			virtual bool				postGenerateCode(FileParsingResult const&	parsingResult,
-														 CodeGenEnv&				env)					noexcept	override;
+			virtual bool				postGenerateCode(CodeGenEnv& env)									noexcept	override;
 
 			/**
 			*	@brief	(Re)generate the header file.
 			* 
-			*	@param parsingResult	Result of the parsing process.
-			*	@param env				Generation environment.
+			*	@param env Generation environment.
 			*/
-			void						generateHeaderFile(FileParsingResult const& parsingResult,
-														   MacroCodeGenEnv&			env)			const	noexcept;
+			void						generateHeaderFile(MacroCodeGenEnv&	env)					const	noexcept;
 
 			/**
 			*	@brief	(Re)generate the source file.
 			* 
-			*	@param parsingResult	Result of the parsing process.
-			*	@param env				Generation environment.
+			*	@param env Generation environment.
 			*/
-			void						generateSourceFile(FileParsingResult const& parsingResult,
-														   MacroCodeGenEnv&			env)			const	noexcept;
+			void						generateSourceFile(MacroCodeGenEnv&	env)					const	noexcept;
 
 			/**
 			*	@brief Compute the path of the header file generated from the provided source file.
@@ -120,6 +102,15 @@ namespace kodgen
 			*	@return true if the code generated for sourceFile is up-to-date, else false.
 			*/
 			virtual bool	isUpToDate(fs::path const& sourceFile)				const	noexcept	override;
+
+			/**
+			*	@brief Create a MacroCodeGenEnv object and forward it to generateCodeInternal.
+			*
+			*	@param parsingResult Result of a file parsing used to generate the new file.
+			* 
+			*	@return false if the generation process was aborted prematurely because of any error, else true.
+			*/
+			virtual bool	generateCode(FileParsingResult const&	parsingResult)		noexcept	override;
 
 			/**
 			*	@brief Setter for the inherited settings field with suitable derived settings class.

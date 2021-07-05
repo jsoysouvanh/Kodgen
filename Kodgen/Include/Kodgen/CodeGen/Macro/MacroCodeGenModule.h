@@ -105,6 +105,8 @@ namespace kodgen
 														 CodeGenEnv&		env)						const	noexcept;
 
 		public:
+			virtual ~MacroCodeGenModule() = default;
+
 			/**
 			*	@brief Generate code using the provided environment as input.
 			* 
@@ -116,6 +118,6 @@ namespace kodgen
 			*/
 			virtual ETraversalBehaviour	generateCode(EntityInfo const*	entity,
 													 CodeGenEnv&		env,
-													 std::string&		inout_result)	const noexcept override final;
+													 std::string&		inout_result)	noexcept override final;
 	};
 }
