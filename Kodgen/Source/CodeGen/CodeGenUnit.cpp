@@ -14,7 +14,8 @@ using namespace kodgen;
 
 CodeGenUnit::CodeGenUnit(CodeGenUnit const& other) noexcept:
 	_isCopy{true},
-	settings{other.settings}
+	settings{other.settings},
+	logger{other.logger}
 {
 	//Replace each module by a new clone of themself so that
 	//each CodeGenUnit instance owns their own modules
@@ -441,6 +442,7 @@ CodeGenUnit& CodeGenUnit::operator=(CodeGenUnit const& other) noexcept
 {
 	initializeGenerationModulesIfNecessary();
 	settings = other.settings;
+	logger = other.logger;
 
 	//Correctly release memory if the instance is already a copy
 	if (_isCopy)

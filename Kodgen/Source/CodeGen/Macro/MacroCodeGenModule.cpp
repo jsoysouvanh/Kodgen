@@ -1,11 +1,35 @@
 #include "Kodgen/CodeGen/Macro/MacroCodeGenModule.h"
 
+#include "Kodgen/Config.h"
 #include "Kodgen/InfoStructures/EntityInfo.h"
 #include "Kodgen/CodeGen/Macro/MacroCodeGenEnv.h"
-
 #include "Kodgen/CodeGen/CodeGenHelpers.h"
 
 using namespace kodgen;
+
+bool MacroCodeGenModule::initialize(CodeGenEnv& env) noexcept
+{
+	if (CodeGenModule::initialize(env))
+	{
+		//Check that the provided environment is castable to MacroCodeGenEnv
+#ifdef RTTI_ENABLED
+		if (dynamic_cast<MacroCodeGenEnv*>(&env) == nullptr)
+		{
+			env.getLogger()->log("MacroCodeGenModule can't be used with non MacroCodeGenEnv environments.", ILogger::ELogSeverity::Error);
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+#else
+		//Can't perform the cast check
+		return true;
+#endif
+	}
+
+	return false;
+}
 
 ETraversalBehaviour MacroCodeGenModule::generateCode(EntityInfo const* entity, CodeGenEnv& env, std::string& inout_result) noexcept
 {
