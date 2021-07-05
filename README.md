@@ -1,12 +1,15 @@
 # Kodgen
 
 [![Latest Release](https://badge.fury.io/gh/jsoysouvanh%2FKodgen.svg)](https://github.com/jsoysouvanh/Kodgen/releases/latest)
-[![Build Status](https://travis-ci.com/jsoysouvanh/Kodgen.svg?branch=master)](https://travis-ci.com/jsoysouvanh/Kodgen)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/0de06d87df194f568e6f4c0f97c00fa8)](https://www.codacy.com/manual/jsoysouvanh/Kodgen?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jsoysouvanh/Kodgen&amp;utm_campaign=Badge_Grade)
+[![Windows Build & Tests](https://github.com/jsoysouvanh/Kodgen/actions/workflows/run_tests_windows.yml/badge.svg?branch=master)](https://github.com/jsoysouvanh/Kodgen/actions/workflows/run_tests_windows.yml)
+[![Linux Build & Tests](https://github.com/jsoysouvanh/Kodgen/actions/workflows/run_tests_linux.yml/badge.svg)](https://github.com/jsoysouvanh/Kodgen/actions/workflows/run_tests_linux.yml)
+[![MacOS Build & Tests](https://github.com/jsoysouvanh/Kodgen/actions/workflows/run_tests_macos.yml/badge.svg)](https://github.com/jsoysouvanh/Kodgen/actions/workflows/run_tests_macos.yml)
 
 Kodgen is a C++17 library based on libclang. It provides tools to parse C++ source files, extract data from it, and generate files from the parsed data. The C++ entities parsed in the current implementation are namespaces, structs/classes, non-member and member variables, non-member and member functions, enums and enum values.
 
 Snippets in this README contain a lot of customizable keywords. All of them will be annotated with a # followed by a number, so that you can find easily which setting to update to change them at the [end of this document](#referenced-settings).
+
+
 
 Usage:
 ```cpp
