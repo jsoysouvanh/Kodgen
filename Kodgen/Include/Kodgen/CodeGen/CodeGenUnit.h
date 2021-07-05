@@ -7,9 +7,8 @@
 
 #pragma once
 
-#include <memory>		//std::shared_ptr
+#include <memory>	//std::shared_ptr
 #include <vector>
-//#include <type_traits>	//std::is_base_of_v, std::is_copy_constructible_v
 
 #include "Kodgen/Parsing/ParsingResults/FileParsingResult.h"
 #include "Kodgen/CodeGen/ETraversalBehaviour.h"
