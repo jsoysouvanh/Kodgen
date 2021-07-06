@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include <memory>	//std::shared_ptr
 #include <vector>
 
 #include "Kodgen/Parsing/ParsingResults/FileParsingResult.h"
@@ -27,19 +26,12 @@ namespace kodgen
 	{
 		private:
 			/** Collection of all registered generation modules. */
-			std::shared_ptr<std::vector<CodeGenModule*>>	_generationModules;
+			std::vector<CodeGenModule*>	_generationModules;
 
 			/** Keep track of either this CodeGenUnit instance was constructed from the copy constructor
 			*	or the copy assignement operator.
 			*/
-			bool											_isCopy	= false;
-
-			/**
-			*	@brief Create the generationModules shared pointer if it is empty.
-			* 
-			*	@return true if the generation modules has been initialized by the call, else false.
-			*/
-			bool initializeGenerationModulesIfNecessary()	noexcept;
+			bool						_isCopy	= false;
 
 			/**
 			*	@brief	Delete all the registered generation modules. If they have been dynamically instantiated,

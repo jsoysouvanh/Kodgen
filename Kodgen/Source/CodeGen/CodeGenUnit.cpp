@@ -19,12 +19,9 @@ CodeGenUnit::CodeGenUnit(CodeGenUnit const& other) noexcept:
 {
 	//Replace each module by a new clone of themself so that
 	//each CodeGenUnit instance owns their own modules
-	if (other._generationModules.get() != nullptr)
+	for (int i = 0; i < other._generationModules.size(); i++)
 	{
-		for (int i = 0; i < other._generationModules->size(); i++)
-		{
-			addModule(*static_cast<CodeGenModule*>((*other._generationModules)[i]->clone()));
-		}
+		addModule(*static_cast<CodeGenModule*>(other._generationModules[i]->clone()));
 	}
 }
 
@@ -130,15 +127,12 @@ bool CodeGenUnit::preGenerateCode(FileParsingResult const& parsingResult, CodeGe
 	env._fileParsingResult	= &parsingResult;
 	env._logger				= logger;
 
-	if (_generationModules.get() != nullptr)
+	//Initialize each module
+	for (CodeGenModule* codeGenModule : _generationModules)
 	{
-		//Initialize each module
-		for (CodeGenModule* codeGenModule : *_generationModules)
+		if (!codeGenModule->initialize(env))
 		{
-			if (!codeGenModule->initialize(env))
-			{
-				return false;
-			}
+			return false;
 		}
 	}
 
@@ -158,52 +152,49 @@ ETraversalBehaviour CodeGenUnit::foreachModuleEntityPair(ETraversalBehaviour (*v
 
 	ETraversalBehaviour result;
 
-	if (_generationModules.get() != nullptr)
+	//Call visitor on all possible generation module/entity pair
+	for (CodeGenModule* codeGenModule : _generationModules)
 	{
-		//Call visitor on all possible generation module/entity pair
-		for (CodeGenModule* codeGenModule : *_generationModules)
+		for (NamespaceInfo const& namespace_ : env.getFileParsingResult()->namespaces)
 		{
-			for (NamespaceInfo const& namespace_ : env.getFileParsingResult()->namespaces)
-			{
-				result = foreachModuleEntityPairInNamespace(namespace_, visitor, env);
+			result = foreachModuleEntityPairInNamespace(namespace_, visitor, env);
 
-				HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
-			}
+			HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
+		}
 
-			for (StructClassInfo const& struct_ : env.getFileParsingResult()->structs)
-			{
-				result = foreachModuleEntityPairInStruct(struct_, visitor, env);
+		for (StructClassInfo const& struct_ : env.getFileParsingResult()->structs)
+		{
+			result = foreachModuleEntityPairInStruct(struct_, visitor, env);
 
-				HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
-			}
+			HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
+		}
 
-			for (StructClassInfo const& class_ : env.getFileParsingResult()->classes)
-			{
-				result = foreachModuleEntityPairInStruct(class_, visitor, env);
+		for (StructClassInfo const& class_ : env.getFileParsingResult()->classes)
+		{
+			result = foreachModuleEntityPairInStruct(class_, visitor, env);
 
-				HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
-			}
+			HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
+		}
 
-			for (EnumInfo const& enum_ : env.getFileParsingResult()->enums)
-			{
-				result = foreachModuleEntityPairInEnum(enum_, visitor, env);
+		for (EnumInfo const& enum_ : env.getFileParsingResult()->enums)
+		{
+			result = foreachModuleEntityPairInEnum(enum_, visitor, env);
 
-				HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
-			}
+			HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
+		}
 
-			for (VariableInfo const& variable : env.getFileParsingResult()->variables)
-			{
-				result = visitor(*codeGenModule, variable, *this, env);
+		for (VariableInfo const& variable : env.getFileParsingResult()->variables)
+		{
+			result = visitor(*codeGenModule, variable, *this, env);
 
-				HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
-			}
+			HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
+		}
 
-			for (FunctionInfo const& function : env.getFileParsingResult()->functions)
-			{
-				result = visitor(*codeGenModule, function, *this, env);
+		for (FunctionInfo const& function : env.getFileParsingResult()->functions)
+		{
+			result = visitor(*codeGenModule, function, *this, env);
 
-				HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
-			}
+			HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
 		}
 	}
 
@@ -216,61 +207,58 @@ ETraversalBehaviour CodeGenUnit::foreachModuleEntityPairInNamespace(NamespaceInf
 {
 	assert(visitor != nullptr);
 	
-	if (_generationModules.get() != nullptr)
+	//Iterate over all generation modules
+	for (CodeGenModule* codeGenModule : _generationModules)
 	{
-		//Iterate over all generation modules
-		for (CodeGenModule* codeGenModule : *_generationModules)
+		//Execute the visitor function on the current namespace
+		ETraversalBehaviour result = visitor(*codeGenModule, namespace_, *this, env);
+
+		if (result != ETraversalBehaviour::Recurse)
 		{
-			//Execute the visitor function on the current namespace
-			ETraversalBehaviour result = visitor(*codeGenModule, namespace_, *this, env);
+			return result;
+		}
 
-			if (result != ETraversalBehaviour::Recurse)
-			{
-				return result;
-			}
+		//Iterate and execute the provided visitor function recursively on all nested entities
+		for (NamespaceInfo const& nestedNamespace : namespace_.namespaces)
+		{
+			result = foreachModuleEntityPairInNamespace(nestedNamespace, visitor, env);
 
-			//Iterate and execute the provided visitor function recursively on all nested entities
-			for (NamespaceInfo const& nestedNamespace : namespace_.namespaces)
-			{
-				result = foreachModuleEntityPairInNamespace(nestedNamespace, visitor, env);
+			HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
+		}
 
-				HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
-			}
+		for (StructClassInfo const& struct_ : namespace_.structs)
+		{
+			result = foreachModuleEntityPairInStruct(struct_, visitor, env);
 
-			for (StructClassInfo const& struct_ : namespace_.structs)
-			{
-				result = foreachModuleEntityPairInStruct(struct_, visitor, env);
+			HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
+		}
 
-				HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
-			}
+		for (StructClassInfo const& class_ : namespace_.classes)
+		{
+			result = foreachModuleEntityPairInStruct(class_, visitor, env);
 
-			for (StructClassInfo const& class_ : namespace_.classes)
-			{
-				result = foreachModuleEntityPairInStruct(class_, visitor, env);
+			HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
+		}
 
-				HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
-			}
+		for (EnumInfo const& enum_ : namespace_.enums)
+		{
+			result = foreachModuleEntityPairInEnum(enum_, visitor, env);
 
-			for (EnumInfo const& enum_ : namespace_.enums)
-			{
-				result = foreachModuleEntityPairInEnum(enum_, visitor, env);
+			HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
+		}
 
-				HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
-			}
+		for (VariableInfo const& variable : namespace_.variables)
+		{
+			result = visitor(*codeGenModule, variable, *this, env);
 
-			for (VariableInfo const& variable : namespace_.variables)
-			{
-				result = visitor(*codeGenModule, variable, *this, env);
+			HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
+		}
 
-				HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
-			}
+		for (FunctionInfo const& function : namespace_.functions)
+		{
+			result = visitor(*codeGenModule, function, *this, env);
 
-			for (FunctionInfo const& function : namespace_.functions)
-			{
-				result = visitor(*codeGenModule, function, *this, env);
-
-				HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
-			}
+			HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
 		}
 	}
 
@@ -283,54 +271,51 @@ ETraversalBehaviour CodeGenUnit::foreachModuleEntityPairInStruct(StructClassInfo
 {
 	assert(visitor != nullptr);
 
-	if (_generationModules.get() != nullptr)
+	//Iterate over all generation modules
+	for (CodeGenModule* codeGenModule : _generationModules)
 	{
-		//Iterate over all generation modules
-		for (CodeGenModule* codeGenModule : *_generationModules)
+		//Execute the visitor function on the current struct/class
+		ETraversalBehaviour result = visitor(*codeGenModule, struct_, *this, env);
+
+		if (result != ETraversalBehaviour::Recurse)
 		{
-			//Execute the visitor function on the current struct/class
-			ETraversalBehaviour result = visitor(*codeGenModule, struct_, *this, env);
+			return result;
+		}
 
-			if (result != ETraversalBehaviour::Recurse)
-			{
-				return result;
-			}
+		//Iterate and execute the provided visitor function recursively on all nested entities
+		for (std::shared_ptr<NestedStructClassInfo> const& nestedStruct : struct_.nestedStructs)
+		{
+			result = foreachModuleEntityPairInStruct(*nestedStruct, visitor, env);
 
-			//Iterate and execute the provided visitor function recursively on all nested entities
-			for (std::shared_ptr<NestedStructClassInfo> const& nestedStruct : struct_.nestedStructs)
-			{
-				result = foreachModuleEntityPairInStruct(*nestedStruct, visitor, env);
+			HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
+		}
 
-				HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
-			}
+		for (std::shared_ptr<NestedStructClassInfo> const& nestedClass : struct_.nestedClasses)
+		{
+			result = foreachModuleEntityPairInStruct(*nestedClass, visitor, env);
 
-			for (std::shared_ptr<NestedStructClassInfo> const& nestedClass : struct_.nestedClasses)
-			{
-				result = foreachModuleEntityPairInStruct(*nestedClass, visitor, env);
+			HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
+		}
 
-				HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
-			}
+		for (NestedEnumInfo const& nestedEnum : struct_.nestedEnums)
+		{
+			result = foreachModuleEntityPairInEnum(nestedEnum, visitor, env);
 
-			for (NestedEnumInfo const& nestedEnum : struct_.nestedEnums)
-			{
-				result = foreachModuleEntityPairInEnum(nestedEnum, visitor, env);
+			HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
+		}
 
-				HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
-			}
+		for (FieldInfo const& field : struct_.fields)
+		{
+			result = visitor(*codeGenModule, field, *this, env);
 
-			for (FieldInfo const& field : struct_.fields)
-			{
-				result = visitor(*codeGenModule, field, *this, env);
+			HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
+		}
 
-				HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
-			}
+		for (MethodInfo const& method : struct_.methods)
+		{
+			result = visitor(*codeGenModule, method, *this, env);
 
-			for (MethodInfo const& method : struct_.methods)
-			{
-				result = visitor(*codeGenModule, method, *this, env);
-
-				HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
-			}
+			HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
 		}
 	}
 	
@@ -343,71 +328,49 @@ ETraversalBehaviour CodeGenUnit::foreachModuleEntityPairInEnum(EnumInfo const& e
 {
 	assert(visitor != nullptr);
 
-	if (_generationModules.get() != nullptr)
+	//Iterate over all generation modules
+	for (CodeGenModule* codeGenModule : _generationModules)
 	{
-		//Iterate over all generation modules
-		for (CodeGenModule* codeGenModule : *_generationModules)
+		//Execute the visitor function on the current enum
+		ETraversalBehaviour result = visitor(*codeGenModule, enum_, *this, env);
+
+		if (result != ETraversalBehaviour::Recurse)
 		{
-			//Execute the visitor function on the current enum
-			ETraversalBehaviour result = visitor(*codeGenModule, enum_, *this, env);
+			return result;
+		}
 
-			if (result != ETraversalBehaviour::Recurse)
-			{
-				return result;
-			}
+		//Iterate and execute the provided visitor function recursively on all nested entities
+		for (EnumValueInfo const& enumValue : enum_.enumValues)
+		{
+			result = visitor(*codeGenModule, enumValue, *this, env);
 
-			//Iterate and execute the provided visitor function recursively on all nested entities
-			for (EnumValueInfo const& enumValue : enum_.enumValues)
-			{
-				result = visitor(*codeGenModule, enumValue, *this, env);
-
-				HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
-			}
+			HANDLE_NESTED_ENTITY_ITERATION_RESULT(result);
 		}
 	}
 	
 	return ETraversalBehaviour::Recurse;
 }
 
-bool CodeGenUnit::initializeGenerationModulesIfNecessary() noexcept
-{
-	//Shared_ptr is not initialized yet, so initialize it
-	if (_generationModules.use_count() == 0)
-	{
-		_generationModules = std::make_shared<std::vector<CodeGenModule*>>();
-
-		return true;
-	}
-
-	return false;
-}
-
 void CodeGenUnit::clearGenerationModules() noexcept
 {
-	if (_generationModules.get() != nullptr)
+	if (_isCopy)
 	{
-		if (_isCopy)
+		//Free copied modules
+		for (CodeGenModule* codeGenModule : _generationModules)
 		{
-			//Free copied modules
-			for (CodeGenModule* codeGenModule : *_generationModules)
-			{
-				delete codeGenModule;
-			}
+			delete codeGenModule;
 		}
-
-		_generationModules->clear();
 	}
+
+	_generationModules.clear();
 }
 
 void CodeGenUnit::addModule(CodeGenModule& generationModule) noexcept
 {
-	initializeGenerationModulesIfNecessary();
-	assert(_generationModules.get() != nullptr);
-
 	//Add modules sorted by generation order
-	_generationModules->insert
+	_generationModules.insert
 	(
-		std::upper_bound(_generationModules->begin(), _generationModules->end(), &generationModule, [](CodeGenModule const* lhs, CodeGenModule const* rhs)
+		std::upper_bound(_generationModules.begin(), _generationModules.end(), &generationModule, [](CodeGenModule const* lhs, CodeGenModule const* rhs)
 		{
 			return lhs->getGenerationOrder() < rhs->getGenerationOrder();
 		}),
@@ -417,17 +380,13 @@ void CodeGenUnit::addModule(CodeGenModule& generationModule) noexcept
 
 bool CodeGenUnit::removeModule(CodeGenModule const& generationModule) noexcept
 {
-	//Don't bother looking for something to remove if the generation modules were not initialized
-	if (_generationModules.get() != nullptr)
+	auto it = std::find(_generationModules.cbegin(), _generationModules.cend(), &generationModule);
+
+	if (it != _generationModules.cend())
 	{
-		auto it = std::find(_generationModules->cbegin(), _generationModules->cend(), &generationModule);
+		_generationModules.erase(it);
 
-		if (it != _generationModules->cend())
-		{
-			_generationModules->erase(it);
-
-			return true;
-		}
+		return true;
 	}
 
 	return false;
@@ -440,7 +399,6 @@ CodeGenUnitSettings const* CodeGenUnit::getSettings() const noexcept
 
 CodeGenUnit& CodeGenUnit::operator=(CodeGenUnit const& other) noexcept
 {
-	initializeGenerationModulesIfNecessary();
 	settings = other.settings;
 	logger = other.logger;
 
@@ -454,18 +412,14 @@ CodeGenUnit& CodeGenUnit::operator=(CodeGenUnit const& other) noexcept
 		_isCopy = true;
 	}
 
-	//At this point, there should be no registered module,
-	//but the modules vector should already exist
-	assert(_generationModules.get() != nullptr && _generationModules->empty());
+	//At this point, there should be no registered module
+	assert(_generationModules.empty());
 
 	//Replace each module by a new clone of themself so that
 	//each CodeGenUnit instance owns their own modules
-	if (other._generationModules.get() != nullptr)
+	for (int i = 0; i < other._generationModules.size(); i++)
 	{
-		for (int i = 0; i < other._generationModules->size(); i++)
-		{
-			addModule(*static_cast<CodeGenModule*>((*other._generationModules)[i]->clone()));
-		}
+		addModule(*static_cast<CodeGenModule*>(other._generationModules[i]->clone()));
 	}
 
 	return *this;
