@@ -41,7 +41,7 @@ namespace kodgen
 			*
 			*	@return true if a file could be loaded, else false.
 			*/
-			bool loadSettings(fs::path const&	pathToSettingsFile,
+			bool loadFromFile(fs::path const&	pathToSettingsFile,
 							  ILogger*			logger = nullptr)	noexcept;
 	};
 }

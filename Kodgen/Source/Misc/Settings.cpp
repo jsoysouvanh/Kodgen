@@ -5,7 +5,7 @@
 
 using namespace kodgen;
 
-bool Settings::loadSettings(fs::path const& pathToSettingsFile, ILogger* logger) noexcept
+bool Settings::loadFromFile(fs::path const& pathToSettingsFile, ILogger* logger) noexcept
 {
 	try
 	{
