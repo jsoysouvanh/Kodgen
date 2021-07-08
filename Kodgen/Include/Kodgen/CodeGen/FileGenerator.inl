@@ -106,9 +106,9 @@ FileGenerationResult FileGenerator::generateFiles(FileParserType& fileParser, Co
 		{
 			//Initialize the parsing settings to setup parser compilation arguments.
 			//parsingSettings can't be nullptr since it has been checked in the checkGenerationSetup call.
-			fileParser.parsingSettings->init(logger);
+			fileParser.settings->init(logger);
 
-			generateMacrosFile(*fileParser.parsingSettings, codeGenUnit.getSettings()->getOutputDirectory());
+			generateMacrosFile(*fileParser.settings, codeGenUnit.getSettings()->getOutputDirectory());
 
 			threadCount = getThreadCount(threadCount);
 

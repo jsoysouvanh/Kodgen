@@ -134,7 +134,7 @@ namespace kodgen
 
 		public:
 			/** Settings to use during parsing. */
-			ParsingSettings*	parsingSettings;
+			ParsingSettings*	settings;
 
 			/** Logger used to issue logs from the FileParser. Can be nullptr. */
 			ILogger*			logger			= nullptr;

@@ -1,9 +1,10 @@
 #include <Kodgen/Misc/Filesystem.h>
 #include <Kodgen/Misc/DefaultLogger.h>
+#include <Kodgen/Parsing/FileParser.h>
 #include <Kodgen/CodeGen/FileGenerator.h>
+#include <Kodgen/CodeGen/FileGeneratorSettings.h>
 #include <Kodgen/CodeGen/Macro/MacroCodeGenUnit.h>
 #include <Kodgen/CodeGen/Macro/MacroCodeGenUnitSettings.h>
-#include <Kodgen/CodeGen/FileGeneratorSettings.h>
 
 #include "GetSetCGM.h"
 
@@ -103,7 +104,7 @@ int main(int argc, char** argv)
 		return EXIT_FAILURE;
 	}
 
-	fileParser.parsingSettings = &parsingSettings;
+	fileParser.settings = &parsingSettings;
 
 	//Setup generation settings
 	kodgen::FileGeneratorSettings		fileGenSettings;

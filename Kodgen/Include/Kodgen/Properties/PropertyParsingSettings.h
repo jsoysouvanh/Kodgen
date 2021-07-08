@@ -23,7 +23,7 @@ namespace kodgen
 			char								argumentSeparator		= ',';
 
 			/** Chars used to respectively start and close a group of sub properties. */
-			char								argumentEnclosers[2]	= { '[', ']' };
+			char								argumentEnclosers[2]	= { '(', ')' };
 
 			/** Macro to use to attach properties to a namespace. */
 			std::string							namespaceMacroName		= "Namespace";
