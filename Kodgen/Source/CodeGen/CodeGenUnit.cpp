@@ -60,7 +60,7 @@ bool CodeGenUnit::checkSettings() const noexcept
 			//Before doing anything, make sure the output directory exists
 			//If it doesn't, create it
 
-			//Try to create them is it doesn't exist
+			//Try to create them if it doesn't exist
 			try
 			{
 				fs::create_directories(settings->getOutputDirectory());

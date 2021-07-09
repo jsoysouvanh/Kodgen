@@ -16,15 +16,13 @@
 #include "Kodgen/Misc/Settings.h"
 #include "Kodgen/CodeGen/FileGenerationResult.h"
 #include "Kodgen/CodeGen/CodeGenUnit.h"
+#include <Kodgen/CodeGen/FileGeneratorSettings.h>
 #include "Kodgen/Parsing/FileParser.h"
 #include "Kodgen/Threading/ThreadPool.h"
 #include "Kodgen/Threading/TaskHelper.h"
 
 namespace kodgen
 {
-	//Forward declaration
-	class FileGeneratorSettings;
-
 	class FileGenerator
 	{
 		private:
@@ -104,10 +102,10 @@ namespace kodgen
 
 		public:
 			/** Logger used to issue logs from the FileGenerator. */
-			ILogger*						logger		= nullptr;
+			ILogger*				logger		= nullptr;
 
 			/** Struct containing all generation settings. */
-			FileGeneratorSettings const*	settings	= nullptr;
+			FileGeneratorSettings	settings;
 
 			/**
 			*	@brief	Parse registered files if they were modified since last generation (or don't exist)

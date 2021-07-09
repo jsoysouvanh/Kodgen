@@ -11,7 +11,7 @@ std::set<fs::path> FileGenerator::identifyFilesToProcess(CodeGenUnit const& code
 	std::set<fs::path> result;
 
 	//Iterate over all "toParseFiles"
-	for (fs::path path : settings->getToParseFiles())
+	for (fs::path path : settings.getToParseFiles())
 	{
 		if (fs::exists(path) && !fs::is_directory(path))
 		{
@@ -32,7 +32,7 @@ std::set<fs::path> FileGenerator::identifyFilesToProcess(CodeGenUnit const& code
 	}
 
 	//Iterate over all "toParseDirectories"
-	for (fs::path pathToIncludedDir : settings->getToParseDirectories())
+	for (fs::path pathToIncludedDir : settings.getToParseDirectories())
 	{
 		if (fs::exists(pathToIncludedDir) && fs::is_directory(pathToIncludedDir))
 		{
@@ -45,8 +45,8 @@ std::set<fs::path> FileGenerator::identifyFilesToProcess(CodeGenUnit const& code
 				{
 					if (entry.is_regular_file())
 					{
-						if (settings->getSupportedExtensions().find(entry.path().extension().string()) != settings->getSupportedExtensions().cend() &&	//supported extension
-							settings->getIgnoredFiles().find(entry.path()) == settings->getIgnoredFiles().cend())								//file is not ignored
+						if (settings.getSupportedExtensions().find(entry.path().extension().string()) != settings.getSupportedExtensions().cend() &&	//supported extension
+							settings.getIgnoredFiles().find(entry.path()) == settings.getIgnoredFiles().cend())								//file is not ignored
 						{
 							if (!codeGenUnit.isUpToDate(entry.path()) || forceRegenerateAll)
 							{
@@ -58,7 +58,7 @@ std::set<fs::path> FileGenerator::identifyFilesToProcess(CodeGenUnit const& code
 							}
 						}
 					}
-					else if (entry.is_directory() && settings->getIgnoredDirectories().find(entry.path()) != settings->getIgnoredDirectories().cend())	//directory is ignored
+					else if (entry.is_directory() && settings.getIgnoredDirectories().find(entry.path()) != settings.getIgnoredDirectories().cend())	//directory is ignored
 					{
 						//Don't iterate on ignored directory content
 						directoryIt.disable_recursion_pending();
@@ -115,30 +115,20 @@ void FileGenerator::generateMacrosFile(ParsingSettings const& parsingSettings, f
 	macrosDefinitionFile.writeLine("\n#endif");
 }
 
-bool FileGenerator::checkGenerationSetup(FileParser const& fileParser, CodeGenUnit const& codeGenUnit) const noexcept
+bool FileGenerator::checkGenerationSetup(FileParser const& /* fileParser */, CodeGenUnit const& codeGenUnit) const noexcept
 {
 	bool canLog	= logger != nullptr;
-	bool result	= codeGenUnit.checkSettings() && fileParser.checkSettings();
 	
-	if (settings == nullptr)
+	if (CodeGenUnitSettings const* codeGenUnitSettings = codeGenUnit.getSettings())
 	{
-		if (canLog)
-		{
-			logger->log("FileGenerator settings have not been set.", ILogger::ELogSeverity::Error);
-		}
-
-		result &= false;
-	}
-	else if (CodeGenUnitSettings const* codeGenUnitSettings = codeGenUnit.getSettings())
-	{
-		auto const& ignoredDirectories = settings->getIgnoredDirectories();
+		auto const& ignoredDirectories = settings.getIgnoredDirectories();
 
 		//Emit a warning if the output directory content is going to be parsed
 		if (fs::exists(codeGenUnitSettings->getOutputDirectory()) &&											//abort check if the output directory doesn't exist
 			!fs::is_empty(codeGenUnitSettings->getOutputDirectory()) &&											//abort check if the output directory contains no file
 			ignoredDirectories.find(codeGenUnitSettings->getOutputDirectory()) == ignoredDirectories.cend())	//abort check if the output directory is already ignored
 		{
-			for (fs::path const& parsedDirectory : settings->getToParseDirectories())
+			for (fs::path const& parsedDirectory : settings.getToParseDirectories())
 			{
 				if (FilesystemHelpers::isChildPath(codeGenUnitSettings->getOutputDirectory(), parsedDirectory))
 				{
@@ -153,5 +143,5 @@ bool FileGenerator::checkGenerationSetup(FileParser const& fileParser, CodeGenUn
 		}
 	}
 	
-	return result;
+	return codeGenUnit.checkSettings();
 }

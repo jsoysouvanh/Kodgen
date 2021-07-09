@@ -10,7 +10,7 @@ using namespace kodgen;
 
 FileParser::FileParser() noexcept:
 	_clangIndex{clang_createIndex(0, 0)},
-	settings{nullptr},
+	_settings{std::make_shared<ParsingSettings>()},
 	logger{nullptr}
 {
 }
@@ -18,7 +18,7 @@ FileParser::FileParser() noexcept:
 FileParser::FileParser(FileParser const& other) noexcept:
 	NamespaceParser(other),
 	_clangIndex{clang_createIndex(0, 0)},	//Don't copy clang index, create a new one
-	settings{other.settings},
+	_settings{other._settings},
 	logger{other.logger}
 {
 }
@@ -27,7 +27,7 @@ FileParser::FileParser(FileParser&& other) noexcept:
 	NamespaceParser(std::forward<NamespaceParser>(other)),
 	_clangIndex{std::forward<CXIndex>(other._clangIndex)},
 	_propertyParser(std::forward<PropertyParser>(other._propertyParser)),
-	settings{other.settings},
+	_settings{other._settings},
 	logger{other.logger}
 {
 	other._clangIndex = nullptr;
@@ -41,24 +41,9 @@ FileParser::~FileParser() noexcept
 	}
 }
 
-bool FileParser::checkSettings() const noexcept
-{
-	if (settings == nullptr)
-	{
-		if (logger != nullptr)
-		{
-			logger->log("FileParser::parsingSettings have not been set.", ILogger::ELogSeverity::Error);
-		}
-
-		return false;
-	}
-
-	return true;
-}
-
 bool FileParser::parse(fs::path const& toParseFile, FileParsingResult& out_result) noexcept
 {
-	assert(settings != nullptr);
+	assert(_settings.use_count() != 0);
 
 	bool isSuccess = false;
 
@@ -70,7 +55,7 @@ bool FileParser::parse(fs::path const& toParseFile, FileParsingResult& out_resul
 		out_result.parsedFile = toParseFile;
 
 		//Parse the given file
-		CXTranslationUnit translationUnit = clang_parseTranslationUnit(_clangIndex, toParseFile.string().c_str(), settings->getCompilationArguments().data(), static_cast<int32>(settings->getCompilationArguments().size()), nullptr, 0, CXTranslationUnit_SkipFunctionBodies | CXTranslationUnit_Incomplete | CXTranslationUnit_KeepGoing);
+		CXTranslationUnit translationUnit = clang_parseTranslationUnit(_clangIndex, toParseFile.string().c_str(), _settings->getCompilationArguments().data(), static_cast<int32>(_settings->getCompilationArguments().size()), nullptr, 0, CXTranslationUnit_SkipFunctionBodies | CXTranslationUnit_Incomplete | CXTranslationUnit_KeepGoing);
 
 		if (translationUnit != nullptr)
 		{
@@ -93,7 +78,7 @@ bool FileParser::parse(fs::path const& toParseFile, FileParsingResult& out_resul
 			//There should not have any context left once parsing has finished
 			assert(contextsStack.empty());
 
-			if (settings->shouldLogDiagnostic)
+			if (_settings->shouldLogDiagnostic)
 			{
 				logDiagnostic(translationUnit);
 			}
@@ -163,14 +148,14 @@ CXChildVisitResult FileParser::parseNestedEntity(CXCursor cursor, CXCursor /* pa
 
 ParsingContext& FileParser::pushContext(CXTranslationUnit const& translationUnit, FileParsingResult& out_result) noexcept
 {
-	_propertyParser.setup(settings->propertyParsingSettings);
+	_propertyParser.setup(_settings->propertyParsingSettings);
 
 	ParsingContext newContext;
 
 	newContext.parentContext	= nullptr;
 	newContext.rootCursor		= clang_getTranslationUnitCursor(translationUnit);
 	newContext.propertyParser	= &_propertyParser;
-	newContext.parsingSettings	= settings;
+	newContext.parsingSettings	= _settings.get();
 	newContext.structClassTree	= &out_result.structClassTree;
 	newContext.parsingResult	= &out_result;
 

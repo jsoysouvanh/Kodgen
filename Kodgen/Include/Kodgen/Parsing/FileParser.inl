@@ -9,3 +9,11 @@ inline FileParsingResult* FileParser::getParsingResult() noexcept
 {
 	return reinterpret_cast<FileParsingResult*>(getContext().parsingResult);
 }
+
+inline ParsingSettings& FileParser::getSettings() noexcept
+{
+	//The _settings pointer should ALWAYS holds a reference (created at construction)
+	assert(_settings.use_count() != 0);
+
+	return *_settings;
+}

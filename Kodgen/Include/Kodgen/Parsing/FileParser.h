@@ -9,6 +9,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>	//std::shared_ptr
 
 #include <clang-c/Index.h>
 
@@ -23,15 +24,15 @@ namespace kodgen
 {
 	class FileParser : public NamespaceParser
 	{
-		//Friend the factory to allow setup of logger & parsing settings
-		friend class FileParserFactoryBase;
-
 		private:
 			/** Index used internally by libclang to process a translation unit. */
-			CXIndex			_clangIndex;
+			CXIndex								_clangIndex;
 
 			/** Property parser used to parse properties of all entities. */
-			PropertyParser	_propertyParser;		
+			PropertyParser						_propertyParser;		
+
+			/** Settings to use during parsing. */
+			std::shared_ptr<ParsingSettings>	_settings;
 
 			/**
 			*	@brief This method is called at each node (cursor) of the parsing.
@@ -133,23 +134,13 @@ namespace kodgen
 			virtual void postParse(fs::path const& parseFile, FileParsingResult const& result)	noexcept;
 
 		public:
-			/** Settings to use during parsing. */
-			ParsingSettings*	settings;
-
 			/** Logger used to issue logs from the FileParser. Can be nullptr. */
-			ILogger*			logger			= nullptr;
+			ILogger*			logger	= nullptr;
 
 			FileParser()					noexcept;
 			FileParser(FileParser const&)	noexcept;
 			FileParser(FileParser&&)		noexcept;
 			virtual ~FileParser()			noexcept;
-
-			/**
-			*	@brief Check that all the settings are valid to parse files.
-			* 
-			*	@return true if all settings are valid, else false.
-			*/
-			virtual bool	checkSettings()									const	noexcept;
 
 			/**
 			*	@brief Parse the file and fill the FileParsingResult.
@@ -159,8 +150,15 @@ namespace kodgen
 			*
 			*	@return true if the parsing process finished without error, else false
 			*/
-			bool			parse(fs::path const&					toParseFile,
-								  FileParsingResult&				out_result)		noexcept;				
+			bool					parse(fs::path const&					toParseFile,
+										  FileParsingResult&				out_result)		noexcept;
+
+			/**
+			*	@brief Getter for _settings field.
+			* 
+			*	@return _settings.
+			*/
+			inline ParsingSettings&	getSettings()											noexcept;
 	};
 
 	#include "Kodgen/Parsing/FileParser.inl"

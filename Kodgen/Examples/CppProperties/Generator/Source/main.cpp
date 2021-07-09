@@ -2,7 +2,6 @@
 #include <Kodgen/Misc/DefaultLogger.h>
 #include <Kodgen/Parsing/FileParser.h>
 #include <Kodgen/CodeGen/FileGenerator.h>
-#include <Kodgen/CodeGen/FileGeneratorSettings.h>
 #include <Kodgen/CodeGen/Macro/MacroCodeGenUnit.h>
 #include <Kodgen/CodeGen/Macro/MacroCodeGenUnitSettings.h>
 
@@ -96,21 +95,19 @@ int main(int argc, char** argv)
 	kodgen::FileParser fileParser;
 	fileParser.logger = &logger;
 
-	kodgen::ParsingSettings parsingSettings;
-
-	if (!initParsingSettings(parsingSettings))
+	if (!initParsingSettings(fileParser.getSettings()))
 	{
 		logger.log("Compiler could not be set because it is not supported on the current machine or vswhere could not be found (Windows|MSVC only).", kodgen::ILogger::ELogSeverity::Error);
 		return EXIT_FAILURE;
 	}
 
-	fileParser.settings = &parsingSettings;
+	//Setup file generator
+	kodgen::FileGenerator fileGenerator;
+	fileGenerator.logger = &logger;
 
-	//Setup generation settings
-	kodgen::FileGeneratorSettings		fileGenSettings;
-	kodgen::MacroCodeGenUnitSettings	cguSettings;
+	kodgen::MacroCodeGenUnitSettings cguSettings;
 
-	initGenerationSettings(workingDirectory, fileGenSettings, cguSettings);
+	initGenerationSettings(workingDirectory, fileGenerator.settings, cguSettings);
 
 	//Setup code generation unit
 	kodgen::MacroCodeGenUnit codeGenUnit;
@@ -119,11 +116,6 @@ int main(int argc, char** argv)
 
 	GetSetCGM getSetCodeGenModule;
 	codeGenUnit.addModule(getSetCodeGenModule);
-
-	//Setup file generator
-	kodgen::FileGenerator fileGenerator;
-	fileGenerator.logger = &logger;
-	fileGenerator.settings = &fileGenSettings;
 
 	//Kick-off code generation
 	kodgen::FileGenerationResult genResult = fileGenerator.generateFiles(fileParser, codeGenUnit, true);
