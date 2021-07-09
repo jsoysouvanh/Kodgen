@@ -19,7 +19,7 @@ CodeGenUnit::CodeGenUnit(CodeGenUnit const& other) noexcept:
 {
 	//Replace each module by a new clone of themself so that
 	//each CodeGenUnit instance owns their own modules
-	for (int i = 0; i < other._generationModules.size(); i++)
+	for (size_t i = 0; i < other._generationModules.size(); i++)
 	{
 		addModule(*static_cast<CodeGenModule*>(other._generationModules[i]->clone()));
 	}
@@ -417,7 +417,7 @@ CodeGenUnit& CodeGenUnit::operator=(CodeGenUnit const& other) noexcept
 
 	//Replace each module by a new clone of themself so that
 	//each CodeGenUnit instance owns their own modules
-	for (int i = 0; i < other._generationModules.size(); i++)
+	for (size_t i = 0; i < other._generationModules.size(); i++)
 	{
 		addModule(*static_cast<CodeGenModule*>(other._generationModules[i]->clone()));
 	}
